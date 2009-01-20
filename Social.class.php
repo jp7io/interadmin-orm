@@ -22,7 +22,7 @@ class Social {
 			'url' => 'http://digg.com/submit?phase=2&url=%url%&title=%title%',
 		),
 		'live' => array(
-			'title' => 'Live',
+			'title' => 'Windows Live',
 			// Idioma na string (mkt = pt-br)
 			'url' => 'https://favorites.live.com/quickadd.aspx?marklet=1&mkt=pt-br&url=%url%&title=%title%&top=1',
 		),
@@ -30,15 +30,30 @@ class Social {
 	);
 	private $extendedSocials = array (
 		'twitter' => 'Twitter',
-		'linkedin' => 'LinkedIn',
-		'facebook' => 'Facebook',
-		'myspace' => 'MySpace',
+		'linkedin' => array(
+			'title' => 'LinkedIn',
+			'url' => 'http://www.linkedin.com/shareArticle?mini=true&url=%url%&title=%title%&summary=&source=',
+		),
+		'facebook' => array(
+			'title' => 'Facebook',
+			'url' => 'http://www.facebook.com/share.php?u=%url%',
+		),
+		'myspace' => array(
+			'title' => 'MySpace',
+			'url' => 'http://www.myspace.com/Modules/PostTo/Pages/?l=3&u=%url%&t=%title%&c=',
+		),
 		'slashdot' => 'Slashdot',
 		'ask' => 'Ask',
 		'blinklist' => 'Blinklist',
 		'multiply' => 'Multiply',
-		'technorati' => 'Technorati',
-		'yahoobkm' => 'Yahoo Bookmarks',
+		'technorati' => array(
+			'title' => 'Technorati',
+			'url' => 'http://www.technorati.com/faves?add=%url%',
+		),
+		'yahoobkm' => array(
+			'title' => 'Yahoo Bookmarks',
+			'url' => 'http://bookmarks.yahoo.com/toolbar/savebm?opener=tb&u=%url%&t=%title%',
+		),
 	);
 	private $otherSocials = array (
 		'propeller' => 'Propeller',
@@ -94,7 +109,7 @@ class Social {
 			if (array_key_exists($item, $this->allSocials)) {
 				$this->displaySocials[$item] = $this->allSocials[$item];
 			} else {
-				exit ('This social does not exist.');
+				exit ('The social "' . $item . '" not exists.');
 			}
 		}
 	}
@@ -162,7 +177,7 @@ class Social {
 		$html = '<div id="bookmark">' . "\n";
 		$html .= '<ul>' . "\n";
 		$count = 1;
-		foreach($this->displaySocials as $key=>$value) {
+		foreach($this->displaySocials as $key => $value) {
 			if (is_array($value)) {
 				$value['url'] = str_replace('%url%', urlencode(utf8_encode($url)), $value['url']);
 				$value['url'] = str_replace('%title%', urlencode(utf8_encode($title)), $value['url']);
@@ -173,12 +188,14 @@ class Social {
 			}
 
 			if($count == $limiter) {
-				$html .= '</ul>' . "\n" . '<ul>' . "\n";
+				$html .= '</ul>' . "\n";
+				$html .= '<ul>' . "\n";
 				$count = 0;
 			}
 			$count++;
 		}
 		$html .= '</ul>' . "\n";
+		$html .= '<div style="clear: both;"></div>' . "\n";
 		$html .= '</div>' . "\n";
 
 		return $html;
