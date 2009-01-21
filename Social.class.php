@@ -181,10 +181,10 @@ class Social {
 			if (is_array($value)) {
 				$value['url'] = str_replace('%url%', urlencode(utf8_encode($url)), $value['url']);
 				$value['url'] = str_replace('%title%', urlencode(utf8_encode($title)), $value['url']);
-				$html .= '<li class="at15t at15t_' . $key . '"><a href="' . $value['url'] . '" target="' . $target . '">' . $value['title'] . '</a></li>' . "\n";
+				$html .= '<li class="at15t at15t_' . $key . '"><a href="' . $value['url'] . '" id="social_' . $key . '" target="' . $target . '">' . $value['title'] . '</a></li>' . "\n";
 			} else {
 				#$html .= '<li><a href="javascript:sets(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";
-				$html .= '<li><a href="javascript:void(0);" onclick="return addthis_sendto(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";
+				$html .= '<li><a href="javascript:void(0);" id="social_' . $key . '" onclick="return addthis_sendto(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";
 			}
 
 			if($count == $limiter) {
