@@ -101,8 +101,15 @@ class InterAdmin{
 		if (!$this->_tipo) $this->getTipo();
 		if ($lang->prefix) $tipoLanguage = $this->_tipo->getFieldsValues('language');
 		if ($fields == '*') $fields = $this->_tipo->getAllFieldsNames(); 
-		$fieldsValues = jp7_fields_values($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
-		 
+		
+		$rs = $this->_tipo->executeQuery(array(
+			'fields' => (array) $fields,
+			'from' => $this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : '') . " AS main",
+			'where' => "main.id = " . $this->id
+		));
+		
+		$fieldsValues = $rs->FetchNextObj();
+		
 		// Force As String - Kept for backwards compatibility
 		if ($forceAsString) {
 			foreach((array)$fieldsValues as $key=>$value) {
