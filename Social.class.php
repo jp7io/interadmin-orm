@@ -203,49 +203,34 @@ class Social {
 	/* Bookmarking */
 
 	/* Send to a friend */
-	public function displaySendFriend ($url = FALSE, $title = '', /*$action = '../social/sendFriend.php', $target = '_parent',*/ $template = array (
-		'form' => 'global',
-		'mail' => 'global',
-		'success' => 'global',
-		'fail' => 'global',
-	),
-	$messages = array (
-		'legend' => 'Envie para um amigo',
-		'yourName' => 'Seu nome:',
-		'yourMail' => 'Seu e-mail:',
-		'friendMail' => 'Enviar para:',
-		'friendMailLabel' => '(separe os e-mails com vírgula)',
-		'friendComment' => 'Comentário:',
-		'send' => 'Enviar',
-	)) {
+	public function displaySendFriend ($id_tipo, $url = FALSE, $title = '', $template = 'default') {
+		
 		// Set the default configuration
 		if (!$url) {
 			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
-		switch ($template['form']) {
-			case 'global':
-				$template['form'] = jp7_path_find('../../_default/site/_templates/social_sendfriend/form.htm');
-				break;
-			default:
-				$template['form'] = jp7_path_find($template['form']);
+		
+		echo '<div id="sendfriend">';
+		echo '<form id="interadminForm">';
+		echo '<input type="hidden" name="sendfriend_url" value="' . $url . '" />';
+		echo '<input type="hidden" name="sendfriend_title" value="' . $title . '" />';
+		echo '<input type="hidden" name="sendfriend_template" value="' . $template . '" />';
+		echo '<table class="form">';
+		
+		$form = new InterAdminTipo($id_tipo);
+		$fields = $form->getCampos();
+		
+		foreach ($fields as $field) {
+			interadmin_returnCampo($field);
 		}
-
-		$html = file_get_contents($template['form']);
-		#$html = str_replace('%action%', $action, $html);
-		#$html = str_replace('%target%', $target, $html);
-		$html = str_replace('%template%', $template['mail'], $html);
-		$html = str_replace('%success%', $template['success'], $html);
-		$html = str_replace('%fail%', $template['fail'], $html);
-		$html = str_replace('%url%', $url, $html);
-		$html = str_replace('%title%', $title, $html);
-		$html = str_replace('%yourName%', $messages['yourName'], $html);
-		$html = str_replace('%yourMail%', $messages['yourMail'], $html);
-		$html = str_replace('%friendMail%', $messages['friendMail'], $html);
-		$html = str_replace('%friendMailLabel%', $messages['friendMailLabel'], $html);
-		$html = str_replace('%friendComment%', $messages['friendComment'], $html);
-		$html = str_replace('%send%', $messages['send'], $html);
-
-		return $html;
+		
+		echo '<tr>';
+		echo '<td></td>';
+		echo '<td><input type="button" value="ENVIAR" id="sendfriend_send" /></td>';
+		echo '</tr>';
+		echo '</table>';
+		echo '</form>';
+		echo '</div>';
 	}
 	/* Send to a friend */
 
