@@ -212,9 +212,9 @@ class Social {
 		
 		echo '<div id="sendfriend">';
 		echo '<form id="interadminForm">';
-		echo '<input type="hidden" name="sendfriend_url" value="' . $url . '" />';
-		echo '<input type="hidden" name="sendfriend_title" value="' . $title . '" />';
-		echo '<input type="hidden" name="sendfriend_template" value="' . $template . '" />';
+		echo '<input type="hidden" name="url" value="' . $url . '" />';
+		echo '<input type="hidden" name="title" value="' . $title . '" />';
+		echo '<input type="hidden" name="template" value="' . $template . '" />';
 		echo '<table class="form">';
 		
 		$form = new InterAdminTipo($id_tipo);
