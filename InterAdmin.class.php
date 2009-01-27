@@ -105,7 +105,7 @@ class InterAdmin{
 		$rs = $this->_tipo->executeQuery(array(
 			'fields' => (array) $fields,
 			'from' => $this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : '') . " AS main",
-			'where' => "main.id = " . $this->id
+			'where' => "main.id = " . intval($this->id)
 		));
 		
 		$fieldsValues = $rs->FetchNextObj();
@@ -121,8 +121,13 @@ class InterAdmin{
 					}
 					$value = implode(', ', $str_arr);
 				}
-				$alias = ($fields_alias) ? $this->_tipo->getCamposAlias($key) : $key;
-				$this->$alias = $value;
+				if ($fields_alias) {
+					$alias = $this->_tipo->getCamposAlias($key);
+					unset($fieldsValues->$key);
+				} else {
+					$alias = $key;
+				}
+				$this->$alias = $fieldsValues->$alias = $value;
 			}
 		} else {
 			$this->_tipo->putOrmData($this, $fieldsValues, array(
@@ -201,9 +206,8 @@ class InterAdmin{
 	 */
 	public function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
-		if ($this->parent_id || $this->getFieldsValues('parent_id')) {
-			return $this->_parent = InterAdmin::getInstance($this->parent_id, $options);
-		}
+		if (!$this->parent_id) $this->getFieldsValues('parent_id');
+		return $this->_parent = InterAdmin::getInstance($this->parent_id, $options);
 	}
 	/**
 	 * Sets the parent InterAdmin object for this record, changing the $_parent property.

@@ -332,8 +332,9 @@ class InterAdminTipo{
 				$joinCount++;
 			}
 			$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
-			$object->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]['xtra']);
-
+			$object->$alias = $row->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]['xtra']);
+			if ($options['fields_alias']) unset($row->$field);
+			
 			if (is_object($object->$alias) && is_array($options['fields'][$field])) {
 				foreach($options['fields'][$field] as $joinField) {
 					$joinAlias = ($options['fields_alias']) ? $campos[$field]['nome']->getCamposAlias($joinField) : $joinField;
