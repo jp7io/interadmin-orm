@@ -254,7 +254,7 @@ class InterSite extends InterAdmin {
 						break;
 					}
 				// InterAdmin Remote
-				} elseif (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
+				} elseif ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
 					$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
 					break;
 				}
