@@ -221,7 +221,9 @@ class Social {
 		$fields = $form->getCampos();
 		
 		foreach ($fields as $field) {
-			interadmin_returnCampo($field);
+			if ($field['tipo'] != 'varchar_key') { // Must be different from URL field
+				interadmin_returnCampo($field);
+			}
 		}
 		
 		echo '<tr>';
