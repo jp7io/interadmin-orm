@@ -61,7 +61,7 @@ class InterSite extends InterAdmin {
 				'fields_alias' => TRUE
 			);
 			$server->db = new InterAdmin($server->db->id, $options);
-			$type = new InterAdmin($server->db->type, array('fields' => 'varchar_1'));
+			$type = new InterAdmin($server->db->type->id, array('fields' => 'varchar_1'));
 			$server->db->type = $type->varchar_1;
 			// Aliases
 			$aliasesObj = $server->getChildren(31, array('fields' => 'varchar_key'));
@@ -152,7 +152,7 @@ class InterSite extends InterAdmin {
 				$cookie = '';
 				// Login required
 				if ($pos1 !== FALSE) {
-					$WS_parameters = 'user=jp7_jp&pass=jpb5727';
+					$WS_parameters = 'user=jp7_jp&pass=naocolocar';
 					$content_2 = $this->_socketRequest($server->host, '/_admin/login/login.php', $WS_parameters, 'POST', 'http://' . $server->host . '/_admin/login/index.php');
 					$content_header = explode('\r\n\r\n', $content_2);
 					$pos1_str = 'Set-Cookie: ';
