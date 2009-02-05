@@ -124,7 +124,7 @@ class Social {
 		}
 	}
 
-	public function newSocialBookmark ($theme = 'main', $add = array (), $remove = array ()) {
+	public function newBookmark ($theme = 'main', $add = array (), $remove = array ()) {
 		// Create a social
 		Social::createSocial ($theme);
 
