@@ -210,29 +210,32 @@ class Social {
 			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
 		
-		echo '<div id="sendfriend">';
-		echo '<form id="interadminForm">';
-		echo '<input type="hidden" name="url" value="' . $url . '" />';
-		echo '<input type="hidden" name="title" value="' . $title . '" />';
-		echo '<input type="hidden" name="template" value="' . $template . '" />';
-		echo '<table class="form">';
+		$html = '<form id="interadminForm">' . "\n";
+		$html .= '<input type="hidden" name="url" value="' . $url . '" />' . "\n";
+		$html .= '<input type="hidden" name="title" value="' . $title . '" />' . "\n";
+		$html .= '<input type="hidden" name="template" value="' . $template . '" />' . "\n";
+		$html .= '<table class="form">' . "\n";
 		
 		$form = new InterAdminTipo($id_tipo);
 		$fields = $form->getCampos();
 		
+		ob_start();
 		foreach ($fields as $field) {
 			if ($field['tipo'] != 'varchar_key') { // Must be different from URL field
 				interadmin_returnCampo($field);
 			}
 		}
+		$html .= ob_get_contents();
+		ob_end_clean();
 		
-		echo '<tr>';
-		echo '<td></td>';
-		echo '<td><input type="button" value="ENVIAR" id="sendfriend_send" /></td>';
-		echo '</tr>';
-		echo '</table>';
-		echo '</form>';
-		echo '</div>';
+		$html .= '<tr>' . "\n";
+		$html .= '<td></td>' . "\n";
+		$html .= '<td><input type="button" value="ENVIAR" id="sendfriend_send" /></td>' . "\n";
+		$html .= '</tr>' . "\n";
+		$html .= '</table>' . "\n";
+		$html .= '</form>' . "\n";
+		
+		return $html;
 	}
 	/* Send to a friend */
 
