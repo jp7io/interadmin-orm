@@ -46,7 +46,7 @@ class InterSite extends InterAdmin {
 		}
 		foreach ((array) $servers as $server) {
 			// Variaveis do server
-			$server_vars = $server->getChildren(39, array( 'fields' => array( 'select_key', 'varchar_1')));
+			$server_vars = $server->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
 			$server->vars = NULL;
 			foreach((array) $server_vars as $var) {
 				$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
@@ -135,14 +135,17 @@ class InterSite extends InterAdmin {
 			$fieldsValuesDB = '';
 			if ($server->type != 'Desenvolvimento') {
 				if (!$server->ftp) $server->ftp = $server->host;
-				$conn_id = ftp_connect($server->ftp); 
+				$conn_id = @ftp_connect($server->ftp); 
 				$login_result = @ftp_login($conn_id, $server->user, $server->pass);
 				if ($login_result) {
+					echo '<div class="configok">Conectado com FTP: ' .  $server->ftp . '</div>';
 					$fieldsValues = array(
 						'varchar_5' => ftp_systype($conn_id),
 						'date_1' => date('Y-m-d H:i:s'),
 						'char_1' => $login_result
 					);
+				} else {
+					echo '<div class="configerror">Erro de conexão com FTP: ' .  $server->ftp . '</div>';
 				}
 				@ftp_close($conn_id);
 				// PHP Info
@@ -168,53 +171,60 @@ class InterSite extends InterAdmin {
 					$content = $this->_socketRequest($server->host, '/_admin/phpinfo_manual.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
 					$content = str_replace("phpversion:", "PHP Version", $content);
 				}
-				// Preparing to update file
-				$pos1 = strpos($content, '<html>') + strlen('<html>');
-				$pos2 = strpos($content, '</html>', $pos1);
-				$fieldsValues['text_1'] = substr($content, $pos1, $pos2 - $pos1);
-				// Getting only the <body>
-				$pos1_str = '<body>';
-				$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
-				$pos2 = strpos($content, '</body>', $pos1);
-				$content = substr($content, $pos1, $pos2 - $pos1);
-				// Table to array conversion
-				$content = str_replace("</tr>", "{;}", $content);
-				$content = str_replace("</td>", "{,}", $content);
-				$content = strip_tags($content);
-				$arr = explode('{;}', $content);
-				// Getting PHP Version
-				$pos1_str = 'PHP Version';
-				$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
-				$pos2 = strpos($content, "\n", $pos1);
-				$php = substr($content, $pos1, $pos2-$pos1);
-				$server->phpinfo = NULL;
-				$server->phpinfo['PHP'] = trim($php, " \r\n\t");
-				// Sets other parameters
-				$parameters = array('PHP', 'host', 'SERVER_ADDR', 'LOCAL_ADDR', 'register_globals', 'GD Version', 'MySQL', 'MySQL Version');
-				foreach ($arr as $value) {
-					$value_arr = explode('{,}', $value);
-					foreach ((array)$value_arr as $position=>$parameter) {
-						$parameter = trim($parameter, " \r\n\t");
-						if (in_array($parameter, $parameters)) {
-							$server->phpinfo[$parameter] = $value_arr[$position + 1];
+				if ($content) { 
+					echo '<div class="configok">Arquivo phpinfo.php lido.</div>';
+					// Preparing to update file
+					$pos1 = strpos($content, '<html>') + strlen('<html>');
+					$pos2 = strpos($content, '</html>', $pos1);
+					$fieldsValues['text_1'] = substr($content, $pos1, $pos2 - $pos1);
+					// Getting only the <body>
+					$pos1_str = '<body>';
+					$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
+					$pos2 = strpos($content, '</body>', $pos1);
+					$content = substr($content, $pos1, $pos2 - $pos1);
+					// Table to array conversion
+					$content = str_replace("</tr>", "{;}", $content);
+					$content = str_replace("</td>", "{,}", $content);
+					$content = strip_tags($content);
+					$arr = explode('{;}', $content);
+					// Getting PHP Version
+					$pos1_str = 'PHP Version';
+					$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
+					$pos2 = strpos($content, "\n", $pos1);
+					$php = substr($content, $pos1, $pos2-$pos1);
+					$server->phpinfo = NULL;
+					$server->phpinfo['PHP'] = trim($php, " \r\n\t");
+					// Sets other parameters
+					$parameters = array('PHP', 'host', 'SERVER_ADDR', 'LOCAL_ADDR', 'register_globals', 'GD Version', 'MySQL', 'MySQL Version');
+					foreach ($arr as $value) {
+						$value_arr = explode('{,}', $value);
+						foreach ((array)$value_arr as $position=>$parameter) {
+							$parameter = trim($parameter, " \r\n\t");
+							if (in_array($parameter, $parameters)) {
+								$server->phpinfo[$parameter] = $value_arr[$position + 1];
+							}
 						}
 					}
+					$fieldsValues['varchar_6'] = $server->phpinfo['PHP'];
+					
+				} else {
+					echo '<div class="configerror">Não foi possível abrir phpinfo.php.</div>';
 				}
-				$fieldsValues['varchar_6'] = $server->phpinfo['PHP'];
 				// Saving FTP and PHP Info data		
 				if ($fieldsValues) {
-					jp7_print_r($fieldsValues);
+					//jp7_print_r($fieldsValues);
 					$server->setFieldsValues($fieldsValues, TRUE);
 				}
-					
+				
 				// DB
 				$dsn = (($server->db->type) ? $server->db->type : 'mysql') . ':host='.$server->db->host;
 				try {
 		    		$server_db_conn = new PDO($dsn, $server->db->user, $server->db->pass);
 				} catch (PDOException $e) {
-					echo 'Connection failed: ' . $e->getMessage();
+					echo '<div class="configerror">Erro de conexão com DB: ' . $server->db->host . ' - ' . $e->getMessage() . '</div>';
 				}
 				if ($server_db_conn) {
+					echo '<div class="configok">Conectado com DB: ' . $server->db->host . '</div>';
 					if ($server->db->type == 'mssql') $db_select = "(CAST(SERVERPROPERTY('productversion') as varchar(255)) + ' - ' + CAST(SERVERPROPERTY('productlevel') as varchar(255)) + ' - ' + CAST(SERVERPROPERTY('edition') as varchar(255)))";
 					else $db_select = "Version()";
 					$ver_result = $server_db_conn->prepare("SELECT " . $db_select . " AS version"); 
@@ -225,7 +235,7 @@ class InterSite extends InterAdmin {
 						'date_1' => date('Y-m-d H:i:s'),
 						'char_1' => $login_result
 					);
-					jp7_print_r($fieldsValuesDB);
+					//jp7_print_r($fieldsValuesDB);
 					$server->db->setFieldsValues($fieldsValuesDB);
 				}
 			}
