@@ -332,7 +332,7 @@ class InterAdminTipo{
 				$joinCount++;
 			}
 			$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
-			$object->$alias = $row->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]['xtra']);
+			$object->$alias = $row->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]);
 			if ($options['fields_alias']) unset($row->$field);
 			
 			if (is_object($object->$alias) && is_array($options['fields'][$field])) {
@@ -340,7 +340,7 @@ class InterAdminTipo{
 					$joinAlias = ($options['fields_alias']) ? $campos[$field]['nome']->getCamposAlias($joinField) : $joinField;
 					$joinCampos = $campos[$field]['nome']->getCampos();
 					$rowField = 'join' . $joinCount . '_' . $joinField;
-					$object->$alias->$joinAlias = $this->getByForeignKey($row->$rowField, $joinField, $joinCampos[$joinField]['xtra']);
+					$object->$alias->$joinAlias = $this->getByForeignKey($row->$rowField, $joinField, $joinCampos[$joinField]);
 				}
 			}
 		}
@@ -350,16 +350,16 @@ class InterAdminTipo{
 	 * 
 	 * @param mixed $value Any value.
 	 * @param string $field The name of the field.
-	 * @param string $xtra Xtra value of the field.
+	 * @param string $campos Value from getCampos().
 	 * @return mixed The object created by the key or the value itself.
 	 */
-	public function getByForeignKey(&$value, $field, $xtra = ''){
+	public function getByForeignKey(&$value, $field, $campos = ''){
 		if (strpos($field, 'select_') === 0) {
 			if (strpos($field, 'select_multi') === 0) {
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
-					if ($xtra === 'S') {
+					if ($campos['xtra'] === 'S') {
 						$value_arr[$key2] = InterAdminTipo::getInstance($value2);
 					} else {
 						$value_arr[$key2] = InterAdmin::getInstance($value2);
@@ -367,10 +367,13 @@ class InterAdminTipo{
 				}
 				$value = $value_arr;
 			} elseif($value && is_numeric($value)) {
-				if ($xtra === 'S') {
+				if ($campos['xtra'] === 'S') {
 					$value = InterAdminTipo::getInstance($value);
 				} else {
-					$value = InterAdmin::getInstance($value);
+					$options = array(
+						'table' => ($campos['nome']->tabela) ? $campos['nome']->tabela : $campos['nome']->getFieldsValues('tabela')
+					);
+					$value = InterAdmin::getInstance($value, $options);
 				}
 			}
 		}
