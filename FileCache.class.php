@@ -117,7 +117,7 @@ class FileCache{
 		*/
 		
 		// Checking if there is enough content to cache
-		if (strlen($file_content) > 10) {
+		if (strlen($file_content) > 100) {
 			// Creating directories
 			$dir_arr = explode('/', $this->fileName);
 			array_pop($dir_arr);
