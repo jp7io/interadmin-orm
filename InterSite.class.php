@@ -134,6 +134,7 @@ class InterSite extends InterAdmin {
 			$fieldsValues = '';
 			$fieldsValuesDB = '';
 			if ($server->type != 'Desenvolvimento') {
+				echo '<br /><br /><div style="font-weight:bold">&bull; ' . $server->name . '</div>';
 				if (!$server->ftp) $server->ftp = $server->host;
 				$conn_id = @ftp_connect($server->ftp); 
 				$login_result = @ftp_login($conn_id, $server->user, $server->pass);
