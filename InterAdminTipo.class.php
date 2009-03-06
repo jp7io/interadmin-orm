@@ -422,6 +422,9 @@ class InterAdminTipo{
 		$options['order'] = implode(',', $order_arr);
 		
 		if ($options['count']) $options['fields'] = (array) $options['count'];
+		
+		if (!$options['fields']) $options['fields'] = array('0');
+		
 		// Sql
 		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
@@ -432,6 +435,7 @@ class InterAdminTipo{
 		
 		if ($jp7_app) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
+		
 		return $rs;
 	}
 	
