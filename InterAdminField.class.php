@@ -94,7 +94,7 @@ class InterAdminField{
 					$campo_nome="Tipos";
 				}else{
 					$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
-					echo interadmin_combo(explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"","","checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio);
+					echo interadmin_combo(explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"","","checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio, $readonly);
 					$campo_nome=$temp_campo_nome;
 				}
 				$form.=ob_get_contents();
