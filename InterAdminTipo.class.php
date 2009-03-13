@@ -107,8 +107,11 @@ class InterAdminTipo{
 				$this->$var = 'date_publish DESC';
 			}
 			return $this->$var;
-		} elseif ($var == 'class') {
-			return ($this->getFieldsValues('class')) ? $this->class : $this->getModel()->getFieldsValues('class');	
+		} elseif ($var == 'class' || $var == 'tabela') {
+			if (!$this->$var && !$this->getFieldsValues($var)) {
+				$this->$var = $this->getModel()->getFieldsValues($var);
+			}
+			return $this->$var;
 		}
 	}
 	/**
@@ -192,9 +195,8 @@ class InterAdminTipo{
 	 */
 	public function getInterAdmins($options = array()) {
 		global $lang;
-		$model = $this->getModel();
-		$table = ($model->getFieldsValues('tabela')) ? '_' . $model->tabela : '';
-
+		$table = ($this->tabela) ? '_' . $this->tabela : '';
+		
 		if ($options['fields'] == '*') $options['fields'] = $this->getAllFieldsNames();
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
