@@ -259,7 +259,7 @@ class InterAdmin{
 
 		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 			" FROM " . $this->db_prefix .(($this->getTipo()->getFieldsValues('language')) ? $lang->prefix : '') . '_arquivos' .
-			" WHERE id=" . $this->id .
+			" WHERE id_tipo = " . $this->id_tipo . " AND id=" . $this->id .
 			(($options['where']) ? $options['where'] : '') .
 			" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . ' ordem' .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
