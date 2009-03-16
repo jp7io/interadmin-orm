@@ -431,8 +431,8 @@ class InterAdminTipo{
 		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
 			" WHERE " . $options['where'] .
-			(($options['order']) ? " ORDER BY " . $options['order'] : '') .
 			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
+			(($options['order']) ? " ORDER BY " . $options['order'] : '') .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		
 		if ($jp7_app) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
