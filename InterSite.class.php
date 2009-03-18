@@ -267,6 +267,7 @@ class InterSite extends InterAdmin {
 				// InterAdmin Remote
 				} elseif ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
 					$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
+					$GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
 					break;
 				}
 				if (in_array($_SERVER['HTTP_HOST'], (array) $server->aliases)) {
@@ -295,7 +296,7 @@ class InterSite extends InterAdmin {
 		$GLOBALS['c_path'] = $this->server->path;
 		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_analytics'] = $this->google_analytics;
-		if (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) $GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
+		//if (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) $GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
 		$GLOBALS['c_w3c'] = TRUE;
 		$GLOBALS['c_doc_root'] = jp7_doc_root();
