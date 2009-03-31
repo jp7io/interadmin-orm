@@ -94,7 +94,7 @@ class InterAdmin{
 	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * @param bool $fields_alias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
-	 * @todo (FIXME - Multiple languages) When $fields_alias is <tt>TRUE</tt> and there is no id_tipo yet, the function is unable to decide which language table it should use.
+	 * @todo (FIXME - Multiple languages) When there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
 	public function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE) {   
 		global $lang;
@@ -226,6 +226,7 @@ class InterAdmin{
 	 * @return InterAdminTipo
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
+		if (!$options['db_prefix']) $options['db_prefix'] = $this->db_prefix;
 		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
 		$childrenTipo->setParent($this);
 		return $childrenTipo;
