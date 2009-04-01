@@ -14,6 +14,7 @@
  * 
  * @property string $interadminsOrderby SQL Order By for the records of this InterAdminTipo.
  * @property string $class Class to be instantiated for the records of this InterAdminTipo.
+ * @property string $tabela Table of this Tipo, or of its Model, if it has no table.
  * @package InterAdminTipo
  */
 class InterAdminTipo{
@@ -94,8 +95,11 @@ class InterAdminTipo{
 		if ($var == 'interadminsOrderby') {
 			$campos = $this->getCampos();
 			if ($campos) {
-				foreach ($campos as $key=>$row) {
-					if ($row['orderby'])$tipo_orderby[$row['orderby']] = $key;
+				foreach ($campos as $key => $row) {
+					if ($row['orderby']) {
+						if ($row['orderby'] < 0) $key .= " DESC";
+						$tipo_orderby[$row['orderby']] = $key;
+					}
 				}
 				if ($tipo_orderby) {
 					ksort($tipo_orderby);
@@ -103,7 +107,7 @@ class InterAdminTipo{
 				}
 				$this->$var = $tipo_orderby;
 			}
-			if (!count($tipo_orderby)) {
+			if (!$tipo_orderby) {
 				$this->$var = 'date_publish DESC';
 			}
 			return $this->$var;
@@ -492,6 +496,7 @@ class InterAdminTipo{
 				$url_arr[] = toId($parent->getFieldsValues('nome'));
 			}
 			$parent = $parent->getParent();
+			if ($parent instanceof InterAdmin) $parent = $parent->getTipo();
 		}
 		$url_arr = array_reverse((array)$url_arr);
 
