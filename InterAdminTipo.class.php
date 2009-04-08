@@ -397,26 +397,27 @@ class InterAdminTipo{
 		// Join
 		$joinsCount = 0;
 		if (!is_array($options['from'])) $options['from'] = (array) $options['from'];
-		foreach($options['fields'] as $key => $fields){
-			if (is_array($fields)) {
-				$join = 'join' . ++$joinsCount;
+		foreach($options['fields'] as $key => $field){
+			$joinTipo = $campos[$key]['nome'];
+			if (is_array($field)) {
 				$options['fields'][$key] = 'main.' . $key;
-				$joinModel = $campos[$key]['nome']->getModel();
+				if (!is_object($joinTipo)) continue;
+				$join = 'join' . ++$joinsCount;
 				if ($campos[$key]['xtra'] == 'S') {
 					$options['from'][] = $this->db_prefix . "_tipos" .
 						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id_tipo";
 				} else {
 					$options['from'][] = $this->db_prefix .
-						(($joinModel->getFieldsValues('tabela')) ? '_' . $joinModel->tabela : '') .
-						(($campos[$key]['nome']->getFieldsValues('language')) ? $lang->prefix : '') .
+						(($joinTipo->tabela) ? '_' . $joinTipo->tabela : '') .
+						(($joinTipo->getFieldsValues('language')) ? $lang->prefix : '') .
 						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id";
 				}
 				
-				foreach($fields as $joinField) {
+				foreach($field as $joinField) {
 					$options['fields'][] = $join . '.' . $joinField . " AS " . $join . '_' . $joinField;
 				}
 			} else {
-				if (strpos($fields, '(') === FALSE && strpos($fields, '.') === FALSE) $options['fields'][$key] = 'main.' . $fields;
+				if (strpos($field, '(') === FALSE && strpos($field, '.') === FALSE) $options['fields'][$key] = 'main.' . $field;
 			}
 		}
 		

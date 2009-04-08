@@ -205,9 +205,12 @@ class InterAdmin{
 	 * @return InterAdmin
 	 */
 	public function getParent($options = array()) {
-		if ($this->_parent) return $this->_parent;
 		if (!$this->parent_id) $this->getFieldsValues('parent_id');
-		return $this->_parent = InterAdmin::getInstance($this->parent_id, $options);
+		if (!$this->_parent) {
+			$this->_parent = InterAdmin::getInstance($this->parent_id, $options);
+			if ($this->_parent->id) $this->getTipo()->setParent($this->_parent);
+		}
+		return $this->_parent;
 	}
 	/**
 	 * Sets the parent InterAdmin object for this record, changing the $_parent property.
@@ -255,8 +258,11 @@ class InterAdmin{
 		global $lang;
 		global $jp7_app;
 		$arquivos = array();
-	
-		if ($options['fields'] == '*')  $options['fields'] = InterAdminArquivo::getAllFieldsNames();
+
+		if (class_exists($options['class'])) $className = $options['class'];
+		else $className = 'InterAdminArquivo';
+
+		if ($options['fields'] == '*') $options['fields'] = call_user_method('getAllFieldsNames', $className);
 
 		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 			" FROM " . $this->db_prefix .(($this->getTipo()->getFieldsValues('language')) ? $lang->prefix : '') . '_arquivos' .
@@ -267,7 +273,7 @@ class InterAdmin{
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while ($row = $rs->FetchNextObj()) {
-			$arquivo = new InterAdminArquivo($row->id_arquivo, array('db_prefix' => $this->db_prefix));
+			$arquivo = new $className($row->id_arquivo, array('db_prefix' => $this->db_prefix));
 			$arquivo->setTipo($this->getTipo());
 			$arquivo->setParent($this);
 			foreach((array)$options['fields'] as $field) {
