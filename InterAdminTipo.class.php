@@ -494,7 +494,9 @@ class InterAdminTipo{
 			if ($seo) {
 				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
 			} else {
-				$url_arr[] = toId($parent->getFieldsValues('nome'));
+				if (toId($parent->getFieldsValues('nome'))) {
+					$url_arr[] = toId($parent->getFieldsValues('nome'));
+				}
 			}
 			$parent = $parent->getParent();
 			if ($parent instanceof InterAdmin) $parent = $parent->getTipo();
