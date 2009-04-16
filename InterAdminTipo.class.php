@@ -377,7 +377,7 @@ class InterAdminTipo{
 					$value = InterAdminTipo::getInstance($value);
 				} else {
 					$options = array(
-						'table' => ($campos['nome']->tabela) ? $campos['nome']->tabela : $campos['nome']->getFieldsValues('tabela')
+						'table' => $campos['nome']->tabela
 					);
 					$value = InterAdmin::getInstance($value, $options);
 				}
