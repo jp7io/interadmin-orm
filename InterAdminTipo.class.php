@@ -169,6 +169,7 @@ class InterAdminTipo{
 
 		$rs = $this->executeQuery($options);
 		
+		$interAdminTipos = array();
 		while ($row = $rs->FetchNextObj()) {
 			$interAdminTipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
