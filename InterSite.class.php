@@ -272,17 +272,16 @@ class InterSite extends InterAdmin {
 		
 		// This server is a main host
 		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
-		
 		$this->interadmin_remote = jp7_explode(';', $this->interadmin_remote);
 
 		while (!$this->server) {
 			// InterAdmin Remote
-			if ($this->interadmin_remote && $GLOBALS['jp7_app']) {
+			if ((in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) && $GLOBALS['jp7_app']) {
 				foreach ($this->servers as $host => $server) {
 					if ($server->type == 'Produção') {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
 						$GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
-						break 2;
+						break 2;  // Exit the foreach and the while.
 					}
 				}
 			}
@@ -298,7 +297,7 @@ class InterSite extends InterAdmin {
 				foreach ($this->servers as $host => $server) {
 					if ($server->type == 'Desenvolvimento') {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
-						break 2;
+						break 2; // Exit the foreach and the while.
 					}
 				}
 				break;
@@ -322,7 +321,7 @@ class InterSite extends InterAdmin {
 			$this->$var = $value;
 		}
 
-		/* TEMP - Creating old globals */
+		/* @todo TEMP - Creating old globals */
 		$oldtypes = array('Produção'=>'Principal', 'QA'=>'QA', 'Desenvolvimento'=>'Local');
 		$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
 		$GLOBALS['c_site'] = $this->name_id;
