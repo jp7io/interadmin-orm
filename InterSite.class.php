@@ -243,6 +243,24 @@ class InterSite extends InterAdmin {
 		}
 	}
 	
+	/**
+	 * Checks if it´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
+	 * If the HTTP_HOST has a . (dot) like something.com, it will return false.
+	 *
+	 * @return bool
+	 */
+	public function isAtLocalhost(){
+		if ($_SERVER['HTTP_HOST'] == 'localhost') {
+			return true;
+		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
+			// Has no dots like 
+			if (strpos($_SERVER['HTTP_HOST'], '.') === false) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	function __sleep() {
 		unset($this->_tipo);
 		unset($this->_parent);
@@ -250,38 +268,59 @@ class InterSite extends InterAdmin {
 	}
 	
 	function __wakeup() {
+		global $debugger;
+		
 		// This server is a main host
 		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
 		
 		$this->interadmin_remote = jp7_explode(';', $this->interadmin_remote);
-		
-		if (!$this->server) {
-			// This server is not there, it might be an alias
-			foreach ($this->servers as $host=>$server) {
-				// Dev Local
-				if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
-					if ($server->type == 'Desenvolvimento') {
+
+		while (!$this->server) {
+			// InterAdmin Remote
+			if ($this->interadmin_remote && $GLOBALS['jp7_app']) {
+				foreach ($this->servers as $host => $server) {
+					if ($server->type == 'Produção') {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
-						break;
+						$GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
+						break 2;
 					}
-				// InterAdmin Remote
-				} elseif ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
-					$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
-					$GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
-					break;
 				}
+			}
+			// Alias found, redirect it to the host
+			foreach ($this->servers as $host => $server) {
 				if (in_array($_SERVER['HTTP_HOST'], (array) $server->aliases)) {
-					// Alias found, redirect it to the host
 					header('Location: http://' . $host . $_SERVER['REQUEST_URI']);
 					exit();
 				}
 			}
-			// No server found, die
-			if (!$this->server) die('Host não está presente nas configurações.');
+			// Dev Local
+			if ($this->isAtLocalhost()) {
+				foreach ($this->servers as $host => $server) {
+					if ($server->type == 'Desenvolvimento') {
+						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
+						break 2;
+					}
+				}
+				break;
+			}
+			// No server found
+			$message = 'Host não está presente nas configurações: ' . $_SERVER['HTTP_HOST'];
+			jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
+			if ($this->servers) {
+				$urlSitePrincipal = 'http://' . jp7_implode('/', array(reset($this->servers)->host, reset($this->servers)->path));
+				$messageLink = 'Acesse o site: <a href="' . $urlSitePrincipal . '">' . $urlSitePrincipal . '</a>';
+			}
+			die(
+				$message . '.<br /><br />' .
+				'Você pode ter digitado um endereço inválido.<br /><br />' .
+				$messageLink
+			);
 		}
 		$this->db = $this->server->db;
 				
-		foreach((array) $this->server->vars as $var=>$value) $this->$var = $value;
+		foreach((array) $this->server->vars as $var=>$value) {
+			$this->$var = $value;
+		}
 
 		/* TEMP - Creating old globals */
 		$oldtypes = array('Produção'=>'Principal', 'QA'=>'QA', 'Desenvolvimento'=>'Local');
