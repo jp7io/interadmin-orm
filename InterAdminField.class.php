@@ -86,7 +86,7 @@ class InterAdminField{
 				$form="<div class=\"select_multi\">";
 				ob_start();
 				if($xtra=="X"){
-					include "select_multi.php";
+					include 'site/aplicacao/select_multi.php';
 					$campo_nome=trim($campo_nome);
 					$campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
 				}elseif($xtra){
