@@ -2,7 +2,7 @@
 
 class Jp7_Locale
 {
-	public $lang = '', $prefix = '', $path = '', $path_url = '', $path_2 = '';
+	public $lang = '', $prefix = '', $path = '';
 
 	public function __construct($language)
 	{
@@ -13,12 +13,10 @@ class Jp7_Locale
 		}
 
 		$this->lang = $language;
+		$this->path = '/' . $language . '/';
+
 		if ($language != 'pt-br') {
 			$this->prefix = '_' . $language;
-			$this->path = $language . '/';
 		}
-
-		$this->path_url = $language . '/';
-		$this->path_2 = $this->path_url;
 	}
 }
