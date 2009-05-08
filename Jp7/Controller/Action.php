@@ -91,7 +91,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->headMeta()->appendName('author', 'JP7 - http://jp7.com.br');
 		$this->view->headMeta()->appendName('generator', 'JP7 InterAdmin');
 		$this->view->headLink()->appendStylesheet('/_default/css/7_w3c.css');
-		$this->view->headLink()->appendStylesheet($this->baseUrl . '/css/default.css');
+		$this->view->headLink()->appendStylesheet($this->baseUrl . '/css/' . $this->config->name_id . '.css');
 		$this->view->headScript()->appendFile('/_default/js/swfobject.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery-1.2.6.pack.js', 'text/javascript');
 		$this->view->headScript()->appendFile($this->baseUrl . '/js/functions.js', 'text/javascript');
@@ -99,21 +99,28 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		// titulos
 		$this->title['client'] = $this->config->langs[$lang->lang]->title;
 		if ($this->parentObj) {
-			$this->title['controller'] = $this->parentObj->getFieldsValues('nome' . $lang->prefix);
-			$this->title['action'] = $this->tipoObj->getFieldsValues('nome' . $lang->prefix);
+			$this->title['breadcrumbs']['controller'] = $this->parentObj->getFieldsValues('nome' . $lang->prefix);
+			$this->title['breadcrumbs']['action'] = $this->tipoObj->getFieldsValues('nome' . $lang->prefix);
 		} else {
-			$this->title['controller'] = $this->tipoObj->getFieldsValues('nome' . $lang->prefix);
+			$this->title['breadcrumbs']['controller'] = $this->tipoObj->getFieldsValues('nome' . $lang->prefix);
 		}
-		$this->title['page'] = implode(' | ', $this->title);
+		$title = array_merge(array('client' => $this->title['client']), $this->title['breadcrumbs']);
+		$this->title['site'] = implode(' | ', $title);
 		$this->view->title = $this->title;
 		
 		// fix para usar o 7.head
-		// TODO Usar o layout_new.phtml e remover esse bloco
+		// TODO Remover e usar o layout_new.phtml
 		$this->view->config = $this->config;
-		$this->view->p_title = $this->title['client'];
-		$this->view->secaoTitle = $this->title['controller'];
-		$this->view->secaoTitle = $this->title['action'];
-		$this->view->c_site = toId($this->view->p_title);
+		$this->view->c_site_title = $this->title['client'];
+		if ($this->title['breadcrumbs']['controller']) {
+			$this->view->secao = 'true';
+		}
+		if ($this->title['breadcrumbs']['action']) {
+			$this->view->subsecao = 'true';
+		}
+		$this->view->secaoTitle = $this->title['breadcrumbs']['controller'];
+		$this->view->subsecaoTitle = $this->title['breadcrumbs']['action'];
+		$this->view->c_site = toId($this->title['client']);
 		$this->view->c_path = jp7_path(Zend_Controller_Front::getInstance()->getBaseUrl());
 		$viewPaths = $this->view->getScriptPaths();
 		$this->view->setScriptPath('../inc/');
@@ -121,7 +128,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->setScriptPath($viewPaths);
 		
 		// fix para usar os arquivos de idioma
-		// TODO Usar gettext e mudar para Jp7_Controller_Action::prepare
+		// TODO Remover e usar o gettext
 		if (file_exists('inc/lang_' . $lang->lang . '.php')) {
 			include 'inc/lang_' . $lang->lang . '.php';
 		} else {
