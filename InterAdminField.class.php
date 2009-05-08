@@ -194,12 +194,12 @@ class InterAdminField{
 			if(strpos($campo,"tit_")===0){
 				
 			}elseif(strpos($campo,"file_")===0){
-				if(strpos($valor,"../../")===0)$url=substr($valor,6);
+				$url = interadmin_uploaded_file_url($valor);
 				echo "".
 				"<tr>".
 					$_th.
 					"<td><input type=\"text\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:80px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
-					"<td rowspan=2".(($valor)?" align=\"center\" onclick=\"openPopup('".$c_cliente_url.$c_cliente_url_path.$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview((strpos($valor,'http://')===0)?$valor:$c_cliente_url.$c_cliente_url_path.$url):">")."</td>".
+					"<td rowspan=2".(($valor)?" align=\"center\" onclick=\"openPopup('".$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url):">")."</td>".
 					"<td rowspan=2>".$S_ajuda."</td>".
 				"</tr>\n".
 				"<tr>".
