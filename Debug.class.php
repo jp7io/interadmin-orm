@@ -140,21 +140,48 @@ class Debug{
 		krsort($backtrace);
 		$erroDetalhesArray = reset($backtrace);
 		$S = '';
-		if ($msgErro) $S .= '<strong style="color:red">       ERRO:</strong> ' . wordwrap($msgErro, 85, "\n")  . "\n";
-		$S .= '<strong style="color:red">    ARQUIVO:</strong> ' . $erroDetalhesArray['file'] . "\n";	
-		$S .= '<strong style="color:red">      LINHA:</strong> ' . $erroDetalhesArray['line'] . "\n";	
-		$S .= '<strong style="color:red">        URL:</strong> ' . (($_SERVER['HTTPS'] == 'on') ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] . "\n";
-		if ($_SERVER["HTTP_REFERER"]) $S .= '<strong style="color:red">    REFERER:</strong> ' . $_SERVER["HTTP_REFERER"] . "\n";	
-		$S .= '<strong style="color:red">         IP:</strong> ' . $_SERVER["REMOTE_ADDR"] . "\n";
-		$S .= '<strong style="color:red"> USER_AGENT:</strong> ' . $_SERVER['HTTP_USER_AGENT'] . "\n";
-		if ($sql) $S .= '<strong style="color:red">        SQL:</strong> ' . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
-		$S .= '<strong style="color:red">  BACKTRACE:</strong> ' . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '                          \1', print_r($backtrace, TRUE));
-		if (count($_POST)) $S .= '<strong style="color:red">       POST:</strong> ' . print_r($_POST, TRUE);	
-		if (count($_GET)) $S .= '<strong style="color:red">        GET:</strong> ' . print_r($_GET, TRUE);
-		if (count($_SESSION)) $S .= '<strong style="color:red">    SESSION:</strong> ' . print_r($_SESSION, TRUE);
-		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
+		if ($msgErro) {
+			$S .= $this->_getBacktraceLabel('ERRO') . wordwrap($msgErro, 85, "\n") . "\n";
+		}
+		$S .= $this->_getBacktraceLabel('ARQUIVO') . $erroDetalhesArray['file'] . "\n";
+		$S .= $this->_getBacktraceLabel('LINHA') . $erroDetalhesArray['line'] . "\n";
+		$S .= $this->_getBacktraceLabel('URL') . (($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . "\n";
+		if ($_SERVER['HTTP_REFERER']) {
+			$S .= $this->_getBacktraceLabel('REFERER') . $_SERVER['HTTP_REFERER'] . "\n";
+		}
+		$S .= $this->_getBacktraceLabel('IP CLIENTE') . $_SERVER['REMOTE_ADDR'] . "\n";
+		$S .= $this->_getBacktraceLabel('IP SERVIDOR') . $_SERVER['SERVER_ADDR'] . "\n";
+		$S .= $this->_getBacktraceLabel('USER_AGENT') . $_SERVER['HTTP_USER_AGENT'] . "\n";
+		if ($sql) { 
+			$S .= $this->_getBacktraceLabel('SQL') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
+		}
+		$S .= $this->_getBacktraceLabel('BACKTRACE') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '                          \1', print_r($backtrace, true));
+		if (count($_POST)) {
+			$S .= $this->_getBacktraceLabel('POST') . print_r($_POST, true);	
+		}
+		if (count($_GET)) {
+			$S .= $this->_getBacktraceLabel('GET') . print_r($_GET, true);
+		}
+		if (count($_SESSION)) {
+			$S .= $this->_getBacktraceLabel('SESSION') . print_r($_SESSION, true);
+		}
+		if (count($_COOKIE)) {
+			$S .= $this->_getBacktraceLabel('COOKIE') . print_r($_COOKIE, true);
+		}
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
+	
+	/**
+	 * Adds padding and html formatting to the backtrace label.
+	 *
+	 * @param string $caption Label caption.
+	 * @return string Formatted label.
+	 */
+	protected function _getBacktraceLabel($caption) {
+		return '<strong style="color:red">'. str_pad($caption, 12, ' ', STR_PAD_LEFT) . ':</strong> ';
+	}
+	
+	
 	/**
 	 * Method to be used as default error handler with set_error_handler() function.
 	 *
