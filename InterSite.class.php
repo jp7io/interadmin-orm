@@ -32,7 +32,7 @@ class InterSite extends InterAdmin {
 	public function getServers() {
 		$options = array(
 			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2'),
-			'fields_alias' => TRUE
+			'fields_alias' => true
 		);
 		$servers = $this->getChildren(26, $options);
 		
@@ -47,7 +47,7 @@ class InterSite extends InterAdmin {
 		foreach ((array) $servers as $server) {
 			// Variaveis do server
 			$server_vars = $server->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
-			$server->vars = NULL;
+			$server->vars = null;
 			foreach((array) $server_vars as $var) {
 				$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
 				$server->vars[$varName->varchar_1] = $var->varchar_1;
@@ -58,16 +58,23 @@ class InterSite extends InterAdmin {
 			// Database
 			$options = array(
 				'fields' => array('varchar_key', 'varchar_1', 'varchar_2', 'varchar_3', 'varchar_4', 'password_key', 'select_2'),
-				'fields_alias' => TRUE
+				'fields_alias' => true
 			);
 			$server->db = new InterAdmin($server->db->id, $options);
 			$type = new InterAdmin($server->db->type->id, array('fields' => 'varchar_1'));
 			$server->db->type = $type->varchar_1;
 			// Aliases
-			$aliasesObj = $server->getChildren(31, array('fields' => 'varchar_key'));
-			$server->aliases = NULL;
+			$aliasesObj = $server->getChildren(31, array('fields' => array('varchar_key', 'char_1')));
+			$server->aliases = null;
 			foreach ((array)$aliasesObj as $aliasObj) {
 				$server->aliases[] = $aliasObj->varchar_key;
+				if ($aliasObj->char_1) {
+					if (strpos($aliasObj->varchar_key, 'www.') === 0) {
+						$server->aliases[] = substr($aliasObj->varchar_key, 4);
+					} else {
+						$server->aliases[] = 'www.' . $aliasObj->varchar_key;
+					}
+				}
 			}
 			// Cleaning unused data
 			unset($server->db->_tipo);
@@ -86,10 +93,10 @@ class InterSite extends InterAdmin {
 	public function getLangs(){
 		$options = array(
 			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2', 'char_1'),
-			'fields_alias' => TRUE
+			'fields_alias' => true
 		);
 		$languages = $this->getChildren(37, $options);
-		$this->langs = NULL;
+		$this->langs = null;
 		foreach ((array)$languages as $language) {
 			$lang =	new InterAdmin($language->lang, array('fields' => array('varchar_1', 'varchar_key', 'char_1')));
 			$language->lang = $lang->varchar_1;
@@ -155,7 +162,7 @@ class InterSite extends InterAdmin {
 				$pos1 = strpos($content, $pos1_str);
 				$cookie = '';
 				// Login required
-				if ($pos1 !== FALSE) {
+				if ($pos1 !== false) {
 					$WS_parameters = 'user=jp7_jp&pass=naocolocar';
 					$content_2 = $this->_socketRequest($server->host, '/_admin/login/login.php', $WS_parameters, 'POST', 'http://' . $server->host . '/_admin/login/index.php');
 					$content_header = explode('\r\n\r\n', $content_2);
@@ -168,7 +175,7 @@ class InterSite extends InterAdmin {
 				// Version not found - Trying another file
 				$pos1_str = 'PHP Version';
 				$pos1 = strpos($content, $pos1_str);
-				if ($pos1 === FALSE) {
+				if ($pos1 === false) {
 					$content = $this->_socketRequest($server->host, '/_admin/phpinfo_manual.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
 					$content = str_replace("phpversion:", "PHP Version", $content);
 				}
@@ -193,7 +200,7 @@ class InterSite extends InterAdmin {
 					$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
 					$pos2 = strpos($content, "\n", $pos1);
 					$php = substr($content, $pos1, $pos2-$pos1);
-					$server->phpinfo = NULL;
+					$server->phpinfo = null;
 					$server->phpinfo['PHP'] = trim($php, " \r\n\t");
 					// Sets other parameters
 					$parameters = array('PHP', 'host', 'SERVER_ADDR', 'LOCAL_ADDR', 'register_globals', 'GD Version', 'MySQL', 'MySQL Version');
@@ -214,7 +221,7 @@ class InterSite extends InterAdmin {
 				// Saving FTP and PHP Info data		
 				if ($fieldsValues) {
 					//jp7_print_r($fieldsValues);
-					$server->setFieldsValues($fieldsValues, TRUE);
+					$server->setFieldsValues($fieldsValues, true);
 				}
 				
 				// DB
@@ -249,7 +256,7 @@ class InterSite extends InterAdmin {
 	 *
 	 * @return bool
 	 */
-	public function isAtLocalhost(){
+	public static function isAtLocalhost(){
 		if ($_SERVER['HTTP_HOST'] == 'localhost') {
 			return true;
 		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
@@ -293,7 +300,7 @@ class InterSite extends InterAdmin {
 				}
 			}
 			// Dev Local
-			if ($this->isAtLocalhost()) {
+			if (self::isAtLocalhost()) {
 				foreach ($this->servers as $host => $server) {
 					if ($server->type == 'Desenvolvimento') {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
@@ -336,7 +343,7 @@ class InterSite extends InterAdmin {
 		$GLOBALS['c_analytics'] = $this->google_analytics;
 		//if (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) $GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
-		$GLOBALS['c_w3c'] = TRUE;
+		$GLOBALS['c_w3c'] = true;
 		$GLOBALS['c_doc_root'] = jp7_doc_root();
 		$GLOBALS['db_type'] = $this->db->type;
 		$GLOBALS['db_host'] = ($this->db->host_internal) ? $this->db->host_internal : $this->db->host;
