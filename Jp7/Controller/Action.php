@@ -58,7 +58,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	{
 		global $lang;
 		
-		if (!$id_tipo) {
+		if ($id_tipo !== 0 && !$id_tipo) {
 			throw new Zend_Controller_Action_Exception('O $id_tipo não foi definido', 404);
 		}
 		$this->id_tipo = $id_tipo;
@@ -92,10 +92,17 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->headMeta()->appendName('generator', 'JP7 InterAdmin');
 		$this->view->headLink()->appendStylesheet('/_default/css/7_w3c.css');
 		$this->view->headLink()->appendStylesheet($this->baseUrl . '/css/' . $this->config->name_id . '.css');
+		$this->view->headScript()->appendFile('/_default/js/interdyn.js', 'text/javascript');
+		$this->view->headScript()->appendFile('/_default/js/interdyn_checkflash.js', 'text/javascript');
+		$this->view->headScript()->appendFile('/_default/js/interdyn_form.js', 'text/javascript');
+		$this->view->headScript()->appendFile('/_default/js/interdyn_form_lang_pt-br.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/swfobject.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery-1.2.6.pack.js', 'text/javascript');
+		$this->view->headScript()->appendFile('/_default/js/interdyn_menu.js', 'text/javascript');
+		$this->view->headScript()->appendFile($this->baseUrl . '/js/interdyn_menu_' . $this->config->name_id . '.js', 'text/javascript');
+		$this->view->headScript()->appendFile($this->baseUrl . '/js/interdyn_menu_str.php?lang=pt-br', 'text/javascript');
 		$this->view->headScript()->appendFile($this->baseUrl . '/js/functions.js', 'text/javascript');
-		
+
 		// titulos
 		$this->title['client'] = $this->config->langs[$lang->lang]->title;
 		if ($this->parentObj) {
@@ -110,6 +117,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		
 		// fix para usar o 7.head
 		// TODO Remover e usar o layout_new.phtml
+		/*
 		$this->view->config = $this->config;
 		$this->view->c_site_title = $this->title['client'];
 		if ($this->title['breadcrumbs']['controller']) {
@@ -126,6 +134,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->setScriptPath('../inc/');
 		$this->view->head = $this->view->render('7.head.php');
 		$this->view->setScriptPath($viewPaths);
+		*/
 		
 		// fix para usar os arquivos de idioma
 		// TODO Remover e usar o gettext
