@@ -90,8 +90,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->headMeta()->appendName('robots', 'all');
 		$this->view->headMeta()->appendName('author', 'JP7 - http://jp7.com.br');
 		$this->view->headMeta()->appendName('generator', 'JP7 InterAdmin');
-		$this->view->headLink()->appendStylesheet('/_default/css/7_w3c.css');
-		$this->view->headLink()->appendStylesheet($this->baseUrl . '/css/' . $this->config->name_id . '.css');
+		$this->view->headLink()->appendStylesheet('/_default/css/7_w3c.css', 'all');
+		$this->view->headLink()->appendStylesheet($this->baseUrl . '/css/' . $this->config->name_id . '.css', 'all');
 		$this->view->headScript()->appendFile('/_default/js/interdyn.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/interdyn_checkflash.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/interdyn_form.js', 'text/javascript');
