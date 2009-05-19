@@ -73,7 +73,7 @@ class Debug{
 			$_COOKIE['debug_toolbar'] = $_GET['debug_toolbar'];
 		}
 		// Setting it as active
-		if ($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) $this->active = TRUE;
+		if ($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) $this->active = true;
 	}
 	/**
 	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
@@ -123,7 +123,7 @@ class Debug{
 	 * @param string Stylesheet on the box displayed. The default value is ''.
 	 * @return void
 	 */	
-	public function showSql($sql, $forceDebug = FALSE, $style = '') {
+	public function showSql($sql, $forceDebug = false, $style = '') {
 		if (!$this->safePoint) return;
 		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
 	}
@@ -190,8 +190,12 @@ class Debug{
 	 * @return bool
 	 */
 	public function errorHandler($code, $msgErro) {
-		if ($code == E_STRICT || $code == E_NOTICE || $code == E_DEPRECATED) return FALSE; // FALSE -> the default error handler will take care of it.
-		if (error_reporting() == 0) return FALSE; // Programmer used @ so the error reporting value is 0.
+		if ($code == E_STRICT || $code == E_NOTICE || $code == E_DEPRECATED) {
+			return false; // FALSE -> the default error handler will take care of it.
+		}
+		if (error_reporting() == 0) {
+			return false; // Programmer used @ so the error reporting value is 0.
+		}
 
 		$backtrace = debug_backtrace();
 		array_shift($backtrace);
@@ -244,11 +248,11 @@ class Debug{
 	public function showToolbar() {
 		if (!$this->active || !$this->safePoint) return;
 		
-		if ($this->_templateFilename ) echo ('Template: ' . $this->_templateFilename );
+		if ($this->_templateFilename ) echo ('Template: ' . $this->_templateFilename);
 		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
 		
 		jp7_print_r($this->_log);
-		$this->getTime(TRUE);
+		$this->getTime(true);
 	}
 }
 ?>
