@@ -53,27 +53,36 @@ class FileCache{
   	 * @global bool
 	 * @global bool
 	 */	
-	public function __construct($storeId = FALSE, $exit = TRUE, $cachePath = 'cache') {
+	public function __construct($storeId = false, $exit = true, $cachePath = 'cache') {
 		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_session, $interadmin_gerar_menu;
 		// Cache not desired
-		if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) return;
+		if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) {
+			return;
+		}
 
 		$this->fileRoot = $c_root;
 		$this->cachePath = $this->fileRoot . $cachePath . '/';
 		// Parsing Filename
 		$this->fileName = substr($_SERVER['REQUEST_URI'], strlen($c_path) + 1);
 		$pos_query = strpos($this->fileName, '?');
-		if ($pos_query !== FALSE) $this->fileName = substr($this->fileName, 0, $pos_query);
-		$this->fileName = jp7_path($this->fileName, TRUE);
-				
+		if ($pos_query !== false) {
+			$this->fileName = substr($this->fileName, 0, $pos_query);
+		}
+		$this->fileName = jp7_path($this->fileName, true);
+
 		$pathinfo = pathinfo($this->cachePath . $this->fileName);
 		// Parsing ID for dynamic content
 		if ($storeId){
-			if ($pathinfo['extension']) $ext = '.' . $pathinfo['extension'];
+			if ($pathinfo['extension']) {
+				$ext = '.' . $pathinfo['extension'];
+			}
 			$this->fileName = dirname($this->fileName) . '/' . basename($this->fileName, $ext) . '/' . $storeId . $ext . '.cache';
 		}else{
-			if ($pathinfo['extension']) $this->fileName .= '.cache';
-			else $this->fileName .= (($this->fileName) ? '/' : '') . 'index.cache';
+			if ($pathinfo['extension']) {
+				$this->fileName .= '.cache';
+			} else {
+				$this->fileName .= (($this->fileName) ? '/' : '') . 'index.cache';
+			}
 		}
 		// Setting default behaviors
 		$this->exit = $exit;
@@ -107,7 +116,9 @@ class FileCache{
 	 * @return void
 	 */	
 	public function endCache() {
-		if (!$this->fileName) return;
+		if (!$this->fileName) {
+			return;
+		}
 
 		$file_content = ob_get_contents();
 		
@@ -145,7 +156,7 @@ class FileCache{
 	public function getCache() {
 		global $debugger;
 		readfile($this->cachePath . $this->fileName);
-		$this->isCached = TRUE;
+		$this->isCached = true;
 		if ($this->exit) {
 			$debugger->showToolbar();
 		 	exit();
@@ -157,12 +168,17 @@ class FileCache{
 	 * @return bool
 	 */	
 	public function checkLog() {
+		global $config;
 		$cache_time = @filemtime($this->cachePath . $this->fileName);
-		$log_time = @filemtime($this->fileRoot . 'interadmin.log');
+		$log_time = @filemtime($this->fileRoot . $config->name_id . '/interadmin/interadmin.log');
 		// TRUE = Cache is ok, no need to refresh
-		if ($cache_time && time() - $log_time < $this->delay) return TRUE;
-		if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) return TRUE;
-		return FALSE;
+		if ($cache_time && time() - $log_time < $this->delay) {
+			return true;
+		}
+		if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) {
+			return true;
+		}
+		return false;
 	}
 }
 ?>
