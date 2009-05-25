@@ -29,7 +29,10 @@ class Social {
 		'reddit' => 'Reddit',
 	);
 	private $extendedSocials = array (
-		'twitter' => 'Twitter',
+		'twitter' => array(
+			'title' => 'Twitter',
+			'url' => 'http://twitter.com/?status=%url%',
+		),
 		'linkedin' => array(
 			'title' => 'LinkedIn',
 			'url' => 'http://www.linkedin.com/shareArticle?mini=true&url=%url%&title=%title%&summary=&source=',
@@ -197,7 +200,7 @@ class Social {
 		$html .= '</ul>' . "\n";
 		$html .= '<div style="clear: both;"></div>' . "\n";
 		$html .= '</div>' . "\n";
-
+		
 		return $html;
 	}
 	/* Bookmarking */
