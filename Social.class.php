@@ -31,7 +31,7 @@ class Social {
 	private $extendedSocials = array (
 		'twitter' => array(
 			'title' => 'Twitter',
-			'url' => 'http://twitter.com/?status=%url%',
+			'url' => 'http://twitter.com/?status=%title% - %url%',
 		),
 		'linkedin' => array(
 			'title' => 'LinkedIn',
@@ -253,11 +253,11 @@ class Social {
 			$html .= '<label for="embeddedUrl' . ucfirst(strtolower($key)) . '">' . $label . '</label>' . "\n";
 		}
 		$html .= '<textarea id="embeddedUrl' . ucfirst(strtolower($key)) . '" type="text" readonly="readonly" onclick="javascript:document.getElementById(\'embeddedUrl' . ucfirst(strtolower($key)) . '\').focus();document.getElementById(\'embeddedUrl' . ucfirst(strtolower($key)) . '\').select();">'  . "\n";
-		if ($type == 'link') {
+		/*if ($type == 'link') {
 			$html .= '<a href="' . $url . '" target="_blank">' . $title . '</a>';
 		} else {
 			exit('This type is not implemented yet');
-		}
+		}*/
 		$html .= '</textarea>'  . "\n";
 		$html .= '<div style="clear:both;"></div>';
 		$html .= '</div>' . "\n";
