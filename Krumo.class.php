@@ -59,7 +59,9 @@ if (!defined('KRUMO_TRUNCATE_LENGTH')) {
 * @package Krumo
 */
 Class Krumo {
-
+    
+    public static $showProtected = false;
+    
 	/**
 	* Return Krumo version
 	*
@@ -975,14 +977,20 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 
 	// keys ?
 	//
-	$keys = ($_is_object)
-		? array_keys(get_object_vars($data))
-		: array_keys($data);
+	if (self::$showProtected) {
+        $data = (array)$data;
+        $_is_object = false;
+	}
+        $keys = ($_is_object)
+            ? array_keys(get_object_vars($data))
+            : array_keys($data);
+	
+	
 	
 	// itterate 
 	//
 	foreach($keys as $k) {
-
+        
 		// skip marker
 		//
 		if ($k === $_recursion_marker) {
@@ -995,8 +1003,11 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 			$v =& $data->$k;
 			} else {
 			$v =& $data[$k];
-			}
-
+		}
+        
+        if (self::$showProtected) {
+            $k = str_replace('*', '', $k);
+        }
 		Krumo::_dump($v,$k);
 		} ?>
 	</ul>
