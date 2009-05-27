@@ -917,17 +917,22 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 			// stain it
 			//
 			$_recursion_marker = Krumo::_marker();
-			(is_object($bee))
-				? @($bee->$_recursion_marker++)
-				: @($bee[$_recursion_marker]++);
 			
-			$_[0][] =& $bee;
+			try {
+                (is_object($bee))
+                    ? @($bee->$_recursion_marker++)
+                    : @($bee[$_recursion_marker]++);
+			} catch (Exception $e) {
+                // Do nothing
 			}
+						
+			$_[0][] =& $bee;
+		}
 
 		// return all bees
 		//
 		return $_[0];
-		}
+	}
 	
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
