@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * TODO
+ * 
+ * @category Jp7
+ * @package Jp7_Locale
+ */
 class Jp7_Locale
 {
 	public $lang = '', $prefix = '', $path = '';
