@@ -54,14 +54,15 @@ class FileCache{
 	 * @global bool
 	 */	
 	public function __construct($storeId = false, $exit = true, $cachePath = 'cache') {
-		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_session, $interadmin_gerar_menu;
+		global $c_doc_root, $c_path, $config, $c_cache, $c_cache_delay;
+		global $debugger, $s_session, $interadmin_gerar_menu;
 		// Cache not desired
 		if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) {
 			return;
 		}
 
-		$this->fileRoot = $c_root;
-		$this->cachePath = $this->fileRoot . $cachePath . '/';
+		$this->fileRoot = $c_doc_root;
+		$this->cachePath = $this->fileRoot . $config->name_id . '/' . $cachePath . '/';
 		// Parsing Filename
 		$this->fileName = substr($_SERVER['REQUEST_URI'], strlen($c_path) + 1);
 		$pos_query = strpos($this->fileName, '?');
@@ -86,7 +87,7 @@ class FileCache{
 		}
 		// Setting default behaviors
 		$this->exit = $exit;
-		$this->setDelay($c_cache_delay, $c_devIps);
+		$this->setDelay($c_cache_delay);
 		// Retrieving/creating cache
 		if ($this->checkLog() && !$_GET['nocache_force']) $this->getCache();
 		else $this->startCache();
@@ -96,8 +97,9 @@ class FileCache{
 	 *
 	 * @return void
 	 */	
-	public function setDelay($time, $devIps) {
-		if (!in_array($_SERVER['REMOTE_ADDR'], (array) $devIps)) {
+	public function setDelay($time) {
+        global $c_devIps;
+		if (!in_array($_SERVER['REMOTE_ADDR'], (array) $c_devIps)) {
 			$this->delay = $time;
 		}
 	}
