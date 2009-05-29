@@ -14,6 +14,7 @@
 	 protected static $_enabled = false;
 	 protected static $_cachedir = './cache/';
 	 protected static $_logdir = './interadmin/';
+	 protected static $_delay = 0;
 	 
 	 /**
 	  * Retorna uma instância configurada do Jp7_Cache_Page.
@@ -32,6 +33,8 @@
 			if ($config->cache && !$debugger->debugFilename && !$debugger->debugSql) {
 				self::$_enabled = true;
 			}
+			
+			self::$_delay = intval($config->cache_delay);
 			
 			$frontDefault = array(
 				'lifetime' => 86400 // 1 dia
@@ -67,8 +70,6 @@
 	  */	 
 	 public function start()
 	 {
-	 	global $c_jp7;
-
 	 	if (!self::$_enabled) {
 	 		return false;
 	 	}
@@ -77,14 +78,17 @@
 	 	$id = $this->_makeId(func_get_args());
 
 	 	// Verifica se o log foi alterado
-	 	$this->_checkLog();
+	 	$logTime = $this->_checkLog();
 
+	 	// Desabilita o cache individual da página pelo $_GET
+	 	if (isset($_GET['nocache_force'])) {
+	 		$this->remove($id);
+	 	}
+	 	
 	 	$retorno = parent::start($id);
 
 	 	if ($retorno) {
-	 		if ($c_jp7) {
-	 			echo '<div style="position:absolute;left:0px;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000">CACHE</div>';
-	 		} 
+	 		$this->_showDebug($id, $logTime);
 	 		exit;
 	 	}
 
@@ -135,20 +139,55 @@
 	/**
 	 * Verifica se o log do InterAdmin foi alterado. E limpa o cache se necessário.
 	 * 
-	 * @return void
+	 * @return int Retorna a data de alteração do arquivo de log. 
 	 */
 	protected function _checkLog()
 	{
 		$lastLogFilename = 'logcheck.log';
-		$lastLogTime = intval(file_get_contents(self::$_cachedir . $lastLogFilename));
+		$lastLogTime = intval(@file_get_contents(self::$_cachedir . $lastLogFilename));
 
 		// Verificação do log
-	 	$logTime = filemtime(self::$_logdir . 'interadmin.log');
+	 	$logTime = @filemtime(self::$_logdir . 'interadmin.log');
 		
 	 	// Grava último log, se necessário
-	 	if ($logTime != $lastLogTime) {
+	 	if ($logTime != $lastLogTime && $logTime + self::$_delay < time()) {
 	 		$this->clean();
 	 		file_put_contents(self::$_cachedir . $lastLogFilename, $logTime);
 	 	}
+	 	
+	 	return $logTime;
 	}
+	
+	/**
+	 * Exibe informações para debug em um overlay no topo da página.
+	 * 
+	 * @param string $id ID do cache.
+	 * @param int $logTime Timestamp da última alteração do log.
+	 */
+	protected function _showDebug($id, $logTime)
+	{
+		global $c_jp7;
+		
+		if ($c_jp7) {
+			$metas = $this->getBackend()->getMetadatas($id);
+			
+			$css = 'position:absolute;border:1px solid black;border-top:0px;font-weight:bold;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000;';
+			$title = array(
+				'# Cache: ',
+					'  ' . self::$_cachedir . $id,
+					'  ' . date('d/m/Y H:i:s', $metas['mtime']), 
+				'# Log: ',
+					'  ' . self::$_logdir . 'interadmin.log',
+					'  ' . date('d/m/Y H:i:s', $logTime),
+				'# Hora do servidor: ' . date('d/m/Y H:i:s', time()),
+				'# Delay para limpeza: ' . self::$_delay . ' segundos',
+			);
+
+			$title = implode('&#013;', $title);
+			
+	 		echo '<div style="' . $css . 'left:0px;" title="' . $title . '">CACHE</div>';
+	 		echo '<div style="' . $css . 'right:0px;" title="' . $title . '">CACHE</div>';
+		}
+	}
+	
 }
