@@ -63,6 +63,7 @@ class Pagination{
 		
 		// HTM
 		$this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
+		$this->query_string = preg_replace('([&]?redirect_root=true)', '', $this->query_string); // Retira o "redirect_root=true" da Query String
 		if ($seo) $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
 		$this->query_string = preg_replace('([&]?go_url=' . $_GET['go_url'] . ')', '', $this->query_string); // Retira a GO Url da Query String
 		if ($this->query_string[0] == '&') $this->query_string = substr($this->query_string,1); // Limpa & que sobrou no começo da string
