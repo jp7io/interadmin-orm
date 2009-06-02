@@ -16,12 +16,20 @@
  * @package InterSite
  */
 class InterSite extends InterAdmin {
+    /**
+     * Tipo de servidor padrão. Produção ou QA.
+     * @var string
+     */
+    private static $_type = 'Produção';
+    
 	/**
-	 * @var Array of servers for this site.
+	 * Array of servers for this site.
+	 * @var array
 	 */
 	public $servers;
 	/**
-	 * @var Array of languages for this site.
+	 * Array of languages for this site.
+	 * @var array
 	 */
 	public $langs;
 	/**
@@ -251,6 +259,32 @@ class InterSite extends InterAdmin {
 	}
 	
 	/**
+	 * Define o tipo do servidor padrão para Produção ou QA.
+	 * Utilizado por exemplo no InterAdmin remote para saber qual servidor remote utilizar.
+	 *
+	 * @param string $type 
+	 * @return void
+	 */
+	public static function setType($type)
+	{
+        if ($type == 'Produção' || $type == 'QA') {
+            self::$_type = $type;
+        } else {
+            throw Exception('Tipo de servidor informado não é Produção ou QA.');
+        }
+	}
+	
+	/**
+	 * Retorna o valor atual de tipo de servidor padrão.
+	 *
+	 * @return string Tipo padrão.
+	 */
+	public static function getType()
+	{
+        return self::$_type;
+	}
+	
+	/**
 	 * Checks if it´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
 	 * If the HTTP_HOST has a . (dot) like something.com, it will return false.
 	 *
@@ -285,7 +319,7 @@ class InterSite extends InterAdmin {
 			// InterAdmin Remote
 			if ((in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) && $GLOBALS['jp7_app']) {
 				foreach ($this->servers as $host => $server) {
-					if ($server->type == 'Produção') {
+					if ($server->type == self::$_type) {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
 						$GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
 						break 2;  // Exit the foreach and the while.
