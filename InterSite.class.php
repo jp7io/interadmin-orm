@@ -264,13 +264,14 @@ class InterSite extends InterAdmin {
 	 *
 	 * @param string $type 
 	 * @return void
+	 * @throws Exception Se o servidor for diferente de QA ou Produção.
 	 */
 	public static function setType($type)
 	{
         if ($type == 'Produção' || $type == 'QA') {
             self::$_type = $type;
         } else {
-            throw Exception('Tipo de servidor informado não é Produção ou QA.');
+            throw new Exception('Tipo de servidor informado não é Produção ou QA.');
         }
 	}
 	
