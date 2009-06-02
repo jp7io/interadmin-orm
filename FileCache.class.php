@@ -147,6 +147,7 @@ class FileCache{
 			$file_content .= "\n" . '<!-- Published by JP7 InterAdmin in ' . date('Y/m/d - H:i:s') . ' -->';
 			@fwrite($file, $file_content);
 			@chmod($this->cachePath . $this->fileName, 0777);
+			@chown($this->cachePath . $this->fileName, fileowner($this->cachePath));
 		}
 		ob_end_flush();
 	}
