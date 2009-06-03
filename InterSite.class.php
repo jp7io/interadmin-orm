@@ -16,30 +16,27 @@
  * @package InterSite
  */
 class InterSite extends InterAdmin {
-    /**
-     * Tipo de servidor padrão. Produção ou QA.
-     * @var string
-     */
-    private static $_type = 'Produção';
-    
+
 	/**
 	 * Array of servers for this site.
 	 * @var array
 	 */
-	public $servers;
+	public $servers = array();
 	/**
 	 * Array of languages for this site.
 	 * @var array
 	 */
-	public $langs;
+	public $langs = array();
+	
 	/**
 	 * Populates and returns the array of servers for this site.
 	 * 
 	 * @return array
 	 */
-	public function getServers() {
+	public function getServers()
+	{
 		$options = array(
-			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2'),
+			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2', 'select_multi_1'),
 			'fields_alias' => true
 		);
 		$servers = $this->getChildren(26, $options);
@@ -47,18 +44,26 @@ class InterSite extends InterAdmin {
 		// Variaveis do site
 		$vars = $this->getChildren(39, array( 'fields' => array( 'select_key', 'varchar_1')));
 		
-		foreach((array) $vars as $var) {
+		foreach($vars as $var) {
 			$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
 			$varName = $varName->varchar_1;
 			$this->$varName = $var->varchar_1;
 		}
-		foreach ((array) $servers as $server) {
+		foreach ($servers as $server) {
 			// Variaveis do server
 			$server_vars = $server->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
-			$server->vars = null;
-			foreach((array) $server_vars as $var) {
+			$server->vars = array();
+			foreach ($server_vars as $var) {
 				$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
 				$server->vars[$varName->varchar_1] = $var->varchar_1;
+			}
+			// InterAdmin Remote
+			foreach ($server->interadmin_remote as $key => $interadmin_remote) {
+				$server->interadmin_remote[$key] = $interadmin_remote->getFieldsValues('varchar_key');
+			}
+			// FTP
+			if (!$server->ftp) {
+				$server->ftp = $server->host;
 			}
 			// Tipo 
 			$type = new InterAdmin($server->type, array('fields' => 'varchar_key'));
@@ -68,13 +73,18 @@ class InterSite extends InterAdmin {
 				'fields' => array('varchar_key', 'varchar_1', 'varchar_2', 'varchar_3', 'varchar_4', 'password_key', 'select_2'),
 				'fields_alias' => true
 			);
-			$server->db = new InterAdmin($server->db->id, $options);
-			$type = new InterAdmin($server->db->type->id, array('fields' => 'varchar_1'));
-			$server->db->type = $type->varchar_1;
+			if ($server->db) {
+				$server->db->getFieldsValues($options['fields'], false, $options['fields_alias']);
+				$type = new InterAdmin($server->db->type->id, array('fields' => 'varchar_1'));
+				$server->db->type = $type->varchar_1;
+			} else {
+				$server->db = new stdClass();
+			}
+			
 			// Aliases
 			$aliasesObj = $server->getChildren(31, array('fields' => array('varchar_key', 'char_1')));
-			$server->aliases = null;
-			foreach ((array)$aliasesObj as $aliasObj) {
+			$server->aliases = array();
+			foreach ($aliasesObj as $aliasObj) {
 				$server->aliases[] = $aliasObj->varchar_key;
 				if ($aliasObj->char_1) {
 					if (strpos($aliasObj->varchar_key, 'www.') === 0) {
@@ -84,21 +94,19 @@ class InterSite extends InterAdmin {
 					}
 				}
 			}
-			// Cleaning unused data
-			unset($server->db->_tipo);
-			unset($server->db->_parent);
-			unset($server->_tipo);
-			unset($server->_parent);
 		}
+		
 		// Renaming keys
-		foreach ((array)$servers as $server) {
+		foreach ($servers as $server) {
 			$renamed_servers[$server->host] = $server;
 		}
 		$this->servers = $renamed_servers;
+			
 		return $this->servers;
 	}
 	
-	public function getLangs(){
+	public function getLangs()
+	{
 		$options = array(
 			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2', 'char_1'),
 			'fields_alias' => true
@@ -117,33 +125,11 @@ class InterSite extends InterAdmin {
 		}
 	}
 	
-	protected function _socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
-		$header = "" .
-		$method . " " . $url . " HTTP/1.1\r\n" .
-		"Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, */*\r\n" .
-		"Referer: " . $referer."\r\n" .
-		"Accept-Language: pt-br\r\n" .
-		"Content-Type: application/x-www-form-urlencoded\r\n" .
-		"Accept-Encoding: gzip, deflate\r\n" .
-		"User-Agent: " . $_SERVER['HTTP_USER_AGENT'] . "\r\n" .
-		"Host: " . $host . "\r\n" .
-		"Content-Length: " . strlen($parameters) . "\r\n" .
-		"Connection: Close\r\n" .
-		"Cache-Control: no-cache\r\n" .
-		"Cookie: " . $cookie . "\r\n\r\n" .
-		$parameters;
-		
-		$fp = @fsockopen ($host, 80, $errno, $errstr, 30);
-		if ($fp) {
-		   	fputs ($fp, $header);
-			while (!feof($fp)) {
-				$content.= fgets ($fp,128);
-			}
-			fclose ($fp);
-		}
-		return $content;
-	}
-	
+	/**
+	 * Testa as configurações do site, conecta com o DB e o FTP e recupera dados do PHPInfo.
+	 * 
+	 * @return void
+	 */
 	public function testConfig() {
 		foreach($this->servers as $server) {
 			$fieldsValues = '';
@@ -259,77 +245,139 @@ class InterSite extends InterAdmin {
 	}
 	
 	/**
-	 * Define o tipo do servidor padrão para Produção ou QA.
-	 * Utilizado por exemplo no InterAdmin remote para saber qual servidor remote utilizar.
-	 *
-	 * @param string $type 
-	 * @return void
-	 * @throws Exception Se o servidor for diferente de QA ou Produção.
-	 */
-	public static function setType($type)
-	{
-        if ($type == 'Produção' || $type == 'QA') {
-            self::$_type = $type;
-        } else {
-            throw new Exception('Tipo de servidor informado não é Produção ou QA.');
-        }
-	}
-	
-	/**
-	 * Retorna o valor atual de tipo de servidor padrão.
-	 *
-	 * @return string Tipo padrão.
-	 */
-	public static function getType()
-	{
-        return self::$_type;
-	}
-	
-	/**
 	 * Checks if it´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
 	 * If the HTTP_HOST has a . (dot) like something.com, it will return false.
 	 *
 	 * @return bool
 	 */
-	public static function isAtLocalhost(){
+	public static function isAtLocalhost()
+	{
 		if ($_SERVER['HTTP_HOST'] == 'localhost') {
 			return true;
 		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
-			// Has no dots like 
+			// Has no dots 
 			if (strpos($_SERVER['HTTP_HOST'], '.') === false) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	function __sleep() {
-		unset($this->_tipo);
-		unset($this->_parent);
-		return array_keys(get_object_vars($this));
+		
+	protected function _socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
+		$header = "" .
+		$method . " " . $url . " HTTP/1.1\r\n" .
+		"Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, */*\r\n" .
+		"Referer: " . $referer."\r\n" .
+		"Accept-Language: pt-br\r\n" .
+		"Content-Type: application/x-www-form-urlencoded\r\n" .
+		"Accept-Encoding: gzip, deflate\r\n" .
+		"User-Agent: " . $_SERVER['HTTP_USER_AGENT'] . "\r\n" .
+		"Host: " . $host . "\r\n" .
+		"Content-Length: " . strlen($parameters) . "\r\n" .
+		"Connection: Close\r\n" .
+		"Cache-Control: no-cache\r\n" .
+		"Cookie: " . $cookie . "\r\n\r\n" .
+		$parameters;
+		
+		$fp = @fsockopen ($host, 80, $errno, $errstr, 30);
+		if ($fp) {
+		   	fputs ($fp, $header);
+			while (!feof($fp)) {
+				$content.= fgets ($fp,128);
+			}
+			fclose ($fp);
+		}
+		return $content;
+	}
+		
+	protected function _removeFromArray($val, array &$array)
+	{
+		$posicao = array_search($val, $array);
+		if ($posicao !== false) {
+			unset($array[$posicao]);
+		}
 	}
 	
+	protected function _removeAttributes($object, array $attributes = array('id', 'id_tipo', 'table', 'db_prefix'))
+	{
+		foreach ($attributes as $name) 
+		{
+			unset($object->$name);
+		}
+	}
+	
+	protected function _toSimpleObject($object)
+	{
+		$retorno = new stdClass();
+		foreach ((array) $object as $key => $atributo) {
+			if ($key[0] != chr(0)) {
+				$retorno->$key = $atributo;
+			}
+		}
+		return $retorno;
+	}
+	
+	/**
+	 * Remove valores não necessários antes de ser serializado.
+	 * 
+	 * @return array
+	 */
+	function __sleep() 
+	{
+		foreach ($this->servers as $key => &$server) {
+			$server = $this->_toSimpleObject($server);
+			$this->_removeAttributes($server);
+			if ($server->db) {
+				$server->db = $this->_toSimpleObject($server->db);
+				$this->_removeAttributes($server->db);
+			}
+		}
+		
+		foreach ($this->langs as $key => &$lang) {
+			$lang = $this->_toSimpleObject($lang);
+			$this->_removeAttributes($lang);
+		}
+		
+		$atributos = array_keys(get_object_vars($this));
+
+		$this->_removeFromArray('_tipo', $atributos);
+		$this->_removeFromArray('_parent', $atributos);
+		$this->_removeFromArray('interadmin_logo', $atributos);
+		$this->_removeFromArray('db_prefix', $atributos);
+		$this->_removeFromArray('table', $atributos);
+		$this->_removeFromArray('id', $atributos);
+		$this->_removeFromArray('id_tipo', $atributos);
+	
+		return $atributos;
+	}
+	
+	/**
+	 * Executada quando é utilizado unserialize().
+	 * 
+	 * @return void
+	 */
 	function __wakeup() {
 		global $debugger;
+		$thisHost = $_SERVER['HTTP_HOST'];
 		
 		// This server is a main host
-		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
-		$this->interadmin_remote = jp7_explode(';', $this->interadmin_remote);
+		$this->server = $this->servers[$thisHost];
 
 		while (!$this->server) {
 			// InterAdmin Remote
-			if ((in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) && $GLOBALS['jp7_app']) {
+			if ($GLOBALS['jp7_app']) {
 				foreach ($this->servers as $host => $server) {
-					if ($server->type == self::$_type) {
-						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
-						$GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
+					$remotes = $server->interadmin_remote;
+					if (in_array($thisHost, $remotes) || in_array('www.' . $thisHost, $remotes)) {
+						$this->server = $this->servers[$thisHost] = $server;
+						$GLOBALS['c_remote'] = $thisHost;
 						break 2;  // Exit the foreach and the while.
 					}
 				}
 			}
 			// Alias found, redirect it to the host
 			foreach ($this->servers as $host => $server) {
-				if (in_array($_SERVER['HTTP_HOST'], (array) $server->aliases)) {
+				if (in_array($thisHost, $server->aliases)) {
 					header('Location: http://' . $host . $_SERVER['REQUEST_URI']);
 					exit();
 				}
@@ -338,17 +386,18 @@ class InterSite extends InterAdmin {
 			if (self::isAtLocalhost()) {
 				foreach ($this->servers as $host => $server) {
 					if ($server->type == 'Desenvolvimento') {
-						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
+						$this->server = $this->servers[$thisHost] = $server;
 						break 2; // Exit the foreach and the while.
 					}
 				}
 				break;
 			}
 			// No server found
-			$message = 'Host não está presente nas configurações: ' . $_SERVER['HTTP_HOST'];
+			$message = 'Host não está presente nas configurações: ' . $thisHost;
 			jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
 			if ($this->servers) {
-				$urlSitePrincipal = 'http://' . jp7_implode('/', array(reset($this->servers)->host, reset($this->servers)->path));
+				$sitePrincipal = reset($this->servers);
+				$urlSitePrincipal = 'http://' . jp7_implode('/', array($sitePrincipal->host, $sitePrincipal->path));
 				$messageLink = 'Acesse o site: <a href="' . $urlSitePrincipal . '">' . $urlSitePrincipal . '</a>';
 			}
 			die(
@@ -359,45 +408,52 @@ class InterSite extends InterAdmin {
 		}
 		$this->db = $this->server->db;
 				
-		foreach((array) $this->server->vars as $var=>$value) {
+		foreach($this->server->vars as $var => $value) {
 			$this->$var = $value;
 		}
 
 		/* @todo TEMP - Creating old globals */
-		$oldtypes = array('Produção'=>'Principal', 'QA'=>'QA', 'Desenvolvimento'=>'Local');
+		$oldtypes = array(
+			'Produção' => 'Principal',
+			'QA' => 'QA',
+			'Desenvolvimento' => 'Local'
+		);
 		$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
 		$GLOBALS['c_site'] = $this->name_id;
 		$GLOBALS['c_menu'] = $this->menu;
-		$GLOBALS['c_publish'] = $this->interadmin_preview;
-		$GLOBALS['c_demo'] = $this->interadmin_demo;
-		$GLOBALS['c_cache'] = $this->cache; // Paginas serão cacheadas ou não
+		$GLOBALS['c_cache'] = $this->cache;
 		$GLOBALS['c_cache_delay'] = $this->cache_delay;
 		$GLOBALS['db_prefix'] = 'interadmin_' . $this->name_id;
 		$GLOBALS['c_path'] = $this->server->path;
-		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_analytics'] = $this->google_analytics;
-		//if (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) $GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
 		$GLOBALS['c_w3c'] = true;
 		$GLOBALS['c_doc_root'] = jp7_doc_root();
+		// DB
 		$GLOBALS['db_type'] = $this->db->type;
 		$GLOBALS['db_host'] = ($this->db->host_internal) ? $this->db->host_internal : $this->db->host;
 		$GLOBALS['db_name'] = $this->db->name;
 		$GLOBALS['db_user'] = $this->db->user;
 		$GLOBALS['db_pass'] = $this->db->pass;
+		// FTP
+		$GLOBALS['ftp']['host'] = $this->server->ftp;
 		$GLOBALS['ftp']['user'] = $this->server->user;
 		$GLOBALS['ftp']['pass'] = $this->server->pass;
 		// InterAdmin
+		$GLOBALS['c_publish'] = $this->interadmin_preview;
+		$GLOBALS['c_demo'] = $this->interadmin_demo;
+		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_cliente_title'] = $this->name;
-		foreach ($this->servers as $host=>$server) {
+		foreach ($this->servers as $host => $server) {
 			$GLOBALS['c_cliente_domains'][] = $host;
-			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
+			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], $server->aliases);
 		}
-		foreach($this->langs as $acron=>$value) {
-			$GLOBALS['c_lang'][] = array($acron, $value->name, (bool) $value->multibyte);
-			if ($value->default) $GLOBALS['c_lang_default'] = $acron;
+		foreach($this->langs as $sigla => $lang) {
+			$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
+			if ($lang->default) {
+				$GLOBALS['c_lang_default'] = $sigla;
+			}
 		}
 		/* TEMP - Creating old globals */
 	}
 }
-?>
