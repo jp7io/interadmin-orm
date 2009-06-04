@@ -15,6 +15,7 @@
  * @property string $interadminsOrderby SQL Order By for the records of this InterAdminTipo.
  * @property string $class Class to be instantiated for the records of this InterAdminTipo.
  * @property string $tabela Table of this Tipo, or of its Model, if it has no table.
+ * @category Jp7
  * @package InterAdminTipo
  */
 class InterAdminTipo{
@@ -398,28 +399,30 @@ class InterAdminTipo{
 		// Join
 		$joinsCount = 0;
 		if (!is_array($options['from'])) $options['from'] = (array) $options['from'];
-		foreach($options['fields'] as $key => $field){
-			$joinTipo = $campos[$key]['nome'];
-			if (is_array($field)) {
-				$options['fields'][$key] = 'main.' . $key;
-				if (!is_object($joinTipo)) continue;
-				$join = 'join' . ++$joinsCount;
-				if ($campos[$key]['xtra'] == 'S') {
-					$options['from'][] = $this->db_prefix . "_tipos" .
-						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id_tipo";
-				} else {
-					$options['from'][] = $this->db_prefix .
-						(($joinTipo->tabela) ? '_' . $joinTipo->tabela : '') .
-						(($joinTipo->getFieldsValues('language')) ? $lang->prefix : '') .
-						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id";
-				}
-				
-				foreach($field as $joinField) {
-					$options['fields'][] = $join . '.' . $joinField . " AS " . $join . '_' . $joinField;
-				}
-			} else {
-				if (strpos($field, '(') === FALSE && strpos($field, '.') === FALSE) $options['fields'][$key] = 'main.' . $field;
-			}
+		if (is_array($options['fields'])) {
+            foreach($options['fields'] as $key => $field){
+                $joinTipo = $campos[$key]['nome'];
+                if (is_array($field)) {
+                    $options['fields'][$key] = 'main.' . $key;
+                    if (!is_object($joinTipo)) continue;
+                    $join = 'join' . ++$joinsCount;
+                    if ($campos[$key]['xtra'] == 'S') {
+                        $options['from'][] = $this->db_prefix . "_tipos" .
+                            " AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id_tipo";
+                    } else {
+                        $options['from'][] = $this->db_prefix .
+                            (($joinTipo->tabela) ? '_' . $joinTipo->tabela : '') .
+                            (($joinTipo->getFieldsValues('language')) ? $lang->prefix : '') .
+                            " AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id";
+                    }
+                    
+                    foreach($field as $joinField) {
+                        $options['fields'][] = $join . '.' . $joinField . " AS " . $join . '_' . $joinField;
+                    }
+                } else {
+                    if (strpos($field, '(') === FALSE && strpos($field, '.') === FALSE) $options['fields'][$key] = 'main.' . $field;
+                }
+            }
 		}
 		
 		// Order Fix
@@ -539,4 +542,3 @@ class InterAdminTipo{
 		return $url;
 	}
 }
-?>
