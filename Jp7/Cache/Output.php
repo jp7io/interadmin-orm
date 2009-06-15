@@ -41,6 +41,7 @@
 			);
 			$backDefault = array(
 				'cache_dir' => self::$_cachedir,
+                'cache_file_umask' => 0777,
 				'file_name_prefix' => 'zf'
 			);
 
@@ -171,7 +172,7 @@
 		if ($c_jp7) {
 			$metas = $this->getBackend()->getMetadatas($id);
 			
-			$css = 'position:absolute;border:1px solid black;border-top:0px;font-weight:bold;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000;';
+			$css = 'position:absolute;border:1px solid black;border-top:0px;font-weight:bold;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000;cursor:pointer;';
 			$title = array(
 				'# Cache: ',
 					'  ' . self::$_cachedir . $id,
@@ -185,8 +186,11 @@
 
 			$title = implode('&#013;', $title);
 			
-	 		echo '<div style="' . $css . 'left:0px;" title="' . $title . '">CACHE</div>';
-	 		echo '<div style="' . $css . 'right:0px;" title="' . $title . '">CACHE</div>';
+			$urlNoCache = preg_replace('/^([^&]*)([&]?)([^&]*)$/', '$1?$3$2nocache_force=true', str_replace('?', '&', $_SERVER['REQUEST_URI']));
+            $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta página?\')) window.location = \'' . $urlNoCache . '\'"';
+	 		
+	 		echo '<div style="' . $css . 'left:0px;" title="' . $title . '" ' . $event . '>CACHE</div>';
+	 		echo '<div style="' . $css . 'right:0px;" title="' . $title . '" ' . $event . '>CACHE</div>';
 		}
 	}
 	
