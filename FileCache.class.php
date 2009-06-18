@@ -171,7 +171,7 @@ class FileCache{
                         '  ' . $this->fileRoot . $config->name_id . '/interadmin/interadmin.log',
                         '  ' . date('d/m/Y H:i:s', @filemtime($this->fileRoot . $config->name_id . '/interadmin/interadmin.log')),
                     '# Hora do servidor: ' . date('d/m/Y H:i:s', time()),
-                    '# Delay para limpeza: ' . $this->delay . ' segundos',
+                    '# Delay para limpeza: ' . intval($this->delay) . ' segundos',
                 );
 
                 $title = implode('&#013;', $title);
