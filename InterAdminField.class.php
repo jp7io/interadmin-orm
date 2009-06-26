@@ -83,6 +83,7 @@ class InterAdminField{
 			$form=jp7_db_checkbox($campo."[".$j."]","S",$campo,$readonly);
 		}elseif(strpos($campo,"select_multi_")===0){
 			if(!$readonly_hidden){
+				if (is_object($campo_nome)) $campo_nome = (string) $campo_nome;
 				$form="<div class=\"select_multi\">";
 				ob_start();
 				if($xtra=="X"){
