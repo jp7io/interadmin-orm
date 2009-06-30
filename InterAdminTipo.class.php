@@ -370,7 +370,10 @@ class InterAdminTipo{
 					if ($campos['xtra'] === 'S') {
 						$value_arr[$key2] = InterAdminTipo::getInstance($value2);
 					} else {
-						$value_arr[$key2] = InterAdmin::getInstance($value2);
+						$options = array(
+							'table' => $campos['nome']->tabela
+						);
+						$value_arr[$key2] = InterAdmin::getInstance($value2, $options);
 					}
 				}
 				$value = $value_arr;
