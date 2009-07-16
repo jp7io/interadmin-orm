@@ -111,15 +111,7 @@ class InterAdminField{
 			"<option value=\"0\">Selecione</option>" .
 			"<option value=\"0\">--------------------</option>";
 			if ($xtra == 'radio') {
-				$sql = "SELECT id,varchar_key FROM ".$db_prefix.
-				" WHERE id_tipo=".$campo_nome.
-				" ORDER BY int_key,varchar_key";
-				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
-				$form = '';
-				while ($row = $rs->FetchNextObj()) {
-					$form.="<input type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "[".$j."]_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")."> <label for=\"" . $campo . "[".$j."]_".$row->id."\">".toHTML($row->varchar_key)."</label><br />";
-				}
-				$rs->Close();
+				$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio);
 			} elseif ($xtra == 'ajax') {
 				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . $campo_nome . ", 'search', 'callback')\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
 				"<option value=\"0\">Selecione ou Procure (Beta)" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
@@ -151,7 +143,7 @@ class InterAdminField{
 					}
 					$rs->Close();
 				}
-			}else{
+			} else {
 				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"autocomplete\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
 				"<option value=\"0\">Selecione ou Procure (Beta)" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
 				"<option value=\"0\">--------------------</option>" .
