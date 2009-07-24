@@ -16,7 +16,10 @@
  * @package InterSite
  */
 class InterSite extends InterAdmin {
-
+	const PRODUCAO = 'Produção';
+	const QA = 'QA';
+	const DESENVOLVIMENTO = 'Desenvolvimento';
+	
 	/**
 	 * Array of servers for this site.
 	 * @var array
@@ -318,6 +321,20 @@ class InterSite extends InterAdmin {
 	}
 	
 	/**
+	 * Returns the first server which has a given type.
+	 * 
+	 * @param string $type Type of the server, such as InterSite::PRODUCAO, InterSite::QA or InterSite::DESENVOLVIMENTO.
+	 * @return InterAdmin
+	 */
+	public function getFirstServerByType($type) {
+		foreach ($this->servers as $server) {
+			if ($server->type == $type) {
+				return $server;
+			}
+		}
+	}
+	
+	/**
 	 * Remove valores não necessários antes de ser serializado.
 	 * 
 	 * @return array
@@ -357,21 +374,21 @@ class InterSite extends InterAdmin {
 	 * @return void
 	 */
 	function __wakeup() {
-		global $debugger;
+		global $debugger, $jp7_app;
 		$thisHost = $_SERVER['HTTP_HOST'];
 		
 		// This server is a main host
 		$this->server = $this->servers[$thisHost];
-
+		
 		while (!$this->server) {
 			// InterAdmin Remote
-			if ($GLOBALS['jp7_app']) {
+			if ($jp7_app) {
 				foreach ($this->servers as $host => $server) {
 					$remotes = $server->interadmin_remote;
 					if (in_array($thisHost, $remotes) || in_array('www.' . $thisHost, $remotes)) {
 						$this->server = $this->servers[$thisHost] = $server;
 						$GLOBALS['c_remote'] = $thisHost;
-						break 2;  // Exit the foreach and the while.
+						break 2;  // Exit foreach and while.
 					}
 				}
 			}
@@ -384,39 +401,34 @@ class InterSite extends InterAdmin {
 			}
 			// Dev Local
 			if (self::isAtLocalhost()) {
-				foreach ($this->servers as $host => $server) {
-					if ($server->type == 'Desenvolvimento') {
-						$this->server = $this->servers[$thisHost] = $server;
-						break 2; // Exit the foreach and the while.
-					}
+				$server = $this->getFirstServerByType(self::DESENVOLVIMENTO);
+				if ($server) {
+					$this->server = $this->servers[$thisHost] = $server;
+					break; // Exit while
 				}
-				break;
 			}
 			// No server found
 			$message = 'Host não está presente nas configurações: ' . $thisHost;
 			jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
+			$message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
 			if ($this->servers) {
-				$sitePrincipal = reset($this->servers);
-				$urlSitePrincipal = 'http://' . jp7_implode('/', array($sitePrincipal->host, $sitePrincipal->path));
-				$messageLink = 'Acesse o site: <a href="' . $urlSitePrincipal . '">' . $urlSitePrincipal . '</a>';
+				$siteProducao = $this->getFirstServerByType(self::PRODUCAO);
+				$urlProducao = 'http://' . jp7_implode('/', array($siteProducao->host, $siteProducao->path));
+				$messageLink = 'Acesse o site: <a href="' . $urlProducao . '">' . $urlProducao . '</a>';
 			}
-			die(
-				$message . '.<br /><br />' .
-				'Você pode ter digitado um endereço inválido.<br /><br />' .
-				$messageLink
-			);
+			die($message . $messageLink);
 		}
 		$this->db = $this->server->db;
-				
+		
 		foreach($this->server->vars as $var => $value) {
 			$this->$var = $value;
 		}
 
 		/* @todo TEMP - Creating old globals */
 		$oldtypes = array(
-			'Produção' => 'Principal',
-			'QA' => 'QA',
-			'Desenvolvimento' => 'Local'
+			self::PRODUCAO => 'Principal',
+			self::QA => 'QA',
+			self::DESENVOLVIMENTO => 'Local'
 		);
 		$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
 		$GLOBALS['c_site'] = $this->name_id;
