@@ -367,7 +367,7 @@ class InterAdminTipo{
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
-					if ($campos['xtra'] === 'S') {
+					if (in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'))) {
 						$value_arr[$key2] = InterAdminTipo::getInstance($value2);
 					} else {
 						$options = array(
@@ -378,7 +378,7 @@ class InterAdminTipo{
 				}
 				$value = $value_arr;
 			} elseif($value && is_numeric($value)) {
-				if ($campos['xtra'] === 'S') {
+				if (in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'))) {
 					$value = InterAdminTipo::getInstance($value);
 				} else {
 					$options = array(
