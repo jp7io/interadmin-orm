@@ -112,6 +112,8 @@ class InterAdminField{
 			"<option value=\"0\">--------------------</option>";
 			if ($xtra == 'radio') {
 				$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio);
+			} elseif ($xtra == 'radio_tipos') {
+				$form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', true, $readonly, $obrigatorio);
 			} elseif ($xtra == 'ajax') {
 				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . $campo_nome . ", 'search', 'callback')\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
 				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
@@ -126,6 +128,13 @@ class InterAdminField{
 					foreach ($rows as $row) {
 						$form.="<option value=\"".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" selected":"").">".toHTML($row->getStringValue())."</option>";
 					}
+				}
+			} elseif ($xtra == 'ajax_tipos') {	
+				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . intval($campo_nome) . ", 'search', 'callback', true)\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
+				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+				"<option value=\"0\">--------------------</option>";
+				if ($valor) {
+					$form.="<option value=\"".$valor."\" value=\"".$valor."\" selected>".toHTML(interadmin_tipos_nome($valor))."</option>";
 				}
 			} elseif ($xtra) {
 				if ($campo_nome == "all") {
