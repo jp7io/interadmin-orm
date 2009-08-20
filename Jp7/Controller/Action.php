@@ -109,10 +109,15 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->headScript()->appendFile('/_default/js/swfobject.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery-1.3.2.min.js', 'text/javascript');
 		$this->view->headScript()->appendFile('/_default/js/interdyn_menu.js', 'text/javascript');
-		$this->view->headScript()->appendFile($this->baseUrl . '/js/interdyn_menu_' . $this->config->name_id . '.js', 'text/javascript');
-		$this->view->headScript()->appendFile($this->baseUrl . '/js/interdyn_menu_str.php?lang=pt-br', 'text/javascript');
+		if ($this->config->menu != "none") {
+			$this->view->headScript()->appendFile($this->baseUrl . '/js/interdyn_menu_' . $this->config->name_id . '.js', 'text/javascript');
+		}
+		if ($this->config->menu != "none" || $this->getRequest()->getParam('interadmin_gerar_menu')) {
+			$this->view->headScript()->appendFile($this->baseUrl . '/js/interdyn_menu_str.php?lang=' . $lang->lang .
+				(($this->getRequest()->getParam('interadmin_gerar_menu')) ? '&interadmin_gerar_menu=true' : ''), 'text/javascript');
+		}
 		$this->view->headScript()->appendFile($this->baseUrl . '/js/functions.js', 'text/javascript');
-
+		
 		// titulos
 		$this->title['client'] = $this->config->langs[$lang->lang]->title;
 		if ($this->parentObj) {
