@@ -88,11 +88,14 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->controller = $this->getRequest()->getControllerName();
 		$this->view->action = $this->getRequest()->getActionName();
 		
+		// Config Lang
+		$this->config->lang = $this->config->langs[$lang->lang];
+		
 		// metas, css, js
 		$this->view->headMeta()->setHttpEquiv('Content-Type', 'text/html; charset=iso-8859-1');
 		$this->view->headMeta()->appendName('language', $lang->lang);
-		$this->view->headMeta()->appendName('description', '');
-		$this->view->headMeta()->appendName('keywords', '');
+		$this->view->headMeta()->appendName('description', $this->config->lang->description);
+		$this->view->headMeta()->appendName('keywords', $this->config->lang->keywords);
 		$this->view->headMeta()->appendName('copyright', date('Y') . ' ' . $this->config->name);
 		$this->view->headMeta()->appendName('robots', 'all');
 		$this->view->headMeta()->appendName('author', 'JP7 - http://jp7.com.br');
