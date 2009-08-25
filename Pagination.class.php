@@ -16,6 +16,33 @@
  * @package Pagination
  */
 class Pagination{
+	public $records;
+	/**
+	 * Total of pages.
+	 * @var $total
+	 */
+	public $total;
+	/**
+	 * Current page.
+	 * @var $page
+	 */
+	public $page;
+	/**
+	 * Offset item.
+	 * @var $init
+	 */
+	public $init;
+	/**
+	 * Itens per page.
+	 * @var $limit
+	 */
+	public $limit;
+	/**
+	 * MySQL LIMIT statement.
+	 * @var $sql_limit
+	 */
+	public $sql_limit;
+	
 	/**
 	 * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie ($this->htm).
 	 *
@@ -43,7 +70,7 @@ class Pagination{
 
 		if ($sql) {
 			if ($GLOBALS["jp7_app"]) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-			else $rs = interadmin_query($sql);		
+			else $rs = interadmin_query($sql);	
 			$row = $rs->FetchNextObj();
 			$this->records = $row->records;
 			$rs->Close();
@@ -78,15 +105,15 @@ class Pagination{
 			if ($this->total > 1) { // E se houver mais de uma pagina
 				// Numbers
 				$this->htm_numbers_extra = $this->htm_numbers = '<div class="numbers"><ul>';
-				
+
 				$min = $page - ceil($numbers_limit / 2);  // Codigo novo. Exemplo: 1 2 3 4 [5] 6 7 8 9 10
-				$max = $min + $numbers_limit - 1; 
+				$max = $min + $numbers_limit - 1;
 				if ($min < 1) {
 					$min = 1;
 					$max = $min + $numbers_limit - 1;
 				}
 				if ($max > $this->total) $max = $this->total;
-						
+				
 				if ($page !=1 && $this->total > 2 && $page > 2) $this->htm_numbers_extra .= $this->_createLink(1, $first_char , ' class="' . (($page == 1) ? 'back-off"' :'bgleft_plus"'));
 				$this->htm_numbers_extra .= $this->_createLink($page - 1, $back_char, ' class="' . (($page == 1) ? 'back-off"' :'bgleft"'));
 				for ($i = $min; $i <= $max; $i++) {
