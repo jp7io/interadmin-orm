@@ -213,7 +213,7 @@ class Social {
 			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
 		
-		$html = '<form id="interadminForm">' . "\n";
+		$html = '<form action="" id="interadminForm">' . "\n";
 		$html .= '<input type="hidden" name="url" value="' . $url . '" />' . "\n";
 		$html .= '<input type="hidden" name="title" value="' . $title . '" />' . "\n";
 		$html .= '<input type="hidden" name="template" value="' . $template . '" />' . "\n";
@@ -252,7 +252,7 @@ class Social {
 		if ($label) {
 			$html .= '<label for="embeddedUrl' . ucfirst(strtolower($key)) . '">' . $label . '</label>' . "\n";
 		}
-		$html .= '<textarea id="embeddedUrl' . ucfirst(strtolower($key)) . '" type="text" readonly="readonly" onclick="javascript:document.getElementById(\'embeddedUrl' . ucfirst(strtolower($key)) . '\').focus();document.getElementById(\'embeddedUrl' . ucfirst(strtolower($key)) . '\').select();">'  . "\n";
+		$html .= '<textarea id="embeddedUrl' . ucfirst(strtolower($key)) . '" readonly="readonly" onclick="javascript:document.getElementById(\'embeddedUrl' . ucfirst(strtolower($key)) . '\').focus();document.getElementById(\'embeddedUrl' . ucfirst(strtolower($key)) . '\').select();">'  . "\n";
 		/*if ($type == 'link') {
 			$html .= '<a href="' . $url . '" target="_blank">' . $title . '</a>';
 		} else {
