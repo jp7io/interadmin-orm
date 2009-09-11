@@ -88,7 +88,7 @@ class Debug{
 	 * Calculates and displays the time spent from the moment startTime() was called.
 	 *
 	 * @param bool Sets whether the time will be outputted or not.
-	 * @return void
+	 * @return int Total time.
 	 */	
 	public function getTime($output = FALSE) {
 		if (!count($this->_startTime)) return;
