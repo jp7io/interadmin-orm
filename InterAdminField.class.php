@@ -63,7 +63,7 @@ class InterAdminField{
 		}
 		$valor=stripslashes($GLOBALS[$campo]);
 		if(!$valor&&!$id)$valor=$valor_default;
-		$_th="<th title=\"".$campo."\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
+		$_th="<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
 		if($readonly=="hidden")$readonly_hidden=true;
 		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
@@ -111,6 +111,7 @@ class InterAdminField{
 			"<option value=\"0\">Selecione</option>" .
 			"<option value=\"0\">--------------------</option>";
 			if ($xtra == 'radio') {
+				$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
 				$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio);
 			} elseif ($xtra == 'radio_tipos') {
 				$form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', true, $readonly, $obrigatorio);
@@ -255,7 +256,7 @@ class InterAdminField{
 				if(!$readonly_hidden){
 					echo "".
 					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
-						"<th title=\"".$campo."\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
+						"<th title=\"" . $campo . ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 						"<td colspan=\"2\">".$form."</td>".
 						"<td>".$S_ajuda."</td>".
 					"</tr>\n";

@@ -5,16 +5,16 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package Debug
+ * @category Jp7
+ * @package Jp7_Debugger
  */
  
 /**
  * Debug class, used to display filenames, processing time and display formatted SQL queries.
  *
- * @package Debug
+ * @package Jp7_Debugger
  */
-class Debug{
+class Jp7_Debugger{
 	/**
 	 * Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
 	 * @var bool
@@ -34,7 +34,7 @@ class Debug{
 	 * In order to prevent errors with output and headers, set this variable <tt>TRUE</tt> after the headers are sent.
 	 * @var bool 
 	 */
-	public $safePoint;
+	protected $_safePoint;
 	/**
 	 * Array containing the activity log for queries, filenames and their processing time.
 	 * @var array 
@@ -88,7 +88,7 @@ class Debug{
 	 * Calculates and displays the time spent from the moment startTime() was called.
 	 *
 	 * @param bool Sets whether the time will be outputted or not.
-	 * @return int Total time.
+	 * @return void
 	 */	
 	public function getTime($output = FALSE) {
 		if (!count($this->_startTime)) return;
@@ -96,7 +96,7 @@ class Debug{
 		// Retrieves and deletes the last value
 		$debug_starttime = array_pop($this->_startTime);
 		$debug_totaltime = round(($debug_mtime[0] + $debug_mtime[1] - $debug_starttime) * 1000);
-		if ($output && $this->safePoint) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
+		if ($output && $this->isSafePoint()) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
 		return $debug_totaltime;
 	}
 	/**
@@ -108,7 +108,7 @@ class Debug{
 	 */	
 	public function showFilename($filename) {
 		global $c_doc_root;
-		if ($this->debugFilename && $this->safePoint) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+		if ($this->debugFilename && $this->isSafePoint()) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
 		if ($this->active) {
 			// Creates a new log entry for this file
 			$this->addLog($filename, 'file');
@@ -124,8 +124,11 @@ class Debug{
 	 * @return void
 	 */	
 	public function showSql($sql, $forceDebug = false, $style = '') {
-		if (!$this->safePoint) return;
-		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
+		if ($forceDebug) {
+			ob_flush();
+		}
+		if (!$this->isSafePoint()) return;
+		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace('/(SELECT | FROM | WHERE | ORDER BY |HAVING|GROUP BY|LEFT JOIN)/','<b>\1</b>', $sql) . '</div>';
 	}
 	/**
 	 * Formats and returns the backtrace.
@@ -136,15 +139,28 @@ class Debug{
  	 * @return string Formatted HTML backtrace.
 	 */	
 	public function getBacktrace($msgErro = NULL, $sql = NULL, $backtrace = NULL) {
+		global $c_doc_root;
 		if (!$backtrace) $backtrace = debug_backtrace();
 		krsort($backtrace);
-		$erroDetalhesArray = reset($backtrace);
+		
 		$S = '';
 		if ($msgErro) {
 			$S .= $this->_getBacktraceLabel('ERRO') . wordwrap($msgErro, 85, "\n") . "\n";
 		}
-		$S .= $this->_getBacktraceLabel('ARQUIVO') . $erroDetalhesArray['file'] . "\n";
-		$S .= $this->_getBacktraceLabel('LINHA') . $erroDetalhesArray['line'] . "\n";
+		$S .= '<hr />';
+		$S .= $this->_getBacktraceLabel('CALL STACK') . '<br />';
+		$S .= '<table id="jp7_debugger_table"><tr><th>#</th><th>Function</th><th>Location</th></tr>';
+		foreach ($backtrace as $key => $row) {
+			$S .= '<tr><td>' . (count($backtrace) - $key) . '</td>';
+			$S .= '<td>' . $row['class'] . $row['type'] . $row['function'] . '()</td>';
+			$S .= '<td>' . str_replace(str_replace('/', '\\', $c_doc_root), '', $row['file']) . ':' . $row['line'] . '</td></tr>';
+		}
+		$S .= '</table>';
+		
+		$S .= '<hr />';
+		if ($sql) {
+			$S .= $this->_getBacktraceLabel('SQL') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
+		}
 		$S .= $this->_getBacktraceLabel('URL') . (($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . "\n";
 		if ($_SERVER['HTTP_REFERER']) {
 			$S .= $this->_getBacktraceLabel('REFERER') . $_SERVER['HTTP_REFERER'] . "\n";
@@ -152,10 +168,8 @@ class Debug{
 		$S .= $this->_getBacktraceLabel('IP CLIENTE') . $_SERVER['REMOTE_ADDR'] . "\n";
 		$S .= $this->_getBacktraceLabel('IP SERVIDOR') . $_SERVER['SERVER_ADDR'] . "\n";
 		$S .= $this->_getBacktraceLabel('USER_AGENT') . $_SERVER['HTTP_USER_AGENT'] . "\n";
-		if ($sql) { 
-			$S .= $this->_getBacktraceLabel('SQL') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
-		}
-		$S .= $this->_getBacktraceLabel('BACKTRACE') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '                          \1', print_r($backtrace, true));
+		$S .= '<hr />';
+		$S .= $this->_getBacktraceLabel('BACKTRACE') . print_r($backtrace, true);
 		if (count($_POST)) {
 			$S .= $this->_getBacktraceLabel('POST') . print_r($_POST, true);	
 		}
@@ -246,7 +260,7 @@ class Debug{
  	 * @return void
 	 */
 	public function showToolbar() {
-		if (!$this->active || !$this->safePoint) return;
+		if (!$this->active || !$this->isSafePoint()) return;
 		
 		if ($this->_templateFilename ) echo ('Template: ' . $this->_templateFilename);
 		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
@@ -254,5 +268,10 @@ class Debug{
 		jp7_print_r($this->_log);
 		$this->getTime(true);
 	}
+	public function isSafePoint() {
+		return $this->_savePoint || headers_sent();
+	}
+	public function setSafePoint($bool) {
+		$this->_savePoint = $bool;
+	}
 }
-?>

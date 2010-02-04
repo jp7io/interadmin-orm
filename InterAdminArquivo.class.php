@@ -14,22 +14,10 @@
  *
  * @package InterAdminArquivo
  */
-class InterAdminArquivo{
-	/**
-	 * This record's 'id_arquivo', which is its primary key.
-	 * @var int
-	 */	
-	public $id_arquivo;
-	/**
-	 * This record's 'id', which is the parent of this InterAdminArquivo.
-	 * @var int
-	 */
-	public $id;
-	/**
-	 * This record's 'id_tipo', this value can be used to get the InterAdminTipo for a InterAdmin object.
-	 * @var int
-	 */
-	public $id_tipo;
+class InterAdminArquivo extends InterAdminAbstract {
+	
+	protected $_primary_key = 'id_arquivo';
+	
 	/**
 	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
 	 * @var string
@@ -54,65 +42,10 @@ class InterAdminArquivo{
 	public function __construct($id_arquivo = 0, $options = array()) {
 		$this->id_arquivo = $id_arquivo;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		if ($options['fields']) $this->getFieldsValues($options['fields']);
-	}
-	/**
-	 * String value of this record´s $id_arquivo.
-	 * 
-	 * @return string String value of the $id_arquivo property.
-	 */
-	public function __toString(){
-		return (string) $this->id_arquivo;
-	}	
-	/**
-	 * Gets values from this record on the database.
-	 *
-	 * @param mixed $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
-	 * @return mixed If fields were an array an object will be returned, otherwise it will return the result as a string.
-	 */
-	function getFieldsValues($fields) {   
-		global $lang, $db;
-		if (!$this->_tipo) $this->getTipo();
-		if ($lang->prefix) $tipoLanguage = $this->_tipo->getFieldsValues('language');
-		if ($fields == '*') $fields = InterAdminArquivo::getAllFieldsNames();
-		 
-		$sql = "SELECT " . implode(',' , (array) $fields) . 
-			" FROM " . $this->db_prefix . (($tipoLanguage) ? $lang->prefix : '') . "_arquivos" .
-			" WHERE id_arquivo = " . $this->id_arquivo;
-		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		if ($fieldsValues = $rs->FetchNextObj()) {
-			foreach ((array) $fieldsValues as $field=>$value) {
-				$this->$field = $value;
-			}
-			if (is_array($fields)) return $fieldsValues;
-			else return $fieldsValues->$fields;
+		if ($options['fields']) {
+			$this->getFieldsValues($options['fields']);
 		}
 	}
-	/**
-	 * Updates the values into the database table. If this object has no 'id_arquivo', the data is inserted.
-	 * 
-	 * @param array $fields_values Array with the values, the keys are the fields names.
-	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active. 
-	 * @return void
-	 */
-	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = FALSE) {
-		global $lang;
-		$tipoLanguage = $this->getTipo()->getFieldsValues('language');
-		if ($this->id_arquivo) {
-			jp7_db_insert($this->db_prefix . (($tipoLanguage) ? $lang->prefix : '')  . '_arquivos', 'id_arquivo', $this->id_arquivo, $fields_values, TRUE, $force_magic_quotes_gpc);
-		} else {
-			$this->id_arquivo = jp7_db_insert($this->db_prefix . (($tipoLanguage) ? $lang->prefix : '')  . '_arquivos', 'id_arquivo', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
-		}
-	}
-	/**
-	 * Returns an array with the names of all the fields.
-	 * 
-	 * @return array
-	 */
-	public static function getAllFieldsNames(){
-		return array('id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'url_mac', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted');
-	}
-	
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
 	 * 
@@ -121,8 +54,13 @@ class InterAdminArquivo{
 	 */
 	public function getTipo($options = array()) {
 		if (!$this->_tipo) {
-			if (!$this->id_tipo) $this->id_tipo = jp7_fields_values($this->db_prefix . $this->table, 'id', $this->id, 'id_tipo');
-			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array('db_prefix' => $this->db_prefix, 'class' => $options['class']));
+			if (!$this->id_tipo) {
+				$this->id_tipo = jp7_fields_values($this->db_prefix . $this->table, 'id', $this->id, 'id_tipo');
+			}
+			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
+				'db_prefix' => $this->db_prefix,
+				'class' => $options['class']
+			));
 		}
 		return $this->_tipo;
 	}
@@ -163,11 +101,87 @@ class InterAdminArquivo{
 	 *
 	 * @return string
 	 */
-	public function getUrl(){
+	public function getUrl() {
 		global $c_url;
 		$url = ($this->url) ? $this->url : $this->getFieldsValues('url');
 		$url = str_replace('../../', $c_url, $url);
 		return $url; 
 	}
+	/**
+	 * Returns the description of this file.
+	 *
+	 * @return string
+	 */
+	public function getText() {
+		$text = ($this->legenda) ? $this->legenda : $this->getFieldsValues('legenda');
+		return $text; 
+	}
+	/**
+	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
+	 *
+	 * @return Url New $url created with the $id_arquivo_banco of the added record.
+	 * @todo Create a class for _arquivos_banco 
+	 */
+	public function addToArquivosBanco() {
+		global $lang;
+		// Inserindo no banco de arquivos
+		$fieldsValues = array(
+			'id_tipo' => $this->id_tipo,
+			'id' => $this->id,
+			'tipo' => $this->getExtension(),
+			'parte' => intval($this->parte),
+			'keywords' => $this->nome,
+			'lang' => $lang->lang
+		);
+		
+		$id_arquivo_banco = jp7_db_insert($this->getTableName() . '_banco', 'id_arquivo_banco', '', $fieldsValues);
+		$id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+		
+		// Descobrindo o caminho da pasta
+		$parent = $this->getParent();
+		if ($parent->getParent()) {
+			$parent = $parent->getParent();
+		}
+		
+		$folder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		// Montando nova url
+		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
+		
+		// Movendo arquivo temporário
+		@rename($this->url, $newurl);
+		$this->url = $newurl;
+		// Movendo o thumb
+		if ($this->url_thumb) {
+			$newurl_thumb = $folder . $id_arquivo_banco . '_t.' . $fieldsValues['tipo'];
+			@rename($this->url_thumb, $newurl_thumb);
+			$this->url_thumb = $newurl_thumb;
+		}
+		return $this->url; 
+	}
+	
+	/**
+	 * Returns the extension of this file.
+	 * 
+	 * @return string Extension, such as 'jpg' or 'gif'.
+	 */
+	public function getExtension() {
+		return preg_replace('/(.*)\.(.*)$/', '\2', $this->url);
+	}
+	
+    function getAttributesAliases() {
+       return array();
+    }
+    function getAttributesCampos() {
+		return array();
+    }
+    function getAttributesNames() {
+		return array('id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'url_mac', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted');
+    }
+	function getTableName() {
+    	if ($this->id_tipo) {
+			return $this->getTipo()->getArquivosTableName();
+		} else {
+			return $this->db_prefix . '_arquivos';
+		}
+    }
 }
-?>

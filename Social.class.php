@@ -58,7 +58,7 @@ class Social {
 			'url' => 'http://bookmarks.yahoo.com/toolbar/savebm?opener=tb&u=%url%&t=%title%',
 		),
 	);
-	private $otherSocials = array (
+	private $otherSocials = array(
 		'propeller' => 'Propeller',
 		'backflip' => 'Backflip',
 		'kaboodle' => 'Kaboodle',
@@ -81,8 +81,8 @@ class Social {
 		'newsvine' => 'Newsvine',
 		'yardbarker' => 'Yardbarker',
 	);
-	private $allSocials = array ();
-
+	private $allSocials = array();
+	
 	private function createSocial ($theme) {
 		// Merge all socials
 		$this->allSocials = array_merge($this->mainSocials, $this->extendedSocials);
@@ -126,16 +126,14 @@ class Social {
 			}
 		}
 	}
-
-	public function newBookmark ($theme = 'main', $add = array (), $remove = array ()) {
+	
+	public function newBookmark ($theme = 'main', $add = array(), $remove = array()) {
 		// Create a social
 		Social::createSocial ($theme);
-
 		// Add socials if passed
 		if ($add) {
 			Social::addSocials ($add);
 		}
-		
 		// Remove socials if passed
 		if ($remove) {
 			Social::removeSocials ($remove);
@@ -206,13 +204,11 @@ class Social {
 	/* Bookmarking */
 
 	/* Send to a friend */
-	public function displaySendFriend ($id_tipo, $url = FALSE, $title = '', $template = 'default') {
-		
+	public function displaySendFriend ($id_tipo, $url = false, $title = '', $template = 'default') {
 		// Set the default configuration
 		if (!$url) {
-			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+			$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		}
-		
 		$html = '<form action="" id="interadminForm">' . "\n";
 		$html .= '<input type="hidden" name="url" value="' . $url . '" />' . "\n";
 		$html .= '<input type="hidden" name="title" value="' . $title . '" />' . "\n";
@@ -247,7 +243,7 @@ class Social {
 		if (!$url) {
 			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
-
+		
 		$html = '<div id="embedded">' . "\n";
 		if ($label) {
 			$html .= '<label for="embeddedUrl' . ucfirst(strtolower($key)) . '">' . $label . '</label>' . "\n";
