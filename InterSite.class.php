@@ -31,7 +31,6 @@ class InterSite extends InterAdmin {
 	 */
 	public $langs = array();
 	
-	
 	public $allowAttributes = false;
 	public function __set($var, $value) {
 		if (!$this->allowAttributes) {
@@ -40,28 +39,31 @@ class InterSite extends InterAdmin {
 			$this->$var = $value;
 		}
 	}
-		
+	
 	/**
 	 * Populates and returns the array of servers for this site.
 	 * 
 	 * @return array
 	 */
-	public function getServers()
-	{
+	public function getServers(InterSite_Aplicacao $app = null) {
 		$options = array(
 			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2', 'select_multi_1'),
-			'fields_alias' => true
+			'fields_alias' => true,
 		);
+		if ($app) {
+			$options['where'][] = "select_key = " . $app;
+		}
 		$servers = $this->getChildren(26, $options);
 		
 		// Variaveis do site
-		$vars = $this->getChildren(39, array( 'fields' => array( 'select_key', 'varchar_1')));
+		$vars = $this->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
 		
 		foreach($vars as $var) {
 			$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
 			$varName = $varName->varchar_1;
 			$this->$varName = $var->varchar_1;
 		}
+		
 		foreach ($servers as $server) {
 			// Variaveis do server
 			$server_vars = $server->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
@@ -275,7 +277,7 @@ class InterSite extends InterAdmin {
 		}
 		return false;
 	}
-		
+	
 	protected function _socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
 		$header = "" .
 		$method . " " . $url . " HTTP/1.1\r\n" .
@@ -303,7 +305,7 @@ class InterSite extends InterAdmin {
 		return $content;
 	}
 		
-	protected function _removeUnneeded($object, array $attributes = array('id', 'id_tipo'))
+	protected function _removeUnneeded($object, array $attributes = array('id', 'id_tipo', 'parent_id'))
 	{
 		foreach ($attributes as $name) 
 		{
@@ -351,17 +353,16 @@ class InterSite extends InterAdmin {
 			$this->_removeUnneeded($lang);
 		}
 		
-		unset($this->attributes['interadmin_logo']);
-		unset($this->attributes['id']);
-		unset($this->attributes['id_tipo']);
-		
 		// FIXME hack para funcionar com versões antigas das classes no host do site
 		$this->allowAttributes = true; 
 		foreach ($this->attributes as $var => $value) {
 			$this->$var = $value;
 		}
-				
-		return array_merge(array_keys($this->attributes), array('servers', 'langs'));
+		
+		$keys = array_keys($this->attributes);
+		$keys = array_diff($keys, array('interadmin_logo', 'id', 'id_tipo'));
+		
+		return array_merge($keys, array('servers', 'langs'));
 	}
 	
 	/**
