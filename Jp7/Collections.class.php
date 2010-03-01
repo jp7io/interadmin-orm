@@ -1,4 +1,7 @@
 <?php
+/**
+ * Class for handling collections of objects.
+ */
 class Jp7_Collections {
  	/**
 	 * Acts like a SELECT statement. Performs 'where', 'order', 'group' and 'limit'.
