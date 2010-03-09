@@ -75,33 +75,33 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
 	public static function getInstance($id, $options = array(), InterAdminTipo $tipo = null) {
+		$optionsWithoutFields = array_merge($options, array('fields' => array()));
+		
+		// Default Class
 		if (!$options['default_class']) {
 			$options['default_class'] = 'InterAdmin';
 		}
-		if ($tipo && !$options['class'] && $tipo->class) {
+		// Classe não foi forçada
+		if (!$options['class']) {
+			if (!$tipo) {
+				$instance = new $options['default_class']($id, $optionsWithoutFields);
+				$tipo = $instance->getTipo();
+			}
 			$options['class'] = $tipo->class;
 		}
-		if ($options['class']) {
-			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
-			$finalInstance = new $class_name($id, $options);
-			if ($tipo) {
-				$finalInstance->setTipo($tipo);
-			}
+		// Classe foi descoberta
+		if ($instance && $options['class'] == get_class($instance)) {
+			// Classe do objeto temporário já está correta
+			$finalInstance = $instance;
 		} else {
-			$instance = new $options['default_class']($id, array_merge($options, array('fields' => array())));
-			if ($tipo) {
-				$instance->setTipo($tipo);
-			}
-			$class_name = $instance->getTipo()->class;
-			if (class_exists($class_name)) {
-				$finalInstance = new $class_name($id, $options);
-				$finalInstance->setTipo($instance->getTipo()); // Performance
-			} else {
-				if ($options['fields']) {
-					$instance->getFieldsValues($options['fields'], false, $options['fields_alias']);
-				}
-				$finalInstance = $instance;
-			}
+			// Classe é outra
+			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
+			$finalInstance = new $class_name($id, $optionsWithoutFields);
+			$finalInstance->setTipo($tipo);
+		}
+		// Fields		
+		if ($options['fields']) {
+			$finalInstance->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 		return $finalInstance;
 	}
