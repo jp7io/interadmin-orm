@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Utilizado somente para ambiente Zend Framework - MVC
+ */
 class Jp7_InterAdmin_Tipo extends InterAdminTipo
 {
 	public function getUrl()
