@@ -46,7 +46,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * Username to be inserted in the log when saving this record.
 	 * @var string
 	 */
-	protected static $log_user = 'site';
+	protected static $log_user = null;
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
@@ -546,7 +546,7 @@ class InterAdmin extends InterAdminAbstract {
 		if ($this->id && !isset($this->log)) {
 			$this->getFieldsValues('log');
 		}
-		$this->log = date('d/m/Y H:i') . ' - ' . self::$log_user . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
+		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		// date_modify
 		$this->date_modify = date('c');
 				
@@ -570,13 +570,18 @@ class InterAdmin extends InterAdminAbstract {
 		}
 	}
     /**
-     * Returns $log_user.
-     *
+     * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on 
+     * applications and 'site' otherwise.
+     * 
      * @see InterAdmin::$log_user
      * @return string
      */
     public static function getLogUser() {
-        return self::$log_user;
+    	global $jp7_app, $s_user;
+    	if (is_null(self::$log_user)) {
+    		return ($jp7_app) ? $s_user['login'] : 'site';	
+		}
+		return self::$log_user;
     }
     /**
      * Sets $log_user.
