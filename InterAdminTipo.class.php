@@ -19,6 +19,8 @@
  * @package InterAdminTipo
  */
 class InterAdminTipo extends InterAdminAbstract {
+	const ID_TIPO = 0;
+	
 	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
 	 * @var array 
@@ -45,12 +47,27 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected $_loadedfrommodel;
 	
 	/**
-	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
+	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
+	 * This method has 4 possible calls:
 	 * 
-	 * @param int $id_tipo This record's 'id_tipo'.
-	 * @param array $options Default array of options. Available keys: db_prefix, fields.
+	 * __construct()
+	 * __construct(int $id_tipo)
+	 * __construct(array $options)
+	 * __construct(int $id_tipo, array $options)
+	 * 
+	 * @param array $id_tipo This record's 'id_tipo'.
+	 * @param array $options [optional]	Default array of options. Available keys: db_prefix, fields.
+	 * @todo Modificar staticConst(...) por static::ID_TIPO no PHP 5.3
 	 */
 	public function __construct($id_tipo = 0, $options = array()) {
+		if (func_num_args() == 0) {
+			$id_tipo = $this->staticConst('ID_TIPO');
+		}
+		if (func_num_args() == 1 && is_array($id_tipo)) {
+			$options = $id_tipo;
+			$id_tipo = $this->staticConst('ID_TIPO');
+		}
+		// Constructor
 		if (is_object($id_tipo)) {
 			$id_tipo = (string) $id_tipo;
 		}
@@ -60,6 +77,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->getFieldsValues($options['fields']);
 		}
 	}
+	
 	/**
 	 * Returns an InterAdminTipo instance. If $options['class'] is passed, 
 	 * it will be returned an object of the given class, otherwise it will search 
