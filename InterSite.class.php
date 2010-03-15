@@ -20,6 +20,8 @@ class InterSite extends InterAdmin {
 	const QA = 'QA';
 	const DESENVOLVIMENTO = 'Desenvolvimento';
 	
+	const DEFAULT_FIELDS_ALIAS = true;
+	
 	/**
 	 * Array of servers for this site.
 	 * @var array
@@ -47,31 +49,37 @@ class InterSite extends InterAdmin {
 	 */
 	public function getServers(InterSite_Aplicacao $app = null) {
 		$options = array(
-			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2', 'select_multi_1'),
-			'fields_alias' => true,
+			'fields' => array('name', 'type', 'host', 'ftp', 'user', 'path', 'pass', 'db', 'interadmin_remote'),
+			'fields_alias' => true
 		);
+		
 		if ($app) {
+			$app->getByAlias('nome');
 			$options['where'][] = "select_key = " . $app;
 		}
-		$servers = $this->getChildren(26, $options);
+		$servers = $this->getServidores($options);
 		
+		
+		$optionsVars = array(
+			'fields' => array('variavel' => array('name_id'), 'valor')
+		);
 		// Variaveis do site
-		$vars = $this->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
+		$vars = $this->getVariaveis($optionsVars);
 		
-		foreach($vars as $var) {
-			$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
-			$varName = $varName->varchar_1;
-			$this->$varName = $var->varchar_1;
+		foreach ($vars as $var) {
+			$varName = $var->variavel->name_id;
+			$this->$varName = $var->valor;
 		}
 		
 		foreach ($servers as $server) {
 			// Variaveis do server
-			$server_vars = $server->getChildren(39, array('fields' => array('select_key', 'varchar_1')));
+			$server_vars = $server->getVariaveis($optionsVars);
 			$server->vars = array();
 			foreach ($server_vars as $var) {
-				$varName = new InterAdmin($var->select_key, array('fields' => 'varchar_1'));
-				$server->vars[$varName->varchar_1] = $var->varchar_1;
+				$varName = $var->variavel->name_id;
+				$server->vars[$varName] = $var->valor;
 			}
+			
 			// InterAdmin Remote
 			foreach ($server->interadmin_remote as $key => $interadmin_remote) {
 				$server->interadmin_remote[$key] = $interadmin_remote->getFieldsValues('varchar_key');
@@ -80,9 +88,11 @@ class InterSite extends InterAdmin {
 			if (!$server->ftp) {
 				$server->ftp = $server->host;
 			}
+			
 			// Tipo 
-			$type = new InterAdmin($server->type, array('fields' => 'varchar_key'));
-			$server->type = $type->varchar_key;
+			if ($server->type) {
+				$server->type = $server->type->getByAlias('nome');
+			}
 			// Database
 			$options = array(
 				'fields' => array('varchar_key', 'varchar_1', 'varchar_2', 'varchar_3', 'varchar_4', 'varchar_6','password_key', 'select_2'),
@@ -97,20 +107,25 @@ class InterSite extends InterAdmin {
 			}
 			
 			// Aliases
-			$aliasesObj = $server->getChildren(31, array('fields' => array('varchar_key', 'char_1')));
+			$aliases = $server->getAliases(array('fields' => array('host', 'www_subdomain')));
 			$server->aliases = array();
-			foreach ($aliasesObj as $aliasObj) {
-				$server->aliases[] = $aliasObj->varchar_key;
-				if ($aliasObj->char_1) {
-					if (strpos($aliasObj->varchar_key, 'www.') === 0) {
-						$server->aliases[] = substr($aliasObj->varchar_key, 4);
+			foreach ($aliases as $alias) {
+				$server->aliases[] = $alias->host;
+				if ($alias->www_subdomain) {
+					if (strpos($alias->host, 'www.') === 0) {
+						$server->aliases[] = substr($alias->host, 4);
 					} else {
-						$server->aliases[] = 'www.' . $aliasObj->varchar_key;
+						$server->aliases[] = 'www.' . $alias->host;
 					}
 				}
 			}
 		}
 		
+		// Apenas o InterAdmin tem $c_publish
+		if ($app && toId($app->nome) != 'interadmin') {
+			$this->interadmin_preview = false;  
+		}
+				
 		// Renaming keys
 		foreach ($servers as $server) {
 			$renamed_servers[$server->host] = $server;
@@ -120,22 +135,31 @@ class InterSite extends InterAdmin {
 		return $this->servers;
 	}
 	
-	public function getLangs()
+	public function getLangs(InterSite_Aplicacao $app = null)
 	{
-		$options = array(
-			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2', 'char_1'),
-			'fields_alias' => true
-		);
-		$languages = $this->getChildren(37, $options);
 		$this->langs = null;
+		$idiomasTipo = new InterSite_IdiomaTipo();
+		$options = array('fields' => array('lang', 'name', 'multibyte'));
+		
+		// Outras aplicações: sempre pt-br
+		if ($app && toId($app->getByAlias('nome')) != 'interadmin') {
+			$lang = $idiomasTipo->getFirstInterAdmin($options + array('where' => "lang = 'pt-br'"));
+			$lang->default = true;
+			$this->langs[$lang->lang] = $lang;
+			return;
+		}
+		
+		// InterAdmin: segue cadastro
+		$languages = $this->getChildren(37, array(
+			'fields' => array('lang', 'title', 'description', 'keywords', 'default'),
+			'fields_alias' => true
+		));
+		
 		foreach ((array)$languages as $language) {
-			$lang =	new InterAdmin($language->lang, array('fields' => array('varchar_1', 'varchar_key', 'char_1')));
-			$language->lang = $lang->varchar_1;
-			$language->name = $lang->varchar_key;
-			$language->multibyte = $lang->char_1;
-			unset($language->_tipo);
-			unset($language->_parent);
-			unset($language->db_prefix);
+			$lang = $language->lang->getByAlias($options['fields']);
+			$language->lang = $lang->lang;
+			$language->name = $lang->name;
+			$language->multibyte = $lang->multibyte;
 			$this->langs[$language->lang] = $language;
 		}
 	}
