@@ -547,9 +547,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				}
 				$interadminsOrderBy = $tipo_orderby;
 			}
-			if (!$tipo_orderby) {
-				$interadminsOrderBy = 'date_publish DESC';
-			}
+			$interadminsOrderBy .= (($interadminsOrderBy) ? ',' : '') . 'date_publish DESC';
 			$this->_setMetadata('interadmins_order', $interadminsOrderBy);
 		}
 		return $interadminsOrderBy;
