@@ -410,6 +410,17 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 	}
 	/**
+	 * Returns the InterAdminTipo for a field.
+	 * 
+	 * @param object $campo
+	 * @return InterAdminTipo 
+	 */
+	protected function _getCampoTipo($campo) {
+		if (is_object($campo['nome'])) {
+			return $campo['nome'];
+		}
+	}	
+	/**
 	 * Returns this object´s nome and all the fields marked as 'combo', if the field 
 	 * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
 	 *

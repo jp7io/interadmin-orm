@@ -558,6 +558,9 @@ class InterAdmin extends InterAdminAbstract {
 	public function getAttributesCampos() {
 		return $this->getTipo()->getCampos();
 	}
+	protected function _getCampoTipo($campo) {
+		return $this->getTipo()->_getCampoTipo($campo);
+	}
 	public function getAttributesAliases() {
 		return $this->getTipo()->getCamposAlias();
 	}

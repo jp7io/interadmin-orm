@@ -183,7 +183,6 @@ abstract class InterAdminAbstract {
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
 			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
-			$tipo = $campo['nome'];
 		} elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
 			$isMulti = in_array($campo['xtra'], array('registros_multi', 'tipos_multi'));
 			$isTipo = ($campo['xtra'] == 'multi_tipos' || $campo['xtra'] == 'tipos');
@@ -198,6 +197,7 @@ abstract class InterAdminAbstract {
 		}
 		
 		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
+		$tipo = $this->_getCampoTipo($campo);
 		
 		if (isset($isMulti)) {
 			if ($isMulti) {
@@ -345,7 +345,7 @@ abstract class InterAdminAbstract {
 						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
 						if (!in_array($table, (array) $options['from_alias'])) {
-							$this->_addJoinAlias($options, $table, $joinNome, $campos);
+							$this->_addJoinAlias($options, $table, $campos[$joinNome]);
 						}
 						$joinAliases = array_flip($campos[$joinNome]['nome']->getCamposAlias());
 					}
@@ -359,11 +359,7 @@ abstract class InterAdminAbstract {
 			$offset = $pos + strlen($termo);
 		}
 		return $clause;
-	}
-	protected function _getJoinTipo($campos, $nome) {
-		return $campos[$nome]['nome'];
-	}
-	
+	}	
 	/**
 	 * Resolves Aliases on $options fields.
 	 * 
@@ -384,8 +380,8 @@ abstract class InterAdminAbstract {
 				if ($nome) {
 					$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					// Join e Recursividade
-					$this->_addJoinAlias($options, $join, $nome, $campos);
-					$joinTipo = $this->_getJoinTipo($campos, $nome);
+					$this->_addJoinAlias($options, $join, $campos[$nome]);
+					$joinTipo = $this->_getCampoTipo($campos[$nome]);
 					if ($fields[$join] == array('*')) {
 						$fields[$join] = $joinTipo->getCamposNames();
 					}
@@ -439,15 +435,18 @@ abstract class InterAdminAbstract {
 	 * 
 	 * @return void 
 	 */
-	protected function _addJoinAlias(&$options = array(), $alias, $nome, $campos, $table = 'main') {
-		$joinTipo = $this->_getJoinTipo($campos, $nome);
+	protected function _addJoinAlias(&$options = array(), $alias, $campo, $table = 'main') {
+		$joinTipo = $this->_getCampoTipo($campo);
+		if (!$joinTipo) {
+			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
+		}		
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
-		if ($campos[$nome]['xtra'] == 'S') { // @todo testar
+		if ($campo['xtra'] == 'S') { // @todo testar
             $options['from'][] = $joinTipo->getTableName() . 
-                ' AS ' . $alias . ' ON '  . $table . '.' . $nome . ' = ' . $alias . '.id_tipo';
+                ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id_tipo';
         } else {
             $options['from'][] = $joinTipo->getInterAdminsTableName() .
-                ' AS ' . $alias . ' ON '  . $table . '.' . $nome . ' = ' . $alias . '.id';
+                ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id';
         }
 	}
 	/**
@@ -485,8 +484,8 @@ abstract class InterAdminAbstract {
 			} else {
 				$joinAlias = '';
 				$join = ($fields[$table]) ? $fields[$table] : $table;
-				$joinTipo = $this->_getJoinTipo($campos, $join);
-				if (is_object($joinTipo)) {
+				$joinTipo = $this->_getCampoTipo($campos[$join]);
+				if ($joinTipo) {
 					$joinCampos = $joinTipo->getCampos();
 					$joinAlias = $joinTipo->getCamposAlias($field);
 				}
@@ -632,6 +631,13 @@ abstract class InterAdminAbstract {
 		}
 	}
 	
+	/**
+	 * Returns the InterAdminTipo for a field.
+	 * 
+	 * @param object $campo
+	 * @return InterAdminTipo 
+	 */
+	abstract protected function _getCampoTipo($campo);
 	abstract function getAttributesCampos();
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();
