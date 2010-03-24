@@ -184,4 +184,12 @@ class InterAdminArquivo extends InterAdminAbstract {
 			return $this->db_prefix . '_arquivos';
 		}
     }
+
+    
+    /**
+     * @see InterAdminAbstract::_getCampoTipo()
+     */
+    protected function _getCampoTipo($campo) {
+       return;
+    }
 }
