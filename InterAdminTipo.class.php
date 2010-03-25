@@ -59,12 +59,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]	Default array of options. Available keys: db_prefix, fields.
 	 * @todo Modificar staticConst(...) por static::ID_TIPO no PHP 5.3
 	 */
-	public function __construct($id_tipo = 0, $options = array()) {
-		if (func_num_args() == 0) {
-			$id_tipo = $this->staticConst('ID_TIPO');
-		}
-		if (func_num_args() == 1 && is_array($id_tipo)) {
-			$options = $id_tipo;
+	public function __construct($id_tipo = null, $options = array()) {
+		if (is_null($id_tipo) || is_array($id_tipo)) {
+			$options = (array) $id_tipo;
 			$id_tipo = $this->staticConst('ID_TIPO');
 		}
 		// Constructor
