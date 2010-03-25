@@ -197,7 +197,9 @@ abstract class InterAdminAbstract {
 		}
 		
 		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
-		$tipo = $this->_getCampoTipo($campo);
+		if ($object instanceof InterAdminAbstract) {
+			$tipo = $object->_getCampoTipo($campo);
+		}
 		
 		if (isset($isMulti)) {
 			if ($isMulti) {
@@ -489,9 +491,11 @@ abstract class InterAdminAbstract {
 					$joinCampos = $joinTipo->getCampos();
 					$joinAlias = $joinTipo->getCamposAlias($field);
 				}
-				$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-				$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $object);
+				
 				if (is_object($attributes[$table])) {
+					$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
+					$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $attributes[$table]);
+					
 					if (is_object($attributes[$table]->$alias)) {
 						continue;
 					}
