@@ -445,7 +445,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->_url) {
 			return $this->_url;
 		}
-		global $config, $implicit_parents_names, $seo, $lang;
+		global $c_url, $c_cliente_url, $c_cliente_url_path, $implicit_parents_names, $jp7_app, $seo, $lang;
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
@@ -454,29 +454,23 @@ class InterAdminTipo extends InterAdminAbstract {
 				$parent->getFieldsValues('nome');
 			}
 			if ($seo) {
-				if (!in_array($parent->nome, (array) $implicit_parents_names)) {
-					$url_arr[] = toSeo($parent->nome);
-				}
+				if (!in_array($parent->nome, (array) $implicit_parents_names)) $url_arr[] = toSeo($parent->nome);
 			} else {
 				if (toId($parent->nome)) {
 					$url_arr[] = toId($parent->nome);
 				}
 			}
 			$parent = $parent->getParent();
-			if ($parent instanceof InterAdmin) {
-				$parent = $parent->getTipo();
-			}
+			if ($parent instanceof InterAdmin) $parent = $parent->getTipo();
 		}
 		$url_arr = array_reverse((array) $url_arr);
-		
+
 		if ($seo) {
-			$url = $config->url . join("/", $url_arr);
+			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . join("/", $url_arr);
 		} else {
-			$url = $config->url . $lang->path_url . implode("_", $url_arr);
+			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . implode("_", $url_arr);
 			$pos = strpos($url, '_');
-			if ($pos) {
-				$url = substr_replace($url, '/', $pos, 1);
-			}
+			if ($pos) $url = substr_replace($url, '/', $pos, 1);
 			$url .= (count($url_arr) > 1) ? '.php' : '/';
 		}
 		return $this->_url = $url;
@@ -487,15 +481,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getTreePath() {
-		global $config, $implicit_parents_names, $seo, $lang;
+		global $c_url, $implicit_parents_names, $seo, $lang;
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
 		while ($parent) {
 			if ($seo) {
-				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) {
-					$url_arr[] = toSeo($parent->getFieldsValues('nome'));
-				}
+				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
 			} else {
 				$url_arr[] = $parent->getFieldsValues('nome');
 			}
@@ -503,7 +495,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		$url_arr = array_reverse((array)$url_arr);
 
-			$url = $config->url . join("/", $url_arr);
+			$url = $c_url . join("/", $url_arr);
 		return $url;
 	}
 	/**

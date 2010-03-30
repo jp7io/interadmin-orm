@@ -39,6 +39,8 @@ class InterAdminField{
 		global $db_prefix;
 		global $s_user;
 		global $s_session;
+		global $c_cliente_url;
+		global $c_cliente_url_path;
 		global $iframes_i;
 		global $lang;
 		global $quantidade;

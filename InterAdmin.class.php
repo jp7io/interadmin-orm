@@ -459,13 +459,13 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return bool
 	 */
 	public function isPublished() {
-		global $config, $s_session;
+		global $c_publish, $s_session;
 		$this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
 		return (
 			strtotime($this->date_publish) <= time() &&
 			(strtotime($this->date_expire) >= time() || $this->date_expire == '0000-00-00 00:00:00') &&
 			$this->char_key &&
-			($this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
+			($this->publish || $s_session['preview'] || !$c_publish) &&
 			!$this->deleted
 		);
 	}
