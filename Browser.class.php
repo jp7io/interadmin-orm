@@ -53,16 +53,16 @@ class Browser{
 		if (strpos($useragent, 'Safari')) {
 			$this->browser = 'sa';
 			$this->v = 5;
-		} elseif (strpos($useragent, 'Opera') !== FALSE) {
+		} elseif (strpos($useragent, 'Opera') !== false) {
 			$this->browser = 'op';
 			$i = strpos($useragent, 'Opera') + 6;
 		} elseif (strpos($useragent, 'MSIE')) {
 			$this->browser = 'ie';
 			$i = strpos($useragent, 'MSIE') + 4;
-		} elseif (strpos($useragent, 'Mozilla/') !== FALSE && strpos($useragent, 'compatible') === FALSE) {
+		} elseif (strpos($useragent, 'Mozilla/') !== false && strpos($useragent, 'compatible') === false) {
 			$this->browser = 'ns';
 			$i = strpos($useragent, 'Mozilla/') + 8;
-		} elseif(strpos($useragent, 'Mozilla/5.0') !== FALSE) {
+		} elseif(strpos($useragent, 'Mozilla/5.0') !== false) {
 			$this->browser = 'mo';
 			$this->v = 5;
 		} else {
@@ -77,16 +77,28 @@ class Browser{
 		$version = '';
 		while (!$this->v) {
 			$c = substr($useragent, $i++, 1);
-			if (is_numeric($c) || $c == '.'|| $c == ' ') $version .= "$c";
-			else $this->v = ($version) ? doubleval($version) : -1;
+			if (is_numeric($c) || $c == '.'|| $c == ' ') {
+				$version .= "$c";
+			} else {
+				$this->v = ($version) ? doubleval($version) : -1;
+			}
 		}
 		$this->ns4 = ($this->ns && $version < 5);
-		if (strpos($useragent, 'Win')) $this->os = 'win';
-		elseif (strpos($useragent, 'Mac')) $this->os = 'mac';
-		elseif (strpos($useragent, 'Unix')) $this->os = 'unx';
-		elseif (strpos($useragent, 'Linux')) $this->os = 'lnx';
-		elseif (strpos($useragent, 'SunOS')) $this->os = 'sol';
-		else $this->os = NULL;
+		
+		if (strpos($useragent, 'Win')) {
+			$this->os = 'win';
+		} elseif (strpos($useragent, 'Mac')) {
+			$this->os = 'mac';
+		} elseif (strpos($useragent, 'Unix')) {
+			$this->os = 'unx';
+		} elseif (strpos($useragent, 'Linux')) {
+			$this->os = 'lnx';
+		} elseif (strpos($useragent, 'SunOS')) {
+			$this->os = 'sol';
+		} else {
+			$this->os = null;
+		}
+		
 		$this->win = ($this->os == 'win');
 		$this->mac = ($this->os == 'mac');
 		$this->unx = ($this->os == 'unx');
@@ -95,20 +107,20 @@ class Browser{
 		// Robots	
 		if ($this->browser == $useragent) {
 			$robots = array(
-				"wget",
-				"getright",
-				"yahoo",
-				"altavista",
-				"lycos",
-				"infoseek",
-				"lwp",
-				"webcrawler",
-				"linkexchange",
-				"slurp",
-				"google"
+				'wget',
+				'getright',
+				'yahoo',
+				'altavista',
+				'lycos',
+				'infoseek',
+				'lwp',
+				'webcrawler',
+				'linkexchange',
+				'slurp',
+				'google'
 			);
 			for ($i = 0; $i < count($robots); $i++) {
-				if (strpos(strtolower($useragent), $robots[$i]) !== FALSE) {
+				if (strpos(strtolower($useragent), $robots[$i]) !== false) {
 					$this->robot = $robots[$i];
 					$this->browser = 'robot';
 					break;
@@ -117,4 +129,3 @@ class Browser{
 		}
 	}
 }
-?>
