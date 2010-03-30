@@ -486,9 +486,13 @@ class InterSite extends InterAdmin {
 		foreach($this->langs as $sigla => $lang) {
 			$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
 			if ($lang->default) {
-				$GLOBALS['c_lang_default'] = $sigla;
+				$this->lang_default = $sigla;
 			}
 		}
+		if (!$this->lang_default) {
+			$this->lang_default = 'pt-br';			
+		}
+		$GLOBALS['c_lang_default'] = $this->lang_default;
 		/* TEMP - Creating old globals */
 	}
 }
