@@ -121,7 +121,7 @@ class InterSite extends InterAdmin {
 			}
 		}
 		
-		// Apenas o InterAdmin tem $c_publish
+		// Apenas o InterAdmin tem $config->interadmin_preview
 		if ($app && toId($app->nome) != 'interadmin') {
 			$this->interadmin_preview = false;  
 		}
@@ -451,13 +451,17 @@ class InterSite extends InterAdmin {
 			self::QA => 'QA',
 			self::DESENVOLVIMENTO => 'Local'
 		);
+		
+		$this->url = 'http://' . $this->server->host . '/' . $this->server->path . '/';
+		
+		$GLOBALS['c_url'] = $this->url;
 		$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
 		$GLOBALS['c_site'] = $this->name_id;
 		$GLOBALS['c_menu'] = $this->menu;
 		$GLOBALS['c_cache'] = $this->cache;
 		$GLOBALS['c_cache_delay'] = $this->cache_delay;
 		$GLOBALS['db_prefix'] = 'interadmin_' . $this->name_id;
-		$GLOBALS['c_path'] = $this->server->path;
+		$GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
 		$GLOBALS['c_analytics'] = $this->google_analytics;
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
 		$GLOBALS['c_w3c'] = true;
@@ -475,7 +479,6 @@ class InterSite extends InterAdmin {
 		// InterAdmin
 		$GLOBALS['c_publish'] = $this->interadmin_preview;
 		$GLOBALS['c_demo'] = $this->interadmin_demo;
-		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_cliente_title'] = $this->name;
 		$GLOBALS['c_nobackup'] = $this->nobackup;
 		
