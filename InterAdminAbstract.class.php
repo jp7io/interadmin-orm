@@ -549,13 +549,16 @@ abstract class InterAdminAbstract {
 	 */
 	public function reload($fields = null) {
 		if (is_null($fields)) {
-			$fields = array();
-			foreach ($this->attributes as $key => $attribute) {
-				$fields[] = $key;
-			}
+			$fields = array_keys($this->attributes);
 		}
-		$this->attributes = array();
-		$this->getFieldsValues($fields);
+		foreach ($fields as $key) {
+			if (in_array($key, array('id', 'id_tipo'))) {
+				continue;
+			}
+			unset($this->attributes[$key]);
+		}
+		$isAliased = $this->staticConst('DEFAULT_FIELDS_ALIAS');
+		$this->getFieldsValues($fields, false, $isAliased);
 	}
 	/**
 	 * Creates a object of the given Class name with the same attributes.
