@@ -678,7 +678,7 @@ abstract class InterAdminAbstract {
 	abstract function getTableName();
 	
 	public static function getPublishedFilters($table, $alias) {
-		global $db, $c_publish, $s_session;
+		global $db, $config, $s_session;
 		$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 		// Tipos
 		if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
@@ -695,7 +695,7 @@ abstract class InterAdminAbstract {
 				" AND (" . $alias . ".date_expire > '" . $DbNow . "' OR " . $alias . ".date_expire = '0000-00-00 00:00:00')" .
 				" AND " . $alias . ".char_key <> ''" .
 				" AND " . $alias . ".deleted = ''" .
-				(($c_publish && !$s_session['preview']) ? " AND " . $alias . ".publish <> ''" : "") . " AND ";
+				(($config->interadmin_preview && !$s_session['preview']) ? " AND " . $alias . ".publish <> ''" : "") . " AND ";
 		}
 	}
 	
