@@ -8,20 +8,18 @@
  */
 class Jp7_Locale
 {
-	public $lang = '', $prefix = '', $path = '';
+	public $lang = '';
+	public $prefix = '';
+	public $path = '';
 
 	public function __construct($language)
 	{
-		$c_default_lang = 'pt-br';
-
-		if (!in_array($language, array('de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br'))) {
-			$language = $c_default_lang;
-		}
-
+		$config = Zend_Registry::get('config');
+		
 		$this->lang = $language;
-		$this->path = '/' . $language . '/';
-
-		if ($language != 'pt-br') {
+		
+		if ($language != $config->lang_default) {
+			$this->path = $language . '/';
 			$this->prefix = '_' . $language;
 		}
 	}

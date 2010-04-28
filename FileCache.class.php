@@ -40,6 +40,10 @@ class FileCache {
 	 */
 	public $partial;
 	/**
+	 * @var bool
+	 */
+	public $isCached;
+	/**
 	 * Public Constructor, defines the path and filename and starts caching or loading it.
 	 *
 	 * @param 	mixed 	$storeId 	ID of the file. Only needed if the same page has different data deppending on the ID.
@@ -234,7 +238,14 @@ class FileCache {
 		// FALSE = Atualizar cache
 		return false;
 	}
-	
+	/**
+	 * Returns TRUE if this partial is already cached.
+	 * 
+	 * @return bool
+	 */
+	public function isCached() {
+		return (bool) $this->isCached;
+	}
 	/**
 	 * @return int Timestamp 
 	 */

@@ -5,7 +5,7 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
+ * @category Jp7
  * @package Pagination
  */
 
@@ -88,8 +88,11 @@ class Pagination {
 			$this->records = $row->records;
 			$rs->Close();
 		} else {
-			if ($records) $this->records = $records;
-			else return '[aa]';
+			if (isset($records)) {
+				$this->records = $records;
+			} else {
+			 	return '[aa]';	
+			}
 		}
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
@@ -99,6 +102,7 @@ class Pagination {
 		
 		$this->init = (($this->page - 1) * $limit); // Item inicial
 		$this->limit = $limit; // Itens por pagina
+		
 		$this->sql_limit = " LIMIT " . $this->init . "," . $this->limit;
 		
 		// HTM
@@ -178,5 +182,8 @@ class Pagination {
 	private function _createLink($pageNumber, $pageLabel, $className = '') {
 		return '<li' . $className . '><a href="' .  $this->request_uri . '?' . $this->parameters . $this->query_string . (($this->parameters || $this->query_string) ? '&' : '') . 'p_page=' . $pageNumber . '">' . $pageLabel . '</a></li>';
 	}
+
+	public function __toString() {
+		return $this->init . ',' . $this->limit;	
+	}
 }
-?>

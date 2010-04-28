@@ -5,8 +5,8 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package InterAdminTipo
+ * @category Jp7
+ * @package InterAdmin
  */
  
 /**
@@ -15,8 +15,7 @@
  * @property string $interadminsOrderby SQL Order By for the records of this InterAdminTipo.
  * @property string $class Class to be instantiated for the records of this InterAdminTipo.
  * @property string $tabela Table of this Tipo, or of its Model, if it has no table.
- * @category Jp7
- * @package InterAdminTipo
+ * @package InterAdmin
  */
 class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;
@@ -45,6 +44,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	
 	// @todo Remove this
 	protected $_loadedfrommodel;
+	protected $_tiposUsingThisModel;
 	
 	/**
 	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
@@ -207,6 +207,17 @@ class InterAdminTipo extends InterAdminAbstract {
 		return reset($this->getChildren(array('limit' => 1) + $options));
 	}
 	/**
+	 * Retrieves the first child of this InterAdminTipo which have the given model_id_tipo.
+	 * 
+	 * @param array $options Default array of options. Available keys: fields, where, order, class.
+	 * @return InterAdminTipo
+	 */
+	public function getFirstChildByModel($model_id_tipo, $options = array()) {
+		$options['where'][] = "model_id_tipo = " . $model_id_tipo;
+		$options['limit'] = 1;
+		return reset($this->getChildren($options));
+	}
+	/**
 	 * Retrieves the children of this InterAdminTipo which have the given model_id_tipo.
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, class.
@@ -223,35 +234,19 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
-		$optionsInstance = array(
-			'class' => $options['class'],
-			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
-		);
-		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
-		
-		$this->_resolveWildcard($options['fields'], $recordModel);
 		$this->_whereArrayFix($options['where']); // FIXME
 		
-		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-			$options['fields'] = array_merge(array('id'), (array) $options['fields']);
-		}
-		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}
-		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
-		// Internal use
-		$options['aliases'] = $recordModel->getAttributesAliases();
-		$options['campos'] = $recordModel->getAttributesCampos();
-		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+		
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$rs = $this->_executeQuery($options);
-		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
 			$record = InterAdmin::getInstance($row->id, $optionsInstance, $this);
-			$record->setTipo($this);
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
 			}
@@ -322,7 +317,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getCampos() {
 		if (!$A = $this->_getMetadata('campos')) {
 			$model = $this->getModel();
-			
 			
 			$campos = $model->getFieldsValues('campos');
 			unset($model->campos);
@@ -415,6 +409,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _getCampoTipo($campo) {
 		if (is_object($campo['nome'])) {
 			return $campo['nome'];
+		} elseif ($campo['nome'] == 'all') {
+			return new InterAdminTipo();
 		}
 	}	
 	/**
@@ -445,7 +441,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->_url) {
 			return $this->_url;
 		}
-		global $c_url, $c_cliente_url, $c_cliente_url_path, $implicit_parents_names, $jp7_app, $seo, $lang;
+		global $config, $implicit_parents_names, $seo, $lang;
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
@@ -454,23 +450,29 @@ class InterAdminTipo extends InterAdminAbstract {
 				$parent->getFieldsValues('nome');
 			}
 			if ($seo) {
-				if (!in_array($parent->nome, (array) $implicit_parents_names)) $url_arr[] = toSeo($parent->nome);
+				if (!in_array($parent->nome, (array) $implicit_parents_names)) {
+					$url_arr[] = toSeo($parent->nome);
+				}
 			} else {
 				if (toId($parent->nome)) {
 					$url_arr[] = toId($parent->nome);
 				}
 			}
 			$parent = $parent->getParent();
-			if ($parent instanceof InterAdmin) $parent = $parent->getTipo();
+			if ($parent instanceof InterAdmin) {
+				$parent = $parent->getTipo();
+			}
 		}
 		$url_arr = array_reverse((array) $url_arr);
-
+		
 		if ($seo) {
-			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . join("/", $url_arr);
+			$url = $config->url . $lang->path . jp7_implode("/", $url_arr);
 		} else {
-			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . implode("_", $url_arr);
+			$url = $config->url . $lang->path_url . implode("_", $url_arr);
 			$pos = strpos($url, '_');
-			if ($pos) $url = substr_replace($url, '/', $pos, 1);
+			if ($pos) {
+				$url = substr_replace($url, '/', $pos, 1);
+			}
 			$url .= (count($url_arr) > 1) ? '.php' : '/';
 		}
 		return $this->_url = $url;
@@ -481,13 +483,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getTreePath() {
-		global $c_url, $implicit_parents_names, $seo, $lang;
+		global $config, $implicit_parents_names, $seo, $lang;
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
 		while ($parent) {
 			if ($seo) {
-				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
+				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) {
+					$url_arr[] = toSeo($parent->getFieldsValues('nome'));
+				}
 			} else {
 				$url_arr[] = $parent->getFieldsValues('nome');
 			}
@@ -495,7 +499,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		$url_arr = array_reverse((array)$url_arr);
 
-			$url = $c_url . join("/", $url_arr);
+			$url = $config->url . join("/", $url_arr);
 		return $url;
 	}
 	/**
@@ -539,26 +543,31 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getTableName() {
 		return $this->db_prefix . '_tipos';
 	}
-	public function getInterAdminsOrder() {
+	public function getInterAdminsOrder($order = '') {
 		if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
+			$interadminsOrderBy = array();
 			$campos = $this->getCampos();
 			if ($campos) {
 				foreach ($campos as $key => $row) {
 					if ($row['orderby']) {
-						if ($row['orderby'] < 0) $key .= " DESC";
-						$tipo_orderby[$row['orderby']] = $key;
+						if ($row['orderby'] < 0) {
+							$key .= " DESC";
+						}
+						$interadminsOrderBy[$row['orderby']] = $key;
 					}
 				}
-				if ($tipo_orderby) {
-					ksort($tipo_orderby);
-					$tipo_orderby = implode(",", $tipo_orderby);
+				if ($interadminsOrderBy) {
+					ksort($interadminsOrderBy);
 				}
-				$interadminsOrderBy = $tipo_orderby;
 			}
-			$interadminsOrderBy .= (($interadminsOrderBy) ? ',' : '') . 'date_publish DESC';
+			$interadminsOrderBy[] = 'date_publish DESC';
 			$this->_setMetadata('interadmins_order', $interadminsOrderBy);
 		}
-		return $interadminsOrderBy;
+		if ($order) {
+			$order = explode(',', $order);
+			$interadminsOrderBy = array_unique(array_merge($order, $interadminsOrderBy));
+		}
+		return implode(',', $interadminsOrderBy);
 	}
 	/**
 	 * Returns the table name for the InterAdmins.
@@ -593,24 +602,23 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $table . '_arquivos';
 	}
 	protected function _setMetadata($varname, $value) {
-		self::$_metadata[$this->id_tipo][$varname] = $value;
+		self::$_metadata[$this->db_prefix][$this->id_tipo][$varname] = $value;
 	}
 	protected function _getMetadata($varname) {
-		global $db_prefix;
-		if ($db_prefix == $this->db_prefix) {
-			return self::$_metadata[$this->id_tipo][$varname];
-		}
+		return self::$_metadata[$this->db_prefix][$this->id_tipo][$varname];
 	}
 	/**
 	 * @return array
 	 */
 	public function getInterAdminsChildren() {
 		if (!$children = $this->_getMetadata('children')) {
+			$model = $this->getModel();
+			
 			$children = array();
-			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
+			$childrenArr = explode("{;}", $model->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
 				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
-				$nome_id = toId($child['nome']);
+				$nome_id = Jp7_Inflector::camelize($child['nome']);
 				$children[$nome_id] = $child;
 			}
 			$this->_setMetadata('children', $children);
@@ -646,7 +654,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
-	function getInterAdminsByTags($tags, $options = array()) {
+	public function getInterAdminsByTags($tags, $options = array()) {
 		if (!is_array($tags)) {
 			$tags = array($tags);
 		}
@@ -666,5 +674,73 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
 		return $this->getInterAdmins($options);
+	}
+	
+	/**
+	 * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
+	 * 
+	 * @param array $options [optional]
+	 * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
+	 */
+	public function getTiposUsingThisModel($options = array()) {
+		if (!isset($this->_tiposUsingThisModel)) {
+			$rs = $this->_executeQuery(array(
+				'fields' => 'id_tipo',
+				'from' => $this->getTableName() . ' AS main',
+				'where' => array(
+					'model_id_tipo = ' . $this->id_tipo
+				)
+			));
+			
+			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';		
+			$this->_tiposUsingThisModel = array();
+			while ($row = $rs->FetchNextObj()) {
+				$this->_tiposUsingThisModel[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);;
+			}
+			$this->_tiposUsingThisModel[$this->id_tipo] = $this;
+		}
+		return $this->_tiposUsingThisModel;
+	}
+	
+	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {
+		$optionsInstance = array(
+			'class' => $options['class'],
+			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
+		);
+		
+		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+		
+		$this->_resolveWildcard($options['fields'], $recordModel);
+		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
+			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
+		}
+		$options['from'] = $recordModel->getTableName() . " AS main";
+		$options['order'] = $this->getInterAdminsOrder($options['order']);
+		// Internal use
+		$options['aliases'] = $recordModel->getAttributesAliases();
+		$options['campos'] = $recordModel->getAttributesCampos();
+		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+	}
+	
+	/**
+	 * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
+	 * 
+	 * @param array $options [optional]
+	 * @return InterAdmin[]
+	 */
+	public function getInterAdminsUsingThisModel($options = array()) {
+		$tipos = $this->getTiposUsingThisModel();
+		$options['where'][] = "id_tipo IN (" . implode(',', $tipos) . ')';
+		
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
+		
+		$rs = $this->_executeQuery($options);
+		$records = array();
+		while ($row = $rs->FetchNextObj()) {
+			$record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->id_tipo]);
+			$this->_getAttributesFromRow($row, $record, $options);
+			$records[] = $record;
+		}
+		return $records;
 	}
 }

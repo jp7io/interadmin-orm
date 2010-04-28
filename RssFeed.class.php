@@ -5,7 +5,7 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
+ * @category Jp7
  * @package RssFeed
  */
 

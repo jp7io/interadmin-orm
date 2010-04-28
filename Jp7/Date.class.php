@@ -1,23 +1,41 @@
 <?php 
+/**
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category Jp7
+ * @package Jp7_Date
+ */
 
 /**
  * Helper for date utils.
  * 
- * @package Jp7
+ * @package Jp7_Date
  */
 class Jp7_Date extends DateTime {
+	/**
+	 * @var string
+	 */
+	private $_serializedValue;
+	
 	/**
 	 * Retorna string da diferença de tempo, ex: '3 dias atrás'.
 	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
 	 * Diferenças menores de 1 minuto retornam 'agora'.
 	 * 
-	 * @param int|string $timeStamp Timestamp ou Datetime. 
+	 * Static: 		humanDiff($timeStamp = false)
+	 * Instance: 	humanDiff()
+	 * 
+	 * @param int|string $timeStamp [only with static calls] Timestamp ou Datetime. 
 	 * @return string
 	 */
-	public function humanDiff($timeStamp) {
-		if (!is_int($timeStamp)) {
-			$timeStamp = strtotime($timeStamp);
+	public function humanDiff($timeStamp = false) {
+		if (isset($this) && $this instanceof self) {
+			$timeStamp = $this;
 		}
+		$timeStamp = self::_toTime($timeStamp);
 		$currentTime = time();
 		$units = array(
 			'ano' => 31556926,
@@ -52,7 +70,7 @@ class Jp7_Date extends DateTime {
 	 * @return int Age in years.
 	 */
 	public function yearsDiff($to = false) {
-		if (isset($this)) {
+		if (isset($this) && $this instanceof self) {
 			$from = $this;
 		} else {
 			$from = $to; 
@@ -84,7 +102,7 @@ class Jp7_Date extends DateTime {
 	 * @return int
 	 */
 	public function daysDiff($to = false) {
-		if (isset($this)) {
+		if (isset($this) && $this instanceof self) {
 			$from = $this;
 		} else {
 			$from = $to; 
@@ -195,17 +213,59 @@ class Jp7_Date extends DateTime {
 	 * @return 
 	 */
 	public function format($format) {
+		// Bug PHP para datas zeradas
+		if (parent::format('Y') === '-0001') {
+			// Switch usado para performance, default: é o tratamento completo do erro
+			switch ($format) {
+				case 'd':
+					return '00';
+				case 'm':
+					return '00';
+				case 'Y':
+					return '0000';
+				case 'Y-m-d H:i:s':
+					return  '0000-00-00 00:00:00';
+				default:
+					$format = preg_replace('/(?<!\\\\)Y/', '0000', $format);
+					$format = preg_replace('/(?<!\\\\)(d|m|y)/', '00', $format);
+					$format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
+			}
+		}
+		
 		if (strpos($format, 'M') !== false) {
-			$format = preg_replace('/M/', addcslashes(jp7_date_month($this->format('m'), true), 'A..z'), $format);
+			$format = preg_replace('/(?<!\\\\)M/', addcslashes(jp7_date_month($this->format('m'), true), 'A..z'), $format);
 		}
 		if (strpos($format, 'F') !== false) {
-			$format = preg_replace('/F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
+			$format = preg_replace('/(?<!\\\\)F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
 		}
-		return parent::format($format);
+		
+		return parent::format($format);		
 	}
 	
 	public function __toString() {
-		return $this->format('c');
+		return $this->format('Y-m-d H:i:s');
+	}
+	
+	/**
+	 * DateTime does not support serialization by default.
+	 * 
+	 * @todo Retirar quando migrar para PHP 5.3
+	 * @return 
+	 */
+	public function __wakeUp() {
+		parent::__construct($this->_serializedValue);
+		unset($this->_serializedValue);
+	}
+	
+	/** 
+	 * DateTime does not support serialization by default.
+	 * 
+	 * @todo Retirar quando migrar para PHP 5.3
+	 * @return void
+	 */
+	public function __sleep() {
+		$this->_serializedValue = $this->__toString();
+		return array('_serializedValue');
 	}
 	
 	public function minute() {
@@ -225,5 +285,14 @@ class Jp7_Date extends DateTime {
 	}
 	public function year() {
 		return $this->format('Y');
+	}
+	
+	/**
+	 * Checks if its not an invalid date such as '0000-00-00 00:00:00'.
+	 * 
+	 * @return bool
+	 */
+	public function isValid() {
+		return parent::format('Y') !== '-0001';
 	}
 }

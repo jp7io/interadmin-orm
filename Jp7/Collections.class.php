@@ -42,7 +42,7 @@ class Jp7_Collections {
 	 * Filters the array using SQL Where.
 	 * 
 	 * @param array $array
-	 * @param string $clause Similar to SQL WHERE Clause, only supports simple comparations by now.
+	 * @param string $clause Similar to SQL WHERE Clause, only supports simple comparations for now.
 	 * @return array
 	 */
 	public static function filter($array, $clause) {
@@ -51,8 +51,10 @@ class Jp7_Collections {
 		}
 		$clause = preg_replace('/([^=!])(=)([^=])/', '\1\2=\3', $clause);
 		$clause = preg_replace('/(?<!\')(\b[a-zA-Z_][a-zA-Z0-9_.]+\b)/', '$a->\1', $clause);
+		// FIXME Fazer um parser melhor depois
+		$clause = str_replace('.', '->', $clause);
+		$clause = str_replace(' $a->OR ', ' OR ', $clause);
 		$fnBody = 'return ' . $clause . ';';
-		
 		return array_filter($array, create_function('$a', $fnBody));
 	}
 	/**
@@ -75,7 +77,8 @@ class Jp7_Collections {
 			}
 			$subitens[$key]->{$newPropertyName}[] = $item;
 		}
-		return $subitens;
+		// Returning values with reindexed keys
+		return array_values($subitens);
 	}
 	/**
  	 * Acts like an order by on an SQL.
@@ -113,10 +116,12 @@ class Jp7_Collections {
 			// Checagem de string para usar collate correto
 			$attr = explode('->', $k);
 			$valor = reset($array)->{$attr[0]};
-			if ($attr[1]) {
+			if ($attr[2]) {
+				$valor = $valor->{$attr[1]}->{$attr[2]};
+			} elseif ($attr[1]) {
 				$valor = $valor->{$attr[1]};
 			}
-			if (is_string($valor)) {
+			if (is_string($valor) && !is_numeric($valor)) {
 				 $fnBody = '$cmp = strcoll(' . $aStr . ', ' . $bStr . ');' .
 				 	' if ($cmp == 0) {' .
 						$retorno .

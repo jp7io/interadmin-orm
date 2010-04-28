@@ -5,7 +5,7 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
+ * @category Jp7
  * @package InterAdmin
  */
  
@@ -16,13 +16,13 @@
  */
 class InterAdmin extends InterAdminAbstract {
 	/**
-	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
+	 * DEPRECATED: Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
 	 * @var string
 	 * @deprecated It will only use this property if there is no id_tipo yet
 	 */
 	public $db_prefix;
 	/**
-	 * Table suffix of this record. e.g.: the table 'interadmin_client_registrations' would have 'registrations' as $table.
+	 * DEPRECATED: Table suffix of this record. e.g.: the table 'interadmin_client_registrations' would have 'registrations' as $table.
 	 * @var string
 	 * @deprecated It will only use this property if there is no id_tipo yet
 	 */
@@ -47,6 +47,11 @@ class InterAdmin extends InterAdminAbstract {
 	 * @var string
 	 */
 	protected static $log_user = null;
+	/**
+	 * If TRUE the records will be filtered using the method getPublishedFilters()
+	 * @var bool
+	 */
+	protected static $publish_filters_enabled = true;
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
@@ -81,7 +86,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$options['default_class']) {
 			$options['default_class'] = 'InterAdmin';
 		}
-		// Classe não foi forçada
+		// Classe não foi forçada, descobrir a classe do Tipo
 		if (!$options['class']) {
 			if (!$tipo) {
 				$instance = new $options['default_class']($id, $optionsWithoutFields);
@@ -97,13 +102,34 @@ class InterAdmin extends InterAdminAbstract {
 			// Classe é outra
 			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
 			$finalInstance = new $class_name($id, $optionsWithoutFields);
+		}
+		if ($tipo) {
 			$finalInstance->setTipo($tipo);
+			$finalInstance->db_prefix = $tipo->db_prefix;
 		}
 		// Fields		
 		if ($options['fields']) {
 			$finalInstance->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 		return $finalInstance;
+	}
+	/**
+	 * Finds a Child Tipo by a camelcase keyword. 
+	 * 
+	 * @param 	string 	$nome_id 	CamelCase
+	 * @return 	array 
+	 */
+	protected function _findChild($nome_id) {
+		$children = $this->getTipo()->getInterAdminsChildren();
+		if (!$children[$nome_id]) {
+			$nome_id = explode('_', Jp7_Inflector::underscore($nome_id));
+			$nome_id[0] = Jp7_Inflector::plural($nome_id[0]);
+			$nome_id = Jp7_Inflector::camelize(implode('_', $nome_id));
+		}
+		if (!$children[$nome_id]) {
+			$nome_id = Jp7_Inflector::plural($nome_id);
+		}
+		return $children[$nome_id];
 	}
 	/**
 	 * Magic method calls
@@ -119,39 +145,39 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function __call($methodName, $args) {
-		$children = $this->getTipo()->getInterAdminsChildren();
-		// get*
+		// get{ChildName}, getFirst{ChildName} and get{ChildName}ById
 		if (strpos($methodName, 'get') === 0) {
-			// getFirst*
+			// getFirst{ChildName}
 			if (strpos($methodName, 'getFirst') === 0) {
-				$nome_id = Jp7_Inflector::tableize(substr($methodName, 8));
-				if ($child = $children[$nome_id]) {
+				$nome_id = substr($methodName, strlen('getFirst'));
+				if ($child = $this->_findChild($nome_id)) {
 					return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
 				}
-			// get*ById
+			// get{ChildName}ById
 			} elseif (substr($methodName, -4) == 'ById') {
-				$nome_id = Jp7_Inflector::tableize(substr($methodName, 3, -4));
-				if ($child = $children[$nome_id]) {
+				$nome_id = substr($methodName, strlen('get'), -strlen('ById'));
+				if ($child = $this->_findChild($nome_id)) {
 					$options = (array) $args[1];
 					$options['where'][] = "id = " . intval($args[0]);
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
+			// get{ChildName}
 			} else {
-				$nome_id = Jp7_Inflector::underscore(substr($methodName, 3)); 
-				if ($child = $children[$nome_id]) {
+				$nome_id = substr($methodName, strlen('get'));
+				if ($child = $this->_findChild($nome_id)) {
 					return $this->getChildren($child['id_tipo'], (array) $args[0]);
 				}
-			} 
-		// create*
+			}
+		// create{ChildName}
 		} elseif (strpos($methodName, 'create') === 0) {
-			$nome_id = Jp7_Inflector::tableize(substr($methodName, strlen('create'))); 
-			if ($child = $children[$nome_id]) {
+			$nome_id = substr($methodName, strlen('create')); 
+			if ($child = $this->_findChild($nome_id)) {
 				return $this->createChild($child['id_tipo'], (array) $args[0]);
 			}
-		// delete *
+		// delete{ChildName}
 		} elseif (strpos($methodName, 'delete') === 0) {
-			$nome_id = Jp7_Inflector::underscore(substr($methodName, strlen('delete')));
-			if ($child = $children[$nome_id]) {
+			$nome_id = substr($methodName, strlen('delete'));
+			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
 		} 
@@ -470,7 +496,7 @@ class InterAdmin extends InterAdminAbstract {
 		);
 	}
 	/**
-	 * Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
+	 * DEPRECATED: Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * 
 	 * @param array $sqlRow
 	 * @param string $tipoLanguage
@@ -517,15 +543,17 @@ class InterAdmin extends InterAdminAbstract {
 				$camposCombo[] = $campo['tipo'];
 			}
 		}
-		$valoresCombo = $this->getFieldsValues($camposCombo);
-		$stringValue = array();
-		foreach ($valoresCombo as $key => $value) {
-			if (is_object($value)) {
-				 $value = $value->getStringValue();
+		if ($camposCombo) {
+			$valoresCombo = $this->getFieldsValues($camposCombo);
+			$stringValue = array();
+			foreach ($valoresCombo as $key => $value) {
+				if (is_object($value)) {
+					 $value = $value->getStringValue();
+				}
+				$stringValue[] = $value;
 			}
-			$stringValue[] = $value;
+			return implode(' - ', $stringValue);
 		}
-		return implode(' - ', $stringValue);
 	}
 	/**
 	 * Saves this record and updates date_modify.
@@ -586,14 +614,61 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return self::$log_user;
     }
-    /**
-     * Sets $log_user.
+  	/**
+     * Sets $log_user and returns the old value.
      *
      * @see InterAdmin::$log_user
      * @param object $log_user
      * @return void
      */
     public static function setLogUser($log_user) {
-        self::$log_user = $log_user;
+        $old_user = self::$log_user;
+		self::$log_user = $log_user;
+		return $old_user;
     }
+	/**
+	 * Enables or disables published filters.
+	 * 
+	 * @param bool $bool
+	 * @return bool Returns the previous value.
+	 */
+	public static function setPublishedFiltersEnabled($bool) {
+		$oldValue = self::$publish_filters_enabled;
+		self::$publish_filters_enabled = (bool) $bool;
+		return $oldValue;
+	}
+	/**
+	 * Returns TRUE if published filters are enabled.
+	 * 
+	 * @return bool $bool
+	 */
+	public static function isPublishedFiltersEnabled() {
+		return self::$publish_filters_enabled;
+	}
+	/**
+	 * Merges two option arrays.
+	 * 
+	 * Values of 'where' will be merged
+	 * Values of 'fields' will be merged
+	 * Other values (such as 'limit') can be overwritten by the $extended array of options.
+	 * 
+	 * @param array $initial 	Initial array of options.
+	 * @param array $extended 	Array of options that will extend the initial array.
+	 * @return array 			Array of $options properly merged.
+	 */
+	public static function mergeOptions($initial, $extended) {
+		if (!$extended) {
+			return $initial;
+		}		
+		if ($initial['fields'] && $extended['fields']) {
+			$extended['fields'] = array_merge($extended['fields'], $initial['fields']);
+		}
+		if ($initial['where'] && $extended['where']) {
+			if (!is_array($extended['where'])) {
+				$extended['where'] = array($extended['where']);
+			}
+			$extended['where'] = array_merge($extended['where'], $initial['where']);
+		}
+		return $extended + $initial;
+	}
 }

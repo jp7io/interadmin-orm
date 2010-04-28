@@ -6,13 +6,13 @@
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @category JP7
- * @package InterAdminArquivo
+ * @package InterAdmin
  */
  
 /**
  * Class which represents records on the table interadmin_{client name}_arquivos.
  *
- * @package InterAdminArquivo
+ * @package InterAdmin
  */
 class InterAdminArquivo extends InterAdminAbstract {
 	

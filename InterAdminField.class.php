@@ -6,13 +6,13 @@
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @category JP7
- * @package InterAdminField
+ * @package InterAdmin
  */
  
 /**
  * Generates the HTML output for a field based on its type, such as varchar, int or text.
  *
- * @package InterAdminField
+ * @package InterAdmin
  */
 class InterAdminField{
 	public $id;

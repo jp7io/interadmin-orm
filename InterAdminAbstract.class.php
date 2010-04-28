@@ -1,4 +1,19 @@
 <?php
+/**
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category JP7
+ * @package InterAdmin
+ */
+ 
+/**
+ * Class which represents records on the table interadmin_{client name}.
+ *
+ * @package InterAdmin
+ */
 abstract class InterAdminAbstract {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
@@ -123,12 +138,13 @@ abstract class InterAdminAbstract {
 		}
 	}
 	/**
-	 * Updates the values into the database table. If this object has no 'id', the data is inserted.
+	 * DEPRECATED: Updates the values into the database table. If this object has no 'id', the data is inserted.
 	 * 
 	 * @param array $fields_values Array with the values, the keys are the fields names.
 	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
 	 * @return void
 	 * @todo Verificar necessidade de $force_magic_quotes_gpc no jp7_db_insert
+	 * @deprecated Utilizar save()
 	 */
 	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = false) {
 		$pk = $this->_primary_key;
@@ -140,15 +156,34 @@ abstract class InterAdminAbstract {
 		$this->_updated = true; // FIXME Hack temporário
 	}
 	/**
+	 * Updates all the attributes from the passed-in array and saves the record.
+	 * 
+	 * @param array $attributes Array with fields names and values.
+	 * @return void
+	 */
+	public function updateAttributes($attributes) {
+		$this->setAttributes($attributes);
+		$this->_update($attributes);
+	}
+	/**
 	 * Saves this record.
 	 * 
 	 * @return void
 	 */
 	public function save() {
-		$pk = $this->_primary_key;
+		$this->_update($this->attributes);
+	}
+	/**
+	 * Updates using SQL.
+	 * 
+	 * @param array $attributes
+	 * @return void
+	 */
+	protected function _update($attributes) {
 		$valuesToSave = array();
 		$aliases = array_flip($this->getAttributesAliases());
-		foreach ($this->attributes as $key => $value) {
+		
+		foreach ($attributes as $key => $value) {
 			$key = ($aliases[$key]) ? $aliases[$key] : $key;
 			if (is_object($value)) {
 				$valuesToSave[$key] = (string) $value;
@@ -158,6 +193,8 @@ abstract class InterAdminAbstract {
 				$valuesToSave[$key] = $value;
 			}
 		}
+		
+		$pk = $this->_primary_key;
 		if ($this->$pk) {
 			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $valuesToSave);
 		} else {
@@ -177,15 +214,15 @@ abstract class InterAdminAbstract {
 		$interAdminClass = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
 		
 		$options = array();
-//		if (strpos($field, 'date_') === 0) {
-//			return new Jp7_Date($value);
-//		}
+		if (strpos($field, 'date_') === 0) {
+			return new Jp7_Date($value);
+		}
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
 			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
 		} elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
 			$isMulti = in_array($campo['xtra'], array('registros_multi', 'tipos_multi'));
-			$isTipo = ($campo['xtra'] == 'multi_tipos' || $campo['xtra'] == 'tipos');
+			$isTipo = ($campo['xtra'] == 'tipos_multi' || $campo['xtra'] == 'tipos');
 		} elseif (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
 			$class_name = $interAdminClass . 'FieldFile';
 			if (!class_exists($class_name)) {
@@ -206,10 +243,15 @@ abstract class InterAdminAbstract {
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
-					if ($isTipo) {
-						$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
+					if ($value2 && is_numeric($value2)) {
+						if ($isTipo) {
+							$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
+						} else {
+							$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
+						}
 					} else {
-						$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
+						//FIXME Retirar quando 7.form.lib parar de salvar N no special
+						unset($value_arr[$key2]);
 					}
 				}
 				$value = $value_arr;
@@ -231,7 +273,7 @@ abstract class InterAdminAbstract {
 	 * @return ADORecordSet
 	 */
 	protected function _executeQuery($options) {
-		global $jp7_app, $db, $debugger;
+		global $db, $debugger;
 		// Type casting 
 		if (!is_array($options['from'])) {
     		$options['from'] = (array) $options['from'];
@@ -253,7 +295,12 @@ abstract class InterAdminAbstract {
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
 		$clauses = $this->_resolveSqlClausesAlias($options);
 		
-		if (!$options['all'] && !$jp7_app) {
+		if (array_key_exists('use_published_filters', $options)) {
+			$use_published_filters = $options['use_published_filters'];
+		} else {
+			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
+		}
+		if ($use_published_filters) {
 			foreach ($options['from'] as $key => $from) {
 				list($table, $alias) = explode(' AS ', $from);
 				if ($alias == 'main') {
@@ -264,6 +311,7 @@ abstract class InterAdminAbstract {
 				}
 			}
 		}
+		
 		// Sql
 		$sql = "SELECT " . implode(',', $options['fields']) .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
@@ -272,9 +320,13 @@ abstract class InterAdminAbstract {
 		// Debug
 		if ($debugger) {
 			$debugger->showSql($sql, $options['debug']);
+			$debugger->startTime();
 		}
 		// Run SQL
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		if ($debugger) {
+			$debugger->getTime($options['debug']);
+		}
 		return $rs;
 	}
 	/**
@@ -330,8 +382,8 @@ abstract class InterAdminAbstract {
 						$joinAliases = array();
 					// Joins com children
 					} elseif (strpos($table, 'children_') === 0) {
-						$joinNome = substr($table, 9);
-						$childrenArr = $this->getInterAdminsChildren();
+						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
+						$childrenArr = $this->getInterAdminsChildren($joinNome);
 						if (!$childrenArr[$joinNome]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
 						}
@@ -349,7 +401,8 @@ abstract class InterAdminAbstract {
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$this->_addJoinAlias($options, $table, $campos[$joinNome]);
 						}
-						$joinAliases = array_flip($campos[$joinNome]['nome']->getCamposAlias());
+						$joinTipo = $this->_getCampoTipo($campos[$joinNome]);
+						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
 					$campo = ($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
 				} else {
@@ -443,7 +496,7 @@ abstract class InterAdminAbstract {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
 		}		
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
-		if ($campo['xtra'] == 'S') { // @todo testar
+		if (in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos', 'tipos', 'tipos_multi'))) { // @todo testar
             $options['from'][] = $joinTipo->getTableName() . 
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id_tipo';
         } else {
@@ -595,32 +648,6 @@ abstract class InterAdminAbstract {
 		}
 		$this->attributes = array();
 		$this->_deleted = true;
-	}
-	public function getRelatedInterAdminsByTags($id_tipo = 0) {
-		global $db, $debugger;
-		$pk = $this->_primary_key;
-		if ($this->$pk) {
-			if ($id_tipo) {
-				$sql = "SELECT tags.id_tag,tags.parent_id,tags.id,tags.id_tipo".
-					" FROM " . $this->db_prefix . "_tags AS tags" .
-					" INNER JOIN " . $this->db_prefix . " AS registros" .
-					" ON tags.parent_id = registros.id" .
-					" WHERE tags." . $this->_primary_key . " = " . $this->$pk .
-					" AND registros.id_tipo = " . $id_tipo;
-			} else {
-				$sql = "SELECT * FROM " . $this->db_prefix . "_tags" .
-					" WHERE " . $this->_primary_key . " = " . $this->$pk;
-			}
-			if ($debugger) {
-				$debugger->showSql($sql, $sql_debug);
-			}
-			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-			while ($row = $rs->FetchNextObj()) {
-				$return[] = new InterAdmin($row->parent_id);
-			}
-			$rs->Close();
-			return $return;
-		}
 	}
 	
 	/**

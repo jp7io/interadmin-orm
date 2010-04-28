@@ -37,7 +37,7 @@ class Jp7_Inflector {
 	 * @param int|array $itens The word will only be pluralized $itens > 1 OR count($itens) > 1.
 	 * @return string
 	 */
-	public static function plural ($word, $itens = null) {
+	public static function plural($word, $itens = null) {
 		static $resolved = array();
 				
 		if (is_null($itens)) {
@@ -70,7 +70,7 @@ class Jp7_Inflector {
 	 * @param object $camelCasedWord
 	 * @return string
 	 */
-	public static function underscore ($camelCasedWord) {
+	public static function underscore($camelCasedWord) {
 		return strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', $camelCasedWord));
 	}
 	
@@ -84,4 +84,14 @@ class Jp7_Inflector {
 		return self::plural(self::underscore($camelCasedWord));
 	}
 	
+	/**
+     * Convert a phrase from the lower case and underscored form to the camel case form.
+     * 
+     * @param 	string 	$lower_case_and_underscored_word  Phrase to convert
+     * @return 	string  Camel case form of the phrase: LowerCaseAndUnderscoredWord
+     */
+   	public static function camelize($lower_case_and_underscored_word) {
+		$lower_case_and_underscored_word = toId($lower_case_and_underscored_word, false, '_'); 
+        return str_replace(' ', '', ucwords(str_replace('_', ' ', $lower_case_and_underscored_word)));
+    }
 } 
