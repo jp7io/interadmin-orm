@@ -41,6 +41,9 @@ class Jp7_Bootstrap {
 	public static function initFrontController() {
 		$frontController = Zend_Controller_Front::getInstance();
 		$frontController->setControllerDirectory(APPLICATION_PATH . '/controllers');
+		
+		$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
+		
 		$frontController->throwExceptions(true); // @todo Usar config para determinar ambiente
 		$frontController->setParam('env', 'development');
 	}
@@ -92,7 +95,25 @@ class Jp7_Bootstrap {
 			'generator' => 'JP7 InterAdmin'
 		);
 		
+		$scripts = array(
+			'/_default/js/interdyn.js',
+			'/_default/js/interdyn_checkflash.js',
+			'/_default/js/interdyn_form.js',
+			'/_default/js/interdyn_form_lang_' . $lang->lang . '.js',
+			'/_default/js/swfobject.js',
+			'/_default/js/jquery/jquery-1.3.2.min.js',
+			'/_default/js/interdyn_menu.js',
+			'js/functions.js'
+		);
+		
+		$links = array(
+			'/_default/css/7_w3c.css',
+			'css/main.css'
+		);
+				
 		Zend_Registry::set('metas', $metas);
+		Zend_Registry::set('scripts', $scripts);
+		Zend_Registry::set('links', $links);
 	}
 	
 	public static function dispatch() {
