@@ -511,6 +511,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->deleted_tipo = 'S';
 		$this->save();
 	}
+	
 	/**
 	 * Deletes all the InterAdmins.
 	 * 
@@ -524,6 +525,25 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return count($records);
 	}
+	
+	/**
+	 * Deletes all the InterAdmins forever.
+	 * 
+	 * @param array $options [optional]
+	 * @return int Count of deleted InterAdmins.
+	 */
+	public function deleteInterAdminsForever($options = array()) {
+		global $db;
+		
+		if ($this->id_tipo) {
+			$sql = "DELETE FROM " . $this->getInterAdminsTableName() . 
+				" WHERE id_tipo = " . $this->id_tipo;
+			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		}
+		
+		return $db->Affected_Rows();
+	}
+	
 	public function getAttributesNames() {
 		return array('id_tipo', 'model_id_tipo', 'parent_id_tipo', 'redirect_id_tipo',
 			'nome', 'nome_en', 'texto', 'class', 'class_tipo', 'template', 'editpage', 
