@@ -164,6 +164,7 @@ class InterSite {
 					$this->server->host = $host;
 				}
 			}
+			break;
 		}
 		
 		if ($this->server) {
