@@ -231,7 +231,12 @@ class Jp7_Date extends DateTime {
 					$format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
 			}
 		}
-		
+		if (strpos($format, 'D') !== false) {
+			$format = preg_replace('/(?<!\\\\)D/', addcslashes(jp7_date_week(intval($this->format('w')), true), 'A..z'), $format);
+		}
+		if (strpos($format, 'l') !== false) {
+			$format = preg_replace('/(?<!\\\\)l/', addcslashes(jp7_date_week(intval($this->format('w'))), 'A..z'), $format);
+		}
 		if (strpos($format, 'M') !== false) {
 			$format = preg_replace('/(?<!\\\\)M/', addcslashes(jp7_date_month($this->format('m'), true), 'A..z'), $format);
 		}
