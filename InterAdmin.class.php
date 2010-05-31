@@ -64,7 +64,7 @@ class InterAdmin extends InterAdminAbstract {
 		$this->id = intval($id);
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
-		if ($options['fields'] && $id) {
+		if ($options['fields'] && $this->id) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
