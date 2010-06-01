@@ -11,7 +11,7 @@ class Salesforce_Client extends SforceEnterpriseClient {
 	/**
 	 * Executes a query using Salesforce WebServices client and returns the records.
 	 *
-	 * @param array|string 	$options	Query String or Array of options with keys: fields, from, where, limit.
+	 * @param array|string 	$options	Query String or Array of options with keys: fields, from, where, group, order, limit.
 	 * @return QueryResult
 	 */
 	public function query($options) {
@@ -21,6 +21,9 @@ class Salesforce_Client extends SforceEnterpriseClient {
 				" FROM " . $options['from'];
 			if ($options['where']) {
 				$query .= " WHERE " . implode(' AND ', (array) $options['where']);
+			}
+			if ($options['group']) {
+				$query .= " GROUP BY " . $options['group'];
 			}
 			if ($options['order']) {
 				$query .= " ORDER BY " . $options['order'];
