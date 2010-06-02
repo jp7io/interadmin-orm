@@ -28,6 +28,9 @@ class Salesforce_Client extends SforceEnterpriseClient {
 			if ($options['order']) {
 				$query .= " ORDER BY " . $options['order'];
 			}
+			if ($options['debug']) {
+				krumo($query);
+			}
 			if ($options['limit']) {
 				// Begin: Faking OFFSET, LIMIT, Salesforce doesn't support OFFSET inside the LIMIT clause
 				$limitArr = explode(',', $options['limit']);
