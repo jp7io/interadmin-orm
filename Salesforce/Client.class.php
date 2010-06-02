@@ -1,5 +1,4 @@
 <?php
-
 require_once(dirname(__FILE__) . '/SforceEnterpriseClient.php');
 
 /**
@@ -82,9 +81,22 @@ class Salesforce_Client extends SforceEnterpriseClient {
 			
 			$soapClientArray = array_merge($soapClientArray, $proxySettings);
 		}
-		
-		$this->sforce = new SoapClient($wsdl, $soapClientArray);
-		return $this->sforce;
 		// End: Original CODE
+		
+		if ($options['connection_timeout']) {
+			@ini_set('default_socket_timeout', $options['connection_timeout']);
+		}
+		try {
+			$this->sforce = @new SoapClient($wsdl, $soapClientArray);
+		} catch (Exception $e) {
+			if ($options['connection_timeout']) {
+				@ini_restore('default_socket_timeout');
+			}
+			throw $e;
+		}
+		if ($options['connection_timeout']) {
+			@ini_restore('default_socket_timeout');
+		}
+		return $this->sforce;
 	}
 }
