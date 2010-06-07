@@ -168,7 +168,10 @@ class InterSite {
 		}
 		
 		if ($this->server) {
-			$this->db = $this->server->db;
+			$this->db = clone $this->server->db;
+			if ($this->db->host_internal) {
+				$this->db->host = $this->db->host_internal;
+			}
 			foreach($this->server->vars as $var => $value) {
 				$this->$var = $value;
 			}
@@ -237,7 +240,7 @@ class InterSite {
 		$GLOBALS['c_doc_root'] = jp7_doc_root();
 		// DB
 		$GLOBALS['db_type'] = $this->db->type;
-		$GLOBALS['db_host'] = ($this->db->host_internal) ? $this->db->host_internal : $this->db->host;
+		$GLOBALS['db_host'] = $this->db->host;
 		$GLOBALS['db_name'] = $this->db->name;
 		$GLOBALS['db_user'] = $this->db->user;
 		$GLOBALS['db_pass'] = $this->db->pass;
