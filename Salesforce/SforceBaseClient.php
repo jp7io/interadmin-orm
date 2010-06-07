@@ -149,22 +149,12 @@ class SforceBaseClient {
 		if ($this->loginScopeHeader != NULL) {
 			$this->sforce->__setSoapHeaders(array($this->loginScopeHeader));
 		}
-		// JP7 - Adicionado Cache
-		$skey = 's_cambridge_salesforce_cache';
-		if ($_SESSION[$skey] && $_SESSION[$skey]['saved'] > strtotime('-10 minutes')) {
-			$result = $_SESSION[$skey]['result'];
-		} else {
-			$result = $this->sforce->login(array (
-	         'username' => $username,
-	         'password' => $password
-			));
-			$result = $result->result;
-			
-			$_SESSION[$skey] = array(
-				'result' => $result,
-				'saved' => time()
-			);
-		}
+		$result = $this->sforce->login(array (
+         'username' => $username,
+         'password' => $password
+		));
+		$result = $result->result;
+		
 		$this->_setLoginHeader($result);
 		return $result;
 	}

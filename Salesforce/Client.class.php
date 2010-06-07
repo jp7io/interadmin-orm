@@ -7,6 +7,8 @@ require_once(dirname(__FILE__) . '/SforceEnterpriseClient.php');
 class Salesforce_Client extends SforceEnterpriseClient {
 	const MAX_RETURNED_ROWS = 2000;
 	
+	private $wsdl;
+	
 	/**
 	 * Executes a query using Salesforce WebServices client and returns the records.
 	 *
@@ -57,6 +59,44 @@ class Salesforce_Client extends SforceEnterpriseClient {
 	}
 	
 	/**
+	 * Login to Salesforce.com and starts a client session.
+	 *
+	 * @param string $username   Username
+	 * @param string $password   Password
+	 *
+	 * @return LoginResult
+	 */
+	public function login($username, $password) {
+		$this->sforce->__setSoapHeaders(NULL);
+		if ($this->callOptions != NULL) {
+			$this->sforce->__setSoapHeaders(array($this->callOptions));
+		}
+		if ($this->loginScopeHeader != NULL) {
+			$this->sforce->__setSoapHeaders(array($this->loginScopeHeader));
+		}
+		// JP7 - Adicionado Cache
+		$skey = 's_salesforce_cache';
+		$cache = $_SESSION[$skey][$this->wsdl];
+		
+		if ($cache && $cache['saved'] > strtotime('-10 minutes')) {
+			$result = $cache['result'];
+		} else {
+			$result = $this->sforce->login(array (
+	         'username' => $username,
+	         'password' => $password
+			));
+			$result = $result->result;
+			
+			$_SESSION[$skey][$this->wsdl] = array(
+				'result' => $result,
+				'saved' => time()
+			);
+		}
+		$this->_setLoginHeader($result);
+		return $result;
+	}
+	
+	/**
 	 * Creates a connection to the SoapClient. I had to override because of ISO-8859-1.
 	 * 
 	 * @param string 	$wsdl
@@ -65,6 +105,8 @@ class Salesforce_Client extends SforceEnterpriseClient {
 	 * @return SoapClient
 	 */
 	public function createConnection($wsdl, $proxy = null, $options = array()) {
+		$this->wsdl = $wsdl;
+		
 		$soapClientArray = $options + array (
 			'encoding' => 'ISO-8859-1',
 			'trace' => 1,
