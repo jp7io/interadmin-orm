@@ -146,6 +146,7 @@ class InterSite {
 					$remotes = $server->interadmin_remote;
 					if (in_array($host, $remotes) || in_array('www.' . $host, $remotes)) {
 						$this->server = $this->servers[$host] = $server;
+						$this->interadmin_remote = $host;
 						$this->hostType = 'remote';
 						break 2;  // Exit foreach and while.
 					}
@@ -204,9 +205,6 @@ class InterSite {
 			case 'alias':
 				header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
 				exit;
-			case 'remote':
-				$GLOBALS['c_remote'] = $this->server->host;
-				break;
 			case !$this->server: {
 				$message = 'Host não está presente nas configurações: ' . $_SERVER['HTTP_HOST'];
 				jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
