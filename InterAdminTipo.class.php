@@ -68,7 +68,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (is_object($id_tipo)) {
 			$id_tipo = (string) $id_tipo;
 		}
-		$this->id_tipo = intval($id_tipo);
+		// id_tipo must be a string, because in_array will not work with integers and an array of objects
+		$this->id_tipo = (string) intval($id_tipo);
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		if ($options['fields']) {
 			$this->getFieldsValues($options['fields']);
