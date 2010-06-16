@@ -54,14 +54,12 @@ class InterAdmin extends InterAdminAbstract {
 	protected static $publish_filters_enabled = true;
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
-	 * @param int $id This record's 'id'.
+	 * @param string $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
 	 */
-	public function __construct($id = 0, $options = array()) {
-		if (is_object($id)) {
-			$id = (string) $id;
-		}
-		$this->id = intval($id);
+	public function __construct($id = '0', $options = array()) {
+		$id = (string) $id;
+		$this->id = is_numeric($id) ? $id : '0';
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
 		if ($options['fields'] && $this->id) {

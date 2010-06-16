@@ -51,12 +51,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * This method has 4 possible calls:
 	 * 
 	 * __construct()
-	 * __construct(int $id_tipo)
+	 * __construct(string $id_tipo)
 	 * __construct(array $options)
-	 * __construct(int $id_tipo, array $options)
+	 * __construct(string $id_tipo, array $options)
 	 * 
-	 * @param array $id_tipo This record's 'id_tipo'.
-	 * @param array $options [optional]	Default array of options. Available keys: db_prefix, fields.
+	 * @param string 	$id_tipo 	[optional] This record's 'id_tipo'.
+	 * @param array		$options 	[optional] Default array of options. Available keys: db_prefix, fields.
 	 * @todo Modificar staticConst(...) por static::ID_TIPO no PHP 5.3
 	 */
 	public function __construct($id_tipo = null, $options = array()) {
@@ -64,12 +64,9 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options = (array) $id_tipo;
 			$id_tipo = $this->staticConst('ID_TIPO');
 		}
-		// Constructor
-		if (is_object($id_tipo)) {
-			$id_tipo = (string) $id_tipo;
-		}
 		// id_tipo must be a string, because in_array will not work with integers and an array of objects
-		$this->id_tipo = (string) intval($id_tipo);
+		$id_tipo = (string) $id_tipo;
+		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		if ($options['fields']) {
 			$this->getFieldsValues($options['fields']);
