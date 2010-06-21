@@ -8,7 +8,7 @@
  * @category JP7
  * @package InterAdmin
  */
- 
+
 /**
  * Class which represents records on the table interadmin_{client name}.
  *
@@ -369,7 +369,7 @@ abstract class InterAdminAbstract {
 				$len = strlen($termo);
 				$table = 'main';
 				if (strpos($termo, '.') !== false) {
-					list($table, $termo) = explode('.', $termo);
+					list($table, $termo, $subtermo) = explode('.', $termo);
 				}
 				if ($table != 'main') {
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins 
@@ -403,6 +403,22 @@ abstract class InterAdminAbstract {
 						}
 						$joinTipo = $this->_getCampoTipo($campos[$joinNome]);
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
+					}
+					// TEMPORARIO FIXME, necessario melhor maneira
+					if ($subtermo) {
+						$subtable = $table . '__' . $termo;
+						$subCampos = $joinTipo->getCampos();
+						$subJoinTipo = $joinTipo->_getCampoTipo($subCampos[$joinAliases[$termo]]);
+						
+						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
+						if (!in_array($subtable, (array) $options['from_alias'])) {
+							$options['from_alias'][] = $subtable;
+							$options['from'][] = $subJoinTipo->getInterAdminsTableName() .
+            					' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] . ' AND ' . $subtable . '.id_tipo = ' . $subJoinTipo->id_tipo;
+						}
+						$table = $subtable;
+						$termo = $subtermo;
+						$joinAliases = array_flip($subJoinTipo->getCamposAlias());
 					}
 					$campo = ($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
 				} else {
