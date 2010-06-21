@@ -116,7 +116,8 @@ class InterAdminField{
 			} elseif ($xtra == 'ajax') {
 				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . $campo_nome . ", 'search', 'callback')\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
 				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
-				"<option value=\"0\">--------------------</option>";
+				"<option value=\"0\">--------------------</option>" .
+				"<option value=\"0\">Mínimo de 3 caracteres para começar a busca...</option>";
 				//interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
 				if ($valor) {
 					$tipoObj = new InterAdminTipo($campo_nome);
