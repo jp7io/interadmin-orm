@@ -126,7 +126,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param string $var Magic property 'interadminsOrderby' or 'class'.
 	 * @return mixed
 	 */
-	public function __get($var) {
+	public function &__get($var) {
 		if ($var == 'class' || $var == 'tabela') {
 			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
 				if (!$this->$var && !$this->getFieldsValues($var)) {
