@@ -158,4 +158,32 @@ class Jp7_Collections {
 		}
 		return array_slice($array, $offset, $length);
 	}
+	
+	/**
+	 * Implodes the properties of an array of objects.
+	 * It uses getFieldsValues() for InterAdminTipo and getByAlias() for InterAdmin. 
+	 * 
+	 * @param 	string	$separator		
+	 * @param 	array	$array					Array of objects.
+	 * @param 	string 	$propertyName 			[optional] Defaults to 'nome'.
+	 * @param 	bool 	$discardEmptyValues		If TRUE empty values won´t be imploded.
+	 * @return 	string 	Values of $propertyName imploded using $separator.
+	 */
+	public static function implode($separator, $array, $propertyName = 'nome', $discardEmptyValues = true) {
+		$stringArr = array();
+		foreach ($array as $item) {
+			if ($item instanceof InterAdminTipo) {
+				$stringArr[] = $item->getFieldsValues($propertyName);
+			} elseif ($item instanceof InterAdmin) {
+				$stringArr[] = $item->getByAlias($propertyName);
+			} else {
+				$stringArr[] = $item->$propertyName;
+			}
+		}
+		if ($discardEmptyValues) {		
+			return jp7_implode($separator, $stringArr);
+		} else {
+			return implode($separator, $stringArr);
+		}
+	}
 }
