@@ -3,7 +3,20 @@
  * 
  * @author JP7
  */
-class Jp7_Form {
+class Jp7_Form extends Zend_Form {
+	/**
+     * Constructor
+     *
+     * Registers form view helper as decorator
+     *
+     * @param mixed $options
+     * @return void
+     */
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+		$this->addPrefixPath('Jp7_Form', 'Jp7/Form/');
+    }
 	
 	/**
 	 * Creates a Jp7_Mail with the data sent from the form.
@@ -25,7 +38,7 @@ class Jp7_Form {
 		$options = $options + $default;
 		
 		// Layout
-		$html = $this->prepareHtml($record, $options);
+		$html = $this->prepareMailHtml($record, $options);
 		$text = strip_tags($html);
 		$view = Zend_Layout::getMvcInstance()->getView();
 		$html = $view->partial($options['template'], $options + array('message' => $html));
@@ -39,7 +52,7 @@ class Jp7_Form {
 		return $mail;
 	}
 	
-	public function prepareHtml(InterAdmin $record, $options = array()) {
+	public function prepareMailHtml(InterAdmin $record, $options = array()) {
 		global $lang;
 		
 		$linebreak = '<br />' . "\r\n";
@@ -53,7 +66,7 @@ class Jp7_Form {
 			if (!$field['form']) {
 				continue;
 			}
-			$html .= '<b>' . $this->_getLabel($field) . '</b>: ' . $this->_getValue($record, $field) . $linebreak;
+			$html .= '<b>' . $this->_getMailLabel($field) . '</b>: ' . $this->_getMailValue($record, $field) . $linebreak;
 			if ($field['separador']) {
 				$html .= $linebreak;			
 			}
@@ -70,7 +83,10 @@ class Jp7_Form {
 		return $html;
 	}
 	
-	protected function _getLabel($field) {
+	/**
+	 * FIXME temporário
+	 */
+	protected function _getMailLabel($field) {
 		if ($field['label']) {
 			return $field['label'];
 		} elseif ($field['nome'] instanceof InterAdminTipo) {
@@ -80,7 +96,10 @@ class Jp7_Form {
 		}
 	}
 	
-	protected function _getValue($record, $field) {
+	/**
+	 * FIXME temporário
+	 */
+	protected function _getMailValue($record, $field) {
 		$value = $record->{$field['nome_id']};
 		
 		// @todo Falta select_multi
@@ -104,7 +123,92 @@ class Jp7_Form {
 		} else {
 			return $value;
 		}
-		
 	}
 	
+	/**
+	 * Create an array of elements from an InterAdminTipo.
+	 * 
+	 * @param InterAdminTipo $tipo
+	 * @return array
+	 */
+	public function createElements(InterAdminTipo $tipo, $prefix = '') {
+		$elements = array();
+		foreach ($tipo->getCampos() as $campo) {
+			if ($campo['form']) {
+				$element = $this->createElementFromCampo($campo, $prefix);
+				$elements[$element->getId()] = $element;
+			}
+		}
+		return $elements;
+	}
+	
+	public function createElementFromCampo($campo, $prefix) {
+		list($tipo, $subTipo) = explode('_', $campo['tipo']);
+		
+		$name = $prefix . $campo['nome_id'];
+		$options = array(
+			'label' => $campo['nome'],
+			'description' => $campo['ajuda'],
+			'required' => (bool) $campo['obrigatorio']
+		);
+		
+		switch ($tipo) {
+			case 'varchar':
+				$element = $this->createElement('text', $name, $options);
+				break;
+			case 'text':
+				$element = $this->createElement('textarea', $name, $options);
+				break;
+			case 'select':
+				$registros = $campo['nome']->getInterAdmins();
+				$multiOptions = array();
+				foreach ($registros as $registro) {
+					$multiOptions[$registro->__toString()] = $registro->getStringValue();
+				}
+				$options['multiOptions'] = $multiOptions;
+				// Label não é o $campo['nome'] como nos outros elementos
+				$options['label'] = $campo['label'];
+								
+				$element = $this->createElement('select', $name, $options);
+				break;
+			case 'date':
+				$element = $this->createElement('date', $name, $options);
+				break;
+			default:
+				$element = $this->createElement('text', $name, $options);
+				break;
+		}
+		return $element;
+	}
+	
+	public function populate($values, $prefix = '') {
+		if ($values instanceof InterAdmin) {
+			$values = $values->attributes;
+			foreach ($values as $key => $value) {
+				if ($value instanceof InterAdmin) {
+					$values[$key] = $value->id;
+				}
+			}
+		}
+		if ($prefix) {
+			foreach ($values as $key => $value) {
+				$values[$prefix . $key] = $value;
+				unset($values[$key]);
+			}
+		}
+		parent::populate($values);
+	}
 }
+
+
+/*
+$usuarioTipo = new Ciintranet_UsuarioTipo();
+$form = new Jp7_Form();
+$elements = $form->createElements($usuarioTipo);
+$form->addElements($elements);
+
+$form->populate($usuarioLogado->attributes);
+
+$form->setAction('atualizar_ok.php');
+echo $form->render(new Zend_View());
+*/

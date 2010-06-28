@@ -1119,7 +1119,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 
 			<a class="krumo-name"><?php echo $name;?></a>
 			(<em class="krumo-type">Object</em>) 
-			<strong class="krumo-class"><?php echo get_class($data) . ((method_exists($data, '__toString')) ? ' - ' . $data : '');?></strong>
+			<strong class="krumo-class"><?php echo get_class($data) . ((method_exists($data, '__toString') && !$data instanceof Zend_Form_Element) ? ' - ' . $data : '');?></strong>
 	</div>
 
 	<?php if (count($data)) {
