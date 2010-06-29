@@ -13,6 +13,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @var InterAdminTipo
 	 */
 	protected static $tipo;
+	/**
+	 * @var InterAdmin
+	 */
+	protected $record;
 	
 	public function init() {
 		if (!Zend_Registry::isRegistered('originalRequest')) {
@@ -54,6 +58,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		
 		// Layout
 		// - Title
+		$this->_prepareTitle();
 		$this->view->headTitle($config->lang->title);
 		// - Metas
 		$this->view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=ISO-8859-1');
@@ -69,6 +74,27 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			$this->view->headLink()->appendStylesheet($file);
 		}
 	}
+	
+	protected function _prepareTitle() {
+		$this->view->headTitle()->setSeparator(' | ');
+		
+		if ($this->record) {
+			if ($titulo = $this->record->getFieldsValues('varchar_key')) {
+				$this->view->headTitle($titulo);
+			}
+		}
+		
+		if ($secao = self::getTipo()) {
+			if ($secao->getFieldsValues('nome') == 'Home' && !$secao->getParent()->id_tipo) {
+				return; // Home
+			}
+			while ($secao->id_tipo) {
+				$this->view->headTitle($secao->getFieldsValues('nome'));
+				$secao = $secao->getParent();
+			}
+		}	
+	}
+	
 	/**
 	 * Trata as actions que não tem a função definida e passa para o template
 	 * se existir.
