@@ -50,6 +50,7 @@ class Jp7_Debugger{
 	 * @var bool
 	 */
 	protected $_templateFilename;
+	protected $_exceptionsEnabled = false;
 	/**
 	 * Public Constructor, it checks the flags and settings, will do nothing if $c_jp7 is <tt>FALSE</tt>.
 	 *
@@ -195,8 +196,19 @@ class Jp7_Debugger{
 	protected function _getBacktraceLabel($caption) {
 		return '<strong style="color:red">'. str_pad($caption, 12, ' ', STR_PAD_LEFT) . ':</strong> ';
 	}
-	
-	
+	/**
+	 * @param bool
+	 * @return void
+	 */
+	public function setExceptionsEnabled($bool) {
+		$this->_exceptionsEnabled = $bool;
+	}
+	/**
+	 * @return bool
+	 */
+	public function isExceptionsEnabled() {
+		return $this->_exceptionsEnabled;
+	}
 	/**
 	 * Method to be used as default error handler with set_error_handler() function.
 	 *

@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * É usado para simular um método no WebService.
+ */
+class Jp7_InterAdmin_Soap_ReflectionMethodGetAll extends Jp7_InterAdmin_Soap_ReflectionMethodGet {
+	
+	/**
+	 * @return string 
+	 */
+	public function getName() {
+		return 'getAll' . $this->secao->class;
+	}
+	
+	public function getDescription() {
+		return utf8_encode('Retorna todos os registros da secao ' . $this->secao->nome . ', incluindo os registros deletados e os nao publicados.');
+	}
+}
