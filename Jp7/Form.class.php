@@ -131,23 +131,30 @@ class Jp7_Form extends Zend_Form {
 	 * @param InterAdminTipo $tipo
 	 * @return array
 	 */
-	public function createElements(InterAdminTipo $tipo, $prefix = '') {
+	public function createElements(InterAdminTipo $tipo, $prefix = '', array $options = array()) {
+		$options = $options + array(
+			'label_suffix' => ':',
+			'required_suffix' => '*'
+		);
+		
 		$elements = array();
 		foreach ($tipo->getCampos() as $campo) {
 			if ($campo['form']) {
-				$element = $this->createElementFromCampo($campo, $prefix);
+				$element = $this->createElementFromCampo($campo, $prefix, $options);
 				$elements[$element->getId()] = $element;
 			}
 		}
 		return $elements;
 	}
 	
-	public function createElementFromCampo($campo, $prefix) {
+	public function createElementFromCampo($campo, $prefix, $options) {
 		list($tipo, $subTipo) = explode('_', $campo['tipo']);
 		
 		$name = $prefix . $campo['nome_id'];
+		$label_suffix = $options['label_suffix'] . (($campo['obrigatorio']) ? $options['required_suffix'] : ''); 
+		
 		$options = array(
-			'label' => $campo['nome'],
+			'label' => $campo['nome'] . $label_suffix,
 			'description' => $campo['ajuda'],
 			'required' => (bool) $campo['obrigatorio']
 		);
@@ -167,7 +174,7 @@ class Jp7_Form extends Zend_Form {
 				}
 				$options['multiOptions'] = $multiOptions;
 				// Label não é o $campo['nome'] como nos outros elementos
-				$options['label'] = $campo['label'];
+				$options['label'] = $campo['label'] . $label_suffix;
 								
 				$element = $this->createElement('select', $name, $options);
 				break;
