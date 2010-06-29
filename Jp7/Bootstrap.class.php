@@ -41,19 +41,28 @@ class Jp7_Bootstrap {
 	public static function initFrontController() {
 		$frontController = Zend_Controller_Front::getInstance();
 		$frontController->setControllerDirectory(APPLICATION_PATH . '/controllers');
-		
-		$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
-		
+		if (is_dir(APPLICATION_PATH . '/modules')) {
+			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
+		}
 		$frontController->throwExceptions(true); // @todo Usar config para determinar ambiente
 		$frontController->setParam('env', 'development');
 	}
 	
 	public static function initLanguage() {
-		// TODO Retirar língua das variáveis globais
+		/**
+		 * É utilizada pela InterAdmin para gerar URL com SEO, que é o padrão no MVC.
+		 * @var bool
+		 */
+		global $seo;
+		$seo = true;
+		// TODO Retirada de $lang das variáveis globais, alterando a InterAdmin
 		global $lang;
 		
 		$config = Zend_Registry::get('config');
 		$frontController = Zend_Controller_Front::getInstance();
+		// Alterando o router para que $this->url() funcione corretamente na View
+		$frontController->setRouter(new Jp7_Controller_Router());
+		// Roteando o idioma na URL
 		$request = new Zend_Controller_Request_Http();
 		foreach ($config->langs as $language) {
 			if ($language->lang == $config->lang_default) {
@@ -67,17 +76,28 @@ class Jp7_Bootstrap {
 				break;
 			}
 		}
+		// Lang da JP7			
 		if (!$lang) {
 			$lang = new Jp7_Locale($config->lang_default);
 		}
-		
 		$config->lang = $config->langs[$lang->lang];
 		Zend_Registry::set('lang', $lang);
+		$request->setParam('lang', $lang->lang);
+		
+		// Zend Translate
+		$language_file = APPLICATION_PATH . '/languages/' . $lang->lang . '.php';
+		if (is_file($language_file)) {
+			$translate = new Zend_Translate('array', $language_file, $lang->lang);
+			Zend_Registry::set('Zend_Translate', $translate);
+		}
 	}	
 	
 	public static function initLayout() {
 		Zend_Layout::startMvc(APPLICATION_PATH . '/layouts/scripts');
 		$view = Zend_Layout::getMvcInstance()->getView();
+		if (is_dir(APPLICATION_PATH . '/modules/default')) {
+			$view->setScriptPath(APPLICATION_PATH . '/modules/default/views/scripts');
+		}
 		$view->doctype('XHTML1_STRICT');
 	}
 	
@@ -94,7 +114,9 @@ class Jp7_Bootstrap {
 			'author' => 'JP7 - http://jp7.com.br',
 			'generator' => 'JP7 InterAdmin'
 		);
-		
+		if ($config->google_site_verification) { 
+			$metas['google-site-verification'] = $config->google_site_verification;
+ 		}
 		$scripts = array(
 			'/_default/js/interdyn.js',
 			'/_default/js/interdyn_checkflash.js',
@@ -110,7 +132,7 @@ class Jp7_Bootstrap {
 			'/_default/css/7_w3c.css',
 			'css/main.css'
 		);
-				
+		
 		Zend_Registry::set('metas', $metas);
 		Zend_Registry::set('scripts', $scripts);
 		Zend_Registry::set('links', $links);
