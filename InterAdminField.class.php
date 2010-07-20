@@ -47,21 +47,27 @@ class InterAdminField{
 		global $select_campos_sql_temp;
 		global $tit_start;
 		$campo = $this->field;
-		if(is_array($campo)){
-			$campo_array=$campo;
-			$campo_nome=$campo["nome"];
-			$ajuda=stripslashes($campo["ajuda"]);
-			$tamanho=$campo["tamanho"];
-			$obrigatorio=($quantidade>1)?"":$campo["obrigatorio"];
-			$separador=$campo["separador"];
-			$xtra=$campo["xtra"];
-			$valor_default=$campo["default"];
-			$readonly=$campo["readonly"];
-			$campo=$campo["tipo"];
+		if (is_array($campo)) {
+			$campo_array = $campo;
+			$campo_nome = (string) $campo["nome"];
+			$ajuda = stripslashes($campo["ajuda"]);
+			$tamanho = $campo["tamanho"];
+			$obrigatorio = ($quantidade>1)?"":$campo["obrigatorio"];
+			$separador = $campo["separador"];
+			$xtra = $campo["xtra"];
+			$valor_default = $campo["default"];
+			$readonly = $campo["readonly"];
+			$campo = $campo["tipo"];
 		}
-		$valor=stripslashes($GLOBALS[$campo]);
-		if(!$valor&&!$id)$valor=$valor_default;
-		$_th="<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
+		if (array_key_exists('value', $campo_array)) {
+			$valor = $campo_array['value'];
+		} else {
+			$valor = stripslashes($GLOBALS[$campo]);
+		}
+		if (!$valor && !$id) {
+			$valor = $valor_default;
+		}
+		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
 		if($readonly=="hidden")$readonly_hidden=true;
 		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
@@ -76,9 +82,11 @@ class InterAdminField{
 		}elseif(strpos($campo,"text_")===0){
 			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_session['screenwidth']<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
 			if($xtra)$form.="<script type=\"text/javascript\">interadmin_iframes[".$iframes_i."]='".$campo."_".$iframes_i++."'</script>";
-		}elseif(strpos($campo,"char_")===0){
-			if($xtra&&!$id)$GLOBALS[$campo]="S";
-			$form=jp7_db_checkbox($campo."[".$j."]","S",$campo,$readonly);
+		} elseif(strpos($campo, "char_") === 0) {
+			if ($xtra && !$id) {
+				$GLOBALS[$campo] = "S";
+			}
+			$form = jp7_db_checkbox($campo."[".$j."]","S",$campo,$readonly, "", ($valor) ? $valor : null);
 		}elseif(strpos($campo,"select_multi_")===0){
 			if(!$readonly_hidden){
 				if (is_object($campo_nome)) $campo_nome = (string) $campo_nome;
@@ -156,7 +164,7 @@ class InterAdminField{
 				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"autocomplete\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
 				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
 				"<option value=\"0\">--------------------</option>" .
-				interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
+				interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
 			}
 			$form .= "</select>";
 			$campo_nome = $campo_nome_2;
