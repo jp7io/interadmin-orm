@@ -15,10 +15,10 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo {
 		$usuario = $this->getFirstInterAdmin(array(
 			'fields' => array('secoes'),
 			'where' => array(
-				"usuario = '" . $username . "'",
+				"usuario = '" . addslashes($username) . "'",
 				"senha = '" . md5($password) . "'"
 			),
-			'use_published_filters' => true,
+			'use_published_filters' => true
 		));
 		
 		if ($usuario && $this->verifyIps($usuario)) {
