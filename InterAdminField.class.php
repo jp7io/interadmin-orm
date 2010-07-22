@@ -57,6 +57,11 @@ class InterAdminField{
 			$xtra = $campo["xtra"];
 			$valor_default = $campo["default"];
 			$readonly = $campo["readonly"];
+			if ($campo["tipo_de_campo"]) {
+				$tipo_de_campo = $campo["tipo_de_campo"] . '_';
+			} else {
+				$tipo_de_campo = $campo["tipo"];
+			}
 			$campo = $campo["tipo"];
 		}
 		if (array_key_exists('value', $campo_array)) {
@@ -72,22 +77,22 @@ class InterAdminField{
 		if($readonly=="hidden")$readonly_hidden=true;
 		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
 		
-		if(strpos($campo,"tit_")===0){
+		if(strpos($tipo_de_campo,"tit_")===0){
 			if($tit_start){
 				echo "</tbody>";
 				$tit_start=false;
 			}
 			echo "<tr><th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
 			$tit_start=true;
-		}elseif(strpos($campo,"text_")===0){
+		}elseif(strpos($tipo_de_campo,"text_")===0){
 			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_session['screenwidth']<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
 			if($xtra)$form.="<script type=\"text/javascript\">interadmin_iframes[".$iframes_i."]='".$campo."_".$iframes_i++."'</script>";
-		} elseif(strpos($campo, "char_") === 0) {
+		} elseif(strpos($tipo_de_campo, "char_") === 0) {
 			if ($xtra && !$id) {
 				$GLOBALS[$campo] = "S";
 			}
 			$form = jp7_db_checkbox($campo."[".$j."]","S",$campo,$readonly, "", ($valor) ? $valor : null);
-		}elseif(strpos($campo,"select_multi_")===0){
+		}elseif(strpos($tipo_de_campo,"select_multi_")===0){
 			if(!$readonly_hidden){
 				$form="<div class=\"select_multi\">";
 				ob_start();
@@ -108,7 +113,7 @@ class InterAdminField{
 				$form.="</div>";
 				if($campo_array[label])$campo_nome=$campo_array[label];
 			}
-		}elseif(strpos($campo,"select_")===0){
+		}elseif(strpos($tipo_de_campo,"select_")===0){
 			if ($campo_array['label']) $campo_nome_2 = $campo_array['label'];
 			else $campo_nome_2 = ($campo_nome == "all" && $xtra) ? "Tipos" : interadmin_tipos_nome($campo_nome);
 			$form = "" .
@@ -167,14 +172,14 @@ class InterAdminField{
 			}
 			$form .= "</select>";
 			$campo_nome = $campo_nome_2;
-		}elseif(strpos($campo,"int_")===0||strpos($campo,"float_")===0){
+		}elseif(strpos($tipo_de_campo,"int_")===0||strpos($tipo_de_campo,"float_")===0){
 			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
 			if($campo=="int_key"&&!$valor&&$quantidade>1)$valor=$registros+1+$j;
-			if (strpos($campo,"float_")===0 && $xtra == 'moeda') $valor = number_format($valor, '2', ',', '.');
+			if (strpos($tipo_de_campo,"float_")===0 && $xtra == 'moeda') $valor = number_format($valor, '2', ',', '.');
 			$form="<input type=\"text\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".$valor."\" maxlength=\"255\"".(($obrigatorio)?" obligatory=\"yes\"":"")." style=\"width:".(($tamanho)?$tamanho."em":"70px")."\"".$readonly.$onkeypress." />";
 		}else{
 			$onkeypress="";
-			if(strpos($campo,"varchar_")===0){
+			if(strpos($tipo_de_campo,"varchar_")===0){
 				switch($xtra){
 					case "id": // ID
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_')\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
@@ -194,15 +199,15 @@ class InterAdminField{
 						break;
 				}
 			}
-			$form = "<input type=\"".((strpos($campo,"password_")===0)?"password":"text")."\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=\"" . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />";
+			$form = "<input type=\"".((strpos($tipo_de_campo,"password_")===0)?"password":"text")."\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=\"" . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />";
 		}
 		$form.="<input type=\"hidden\" name=\"".$campo."_xtra[]\" value=\"".$xtra."\"".$readonly." />";
 		if($readonly&&$valor_default)$form.="<input type=\"hidden\" name=\"".$campo."[]\" value=\"".$valor."\" />";
 		
 		if($campo_nome){
-			if(strpos($campo,"tit_")===0){
+			if(strpos($tipo_de_campo,"tit_")===0){
 				
-			}elseif(strpos($campo,"file_")===0){
+			}elseif(strpos($tipo_de_campo,"file_")===0){
 				$url = interadmin_uploaded_file_url($valor);
 				echo "".
 				"<tr>".
@@ -215,7 +220,7 @@ class InterAdminField{
 					"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">Créditos/Leg.:</th>".
 					"<td><input type=\"text\" name=\"".$campo."_text[]\" value=\"".$GLOBALS[$campo."_text"]."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file\" /></td>".
 				"</tr>\n";
-			}elseif(strpos($campo,"date_")===0){
+			}elseif(strpos($tipo_de_campo,"date_")===0){
 				$S="".
 				"<tr>".
 					$_th.
@@ -234,7 +239,7 @@ class InterAdminField{
 					"<td>".$S_ajuda."</td>".
 				"</tr>";
 				echo $S;
-			}elseif(strpos($campo,"password_")===0&&$valor&&$xtra){
+			}elseif(strpos($tipo_de_campo,"password_")===0&&$valor&&$xtra){
 				echo "".
 				"<tr>".
 					$_th.
@@ -248,20 +253,20 @@ class InterAdminField{
 					"</td>".
 					"<td>".$S_ajuda."</td>".
 				"</tr>\n";
-			}elseif(strpos($campo,"plugin_")===0){
+			}elseif(strpos($tipo_de_campo,"plugin_")===0){
 				$plugin_function = 'interadmin_plugin_' . $xtra;
 				$plugin_include = '../../plugins/' . $xtra . '.php';
 				if (file_exists($plugin_include)) include $plugin_include;
 				else echo 'Include ' . $plugin_include . ' não encontrado.<br />';
 				if (function_exists($plugin_function)) echo $plugin_function($campo_array,$valor);
 				else echo 'Função ' . $plugin_function . ' não encontrada.<br />';
-			}elseif(strpos($campo,"special_")===0 || strpos($campo,"func_")===0){
+			}elseif(strpos($tipo_de_campo,"special_")===0 || strpos($tipo_de_campo,"func_")===0){
 				if (function_exists($campo_nome)) echo $campo_nome($campo_array,$valor);
 				else echo 'Função ' . $campo_nome . ' não encontrada.<br />';
 			}else{
 				if(!$readonly_hidden){
 					echo "".
-					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+					"<tr".(($s_session['mode']=="light"&&strpos($tipo_de_campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
 						"<th title=\"" . $campo . ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 						"<td colspan=\"2\">".$form."</td>".
 						"<td>".$S_ajuda."</td>".
