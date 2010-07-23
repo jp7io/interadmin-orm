@@ -74,7 +74,9 @@ class InterAdminField{
 		}
 		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
-		if($readonly=="hidden")$readonly_hidden=true;
+		if ($readonly == "hidden") {
+			$readonly_hidden = true;
+		}
 		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
 		
 		if(strpos($tipo_de_campo,"tit_")===0){
@@ -101,11 +103,11 @@ class InterAdminField{
 					$campo_nome = trim($campo_nome);
 					$campo_nome = interadmin_tipos_nome((is_numeric($campo_nome)) ? $campo_nome : 0);
 				} elseif ($xtra) {
-					interadmin_tipos_combo(explode(',', $valor), (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "checkbox", $campo . "[".$j."][]", false, $readonly, $obrigatorio, $campo_array['opcoes']);
+					interadmin_tipos_combo(jp7_explode(',', $valor), (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "checkbox", $campo . "[".$j."][]", false, $readonly, $obrigatorio, $campo_array['opcoes']);
 					$campo_nome = 'Tipos';
 				} else {
 					$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
-					echo interadmin_combo(explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"","","checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio, $readonly);
+					echo interadmin_combo(jp7_explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"","","checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio, $readonly);
 					$campo_nome=$temp_campo_nome;
 				}
 				$form.=ob_get_contents();
@@ -114,64 +116,66 @@ class InterAdminField{
 				if($campo_array[label])$campo_nome=$campo_array[label];
 			}
 		}elseif(strpos($tipo_de_campo,"select_")===0){
-			if ($campo_array['label']) $campo_nome_2 = $campo_array['label'];
-			else $campo_nome_2 = ($campo_nome == "all" && $xtra) ? "Tipos" : interadmin_tipos_nome($campo_nome);
-			$form = "" .
-			"<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly . " class=\"inputs_width\">" .
-			"<option value=\"0\">Selecione</option>" .
-			"<option value=\"0\">--------------------</option>";
-			if ($xtra == 'radio') {
-				$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
-				$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio);
-			} elseif ($xtra == 'radio_tipos') {
-				$form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', true, $readonly, $obrigatorio);
-			} elseif ($xtra == 'ajax') {
-				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . $campo_nome . ", 'search', 'callback')\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
-				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
-				"<option value=\"0\">--------------------</option>" .
-				"<option value=\"0\">Mínimo de 3 caracteres para começar a busca...</option>";
-				//interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
-				if ($valor) {
-					$tipoObj = new InterAdminTipo($campo_nome);
-					$options = array(
-						'where' => " AND id=".$valor
-					);
-					$rows = $tipoObj->getInterAdmins($options);
-					foreach ($rows as $row) {
-						$form.="<option value=\"".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" selected":"").">".toHTML($row->getStringValue())."</option>";
-					}
-				}
-			} elseif ($xtra == 'ajax_tipos') {	
-				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . intval($campo_nome) . ", 'search', 'callback', true)\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
-				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+			if(!$readonly_hidden){
+				if ($campo_array['label']) $campo_nome_2 = $campo_array['label'];
+				else $campo_nome_2 = ($campo_nome == "all" && $xtra) ? "Tipos" : interadmin_tipos_nome($campo_nome);
+				$form = "" .
+				"<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly . " class=\"inputs_width\">" .
+				"<option value=\"0\">Selecione</option>" .
 				"<option value=\"0\">--------------------</option>";
-				if ($valor) {
-					$form.="<option value=\"".$valor."\" value=\"".$valor."\" selected>".toHTML(interadmin_tipos_nome($valor))."</option>";
-				}
-			} elseif ($xtra) {
-				if ($campo_nome == "all") {
-					ob_start();
-					interadmin_tipos_combo($valor,0);
-					$form.=ob_get_contents();
-					ob_end_clean();
-				}else{
-					$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
-					" WHERE parent_id_tipo=".$campo_nome.
-					" ORDER BY ordem,nome";
-					$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
-					while ($row = $rs->FetchNextObj()) {
-						$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
+				if ($xtra == 'radio') {
+					$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
+					$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio);
+				} elseif ($xtra == 'radio_tipos') {
+					$form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', true, $readonly, $obrigatorio);
+				} elseif ($xtra == 'ajax') {
+					$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . $campo_nome . ", 'search', 'callback')\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
+					"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+					"<option value=\"0\">--------------------</option>" .
+					"<option value=\"0\">Mínimo de 3 caracteres para começar a busca...</option>";
+					//interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
+					if ($valor) {
+						$tipoObj = new InterAdminTipo($campo_nome);
+						$options = array(
+							'where' => " AND id=".$valor
+						);
+						$rows = $tipoObj->getInterAdmins($options);
+						foreach ($rows as $row) {
+							$form.="<option value=\"".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" selected":"").">".toHTML($row->getStringValue())."</option>";
+						}
 					}
-					$rs->Close();
+				} elseif ($xtra == 'ajax_tipos') {	
+					$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . intval($campo_nome) . ", 'search', 'callback', true)\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
+					"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+					"<option value=\"0\">--------------------</option>";
+					if ($valor) {
+						$form.="<option value=\"".$valor."\" value=\"".$valor."\" selected>".toHTML(interadmin_tipos_nome($valor))."</option>";
+					}
+				} elseif ($xtra) {
+					if ($campo_nome == "all") {
+						ob_start();
+						interadmin_tipos_combo($valor,0);
+						$form.=ob_get_contents();
+						ob_end_clean();
+					}else{
+						$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
+						" WHERE parent_id_tipo=".$campo_nome.
+						" ORDER BY ordem,nome";
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
+						while ($row = $rs->FetchNextObj()) {
+							$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
+						}
+						$rs->Close();
+					}
+				} else {
+					$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"autocomplete\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
+					"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+					"<option value=\"0\">--------------------</option>" .
+					interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
 				}
-			} else {
-				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"autocomplete\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
-				"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
-				"<option value=\"0\">--------------------</option>" .
-				interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
+				$form .= "</select>";
+				$campo_nome = $campo_nome_2;
 			}
-			$form .= "</select>";
-			$campo_nome = $campo_nome_2;
 		}elseif(strpos($tipo_de_campo,"int_")===0||strpos($tipo_de_campo,"float_")===0){
 			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
 			if($campo=="int_key"&&!$valor&&$quantidade>1)$valor=$registros+1+$j;
@@ -202,7 +206,9 @@ class InterAdminField{
 			$form = "<input type=\"".((strpos($tipo_de_campo,"password_")===0)?"password":"text")."\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=\"" . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />";
 		}
 		$form.="<input type=\"hidden\" name=\"".$campo."_xtra[]\" value=\"".$xtra."\"".$readonly." />";
-		if($readonly&&$valor_default)$form.="<input type=\"hidden\" name=\"".$campo."[]\" value=\"".$valor."\" />";
+		if ($readonly && $valor_default) {
+			$form.="<input type=\"hidden\" name=\"".$campo."[]\" value=\"".$valor."\" />";
+		}
 		
 		if($campo_nome){
 			if(strpos($tipo_de_campo,"tit_")===0){
