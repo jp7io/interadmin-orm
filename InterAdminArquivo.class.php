@@ -118,7 +118,8 @@ class InterAdminArquivo extends InterAdminAbstract {
 	}
 	/**
 	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
-	 *
+	 * '$this->url' needs to have the path to the temporary file and it must have a parent.
+	 * 
 	 * @return Url New $url created with the $id_arquivo_banco of the added record.
 	 * @todo Create a class for _arquivos_banco 
 	 */
