@@ -117,10 +117,16 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @return bool TRUE if it has a template, FALSE otherwise.
 	 */
 	public function forwardToTemplate() {
-		if ($tipo = self::getTipo()) {
+		// TODO $this->getTipo() should be static::getTipo(). Available on PHP 5.3
+		if ($tipo = $this->getTipo()) {
 			if ($template = $tipo->getModel()->template) {
-				list($controller, $action) = explode('/', $template);
-				$this->_forward($action, $controller);
+				$templateArr = explode('/', $template);
+				if (count($templateArr) > 2) {
+					list($module, $controller, $action) = $templateArr;
+				} else {
+					list($controller, $action) = $templateArr;
+				}
+				$this->_forward($action, $controller, $module);
 				return true;
 			}
 		}
