@@ -40,6 +40,11 @@ class Jp7_Bootstrap {
 	
 	public static function initFrontController() {
 		$frontController = Zend_Controller_Front::getInstance();
+		// Alterando o dispatcher para abrir o template caso o Controller não exista
+		$frontController->setDispatcher(new Jp7_Controller_Dispatcher());
+		// Alterando o router para que $this->url() funcione corretamente na View
+		$frontController->setRouter(new Jp7_Controller_Router());
+				
 		$frontController->setControllerDirectory(APPLICATION_PATH . '/controllers');
 		if (is_dir(APPLICATION_PATH . '/modules')) {
 			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
@@ -60,8 +65,6 @@ class Jp7_Bootstrap {
 		
 		$config = Zend_Registry::get('config');
 		$frontController = Zend_Controller_Front::getInstance();
-		// Alterando o router para que $this->url() funcione corretamente na View
-		$frontController->setRouter(new Jp7_Controller_Router());
 		// Roteando o idioma na URL
 		$request = new Zend_Controller_Request_Http();
 		foreach ($config->langs as $language) {
