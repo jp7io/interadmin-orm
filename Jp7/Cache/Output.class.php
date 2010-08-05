@@ -69,7 +69,7 @@
 	  * @param mixed $_ Valores que se alteram na página e que portanto geram outra versão de cache.
 	  * @see Zend/Cache/Frontend/Zend_Cache_Frontend_Page#start()
 	  */	 
-	 public function start()
+	 public function start(/* Dynamic args*/)
 	 {
 	 	if (!self::$_enabled) {
 	 		return false;
