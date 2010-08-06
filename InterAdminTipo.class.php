@@ -87,17 +87,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['default_class'] = 'InterAdminTipo';
 		}
 		if ($options['class']) {
+			// Classe foi forçada
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
-			$instance = new $options['default_class']($id_tipo, array_merge($options, array('fields' => array('model_id_tipo', 'class_tipo'))));
-			if ($instance->class_tipo) {
-				 $class_name = $instance->class_tipo;
-			} else {
-				// @todo Store class_tipo on metadatas do save queries
-				if ($instance->model_id_tipo) {
-					$class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
-				}
-			}
+			// Classe não foi forçada, cria uma instância temporária para acessar o DB e verificar a classe correta
+			$instance = new $options['default_class']($id_tipo, array_merge($options, array(
+				'fields' => array('model_id_tipo', 'class_tipo')
+			)));
+			$class_name = $instance->class_tipo;
+			// Classe não é customizada, retornar a própria classe temporária
 			if (!class_exists($class_name)) {
 				if ($options['fields']) {
 					$instance->getFieldsValues($options['fields']);
@@ -105,6 +103,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				return $instance;
 			}
 		}
+		// Classe foi encontrada, instanciar o objeto
 		return new $class_name($id_tipo, $options);
 	}
 	public function getFieldsValues($fields) {
@@ -127,11 +126,17 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function &__get($var) {
-		if ($var == 'class' || $var == 'tabela') {
+		if ($var == 'class' || $var == 'class_tipo' || $var == 'tabela') {
 			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
-				if (!$this->$var && !$this->getFieldsValues($var)) {
-					$this->$var = $this->getModel()->getFieldsValues($var);
-					$this->_loadedfrommodel[$var] = true;
+				$modelo = $this;
+				while ($modelo->id_tipo) {
+					$modelo->getFieldsValues(array($var, 'model_id_tipo'));
+					if ($modelo->attributes[$var]) {
+						$this->$var = $modelo->attributes[$var];
+						$this->_loadedfrommodel[$var] = true;
+						break;
+					}
+					$modelo = new InterAdminTipo($modelo->model_id_tipo);				
 				}
 			}
 		}
