@@ -125,15 +125,15 @@
 	 		$params['lang'], 
 	 		$params['module'])
 	 	));
-
+		
 	 	if ($data) {
-			if (count($data) == 1 && is_string($data[0])) {
+			if (count($data) == 1 && is_string($data[0]) && strlen($data[0]) < 100) {
 		 		$id .= '_' . toId($data[0]);
 		 	} else {
 		 		$id .= '_' . md5(serialize($data));
 		 	}
 	 	}
-
+		
 	 	return $id;
 	}
 
