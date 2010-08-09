@@ -77,7 +77,7 @@ class InterAdminField{
 		if ($readonly == "hidden") {
 			$readonly_hidden = true;
 		}
-		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
+		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=' disabled="disabled"';
 		
 		if(strpos($tipo_de_campo,"tit_")===0){
 			if($tit_start){
