@@ -46,7 +46,7 @@ class InterAdminFieldFile {
 	 */
     public function getText() {
         if ($this->text) {
-			return $this->text;
+			$retorno = $this->text;
 		}
 		if ($parent = $this->getParent()) {
 			$fieldsAlias = constant(get_class($parent) . '::DEFAULT_FIELDS_ALIAS');
@@ -54,8 +54,9 @@ class InterAdminFieldFile {
 			if ($fieldsAlias) {
 				$varchar_key = $parent->getTipo()->getCamposAlias($varchar_key);
 			}
-			return $parent->$varchar_key;
+			$retorno = $parent->$varchar_key;
 		}
+		return htmlspecialchars($retorno);
 	}
 	/**
      * Returns $parent.
