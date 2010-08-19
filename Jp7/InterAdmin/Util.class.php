@@ -89,7 +89,7 @@ class Jp7_InterAdmin_Util {
 						$child->parent_id = $record->id;
 						
 						if ($use_id_string) {
-							self::_importAttributeFromIdString($record);
+							self::_importAttributeFromIdString($child);
 						}
 						
 						$child->save();
