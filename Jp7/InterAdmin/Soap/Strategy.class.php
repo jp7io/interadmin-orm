@@ -67,15 +67,15 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 	protected function _getCampoTipo($campo) {
 		if (strpos($field, 'special_') === 0 && $campo['xtra']) {
 			
-			$isMulti = in_array($campo['xtra'], array('registros_multi', 'tipos_multi'));
-			$isTipo = ($campo['xtra'] == 'tipos_multi' || $campo['xtra'] == 'tipos');
+			$isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
+			$isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
 			
 			$retorno = $this->_getCampoSelectClass($campo, $isTipo, $isMulti);
 			
 		} elseif (strpos($campo['tipo'], 'select_') === 0) {
 			
 			$isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
-			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
+			$isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
 			
 			$retorno = $this->_getCampoSelectClass($campo, $isTipo, $isMulti);
 			

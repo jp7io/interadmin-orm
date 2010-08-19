@@ -290,5 +290,26 @@ class InterAdminField{
 			echo "<tr><td height=\"".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
 		}
 	}
+	/**
+	 * Retorna os xtra dos campos do tipo select_ que armazenam tipos.
+	 * @return array
+	 */
+	public static function getSelectTipoXtras() {
+		return array('S', 'ajax_tipos', 'radio_tipos');
+	}	
+	/**
+	 * Retorna os xtra dos campos do tipo special_ que armazenam tipos.
+	 * @return array
+	 */
+	public static function getSpecialTipoXtras() {
+		return array('tipos_multi', 'tipos');
+	}
+	/**
+	 * Retorna os xtra dos campos do tipo special_ que armazenam múltiplos registros.
+	 * @return array
+	 */
+	public static function getSpecialMultiXtras() {
+		return array('registros_multi', 'tipos_multi');
+	}
 }
 ?>

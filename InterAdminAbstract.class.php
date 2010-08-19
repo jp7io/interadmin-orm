@@ -219,10 +219,10 @@ abstract class InterAdminAbstract {
 		}
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
-			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
+			$isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
 		} elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
-			$isMulti = in_array($campo['xtra'], array('registros_multi', 'tipos_multi'));
-			$isTipo = ($campo['xtra'] == 'tipos_multi' || $campo['xtra'] == 'tipos');
+			$isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
+			$isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
 		} elseif (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
 			$class_name = $interAdminClass . 'FieldFile';
 			if (!class_exists($class_name)) {
@@ -528,7 +528,8 @@ abstract class InterAdminAbstract {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
 		}		
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
-		if (in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos', 'tipos', 'tipos_multi'))) { // @todo testar
+		// @todo testar
+		if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {
             $options['from'][] = $joinTipo->getTableName() . 
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id_tipo';
         } else {
