@@ -372,9 +372,9 @@ abstract class InterAdminAbstract {
 					$negativas = array_reverse($negativas);
 				}
 				$inicio = substr($clause, 0, $pos + strlen($termo));
-				$inicioRep = preg_replace('/(<>|!=)([ ]*)' . $termo . '$/i', $negativas[0] . "=$2''", $inicio, 1, $count);
+				$inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)' . $termo . '$/i', "$1" . $negativas[0] . "=$3''", $inicio, 1, $count);
 				if (!$count) {
-					$inicioRep = preg_replace('/=([ ]*)' . $termo . '/i', $negativas[1] . "=$1''", $inicio, 1);
+					$inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)' . $termo . '/i', "$1" . $negativas[1] . "=$2''", $inicio, 1);
 				}
 				$clause = $inicioRep . substr($clause, $pos + strlen($termo));
 				$offset = strlen($inicioRep);
