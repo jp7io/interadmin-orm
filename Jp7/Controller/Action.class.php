@@ -170,8 +170,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 					'where' => array("id_tipo_string = '" . $id_tipo_string . "'")
 				));
 				// Caso action não exista no interadmin, mas o controller sim
-				if (!$tipo) {
-					$tipo = $parentTipo;
+				if (!$tipo) { 
+					if ($parentTipo->id_tipo) {
+						$tipo = $parentTipo;
+					}
 					break;
 				}
 				$parentTipo = $tipo;
