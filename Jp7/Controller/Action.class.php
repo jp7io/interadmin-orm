@@ -143,9 +143,9 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 						
 			$customTipo = ucfirst($config->name_id) . '_InterAdminTipo';
 			if (class_exists($customTipo)) {
-				$rootTipo = new $customTipo();
+				$parentTipo = new $customTipo();
 			} else {
-				$rootTipo = new InterAdminTipo();
+				$parentTipo = new InterAdminTipo();
 			}
 			
 			$request = Zend_Controller_Front::getInstance()->getRequest();
@@ -165,14 +165,16 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			}
 			
 			foreach ($tipos as $id_tipo_string) {
-				if (!$rootTipo) {
-					break;
-				}
-				$tipo = $rootTipo->getFirstChild(array(
+				$tipo = $parentTipo->getFirstChild(array(
 					'fields' => array('template'),
 					'where' => array("id_tipo_string = '" . $id_tipo_string . "'")
 				));
-				$rootTipo = $tipo;
+				// Caso action não exista no interadmin, mas o controller sim
+				if (!$tipo) {
+					$tipo = $parentTipo;
+					break;
+				}
+				$parentTipo = $tipo;
 			}
 			self::$tipo = $tipo;
 		}
