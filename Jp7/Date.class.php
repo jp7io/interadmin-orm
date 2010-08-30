@@ -32,29 +32,36 @@ class Jp7_Date extends DateTime {
 	 * @return string
 	 */
 	public function humanDiff($timeStamp = false) {
+		global $lang;
+		switch ($lang->lang) {
+			case 'en':
+				$units_names = array('years' => 'year', 'months' => 'month', 'weeks' => 'week', 'days' => 'day', 'hours' => 'hour', 'minutes' => 'minute');
+				$now = 'now';
+				$yesterday = 'yesterday';
+				$ago = 'ago';
+				break;
+			default:
+				$units_names = array('anos' => 'ano', 'meses' => 'mês', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto');
+				$now = 'agora';
+				$yesterday = 'ontem';
+				$ago = 'atrás';
+		}
 		if (isset($this) && $this instanceof self) {
 			$timeStamp = $this;
 		}
 		$timeStamp = self::_toTime($timeStamp);
 		$currentTime = time();
-		$units = array(
-			'ano' => 31556926,
-			'mês' => 2629743,
-			'semana' => 604800,
-			'dia' => 86400,
-			'hora' => 3600,
-			'minuto' => 60
-		);
+		$units = array_combine($units_names, array(31556926, 2629743, 604800, 86400, 3600, 60));
 		$seconds = $currentTime - $timeStamp;
 		if ($seconds <= 60) {
-			return 'agora';
-		} elseif ($seconds >= $units['dia'] && $seconds < $units['dia'] * 2) {
-			return 'ontem';
+			return $now;
+		} elseif ($seconds >= 86400 && $seconds < 86400 * 2) {
+			return $yesterday;
 		}
 		foreach ($units as $unit => $seconds_in_period) {
 			if ($seconds >= $seconds_in_period) {
 				$count = floor($seconds / $seconds_in_period);
-				return Jp7_Inflector::plural($unit, $count) . ' atrás';
+				return $count . ' ' . (($count > 1) ? array_search($unit, $units_names) : $unit) . ' ' . $ago;
 			}
 		}
 	}
