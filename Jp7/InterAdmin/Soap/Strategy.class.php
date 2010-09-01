@@ -7,7 +7,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 	public function addComplexType($type) {
 		if (!in_array($type, $this->getContext()->getTypes())) {
 			
-			$isDynamicClass = preg_match('/^([a-zA-Z]*)_([0-9]*)$/', $type);
+			$isDynamicClass = Jp7_InterAdmin_Soap::isDynamicClass($type);
 			
 			if (!$isDynamicClass && (!class_exists($type) || !is_subclass_of($type, 'InterAdminAbstract'))) {
 				return parent::addComplexType($type);
@@ -25,13 +25,8 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 				
 				// Jp7
 				if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
-					if ($isDynamicClass) {
-						$id_tipo = preg_replace('/[a-zA-Z_]*/', '', $type);
-						$tipo = new InterAdminTipo($id_tipo);
-					} else {
-						$tipoName = $type . 'Tipo';
-						$tipo = new $tipoName();
-					}
+					$tipo = Jp7_InterAdmin_Soap::getClassTipo($type);
+					
 					$tipo->getCamposAlias();
 					$campos = $tipo->getCampos();
 					
@@ -118,6 +113,4 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 		}
 		return $retorno;
 	}
-	
-	
 }

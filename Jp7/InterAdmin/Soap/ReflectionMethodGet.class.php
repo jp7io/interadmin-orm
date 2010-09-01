@@ -26,8 +26,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 		return array(
 			new Jp7_InterAdmin_Soap_ReflectionParameter('fields', 'string'),
 			new Jp7_InterAdmin_Soap_ReflectionParameter('where', 'string'),
-			new Jp7_InterAdmin_Soap_ReflectionParameter('limit', 'string'),
-			new Jp7_InterAdmin_Soap_ReflectionParameter('token', 'string')
+			new Jp7_InterAdmin_Soap_ReflectionParameter('limit', 'string')
 		);
 	}
 	
