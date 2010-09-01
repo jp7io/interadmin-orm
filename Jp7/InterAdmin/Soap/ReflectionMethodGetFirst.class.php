@@ -9,7 +9,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	 * @return string 
 	 */
 	public function getName() {
-		return 'getFirst' . $this->secao->class;
+		return 'getFirst' . $this->_getClassName();
 	}
 	
 	/**
@@ -27,10 +27,10 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	 * @return string 
 	 */
 	public function getReturnType() {
-		return $this->secao->class;
+		return $this->_getClassName();
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna o primeiro registro da secao ' . $this->secao->nome . '.');
+		return utf8_encode('Retorna o primeiro registro da seção ' . $this->secao->nome . '.');
 	}
 }

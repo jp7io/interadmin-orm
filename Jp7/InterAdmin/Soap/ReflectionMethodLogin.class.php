@@ -3,7 +3,7 @@
 /**
  * É usado para recuperar o token de segurança que libera acesso ao Webservice.
  */
-class Jp7_InterAdmin_Soap_ReflectionMethodlogin {
+class Jp7_InterAdmin_Soap_ReflectionMethodLogin {
 	
 	/**
 	 * @return array

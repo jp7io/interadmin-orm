@@ -35,17 +35,21 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	 * @return string 
 	 */
 	public function getName() {
-		return 'get' . $this->secao->class;
+		return 'get' . $this->_getClassName();
 	}
 	
 	/**
 	 * @return string 
 	 */
 	public function getReturnType() {
-		return $this->secao->class . '[]';
+		return $this->_getClassName() . '[]';
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna os registros publicados e nao deletados da secao ' . $this->secao->nome . '.');
+		return utf8_encode('Retorna os registros publicados e não deletados da seção ' . $this->secao->nome . '.');
+	}
+	
+	protected function _getClassName() {
+		return ($this->secao->class) ? $this->secao->class : Jp7_Inflector::camelize($this->secao->nome) . '_' . $this->secao->id_tipo;
 	}
 }
