@@ -4,12 +4,20 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 	
 	protected $_inProgress = array();
 	
+	protected function _appendElements($dom, $container, $elements) {
+		foreach ($elements as $name => $type) {
+			$element = $dom->createElement('xsd:element');
+			$element->setAttribute('minOccurs', '0');
+			$element->setAttribute('name', $name);
+			$element->setAttribute('nillable', 'true');
+			$element->setAttribute('type', $type);
+			$container->appendChild($element);
+		}
+	}
+	
 	public function addComplexType($type) {
 		if (!in_array($type, $this->getContext()->getTypes())) {
-			
-			$isDynamicClass = Jp7_InterAdmin_Soap::isDynamicClass($type);
-			
-			if (!$isDynamicClass && (!class_exists($type) || !is_subclass_of($type, 'InterAdminAbstract'))) {
+			if (substr($type, strlen($type) - 2) == '[]') {
 				return parent::addComplexType($type);
 			}
 			// Evitar looping infinito
@@ -20,48 +28,59 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 		       	
 				$complexType = $dom->createElement('xsd:complexType');
 		        $complexType->setAttribute('name', $type);
-				
 		        $all = $dom->createElement('xsd:all');
 				
 				// Jp7
-				if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
-					$tipo = Jp7_InterAdmin_Soap::getClassTipo($type);
-					
-					$tipo->getCamposAlias();
-					$campos = $tipo->getCampos();
-					
-					$campos[] = array('nome_id' => 'id', 'tipo' => 'id_');
-					$campos[] = array('nome_id' => 'id_tipo', 'tipo' => 'id_');
-					$campos[] = array('nome_id' => 'parent_id', 'tipo' => 'id_');
-					$campos[] = array('nome_id' => 'date_insert', 'tipo' => 'date_');
-					$campos[] = array('nome_id' => 'date_modify', 'tipo' => 'date_');
-					$campos[] = array('nome_id' => 'date_publish', 'tipo' => 'date_');
-					$campos[] = array('nome_id' => 'deleted', 'tipo' => 'char_');
-					$campos[] = array('nome_id' => 'publish', 'tipo' => 'char_');
+				if ($type == 'Options') {
+					$this->_appendElements($dom, $all, array(
+						'fields' => 'xsd:string',
+						'where' => 'xsd:string',
+						'limit' => 'xsd:string'
+					));				
 				} else {
-					$campos[] = array('nome_id' => 'id_tipo', 'tipo' => 'id_');
-					$campos[] = array('nome_id' => 'nome', 'tipo' => 'varchar_');
-					$campos[] = array('nome_id' => 'parent_id_tipo', 'tipo' => 'id_');
-					$campos[] = array('nome_id' => 'model_id_tipo', 'tipo' => 'id_');
-					$campos[] = array('nome_id' => 'class', 'tipo' => 'varchar_');
-					$campos[] = array('nome_id' => 'class_tipo', 'tipo' => 'varchar_');
-					$campos[] = array('nome_id' => 'deleted_tipo', 'tipo' => 'char_');
-					$campos[] = array('nome_id' => 'mostrar', 'tipo' => 'char_');
+					$isDynamicClass = Jp7_InterAdmin_Soap::isDynamicClass($type);
+					if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
+						$tipo = Jp7_InterAdmin_Soap::getClassTipo($type);
+						
+						$tipo->getCamposAlias();
+						$campos = $tipo->getCampos();
+						
+						$elements = array();
+						foreach ($campos as $campo) {
+							if (strpos($campo['tipo'], 'tit_') === false && strpos($campo['tipo'], 'func_') === false) {
+								$elements[$campo['nome_id']] = $this->_getCampoTipo($campo);
+							}
+				        }
+						
+						$elements += array(
+							'id' => 'xsd:int',
+							'id_tipo' => 'xsd:int',
+							'parent_id' => 'xsd:int',
+							'date_insert' => 'xsd:dateTime',
+							'date_modify' => 'xsd:dateTime',
+							'date_publish' => 'xsd:dateTime',
+							'deleted' => 'xsd:boolean',
+							'publish' => 'xsd:boolean'
+						);
+						
+						$this->_appendElements($dom, $all, $elements);
+					} else {
+						// InterAdminTipo
+						$this->_appendElements($dom, $all, array(
+							'id_tipo' => 'xsd:int',
+							'nome' => 'xsd:string',
+							'parent_id_tipo' => 'xsd:int',
+							'model_id_tipo' => 'xsd:int',
+							'class' => 'xsd:string',
+							'class_tipo' => 'xsd:string',
+							'deleted_tipo' => 'xsd:boolean',
+							'mostrar' => 'xsd:boolean'
+						));
+					}
 				}
 				
-				foreach ($campos as $campo) {
-					if (strpos($campo['tipo'], 'tit_') === false &&  strpos($campo['tipo'], 'func_') === false) {
-			    		$element = $dom->createElement('xsd:element');
-						$element->setAttribute('minOccurs', '0');
-						$element->setAttribute('name', $campo['nome_id']);
-						$element->setAttribute('nillable', 'true');
-						$element->setAttribute('type', $this->_getCampoTipo($campo));
-						$all->appendChild($element);
-					}
-		        }
-				
 		        $complexType->appendChild($all);
-		        $this->getContext()->getSchema()->appendChild($complexType);
+				$this->getContext()->getSchema()->appendChild($complexType);
 		        $this->getContext()->addType($type);
 			}
 	        return "tns:$type";

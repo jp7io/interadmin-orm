@@ -21,13 +21,19 @@ class Jp7_InterAdmin_Soap_Reflection {
 	
 	public function getMethods() {
 		$methods = array();
+		$reflection = new Zend_Server_Reflection();
+				
+		// Reflection das classes na stack
+		foreach (Jp7_InterAdmin_Soap::getClasses() as $className) {
+			$methods = array_merge($methods, $reflection->reflectClass($className)->getMethods());
+		}
 		
+		// Reflection dinâmico para Jp7_InterAdmin_Soap_Generic
 		foreach ($this->usuario->secoes as $secao) {
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGet($secao);
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetAll($secao);
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetFirst($secao);
 		}
-		
 		return $methods;
 	}
 

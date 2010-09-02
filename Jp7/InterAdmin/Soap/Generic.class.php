@@ -10,24 +10,8 @@ class Jp7_InterAdmin_Soap_Generic {
 	 */
 	public function get($className, $options = array()) {
 		try {
-			$tipo = self::getClassTipo($className);
-			
-			$records = $tipo->getInterAdmins($options);
-			foreach ($records as $key => $record) {
-				foreach ($record->attributes as $key2 => $value) {
-					if ($value instanceof InterAdminAbstract) {
-						$record->attributes[$key2] = $value->attributes;
-					} elseif ($value instanceof Jp7_Date) {
-						if ($value->isValid()) {
-							$record->attributes[$key2] = $value->format('c');
-						} else {
-							$record->attributes[$key2] = null;
-						}
-					}
-				}
-				$records[$key] = $record->attributes;
-			}
-			return $records;
+			$tipo = Jp7_InterAdmin_Soap::getClassTipo($className);
+			return $tipo->getInterAdmins($options);
 		} catch (Exception $e) {
 			if (strpos($e->getMessage(), 'Unknown column') !== false) {
 				throw new Jp7_InterAdmin_Soap_Exception('Unknown field in "fields" or "where".');

@@ -13,16 +13,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	}
 	
 	/**
-	 * @return array
-	 */
-	public function getParameters() {
-		return array(
-			new Jp7_InterAdmin_Soap_ReflectionParameter('fields', 'string'),
-			new Jp7_InterAdmin_Soap_ReflectionParameter('where', 'string')
-		);
-	}
-	
-	/**
 	 * @return string 
 	 */
 	public function getReturnType() {
