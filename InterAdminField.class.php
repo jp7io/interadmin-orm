@@ -311,5 +311,26 @@ class InterAdminField{
 	public static function getSpecialMultiXtras() {
 		return array('registros_multi', 'tipos_multi');
 	}
+	/**
+	 * Retorna o valor do campo no header (cabeçalho da listagem).
+	 * 
+	 * @param array $campo
+	 * @return string
+	 */
+	public static function getCampoHeader($campo) {
+		$key = $campo['tipo'];
+		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
+			return $campo[nome]($campo, '', 'header');
+		} elseif (strpos($key, 'select_') === 0) {
+			if ($campo['label']) {
+				return $campo['label'];
+			} elseif ($campo['nome'] instanceof InterAdminTipo || is_numeric($campo['nome'])) {
+				return $campo['nome']->getFieldsValues('nome');
+			} elseif ($campo['nome'] == 'all') {
+				return 'Tipos';
+			}
+		} else {
+			return $campo['nome'];
+		}
+	}
 }
-?>
