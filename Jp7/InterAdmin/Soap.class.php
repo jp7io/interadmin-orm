@@ -138,4 +138,63 @@ STR;
 	public static function setClasses($classes) {
 		self::$classes = $classes;
 	}
+	/**
+	 * Describes the functions, parameters and return values from a WSDL.
+	 * 
+	 * @param 	string $wsdl
+	 * @return 	array
+	 */
+	public static function describeWsdl($wsdl) {
+		$dom = new DOMDocument('1.0', 'UTF-8');
+		$dom->loadXML(file_get_contents($wsdl));
+		
+		// Elements
+		$schema = $dom->getElementsByTagName('schema')->item(0);
+		$elements = array();
+		$types = array();
+		foreach ($schema->childNodes as $child) {
+			$tagname = str_replace($child->prefix . ':', '', $child->nodeName); 
+			if ($tagname == 'element') {
+				$elements[$child->getAttribute('name')] = $child;
+			} elseif ($tagname == 'complexType') {
+				// Attributes
+				$attributes = array();
+				$attrs = $child->getElementsByTagName('element');
+				foreach ($attrs as $attr) {
+					$attributes[] = array(
+						'name' => $attr->getAttribute('name'),
+						'type' => $attr->getAttribute('type')  . (($attr->getAttribute('maxOccurs') == 'unbounded') ? '[]' : '')
+					);
+				}
+				$types[$child->getAttribute('name')] = $attributes;
+			}
+		}
+		
+		// Funções
+		$functions = array();
+		
+		$portType = $dom->getElementsByTagName('portType')->item(0);
+		$operations = $portType->getElementsByTagName('operation');
+		foreach ($operations as $operation) {
+			$function = array(
+				'name' => $operation->getAttribute('name'),
+				'description' => utf8_decode($operation->getElementsByTagName('documentation')->item(0)->textContent),
+				'params' => array()
+			);
+			// Parâmetros
+			$params = $elements[$operation->getAttribute('name')]->getElementsByTagName('element');
+			foreach ($params as $param) {
+				$function['params'][] = array(
+					'name' => $param->getAttribute('name'),
+					'type' => $param->getAttribute('type')
+				);
+			}
+			// Retorno
+			$return = $elements[$operation->getAttribute('name') . 'Response']->getElementsByTagName('element');
+			$function['return'] = $return->item(0)->getAttribute('type');
+			
+			$functions[] = $function;
+		}
+		return compact('functions', 'types');
+	}
 }
