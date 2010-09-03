@@ -197,4 +197,15 @@ STR;
 		}
 		return compact('functions', 'types');
 	}
+	public static function isSoapRequest() {
+		// Soap 1.1
+		if ($_SERVER['HTTP_SOAPACTION']) {
+			return true;	
+		}
+		// Soap 1.2
+		if ($_SERVER['CONTENT_TYPE'] && strpos($_SERVER['CONTENT_TYPE'], 'action=') !== false) {
+			return true;
+		}
+		return false; 
+	}
 }
