@@ -60,6 +60,8 @@ STR;
 	 * @return array
 	 */
 	protected static function _formatAttributes($record) {
+		global $config;
+		
 		foreach ($record->attributes as $key2 => $value) {
 			// Relacionamentos
 			if ($value instanceof InterAdminAbstract) {
@@ -71,6 +73,8 @@ STR;
 				} else {
 					$record->attributes[$key2] = null;
 				}
+			} elseif ($value instanceof InterAdminFieldFile) {
+				$record->attributes[$key2] = $config->url . preg_replace('~../../~', '', $value);
 			}
 		}
 		return $record->attributes;
