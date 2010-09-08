@@ -57,7 +57,13 @@ class Jp7_Youtube {
 	 * @return string
 	 */
 	public static function getId($youTubeVideoUrl) {
-		return preg_replace('/.*(watch\?v=|v\/)([^&]*).*/', '\2', $youTubeVideoUrl);
+		if (strpos($youTubeVideoUrl, 'http://www.youtube.com/user/') === 0) {
+			// Channels
+			return preg_replace('~(.*)/u/([0-9]*)/(.*)~', '\3', $youTubeVideoUrl);
+		} else {
+			// Normal link
+			return preg_replace('/.*(watch\?v=|v\/)([^&]*).*/', '\2', $youTubeVideoUrl);
+		}
 	}
 	
 }
