@@ -65,6 +65,8 @@ class Jp7_Bootstrap {
 		
 		$config = Zend_Registry::get('config');
 		$frontController = Zend_Controller_Front::getInstance();
+		$frontController->setBaseUrl('/' . $config->server->path);
+		
 		// Roteando o idioma na URL
 		$request = new Zend_Controller_Request_Http();
 		foreach ($config->langs as $language) {
