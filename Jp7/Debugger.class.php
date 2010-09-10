@@ -171,7 +171,6 @@ class Jp7_Debugger{
 		$S .= $this->_getBacktraceLabel('IP SERVIDOR') . $_SERVER['SERVER_ADDR'] . "\n";
 		$S .= $this->_getBacktraceLabel('USER_AGENT') . $_SERVER['HTTP_USER_AGENT'] . "\n";
 		$S .= '<hr />';
-		$S .= $this->_getBacktraceLabel('BACKTRACE') . print_r($backtrace, true);
 		if (count($_POST)) {
 			$S .= $this->_getBacktraceLabel('POST') . print_r($_POST, true);	
 		}
@@ -288,5 +287,27 @@ class Jp7_Debugger{
 	}
 	public function setSafePoint($bool) {
 		$this->_savePoint = $bool;
+	}
+	/**
+	 * Envia o trace do erro para debug+CLIENTE@jp7.com.br
+	 * 
+	 * @param string $backtrace
+	 * @return void
+	 */
+	public function sendTraceByEmail($backtrace) {
+		global $config, $s_interadmin_cliente, $jp7_app;
+		$nome_app = ($jp7_app) ? $jp7_app : 'Site';
+		if (trim($config->name_id)) {
+			$cliente = $config->name_id;
+		} elseif (trim($s_interadmin_cliente)) {
+			$cliente = $s_interadmin_cliente;
+		}
+		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
+		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
+		$to = 'debug+' . $cliente . '@jp7.com.br';
+		$headers = 'To: ' . $to . " <" . $to . ">\r\n";
+		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
+		
+		jp7_mail($to, $subject, $message, $headers, '', $template, true);
 	}
 }

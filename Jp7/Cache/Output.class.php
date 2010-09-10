@@ -96,17 +96,26 @@
 	 	self::$_started = true;
 
 	 	return $retorno;
-	 }
+	}
+	
+	/**
+	 * Cancela o cache.
+	 * 
+	 * @return void
+	 */
+	public function cancel() {
+		self::$_enabled = false;
+		ob_get_clean();	
+	}
 
-	 /**
-	  * Retorna true se o cache tiver iniciado.
-	  * 
-	  * @return bool
-	  */
-	 public static function hasStarted()
-	 {
-	 	return self::$_started;
-	 }
+	/**
+	 * Retorna true se o cache tiver iniciado.
+	 * 
+	 * @return bool
+	 */
+	public static function hasStarted() {
+		return self::$_started;
+	}
 	 
 	 
 	 /**

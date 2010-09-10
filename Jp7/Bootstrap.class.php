@@ -3,7 +3,9 @@
 class Jp7_Bootstrap {
 	
 	public static function run() {
-		global $config;
+		global $config, $debugger;
+		
+		$debugger->setExceptionsEnabled(true);
 		
 		include_once APPLICATION_PATH . '/../interadmin/config.php';
 		
@@ -49,7 +51,8 @@ class Jp7_Bootstrap {
 		if (is_dir(APPLICATION_PATH . '/modules')) {
 			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
 		}
-		$frontController->throwExceptions(true); // @todo Usar config para determinar ambiente
+		$frontController->throwExceptions(false);
+		// @todo Usar config para determinar ambiente
 		$frontController->setParam('env', 'development');
 	}
 	
