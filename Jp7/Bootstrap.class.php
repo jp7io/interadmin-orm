@@ -79,8 +79,7 @@ class Jp7_Bootstrap {
 			// http://localhost/CLIENTE/en/
 			if (preg_match('~^' . $request->getBaseUrl() . '/' . $language->lang . '(/|$)~', $request->getRequestUri())) {
 				$lang = new Jp7_Locale($language->lang);
-				$request->setBaseUrl($request->getBaseUrl() . '/' . $language->lang);
-				$frontController->setRequest($request);
+				$frontController->setBaseUrl($frontController->getBaseUrl() . '/' . $language->lang);
 				break;
 			}
 		}
@@ -91,6 +90,7 @@ class Jp7_Bootstrap {
 		$config->lang = $config->langs[$lang->lang];
 		Zend_Registry::set('lang', $lang);
 		$request->setParam('lang', $lang->lang);
+		$frontController->setRequest($request);
 		
 		// Zend Translate
 		$language_file = APPLICATION_PATH . '/languages/' . $lang->lang . '.php';
