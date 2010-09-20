@@ -27,6 +27,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
     public function preDispatch() {
     	if (!$this->actionExists()) {
 			$this->forwardToTemplate();
+			return;
 		}
 	}
 	public function postDispatch() {
@@ -119,7 +120,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	public function forwardToTemplate() {
 		// TODO $this->getTipo() should be static::getTipo(). Available on PHP 5.3
 		if ($tipo = $this->getTipo()) {
-			if ($template = $tipo->getModel()->template) {
+			if ($template = $tipo->template) {
 				$templateArr = explode('/', $template);
 				if (count($templateArr) > 2) {
 					list($module, $controller, $action) = $templateArr;
