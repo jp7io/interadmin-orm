@@ -248,7 +248,6 @@ class InterSite {
 		$GLOBALS['ftp']['pass'] = $this->server->pass;
 		// InterAdmin
 		$GLOBALS['c_publish'] = $this->interadmin_preview;
-		$GLOBALS['c_demo'] = $this->interadmin_demo;
 		$GLOBALS['c_remote'] = $this->interadmin_remote;
 		$GLOBALS['c_cliente_title'] = $this->name;
 		$GLOBALS['c_nobackup'] = $this->nobackup;
