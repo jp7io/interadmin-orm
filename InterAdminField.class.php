@@ -14,19 +14,20 @@
  *
  * @package InterAdmin
  */
-class InterAdminField{
+class InterAdminField {
 	public $id;
 	public $id_tipo;
 	/**
-	 * @param int $id
-	 * @param varchar $_db_prefix
-	 * @return object
+	 * Construtor público.
+	 * 
+	 * @param array 	$field 	Formato dos campos do InterAdminTipo [optional]
+	 * @return 
 	 */
-	function __construct($field = ''){
+	function __construct($field = array()) {
 		$this->field = $field;
 	}
 	function __toString(){
-		return $this->field;
+		return $this->field['tipo'];
 	}	
 	/**
 	 * @return mixed
@@ -203,7 +204,7 @@ class InterAdminField{
 						break;
 					case "cor": // Cor
 						$tamanho = 7;
-						$form_xtra = '<div class="colorpicker-button" style="background-color: ' . $valor . ';width: 16px; height: 16px; float: left; margin-right: 5px; border: 1px solid #999999;"></div>';
+						$form_xtra = '<div class="colorpicker-button" style="background-color: ' . $valor . ';width: 16px; height: 16px; float: left; margin-right: 5px; border: 1px solid #999999; cursor: pointer;"></div>';
 						break;
 				}
 			}
@@ -222,14 +223,17 @@ class InterAdminField{
 				echo "".
 				"<tr>".
 					$_th.
-					"<td><input type=\"text\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:80px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
-					"<td rowspan=2".(($valor)?" align=\"center\" onclick=\"openPopup('".$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url):">")."</td>".
-					"<td rowspan=2>".$S_ajuda."</td>".
-				"</tr>\n".
-				"<tr>".
-					"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">Créditos/Leg.:</th>".
-					"<td><input type=\"text\" name=\"".$campo."_text[]\" value=\"".$GLOBALS[$campo."_text"]."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file\" /></td>".
+					"<td><input type=\"text\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:" . ($campo_array['sem_creditos'] ? 60 : 80) . "px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
+					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . (($valor)?" align=\"center\" onclick=\"openPopup('".$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url):">")."</td>".
+					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . ">".$S_ajuda."</td>".
 				"</tr>\n";
+				
+				if (!$campo_array['sem_creditos']) {
+					echo "<tr>".
+						"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">Créditos/Leg.:</th>".
+						"<td><input type=\"text\" name=\"".$campo."_text[]\" value=\"".$GLOBALS[$campo."_text"]."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file\" /></td>".
+					"</tr>\n";
+				}
 			}elseif(strpos($tipo_de_campo,"date_")===0){
 				$S="".
 				"<tr>".
@@ -324,12 +328,14 @@ class InterAdminField{
 	public static function getCampoHeader($campo) {
 		$key = $campo['tipo'];
 		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
-			return $campo[nome]($campo, '', 'header');
+			return $campo['nome']($campo, '', 'header');
 		} elseif (strpos($key, 'select_') === 0) {
 			if ($campo['label']) {
 				return $campo['label'];
-			} elseif ($campo['nome'] instanceof InterAdminTipo || is_numeric($campo['nome'])) {
+			} elseif ($campo['nome'] instanceof InterAdminTipo) {
 				return $campo['nome']->getFieldsValues('nome');
+			} elseif (is_numeric($campo['nome'])) {
+				return interadmin_tipos_nome($campo['nome']);				
 			} elseif ($campo['nome'] == 'all') {
 				return 'Tipos';
 			}
