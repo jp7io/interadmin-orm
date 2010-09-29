@@ -183,7 +183,7 @@ class InterAdminField{
 			$form="<input type=\"text\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".$valor."\" maxlength=\"255\"".(($obrigatorio)?" obligatory=\"yes\"":"")." style=\"width:".(($tamanho)?$tamanho."em":"70px")."\"".$readonly.$onkeypress." />";
 		}else{
 			$onkeypress="";
-			if(strpos($tipo_de_campo,"varchar_")===0){
+			if (strpos($tipo_de_campo, 'varchar_') === 0) {
 				switch($xtra){
 					case "id": // ID
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_')\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
@@ -201,9 +201,13 @@ class InterAdminField{
 					case "cpf": // CPF
 						$onkeypress=" xtype=\"cpf\"";
 						break;
+					case "cor": // Cor
+						$tamanho = 7;
+						$form_xtra = '<div class="colorpicker-button" style="background-color: ' . $valor . ';width: 16px; height: 16px; float: left; margin-right: 5px; border: 1px solid #999999;"></div>';
+						break;
 				}
 			}
-			$form = "<input type=\"".((strpos($tipo_de_campo,"password_")===0)?"password":"text")."\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=\"" . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />";
+			$form = "<input type=\"".((strpos($tipo_de_campo,"password_")===0)?"password":"text")."\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=\"" . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />" . $form_xtra;
 		}
 		$form.="<input type=\"hidden\" name=\"".$campo."_xtra[]\" value=\"".$xtra."\"".$readonly." />";
 		if ($readonly && $valor_default) {
