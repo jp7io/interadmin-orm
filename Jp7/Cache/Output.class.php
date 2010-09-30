@@ -9,12 +9,13 @@
  
  class Jp7_Cache_Output extends Zend_Cache_Frontend_Output
  {
-	 protected static $_instance = null;
-	 protected static $_started = false;
-	 protected static $_enabled = false;
-	 protected static $_cachedir = './cache/';
-	 protected static $_logdir = './interadmin/';
-	 protected static $_delay = 0;
+	protected static $_instance = null;
+	protected static $_started = false;
+	protected static $_enabled = false;
+	protected static $_cachedir = './cache/';
+	protected static $_logdir = './interadmin/';
+	protected static $_delay = 0;
+	protected static $_className = __CLASS__;
 	 
 	 /**
 	  * Retorna uma instância configurada do Jp7_Cache_Page.
@@ -47,7 +48,7 @@
 
 			self::$_cachedir = $backDefault['cache_dir'];
 			
-			$frontend = new Jp7_Cache_Output($frontOptions + $frontDefault);
+			$frontend = new self::$_className($frontOptions + $frontDefault);
 
 			if (is_dir(self::$_cachedir)) {
 				$backend = new Zend_Cache_Backend_File($backOptions + $backDefault);
