@@ -71,6 +71,12 @@ class InterAdminField {
 			$valor = stripslashes($GLOBALS[$campo]);
 		}
 		if (!$valor && !$id) {
+			if (strpos($tipo_de_campo, 'select_') === 0 && $valor_default && !is_numeric($valor_default)) {
+				$valorTipo = ($campo_array['nome'] instanceof InterAdminTipo) ? $campo_array['nome'] : InterAdminTipo::getInstance($campo_nome);
+				if ($valorObj = $valorTipo->getInterAdminByIdString($valor_default)) {
+					$valor_default = $valorObj->id;
+				}
+			}
 			$valor = $valor_default;
 		}
 		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
