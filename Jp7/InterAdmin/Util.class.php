@@ -14,6 +14,7 @@ class Jp7_InterAdmin_Util {
 	public static function export(InterAdminTipo $tipoObj, array $ids, $use_id_string = false) {
 		$options = array(
 			'fields' => array_merge(array('*'), self::$_default_vars),
+			'class' => 'InterAdmin',
 			'fields_alias' => false
 		);
 		
@@ -30,7 +31,9 @@ class Jp7_InterAdmin_Util {
 			$export->_children = array();
 			foreach ($tiposChildren as $tipoChildren) {
 				$optionsChildren = $options;
-				$tipoChildren = $export->getChildrenTipo($tipoChildren['id_tipo']);
+				$tipoChildren = $export->getChildrenTipo($tipoChildren['id_tipo'], array(
+					'class' => 'InterAdminTipo'
+				));
 				if ($use_id_string) {
 					$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
 				}
