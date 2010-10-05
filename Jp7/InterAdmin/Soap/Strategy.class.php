@@ -7,7 +7,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 	protected function _appendElements($dom, $container, $elements) {
 		foreach ($elements as $name => $type) {
 			$element = $dom->createElement('xsd:element');
-			$element->setAttribute('minOccurs', '0');
+			//$element->setAttribute('minOccurs', '0');
 			$element->setAttribute('name', $name);
 			$element->setAttribute('nillable', 'true');
 			$element->setAttribute('type', $type);
@@ -50,7 +50,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 						$elements = array();
 						foreach ($campos as $campo) {
 							if (strpos($campo['tipo'], 'tit_') === false && strpos($campo['tipo'], 'func_') === false) {
-								$elements[$campo['nome_id']] = $this->_getCampoTipo($campo);
+								$elements[$campo['nome_id']] = $this->_getCampoType($tipo, $campo);
 							}
 				        }
 						
@@ -93,20 +93,20 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
         }
 	}	
 	
-	protected function _getCampoTipo($campo) {
-		if (strpos($field, 'special_') === 0 && $campo['xtra']) {
+	protected function _getCampoType($tipo, $campo) {
+		if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
 			
 			$isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
 			$isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
 			
-			$retorno = $this->_getCampoSelectClass($campo, $isTipo, $isMulti);
+			$retorno = $this->_getCampoTypeClass($tipo->getCampoTipo($campo), $isTipo, $isMulti);
 			
 		} elseif (strpos($campo['tipo'], 'select_') === 0) {
 			
 			$isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
 			$isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
 			
-			$retorno = $this->_getCampoSelectClass($campo, $isTipo, $isMulti);
+			$retorno = $this->_getCampoTypeClass($campo['nome'], $isTipo, $isMulti);
 			
 		} elseif (strpos($campo['tipo'], 'int') === 0 || strpos($campo['tipo'], 'id') === 0) {
 			$retorno = 'int';
@@ -119,12 +119,20 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 		}
 		return $this->getContext()->getType($retorno);
 	}
-	
-	protected function _getCampoSelectClass($campo, $isTipo, $isMulti) {
+	/**
+	 * Helper da função _getCampoType
+	 * 
+	 * @param InterAdminTipo $campoTipo
+	 * @param bool $isTipo
+	 * @param bool $isMulti
+	 * 
+	 * @return string Type para o WSDL a partir da classe que está no $campoTipo->class.
+	 */
+	protected function _getCampoTypeClass($campoTipo, $isTipo, $isMulti) {
 		if ($isTipo) {
 			$retorno = 'InterAdminTipo';
 		} else {
-			$retorno = $campo['nome']->class;
+			$retorno = $campoTipo->class;
 		}
 		if ($isMulti && $retorno) {
 			$retorno .= '[]';
@@ -134,4 +142,37 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 		}
 		return $retorno;
 	}
+
+	/**
+     * Append the complex type definition to the WSDL via the context access
+     *
+     * @param  string $arrayType
+     * @param  string $childTypeName
+     * @return void
+     */
+     protected function _addElementFromWsdlAndChildTypes($arrayType, $childTypeName)
+    {
+    	/* Código da ZEND - Não Alterar */
+        if (!in_array($arrayType, $this->getContext()->getTypes())) {
+            $dom = $this->getContext()->toDomDocument();
+
+            $complexType = $dom->createElement('xsd:complexType');
+            $complexType->setAttribute('name', $arrayType);
+
+            $sequence = $dom->createElement('xsd:sequence');
+
+            $element = $dom->createElement('xsd:element');
+            $element->setAttribute('name',      'itens'); /* LINHA ALTERADA PELA Jp7*/
+            $element->setAttribute('type',      $childTypeName);
+            $element->setAttribute('minOccurs', 0);
+            $element->setAttribute('maxOccurs', 'unbounded');
+            $sequence->appendChild($element);
+
+            $complexType->appendChild($sequence);
+
+            $this->getContext()->getSchema()->appendChild($complexType);
+            $this->getContext()->addType($arrayType);
+        }
+    }
+
 }

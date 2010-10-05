@@ -2,23 +2,15 @@
 
 class Jp7_InterAdmin_Soap_Generic {
 	/**
-	 * Returna todos os registros publicados.
+	 * Retorna todos os registros publicados.
 	 * 
 	 * @param string $className
 	 * @param array $options
 	 * @return mixed
 	 */
 	public function get($className, $options = array()) {
-		try {
-			$tipo = Jp7_InterAdmin_Soap::getClassTipo($className);
-			return $tipo->getInterAdmins($options);
-		} catch (Exception $e) {
-			if (strpos($e->getMessage(), 'Unknown column') !== false) {
-				throw new Jp7_InterAdmin_Soap_Exception('Unknown field in "fields" or "where".');
-			} else {
-				throw new Jp7_InterAdmin_Soap_Exception('Invalid format for "where" or "limit".');
-			}
-		}
+		$tipo = Jp7_InterAdmin_Soap::getClassTipo($className);
+		return $tipo->getInterAdmins($options);
 	}
 	
 	/**

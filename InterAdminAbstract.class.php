@@ -235,7 +235,7 @@ abstract class InterAdminAbstract {
 		
 		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
 		if ($object instanceof InterAdminAbstract) {
-			$tipo = $object->_getCampoTipo($campo);
+			$tipo = $object->getCampoTipo($campo);
 		}
 		
 		if (isset($isMulti)) {
@@ -417,14 +417,14 @@ abstract class InterAdminAbstract {
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$this->_addJoinAlias($options, $table, $campos[$joinNome]);
 						}
-						$joinTipo = $this->_getCampoTipo($campos[$joinNome]);
+						$joinTipo = $this->getCampoTipo($campos[$joinNome]);
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
 					// TEMPORARIO FIXME, necessario melhor maneira
 					if ($subtermo) {
 						$subtable = $table . '__' . $termo;
 						$subCampos = $joinTipo->getCampos();
-						$subJoinTipo = $joinTipo->_getCampoTipo($subCampos[$joinAliases[$termo]]);
+						$subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
 						
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
 						if (!in_array($subtable, (array) $options['from_alias'])) {
@@ -468,7 +468,7 @@ abstract class InterAdminAbstract {
 					$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					// Join e Recursividade
 					$this->_addJoinAlias($options, $join, $campos[$nome]);
-					$joinTipo = $this->_getCampoTipo($campos[$nome]);
+					$joinTipo = $this->getCampoTipo($campos[$nome]);
 					if ($fields[$join] == array('*')) {
 						$fields[$join] = $joinTipo->getCamposNames();
 					}
@@ -523,7 +523,7 @@ abstract class InterAdminAbstract {
 	 * @return void 
 	 */
 	protected function _addJoinAlias(&$options = array(), $alias, $campo, $table = 'main') {
-		$joinTipo = $this->_getCampoTipo($campo);
+		$joinTipo = $this->getCampoTipo($campo);
 		if (!$joinTipo) {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
 		}		
@@ -572,7 +572,7 @@ abstract class InterAdminAbstract {
 			} else {
 				$joinAlias = '';
 				$join = ($fields[$table]) ? $fields[$table] : $table;
-				$joinTipo = $this->_getCampoTipo($campos[$join]);
+				$joinTipo = $this->getCampoTipo($campos[$join]);
 				if ($joinTipo) {
 					$joinCampos = $joinTipo->getCampos();
 					$joinAlias = $joinTipo->getCamposAlias($field);
@@ -704,7 +704,7 @@ abstract class InterAdminAbstract {
 	 * @param object $campo
 	 * @return InterAdminTipo 
 	 */
-	abstract protected function _getCampoTipo($campo);
+	abstract public function getCampoTipo($campo);
 	abstract function getAttributesCampos();
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();

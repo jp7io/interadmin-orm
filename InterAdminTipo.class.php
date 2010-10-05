@@ -409,7 +409,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param object $campo
 	 * @return InterAdminTipo 
 	 */
-	protected function _getCampoTipo($campo) {
+	public function getCampoTipo($campo) {
 		if (is_object($campo['nome'])) {
 			return $campo['nome'];
 		} elseif ($campo['nome'] == 'all') {

@@ -186,7 +186,8 @@ STR;
 			foreach ($params as $param) {
 				$function['params'][] = array(
 					'name' => $param->getAttribute('name'),
-					'type' => $param->getAttribute('type')
+					'type' => $param->getAttribute('type'),
+					'optional' => $param->getAttribute('nillable'),
 				);
 			}
 			// Retorno

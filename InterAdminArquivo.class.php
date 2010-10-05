@@ -188,9 +188,9 @@ class InterAdminArquivo extends InterAdminAbstract {
 
     
     /**
-     * @see InterAdminAbstract::_getCampoTipo()
+     * @see InterAdminAbstract::getCampoTipo()
      */
-    protected function _getCampoTipo($campo) {
+    public function getCampoTipo($campo) {
        return;
     }
 }

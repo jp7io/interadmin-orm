@@ -589,8 +589,8 @@ class InterAdmin extends InterAdminAbstract {
 	public function getAttributesCampos() {
 		return $this->getTipo()->getCampos();
 	}
-	protected function _getCampoTipo($campo) {
-		return $this->getTipo()->_getCampoTipo($campo);
+	public function getCampoTipo($campo) {
+		return $this->getTipo()->getCampoTipo($campo);
 	}
 	public function getAttributesAliases() {
 		return $this->getTipo()->getCamposAlias();
@@ -662,11 +662,11 @@ class InterAdmin extends InterAdminAbstract {
 	public static function mergeOptions($initial, $extended) {
 		if (!$extended) {
 			return $initial;
-		}		
-		if ($initial['fields'] && $extended['fields']) {
+		}
+		if (isset($initial['fields']) && isset($extended['fields'])) {
 			$extended['fields'] = array_merge($extended['fields'], $initial['fields']);
 		}
-		if ($initial['where'] && $extended['where']) {
+		if (isset($initial['where']) && isset($extended['where'])) {
 			if (!is_array($extended['where'])) {
 				$extended['where'] = array($extended['where']);
 			}
