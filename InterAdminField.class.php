@@ -93,14 +93,22 @@ class InterAdminField {
 			}
 			echo "<tr><th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
 			$tit_start=true;
+		// TEXT
 		}elseif(strpos($tipo_de_campo,"text_")===0){
-			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_session['screenwidth']<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
-			if($xtra)$form.="<script type=\"text/javascript\">interadmin_iframes[".$iframes_i."]='".$campo."_".$iframes_i++."'</script>";
+			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\"" . 
+				" label=\"" . $campo_nome . "\"" .
+				(($obrigatorio) ? " obligatory=\"yes\"" : "") . " rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"").
+				" xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_session['screenwidth']<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
+			if ($xtra) {
+				$form .= "<script type=\"text/javascript\">interadmin_iframes[".$iframes_i."]='".$campo."_".$iframes_i++."'</script>";
+			}
+		// CHAR
 		} elseif(strpos($tipo_de_campo, "char_") === 0) {
 			if ($xtra && !$id) {
 				$GLOBALS[$campo] = "S";
 			}
 			$form = jp7_db_checkbox($campo."[".$j."]","S",$campo,$readonly, "", ($valor) ? $valor : null);
+		// SELECT_MULTI
 		}elseif(strpos($tipo_de_campo,"select_multi_")===0){
 			if(!$readonly_hidden){
 				$form="<div class=\"select_multi\">";
@@ -113,15 +121,20 @@ class InterAdminField {
 					interadmin_tipos_combo(jp7_explode(',', $valor), (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "checkbox", $campo . "[".$j."][]", false, $readonly, $obrigatorio, $campo_array['opcoes']);
 					$campo_nome = 'Tipos';
 				} else {
-					$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
-					echo interadmin_combo(jp7_explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"","","checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio, $readonly);
+					$temp_campo_nome = self::getCampoHeader(array(
+						'tipo' => $tipo_de_campo,
+						'nome' => $campo_nome,
+						'label' => $campo_array['label']
+					));
+					echo interadmin_combo(jp7_explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"",$campo_array['where'],"checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio, $readonly);
 					$campo_nome=$temp_campo_nome;
 				}
 				$form.=ob_get_contents();
 				ob_end_clean();
 				$form.="</div>";
-				if($campo_array[label])$campo_nome=$campo_array[label];
+				if($campo_array['label'])$campo_nome=$campo_array['label'];
 			}
+		// SELECT
 		}elseif(strpos($tipo_de_campo,"select_")===0){
 			if(!$readonly_hidden){
 				if ($campo_array['label']) $campo_nome_2 = $campo_array['label'];
@@ -131,8 +144,12 @@ class InterAdminField {
 				"<option value=\"0\">Selecione</option>" .
 				"<option value=\"0\">--------------------</option>";
 				if ($xtra == 'radio') {
-					$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
-					$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio, $readonly);
+					$temp_campo_nome = self::getCampoHeader(array(
+						'tipo' => $tipo_de_campo,
+						'nome' => $campo_nome,
+						'label' => $campo_array['label']
+					));
+					$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', $campo_array['where'], 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio, $readonly);
 				} elseif ($xtra == 'radio_tipos') {
 					$form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', true, $readonly, $obrigatorio);
 				} elseif ($xtra == 'ajax') {
