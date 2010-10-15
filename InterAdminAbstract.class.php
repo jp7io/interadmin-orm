@@ -479,7 +479,9 @@ abstract class InterAdminAbstract {
 						'aliases' => array_flip($joinTipo->getCamposAlias())
 					);
 					$this->_resolveFieldsAlias($joinOptions, $join . '.');
-					$fields = array_merge($fields, $joinOptions['fields']);
+					foreach ($joinOptions['fields'] as $joinField) {
+						array_push($fields, $joinField);
+					}
 					unset($fields[$join]);
 				}
 			// Com função
