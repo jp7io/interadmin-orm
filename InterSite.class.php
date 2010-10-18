@@ -20,6 +20,10 @@ class InterSite {
 	const QA = 'QA';
 	const DESENVOLVIMENTO = 'Desenvolvimento';
 	
+	const HOST_MAIN = 'main';
+	const HOST_ALIAS = 'alias';
+	const HOST_REMOTE = 'remote';
+	
 	/**
 	 * Sets if the magic __wakeup() is enabled.
 	 * @var bool
@@ -136,7 +140,7 @@ class InterSite {
 		
 		// This server is a main host
 		$this->server = $this->servers[$host];
-		$this->hostType = 'main';
+		$this->hostType = self::HOST_MAIN;
 		
 		// Not Found, searching aliases
 		while (!$this->server) {
@@ -147,14 +151,14 @@ class InterSite {
 					if (in_array($host, $remotes) || in_array('www.' . $host, $remotes)) {
 						$this->server = $this->servers[$host] = $server;
 						$this->interadmin_remote = $host;
-						$this->hostType = 'remote';
+						$this->hostType = self::HOST_REMOTE;
 						break 2;  // Exit foreach and while.
 					}
 				}
 				// Aliases
 				if (in_array($host, $server->aliases)) {
 					$this->server = $this->servers[$host] = $server;
-					$this->hostType = 'alias';
+					$this->hostType = self::HOST_ALIAS;
 					break 2;  // Exit foreach and while.
 				}
 			}
@@ -170,7 +174,7 @@ class InterSite {
 		
 		if ($this->server) {
 			$this->db = clone $this->server->db;
-			if ($this->db->host_internal) {
+			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
 				$this->db->host = $this->db->host_internal;
 			}
 			foreach($this->server->vars as $var => $value) {
@@ -202,7 +206,7 @@ class InterSite {
 		$this->init($_SERVER['HTTP_HOST']);
 		
 		switch ($this->hostType) {
-			case 'alias':
+			case self::HOST_ALIAS:
 				header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
 				exit;
 			case !$this->server: {
@@ -210,9 +214,10 @@ class InterSite {
 				jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
 				$message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
 				if ($this->servers) {
-					$siteProducao = $this->getFirstServerByType(self::PRODUCAO);
-					$urlProducao = 'http://' . jp7_implode('/', array($siteProducao->host, $siteProducao->path));
-					$messageLink = 'Acesse o site: <a href="' . $urlProducao . '">' . $urlProducao . '</a>';
+					if ($siteProducao = $this->getFirstServerByType(self::PRODUCAO)) {
+						$urlProducao = 'http://' . jp7_implode('/', array($siteProducao->host, $siteProducao->path));
+						$messageLink = 'Acesse o site: <a href="' . $urlProducao . '">' . $urlProducao . '</a>';
+					}
 				}
 				die($message . $messageLink);
 			}
