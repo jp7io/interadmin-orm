@@ -77,9 +77,9 @@ class Jp7_Bootstrap {
 				continue;
 			}
 			// http://localhost/CLIENTE/en/
-			if (preg_match('~^' . $request->getBaseUrl() . '/' . $language->lang . '(/|$)~', $request->getRequestUri())) {
+			if (preg_match('~^' . $frontController->getBaseUrl() . $language->lang . '(/|$)~', $request->getRequestUri())) {
 				$lang = new Jp7_Locale($language->lang);
-				$frontController->setBaseUrl($frontController->getBaseUrl() . '/' . $language->lang);
+				$frontController->setBaseUrl($frontController->getBaseUrl() . $language->lang);
 				break;
 			}
 		}
