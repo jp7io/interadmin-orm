@@ -108,9 +108,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	{
 		if ($this->forwardToTemplate()) {
 			return;	
-		} else {
-			return parent::__call($method, $args);
 		}
+		return parent::__call($method, $args);
 	}
 	/** 
 	 * Forwards the request to the template of this InterAdminTipo.
@@ -120,15 +119,20 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	public function forwardToTemplate() {
 		// TODO $this->getTipo() should be static::getTipo(). Available on PHP 5.3
 		if ($tipo = $this->getTipo()) {
-			if ($template = $tipo->template) {
+			 if ($template = $tipo->template) {
 				$templateArr = explode('/', $template);
 				if (count($templateArr) > 2) {
 					list($module, $controller, $action) = $templateArr;
 				} else {
 					list($controller, $action) = $templateArr;
 				}
-				$this->_forward($action, $controller, $module);
-				return true;
+				
+				static $loop_count;
+				if (!$loop_count) {
+					$loop_count++;
+					$this->_forward($action, $controller, $module);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -140,14 +144,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 */
 	public static function getTipo() {
 		if (!isset(self::$tipo)) {
-			$config = Zend_Registry::get('config');
-						
-			$customTipo = ucfirst($config->name_id) . '_InterAdminTipo';
-			if (class_exists($customTipo)) {
-				$parentTipo = new $customTipo();
-			} else {
-				$parentTipo = new InterAdminTipo();
-			}
+			$parentTipo = self::getRootTipo();
 			
 			$request = Zend_Controller_Front::getInstance()->getRequest();
 			
@@ -201,5 +198,43 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$actionName = toId($request->getActionName());
 		// Case insensitive
 		return method_exists($this,  $actionName . $request->getActionKey());
+	}
+	
+	public static function getRootTipo() {
+		$config = Zend_Registry::get('config');
+		
+		$customTipo = ucfirst($config->name_id) . '_InterAdminTipo';
+		if (class_exists($customTipo)) {
+			$rootTipo = new $customTipo();
+		} else {
+			$rootTipo = new InterAdminTipo();
+		}
+		
+		return $rootTipo;
+	}
+	
+	/**
+	 * 
+	 * @return 
+	 */
+	public static function getMenu() {
+		$lang = Zend_Registry::get('lang');
+		
+		$options = array(
+			'fields' => array('nome'),
+			'where' => array('menu <> ""')
+		);
+		
+		if ($lang->prefix) {
+			$options['fields'] = 'nome' . $lang->prefix; 
+		}
+		
+		//Retrieves all the menus
+		$rootTipo = self::getRootTipo();
+		$menu = $rootTipo->getChildren($options);
+		foreach ($menu as $item) {
+			$item->subitens = $item->getChildren($options);
+		}
+		return $menu;
 	}
 }
