@@ -76,9 +76,11 @@ class Jp7_InterAdmin_Util {
 		foreach ($records as $record) {
 			unset($record->id);
 			
+			$tipo = InterAdminTipo::getInstance($id_tipo);
+			
 			$record->parent_id = $parent_id;
-			$record->id_tipo = $id_tipo;
-
+			$record->setTipo($tipo);
+				
 			if ($use_id_string) {
 				self::_importAttributeFromIdString($record);
 			}
