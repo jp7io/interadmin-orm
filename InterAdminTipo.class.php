@@ -436,6 +436,20 @@ class InterAdminTipo extends InterAdminAbstract {
 		return implode(' - ', $return);
 	}
 	/**
+	 * Returns the nome according to the $lang.
+	 * 
+	 * @return string 
+	 */
+	public function getNome() {
+		global $lang;
+		if ($lang->prefix) {
+			$this->getFieldsValues(array('nome', 'nome' . $lang->prefix));
+			return $this->{'nome' . $lang->prefix} ? $this->{'nome' . $lang->prefix} : $this->nome;
+		} else {
+			return $this->getFieldsValues('nome');
+		}
+	}
+	/**
 	 * Returns the full url for this InterAdminTipo.
 	 * 
 	 * @return string
