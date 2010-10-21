@@ -159,6 +159,12 @@ class InterAdmin extends InterAdminAbstract {
 					$options['where'][] = "id = " . intval($args[0]);
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
+			// get{ChildName}Count
+			} elseif (substr($methodName, -5) == 'Count') {
+				$nome_id = substr($methodName, strlen('get'), -strlen('Count'));
+				if ($child = $this->_findChild($nome_id)) {
+					return $this->getChildrenCount($child['id_tipo'], (array) $args[0]);
+				}
 			// get{ChildName}
 			} else {
 				$nome_id = substr($methodName, strlen('get'));
@@ -301,6 +307,18 @@ class InterAdmin extends InterAdminAbstract {
 			$children = $this->getChildrenTipo($id_tipo)->getInterAdmins($options);
 		}
 		return $children;
+	}
+	/**
+	 * Returns the number of children using COUNT(id).
+	 * 
+	 * @param int $id_tipo
+	 * @param array $options Default array of options. Available keys: where.
+	 * @return int Count of InterAdmins found.
+	 */
+	public function getChildrenCount($id_tipo, $options = array()) {
+		$options['fields'] = array('COUNT(DISTINCT id)');
+		$retorno = $this->getFirstChild($id_tipo, $options);
+		return intval($retorno->count_distinct_id);
 	}
 	/**
 	 * Returns the first Child.
