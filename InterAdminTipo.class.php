@@ -586,7 +586,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$campos = $this->getCampos();
 			if ($campos) {
 				foreach ($campos as $key => $row) {
-					if ($row['orderby']) {
+					if ($row['orderby'] && strpos($key, 'func_') === false) {
 						if ($row['orderby'] < 0) {
 							$key .= " DESC";
 						}
