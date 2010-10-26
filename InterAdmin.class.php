@@ -638,9 +638,9 @@ class InterAdmin extends InterAdminAbstract {
   	/**
      * Sets $log_user and returns the old value.
      *
-     * @see InterAdmin::$log_user
-     * @param object $log_user
-     * @return void
+     * @see 	InterAdmin::$log_user
+     * @param 	object 	$log_user
+     * @return 	string	Old value.
      */
     public static function setLogUser($log_user) {
         $old_user = self::$log_user;
