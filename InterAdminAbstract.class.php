@@ -340,7 +340,9 @@ abstract class InterAdminAbstract {
 		$aliases = &$options['aliases'];
 		
 		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
-		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
+		$keyword = '\b[a-zA-Z0-9_.]+\b';
+		// not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
+		$not_function = '(?![ ]?\()';
 		$reserved = array(
 			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
 			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING'
@@ -363,7 +365,7 @@ abstract class InterAdminAbstract {
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
 		$offset = 0;
-		while(preg_match('/(' . $quoted . '|' . $keyword . ')/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+		while(preg_match('/(' . $quoted . '|' . $keyword . $not_function . '|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
 			// Resolvendo true e false para char
 			if (strtolower($termo) == 'true' || strtolower($termo) == 'false') {
@@ -379,6 +381,25 @@ abstract class InterAdminAbstract {
 				$clause = $inicioRep . substr($clause, $pos + strlen($termo));
 				$offset = strlen($inicioRep);
 				continue;
+			}
+			
+			// Joins com EXISTS
+			if ($termo == 'EXISTS') {
+				$inicio = substr($clause, 0, $pos + strlen($termo));
+				$existsClause = substr($clause, $pos + strlen($termo));
+				
+				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
+					$table = $existsMatches[2];
+					if ($table == 'tags') { // TODO unificar lógica
+						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table . 
+						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
+					}
+					
+					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
+					$clause = $inicioRep . substr($clause, strlen($inicio . $existsMatches[0]));
+					$offset = strlen($inicioRep);
+					continue;
+				}
 			}
 			
 			if (!is_numeric($termo) && !in_array($termo, $reserved) && $termo[0] != "'") {
