@@ -240,8 +240,7 @@ abstract class InterAdminAbstract {
 		
 		if (isset($isMulti)) {
 			if ($isMulti) {
-				$value_arr = explode(',', $value);
-				if (!$value_arr[0]) $value_arr = array();
+				$value_arr = jp7_explode(',', $value);
 				foreach ($value_arr as $key2 => $value2) {
 					if ($value2 && is_numeric($value2)) {
 						if ($isTipo) {
