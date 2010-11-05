@@ -139,6 +139,10 @@ class Pagination {
 				}
 				if ($max > $this->total) {
 					$max = $this->total;
+					$min = $max - $numbers_limit + 1;
+					if ($min < 1) {
+						$min = 1;
+					}
 				}
 				
 				// Montando HTML
