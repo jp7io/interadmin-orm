@@ -113,26 +113,27 @@ class InterAdminField {
 			if(!$readonly_hidden){
 				$form="<div class=\"select_multi\">";
 				ob_start();
+				
+				$temp_campo_nome = self::getCampoHeader(array(
+					'tipo' => $tipo_de_campo,
+					'nome' => $campo_nome,
+					'label' => $campo_array['label']
+				));
+				
 				if ($xtra == 'X') {
 					include 'site/aplicacao/select_multi.php';
 					$campo_nome = trim($campo_nome);
 					$campo_nome = interadmin_tipos_nome((is_numeric($campo_nome)) ? $campo_nome : 0);
 				} elseif ($xtra) {
-					interadmin_tipos_combo(jp7_explode(',', $valor), (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "checkbox", $campo . "[".$j."][]", false, $readonly, $obrigatorio, $campo_array['opcoes']);
+					interadmin_tipos_combo(jp7_explode(',', $valor), (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", $campo_array['where'], "checkbox", $campo . "[".$j."][]", false, $readonly, $obrigatorio, $campo_array['opcoes'], $temp_campo_nome);
 					$campo_nome = 'Tipos';
 				} else {
-					$temp_campo_nome = self::getCampoHeader(array(
-						'tipo' => $tipo_de_campo,
-						'nome' => $campo_nome,
-						'label' => $campo_array['label']
-					));
 					echo interadmin_combo(jp7_explode(",",$valor),(is_numeric($campo_nome))?$campo_nome:0,0,"",$campo_array['where'],"checkbox",$campo."[".$j."][]",$temp_campo_nome,$obrigatorio, $readonly);
-					$campo_nome=$temp_campo_nome;
 				}
-				$form.=ob_get_contents();
+				$form .= ob_get_contents();
 				ob_end_clean();
-				$form.="</div>";
-				if($campo_array['label'])$campo_nome=$campo_array['label'];
+				$form .= "</div>";
+				$campo_nome = $temp_campo_nome;
 			}
 		// SELECT
 		}elseif(strpos($tipo_de_campo,"select_")===0){
