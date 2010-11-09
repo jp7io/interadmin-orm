@@ -692,4 +692,8 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $extended + $initial;
 	}
+	
+	public function getTagFilters() {
+		return "(tags.id = " . $this->id . " AND tags.id_tipo = '" . $this->getTipo()->id_tipo . "')";
+	}
 }

@@ -185,7 +185,6 @@ class InterAdminArquivo extends InterAdminAbstract {
 			return $this->db_prefix . '_arquivos';
 		}
     }
-
     
     /**
      * @see InterAdminAbstract::getCampoTipo()
@@ -193,4 +192,8 @@ class InterAdminArquivo extends InterAdminAbstract {
     public function getCampoTipo($campo) {
        return;
     }
+ 	
+	public function getTagFilters() {
+		return '';
+	} 
 }

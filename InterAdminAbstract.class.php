@@ -754,4 +754,10 @@ abstract class InterAdminAbstract {
 		}
 	}
 	
+	/**
+	 * Returns the SQL WHERE for filtering this as a tag.
+	 * 
+	 * @return string
+	 */
+	abstract public function getTagFilters();
 }

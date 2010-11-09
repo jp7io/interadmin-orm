@@ -697,18 +697,15 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		$tagsWhere = array();
 		foreach ($tags as $tag) {
-			if ($tag instanceof InterAdminTipo) {
-				$tagsWhere[] = "(tags.id_tipo = " . $tag->id_tipo . " AND tags.id = 0)";
-			} elseif ($tag instanceof InterAdmin) {
-				$tagsWhere[] = "(tags.id = " . $tag->id . " AND tags.id_tipo = '" . $tag->getTipo()->id_tipo . "')";
+			if ($tag instanceof InterAdminAbstract) {
+				$tagsWhere[] = $tag->getTagFilters();
 			} elseif (is_numeric($tag)) {
-				$tagsWhere[] = "(tags.id_tipo = " . $tag . " AND tags.id <> 0)";
+				$tagsWhere[] = "(tags.id_tipo = " . $tag . " AND tags.id > 0)";
 			}
 		}
 		if (!$tagsWhere) {
 			return array();
-		}
-		
+		}		
 		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
 		return $this->getInterAdmins($options);
 	}
@@ -779,5 +776,9 @@ class InterAdminTipo extends InterAdminAbstract {
 			$records[] = $record;
 		}
 		return $records;
+	}
+	
+	public function getTagFilters() {
+		return "(tags.id_tipo = " . $this->id_tipo . " AND tags.id = 0)";
 	}
 }
