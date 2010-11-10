@@ -15,9 +15,11 @@ class Jp7_Collections {
 			if ($options['where']) {
 				$array = self::filter($array, $options['where']);
 			}
+			/*
 			if ($options['group']) {
 				$array = self::group($array, $options['group']);
 			}
+			*/
 			if ($options['order']) {
 				$array = self::sort($array, $options['order']);
 			}
@@ -34,10 +36,12 @@ class Jp7_Collections {
 	 * @param string $clause
 	 * @return array
 	 */
+	/*
 	public static function group($array, $clause) {
 		return $array;
 		// @todo
 	}
+	*/
 	/**
 	 * Filters the array using SQL Where.
 	 * 
@@ -70,12 +74,14 @@ class Jp7_Collections {
 		foreach ($compactedArray[$newPropertyName] as $item) {
 			$subitem = $item->$property;
 			unset($item->$property);
-			$key = $subitem->__toString();
-			if (!in_array($key, $subitens)) {
-				$subitem->$newPropertyName = array();
-				$subitens[$key] = $subitem;
+			if (is_object($subitem)) {
+				$key = $subitem->__toString();
+				if (!array_key_exists($key, $subitens)) {
+					$subitem->$newPropertyName = array();
+					$subitens[$key] = $subitem;
+				}
+				$subitens[$key]->{$newPropertyName}[] = $item;
 			}
-			$subitens[$key]->{$newPropertyName}[] = $item;
 		}
 		// Returning values with reindexed keys
 		return array_values($subitens);
@@ -158,7 +164,6 @@ class Jp7_Collections {
 		}
 		return array_slice($array, $offset, $length);
 	}
-	
 	/**
 	 * Implodes the properties of an array of objects.
 	 * It uses getFieldsValues() for InterAdminTipo and getByAlias() for InterAdmin. 
