@@ -348,10 +348,11 @@ abstract class InterAdminAbstract {
 		);
 		
 		// Group by para wheres com children
-		if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // Performance
+		if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // strpos por Performance
 			preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 			foreach ($matches[1] as $match) {
-				if ($match[0] != "'" && strpos($options['fields'][0], 'DISTINCT') === false) { // Filter, DISTINCT para o getInterAdminsCount()
+				// Filter, DISTINCT para o getInterAdminsCount(), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
+				if ($match[0] != "'" && strpos($options['fields'][0], 'DISTINCT') === false && strpos($options['group'], 'children_') === false) {
 					$options['group'] .= (($options['group']) ? ',' : '') . 'main.id';
 					break;
 				}
