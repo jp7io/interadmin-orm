@@ -350,6 +350,7 @@ class InterAdminTipo extends InterAdminAbstract {
 					if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
 						$id_tipo = $A[$parameters[0]]['nome'];
 						$A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
+							'db_prefix' => $this->db_prefix,
 							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 						));
 					}
