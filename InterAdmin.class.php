@@ -598,8 +598,8 @@ class InterAdmin extends InterAdminAbstract {
 		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		// date_modify
 		$this->date_modify = date('c');
-				
-		return parent::save();
+		
+		return $this->_update($this->attributes, 'id_tipo = ' . $this->id_tipo . ' AND ');
 	}
 	public function getAttributesNames() {
 		return $this->getTipo()->getCamposNames();

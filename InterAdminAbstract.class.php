@@ -179,7 +179,7 @@ abstract class InterAdminAbstract {
 	 * @param array $attributes
 	 * @return void
 	 */
-	protected function _update($attributes) {
+	protected function _update($attributes, $where = '') {
 		$valuesToSave = array();
 		$aliases = array_flip($this->getAttributesAliases());
 		
@@ -196,7 +196,7 @@ abstract class InterAdminAbstract {
 		
 		$pk = $this->_primary_key;
 		if ($this->$pk) {
-			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $valuesToSave);
+			jp7_db_insert($this->getTableName(), $where . $this->_primary_key, $this->$pk, $valuesToSave);
 		} else {
 			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $valuesToSave);
 		}
