@@ -221,6 +221,7 @@ class Social {
 
 	/* Send to a friend */
 	public function displaySendFriend ($id_tipo, $url = false, $title = '', $template = 'default') {
+		global $xtra_disabledfields;
 		// Set the default configuration
 		if (!$url) {
 			$url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -236,7 +237,7 @@ class Social {
 		
 		ob_start();
 		foreach ($fields as $field) {
-			if ($field['tipo'] != 'varchar_key') { // Must be different from URL field
+			if ($field['tipo'] != 'varchar_key' && !in_array($field['tipo'], (array) $xtra_disabledfields)) { // Must be different from URL field
 				interadmin_returnCampo($field);
 			}
 		}
