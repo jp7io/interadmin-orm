@@ -43,7 +43,9 @@
 			$backDefault = array(
 				'cache_dir' => self::$_cachedir,
                 'cache_file_umask' => 0777,
-				'file_name_prefix' => 'zf'
+				'file_name_prefix' => 'zf',
+				'hashed_directory_level' => 1,
+				'hashed_directory_umask' => 0777
 			);
 
 			self::$_cachedir = $backDefault['cache_dir'];
