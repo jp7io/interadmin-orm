@@ -203,7 +203,11 @@ class InterSite {
 			return;
 		}
 		
-		$this->init($_SERVER['HTTP_HOST']);
+		$host = $_SERVER['HTTP_HOST'];
+		if (strpos($host, ':80') !== false) {
+			$host = preg_replace('/:80$/', '', $host);
+		}
+		$this->init($host);
 		
 		switch ($this->hostType) {
 			case self::HOST_ALIAS:
