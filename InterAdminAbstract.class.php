@@ -187,6 +187,9 @@ abstract class InterAdminAbstract {
 			$key = ($aliases[$key]) ? $aliases[$key] : $key;
 			if (is_object($value)) {
 				$valuesToSave[$key] = (string) $value;
+				if ($value instanceof InterAdminFieldFile) {
+					$valuesToSave[$key . '_text'] = $value->text;
+				}
 			} elseif (is_array($value)) {
 				$valuesToSave[$key] = implode(',', $value);
 			} else {
