@@ -306,10 +306,12 @@ abstract class InterAdminAbstract {
 			foreach ($options['from'] as $key => $from) {
 				list($table, $alias) = explode(' AS ', $from);
 				if ($alias == 'main') {
-					$filters = self::getPublishedFilters($table, $alias);
+					// @todo PHP 5.3, trocar $this por static
+					$filters = $this->getPublishedFilters($table, $alias);
 				} else {
 					$join = explode(' ON', $alias);
-					$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . self::getPublishedFilters($table, $join[0]) . $join[1];
+					// @todo PHP 5.3, trocar $this por static
+					$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
 				}
 			}
 		}
