@@ -88,10 +88,14 @@ class Jp7_InterAdmin_Util {
 			$record->save();
 			
 			if ($import_children) {
-				foreach ($record->_children as $tipo_children) {
+				foreach ($record->_children as $child_id_tipo => $tipo_children) {
+					$child_tipo = InterAdminTipo::getInstance($child_id_tipo);
+					
 					foreach ($tipo_children as $child) {
 						unset($child->id);
+												
 						$child->parent_id = $record->id;
+						$child->setTipo($child_tipo);
 						
 						if ($use_id_string) {
 							self::_importAttributeFromIdString($child);
