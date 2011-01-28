@@ -50,7 +50,10 @@ class Browser{
 	public function __construct($useragent){
 		$this->userAgent = $useragent;
 		$i = 0;
-		if (strpos($useragent, 'Safari')) {
+		if (strpos($useragent, 'Chrome') !== false) {
+			$this->browser = 'ch';
+			$this->v = 5;
+		} elseif (strpos($useragent, 'Safari')) {
 			$this->browser = 'sa';
 			$this->v = 5;
 		} elseif (strpos($useragent, 'Opera') !== false) {
@@ -69,6 +72,7 @@ class Browser{
 			$this->browser = $useragent;
 			$this->v = -1;
 		}
+		$this->ch = ($this->browser == 'ch');
 		$this->sa = ($this->browser == 'sa');
 		$this->op = ($this->browser == 'op');
 		$this->ie = ($this->browser == 'ie');
