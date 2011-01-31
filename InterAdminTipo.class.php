@@ -136,7 +136,12 @@ class InterAdminTipo extends InterAdminAbstract {
 						$this->_loadedfrommodel[$var] = true;
 						break;
 					}
-					$modelo = new InterAdminTipo($modelo->model_id_tipo);				
+					if (is_numeric($modelo->model_id_tipo) || !$modelo->model_id_tipo) {
+						$modelo = new InterAdminTipo($modelo->model_id_tipo);
+					} else {
+						$className = 'Jp7_Model_' . $modelo->model_id_tipo . 'Tipo';
+						$modelo = new $className();	
+					}
 				}
 			}
 		}
@@ -315,7 +320,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getModel($options = array()) {
 		if ($this->model_id_tipo || $this->getFieldsValues('model_id_tipo')) {
-			$model = new InterAdminTipo($this->model_id_tipo, $options);
+			if (is_numeric($this->model_id_tipo)) {
+				$model = new InterAdminTipo($this->model_id_tipo, $options);
+			} else {
+				$className = 'Jp7_Model_' . $this->model_id_tipo . 'Tipo';
+				$model = new $className();
+			}
 			return $model->getModel($options);
 		} else {
 			return $this;
@@ -572,14 +582,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function getAttributesNames() {
-		return array('id_tipo', 'model_id_tipo', 'parent_id_tipo', 'redirect_id_tipo',
-			'nome', 'nome_en', 'texto', 'class', 'class_tipo', 'template', 'editpage', 
-			'template_inserir', 'tabela', 'disparo', 'campos', 'arquivos', 'arquivos_ajuda',
-			'arquivos_2', 'arquivos_2_ajuda', 'arquivos_3', 'arquivos_3_ajuda', 'arquivos_4',
-			'arquivos_4_ajuda', 'links', 'links_ajuda', 'children', 'mostrar', 'language',
-			'menu', 'busca', 'restrito', 'admin', 'editar', 'unico', 'publish_tipo', 'versoes',
-			'hits', 'tags', 'tags_tipo', 'tags_registros', 'visualizar', 'ordem', 'log', 'deleted_tipo'
-		);
+		global $db;
+		if (!$attributes  = $this->_getMetadata('attributes')) {
+			$attributes = $db->MetaColumnNames($this->getTableName()) or die(jp7_debug($db->ErrorMsg()));
+			$this->_setMetadata('attributes', $attributes);
+		}
+		return $attributes;
 	}
 	public function getAttributesCampos() {
 		return array();

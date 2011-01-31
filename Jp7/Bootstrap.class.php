@@ -7,7 +7,7 @@ class Jp7_Bootstrap {
 		
 		$debugger->setExceptionsEnabled(true);
 		
-		include_once APPLICATION_PATH . '/../interadmin/config.php';
+		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
 		
 		Zend_Registry::set('config', $config);
 		Zend_Registry::set('session', new Zend_Session_Namespace());
@@ -41,13 +41,16 @@ class Jp7_Bootstrap {
 	}
 	
 	public static function initFrontController() {
+		global $c_doc_root;
+		
 		$frontController = Zend_Controller_Front::getInstance();
 		// Alterando o dispatcher para abrir o template caso o Controller não exista
 		$frontController->setDispatcher(new Jp7_Controller_Dispatcher());
 		// Alterando o router para que $this->url() funcione corretamente na View
 		$frontController->setRouter(new Jp7_Controller_Router());
-				
 		$frontController->setControllerDirectory(APPLICATION_PATH . '/controllers');
+		$frontController->addControllerDirectory($c_doc_root . 'classes/Jp7', 'jp7');
+		
 		if (is_dir(APPLICATION_PATH . '/modules')) {
 			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
 		}

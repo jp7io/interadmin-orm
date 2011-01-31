@@ -55,7 +55,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		// View
 		$this->view->config = $config;
 		$this->view->lang = $lang;
-		$this->view->tipo = self::getTipo();
+		$this->view->tipo = $this->getTipo(); // TODO Late Static Binding
+		
 		
 		// Layout
 		// - Title
@@ -85,7 +86,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			}
 		}
 		
-		if ($secao = self::getTipo()) {
+		if ($secao = $this->getTipo()) { // TODO Late static Binding
 			if ($secao->getFieldsValues('nome') == 'Home' && !$secao->getParent()->id_tipo) {
 				return; // Home
 			}
@@ -127,10 +128,13 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 					list($controller, $action) = $templateArr;
 				}
 				
-				static $loop_count;
-				if (!$loop_count) {
-					$loop_count++;
+				static $loop_count = 0;
+				$loop_count++;
+				if ($loop_count === 1) {
 					$this->_forward($action, $controller, $module);
+					return true;
+				} elseif ($loop_count === 2) {
+					$this->_forward($action, $controller, 'jp7');
 					return true;
 				}
 			}
@@ -142,10 +146,13 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * 
 	 * @return InterAdminTipo
 	 */
-	public static function getTipo() {
+	public function getTipo() {
 		if (!isset(self::$tipo)) {
-			$parentTipo = self::getRootTipo();
-			
+			if (isset($this)) { // TODO Corrigir no 5.3 com Late Static Binding
+				$parentTipo = $this->getRootTipo();
+			} else {
+				$parentTipo = self::getRootTipo();
+			}
 			$request = Zend_Controller_Front::getInstance()->getRequest();
 			
 			$tipos = array();
@@ -197,7 +204,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$actionName = toId($request->getActionName());
 		// Case insensitive
-		return method_exists($this,  $actionName . $request->getActionKey());
+		return method_exists($this, $actionName . $request->getActionKey());
 	}
 	
 	public static function getRootTipo() {
