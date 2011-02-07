@@ -13,6 +13,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetAll extends Jp7_InterAdmin_Soap_Ref
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna todos os registros da seção ' . $this->secao->nome . ', incluindo os registros deletados e os não publicados.');
+		return 'Retorna todos os registros da seção ' . $this->secao->nome . ', incluindo os registros deletados e os não publicados.';
 	}
 }

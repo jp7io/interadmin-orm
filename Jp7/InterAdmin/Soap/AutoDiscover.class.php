@@ -122,7 +122,7 @@ class Jp7_InterAdmin_Soap_AutoDiscover extends Zend_Soap_AutoDiscover {
         }
         $desc = $function->getDescription();
         if (strlen($desc) > 0) {
-            $wsdl->addDocumentation($portOperation, $desc);
+            $wsdl->addDocumentation($portOperation, utf8_encode($desc));
         }
 
         // When using the RPC style, make sure the operation style includes a 'namespace' attribute (WS-I Basic Profile 1.1 R2717)

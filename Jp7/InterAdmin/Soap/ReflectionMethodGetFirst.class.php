@@ -20,6 +20,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna o primeiro registro da seção ' . $this->secao->nome . '.');
+		return 'Retorna o primeiro registro da seção ' . $this->secao->nome . '.';
 	}
 }

@@ -43,7 +43,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna os registros publicados e não deletados da seção ' . $this->secao->nome . '.');
+		return 'Retorna os registros publicados e não deletados da seção ' . $this->secao->nome . '.';
 	}
 	
 	protected function _getClassName() {
