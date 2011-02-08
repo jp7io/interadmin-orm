@@ -221,7 +221,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChildByModel($model_id_tipo, $options = array()) {
-		$options['where'][] = "model_id_tipo = " . $model_id_tipo;
+		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
 		return $this->getFirstChild($options);
 	}
 	/**
@@ -241,7 +241,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return Array of InterAdminTipo objects.
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
-		$options['where'][] = "model_id_tipo = " . $model_id_tipo;
+		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
 		return $this->getChildren($options);
 	}
 	/**
