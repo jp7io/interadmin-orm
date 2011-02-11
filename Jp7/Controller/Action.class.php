@@ -148,7 +148,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 */
 	public function getTipo() {
 		if (!isset(self::$tipo)) {
-			if (isset($this)) { // TODO Corrigir no 5.3 com Late Static Binding
+			if (isset($this) && $this instanceof self) { // TODO Corrigir no 5.3 com Late Static Binding
 				$parentTipo = $this->getRootTipo();
 			} else {
 				$parentTipo = self::getRootTipo();
