@@ -123,7 +123,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @return Url New $url created with the $id_arquivo_banco of the added record.
 	 * @todo Create a class for _arquivos_banco 
 	 */
-	public function addToArquivosBanco() {
+	public function addToArquivosBanco($upload_root = '../../upload/') {
 		global $lang;
 		// Inserindo no banco de arquivos
 		$fieldsValues = array(
@@ -144,7 +144,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$folder =  $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
