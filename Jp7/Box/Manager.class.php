@@ -20,10 +20,17 @@ class Jp7_Box_Manager {    /**
         return self::$array;
     }
 	/**
-	 * Adds a box to the array.
+	 * Sets a classname to the given box id.
 	 * @return void
 	 */
-	public static function add($id, $className) {
+	public static function set($id, $className) {
 		self::$array[$id] = $className;
+	}
+	/**
+	 * Gets the classname for the given box id.
+	 * @return string
+	 */
+	public static function get($id) {
+		return self::$array[$id];
 	}
 }
