@@ -84,15 +84,19 @@ class InterAdminField {
 		if ($readonly == "hidden") {
 			$readonly_hidden = true;
 		}
-		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=' disabled="disabled"';
 		
-		if(strpos($tipo_de_campo,"tit_")===0){
-			if($tit_start){
+		$temPermissao = $s_user['sa'] || $campo_array['permissoes'] == $s_user['tipo'] || ($campo_array['permissoes'] == 'admin' && $s_user['admin']);
+		if ($readonly || ($campo_array['permissoes'] && !$temPermissao)) {
+			$readonly = ' disabled="disabled"';
+		}
+		
+		if (strpos($tipo_de_campo, 'tit_') === 0) {
+			if ($tit_start) {
 				echo "</tbody>";
-				$tit_start=false;
+				$tit_start = false;
 			}
 			echo "<tr><th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
-			$tit_start=true;
+			$tit_start = true;
 		// TEXT
 		}elseif(strpos($tipo_de_campo,"text_")===0){
 			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\"" . 
