@@ -38,6 +38,10 @@ class InterAdminFieldFile {
 	public function getUrl() {
 		return $this->url;
 	}
+	public function getAbsoluteUrl() {
+		global $config;
+		return str_replace('../../upload/', $config->url . 'upload/', $this->url);
+	}	
 	/**
 	 * Retorna texto para ser usado no "alt" ou "title" da imagem.
      * Utiliza o campo "Créditos/Leg.:" do arquivo ou o varchar_key do Registro.
