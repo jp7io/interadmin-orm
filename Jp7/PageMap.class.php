@@ -1,7 +1,7 @@
 <?php
 class Jp7_PageMap {
 	public function getHtml() {
-		$str =  "\r\n" . '<PageMap>' . "\r\n";
+		$str = '';
 		foreach ($this as $type => $attributes) {
 			$str .= "\t" . '<DataObject type="' . $type . '">' . "\r\n";
 			foreach ($attributes as $name => $values) {
@@ -12,7 +12,12 @@ class Jp7_PageMap {
 			}
 			$str .= "\t" . '</DataObject>' . "\r\n";
 		}
-		$str .= '</PageMap>' . "\r\n";
-		return $str;
+		if ($str) {
+			return '<!--' . "\r\n" .
+				'<PageMap>' . "\r\n" .
+				$str .
+				'</PageMap>' . "\r\n" . 
+				'-->' . "\r\n";
+		}
 	}
 }
