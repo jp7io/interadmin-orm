@@ -599,7 +599,7 @@ class InterAdmin extends InterAdminAbstract {
 		// date_modify
 		$this->date_modify = date('c');
 		
-		return $this->_update($this->attributes, 'id_tipo = ' . $this->id_tipo . ' AND ');
+		return parent::save();
 	}
 	public function getAttributesNames() {
 		return $this->getTipo()->getCamposNames();
