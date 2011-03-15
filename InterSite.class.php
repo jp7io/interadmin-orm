@@ -211,6 +211,7 @@ class InterSite {
 		
 		switch ($this->hostType) {
 			case self::HOST_ALIAS:
+				header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
 				header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
 				exit;
 			case !$this->server: {
