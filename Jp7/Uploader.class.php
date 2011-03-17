@@ -9,11 +9,15 @@ if ($upload->hasFile('foto')) {
 /**
  * Handler to help using $_FILES array.
  */
-class Jp7_Uploader {
-	protected $fieldName;
+class Jp7_Uploader {	protected $fieldName;
 	protected $extensionsFilter;
 	protected $typesFilter;
 	protected $basePath = '../../upload/';
+	/**
+	 * Numero em bytes: 9000000 = 9MB (Aprox.)
+	 * @var int
+	 */
+	protected $maxSize = 0; 
 	
 	/**
 	 * Creates a new $_FILES handler.
@@ -52,6 +56,9 @@ class Jp7_Uploader {
 		}
 		if (!preg_match($this->extensionsFilter, $name[$key]) || !preg_match($this->typesFilter, $type[$key])) {
 			throw new Jp7_Uploader_InvalidExtensionException($name[$key]);
+		}
+		if ($this->maxSize && $size[$key] > $this->maxSize) {
+			throw new Jp7_Uploader_InvalidSizeException($name[$key]);
 		}
 		
 		// Copy
@@ -145,5 +152,23 @@ class Jp7_Uploader {
      */
     public function setBasePath($basePath) {
         $this->basePath = $basePath;
+    }
+    /**
+     * Returns $maxSize.
+     * 
+     * @return int
+     * @see Jp7_Uploader::$maxSize
+     */
+    public function getMaxSize() {
+        return $this->maxSize;
+    }
+    /**
+     * Sets $maxSize.
+     *
+     * @param int $maxSize
+     * @see Jp7_Uploader::$maxSize
+     */
+    public function setMaxSize($maxSize) {
+        $this->maxSize = $maxSize;
     }
 }
