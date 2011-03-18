@@ -593,7 +593,9 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// log
 		if ($this->id && !isset($this->log)) {
+			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
 			$this->getFieldsValues('log');
+			InterAdmin::setPublishedFiltersEnabled($old_value);
 		}
 		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		// date_modify

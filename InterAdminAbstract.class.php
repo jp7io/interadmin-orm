@@ -112,11 +112,12 @@ abstract class InterAdminAbstract {
 			$options = array(
 				'fields' => (array) $fieldsToLoad,
 				'fields_alias' => $fieldsAlias,
-				'from' => $this->getTableName() . " AS main",
-				'where' => array($this->_primary_key . " = " . intval($this->{$this->_primary_key})),
+				'from' => $this->getTableName() . ' AS main',
+				'where' => array($this->_primary_key . ' = ' . intval($this->{$this->_primary_key})),
 				// Internal use
 				'aliases' => $this->getAttributesAliases(),
 				'campos' => $this->getAttributesCampos()
+				//'skip_published_filters' => array('main')
 			);
 			$rs = $this->_executeQuery($options);
 			if ($forceAsString) {
@@ -305,6 +306,10 @@ abstract class InterAdminAbstract {
 		if ($use_published_filters) {
 			foreach ($options['from'] as $key => $from) {
 				list($table, $alias) = explode(' AS ', $from);
+				/*
+				if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
+					continue;
+				}*/
 				if ($alias == 'main') {
 					// @todo PHP 5.3, trocar $this por static
 					$filters = $this->getPublishedFilters($table, $alias);

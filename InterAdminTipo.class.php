@@ -108,7 +108,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	public function getFieldsValues($fields) {
 		if (!isset($this->attributes['model_id_tipo'])) {
-			$eagerload = array('nome', 'parent_id_tipo', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
+			$eagerload = array('nome', 'language', 'parent_id_tipo', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
 			$neededFields = array_unique(array_merge((array) $fields, $eagerload));
 			$values = parent::getFieldsValues($neededFields);
 			if (is_array($fields)) {
