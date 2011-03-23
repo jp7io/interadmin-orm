@@ -184,9 +184,9 @@ class InterAdmin extends InterAdminAbstract {
 			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
-		} 
+		}
 		// Default error when method doesn´t exist
-		trigger_error('Call to undefined method ' . get_class($this) . '->' . $methodName . '()', E_USER_ERROR);
+		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $methodName . '()'));
 	}
 	/**
 	 * Gets fields values by their alias.

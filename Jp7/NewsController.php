@@ -1,3 +1,3 @@
 <?php
 
-include str_replace('.php', '.class.php', __FILE__);
+require str_replace('.php', '.class.php', __FILE__);

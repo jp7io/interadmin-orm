@@ -51,41 +51,53 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		 * @var array $links Arquivos de CSS
 		 */
     	$links = Zend_Registry::get('links');
+		// TODO Late Static Binding static::getTipo()
+		$tipo = $this->getTipo();
 		
 		// View
 		$this->view->config = $config;
 		$this->view->lang = $lang;
-		$this->view->tipo = $this->getTipo(); // TODO Late Static Binding
+		$this->view->tipo = $tipo; 
+		$this->view->record = $this->record;
 		
+		// Boxes editáveis pelo InterAdmin
+		$boxTipo = $tipo->getFirstChildByModel('Boxes');
+		if ($boxTipo) {
+			$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxTipo, $this->record);
+		}
 		
 		// Layout
-		// - Title
+		// Title
 		$this->_prepareTitle();
 		$this->view->headTitle($config->lang->title);
-		// - Metas
+		// Metas
 		$this->view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=ISO-8859-1');
 		foreach ($metas as $key => $value) {
 			$this->view->headMeta()->appendName($key, $value);
 		}
-		// - Javascripts
+		// Javascripts
 		foreach ($scripts as $file) {
 			$this->view->headScript()->appendFile($file);
 		}
-		// - CSS
+		// CSS
 		foreach ($links as $file) {
 			$this->view->headLink()->appendStylesheet($file);
 		}
 	}
-	
+	/**
+	 * Função responsável por montar o título da página.
+	 * Permite que se altere o título sem sobrescrever o método postDispatch().
+	 * @return string
+	 */
 	protected function _prepareTitle() {
 		$this->view->headTitle()->setSeparator(' | ');
-		
+		// Adiciona o nome do registro atual ao título
 		if ($this->record) {
 			if ($titulo = $this->record->getFieldsValues('varchar_key')) {
 				$this->view->headTitle($titulo);
 			}
 		}
-		
+		// Adiciona breadcrumb to tipo
 		if ($secao = $this->getTipo()) { // TODO Late static Binding
 			if ($secao->getFieldsValues('nome') == 'Home' && !$secao->getParent()->id_tipo) {
 				return; // Home
@@ -94,7 +106,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				$this->view->headTitle($secao->getFieldsValues('nome'));
 				$secao = $secao->getParent();
 			}
-		}	
+		}
 	}
 	
 	/**
@@ -208,16 +220,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	}
 	
 	public static function getRootTipo() {
-		$config = Zend_Registry::get('config');
-		
-		$customTipo = ucfirst($config->name_id) . '_InterAdminTipo';
-		if (class_exists($customTipo)) {
-			$rootTipo = new $customTipo();
-		} else {
-			$rootTipo = new InterAdminTipo();
-		}
-		
-		return $rootTipo;
+		$defaultClassName = InterAdminTipo::getDefaultClass();
+		return new $defaultClassName();
 	}
 	
 	/**

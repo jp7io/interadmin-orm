@@ -238,6 +238,7 @@ class Jp7_Date extends DateTime {
 					$format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
 			}
 		}
+		// Tratamento de nomes para múltiplas línguas
 		if (strpos($format, 'D') !== false) {
 			$format = preg_replace('/(?<!\\\\)D/', addcslashes(jp7_date_week(intval($this->format('w')), true), 'A..z'), $format);
 		}
@@ -250,8 +251,26 @@ class Jp7_Date extends DateTime {
 		if (strpos($format, 'F') !== false) {
 			$format = preg_replace('/(?<!\\\\)F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
 		}
-		
+		// Format padrão
 		return parent::format($format);		
+	}
+	
+	public function short() {
+		global $lang;
+		if ($lang->lang == 'en') {
+			return $this->format('m/d/Y');	
+		} else {
+			return $this->format('d/m/Y');
+		}
+	}
+	
+	public function long() {
+		global $lang;
+		if ($lang->lang == 'en') {
+			return $this->format('F d, Y');	
+		} else {
+			return $this->format('d \d\e F \d\e Y');
+		}
 	}
 	
 	public function __toString() {

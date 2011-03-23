@@ -25,6 +25,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @var array 
 	 */
 	protected static $_metadata;
+	
+	protected static $_defaultClass = 'InterAdminTipo';
+	
 	protected $_primary_key = 'id_tipo';
 	/**
 	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
@@ -84,7 +87,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public static function getInstance($id_tipo, $options = array()) {
 		if (!$options['default_class']) {
-			$options['default_class'] = 'InterAdminTipo';
+			$options['default_class'] = self::$_defaultClass;
 		}
 		if ($options['class']) {
 			// Classe foi forçada
@@ -126,7 +129,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function &__get($var) {
-		if ($var == 'class' || $var == 'class_tipo' || $var == 'tabela' || $var == 'template') {
+		$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros');
+		if (in_array($var, $inheritArr)) {
 			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
 				$modelo = $this;
 				while ($modelo->id_tipo) {
@@ -212,7 +216,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChild($options = array()) {
-		return reset($this->getChildren($options + array('limit' => 1)));
+		return reset($this->getChildren(array('limit' => 1) + $options));
 	}
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
@@ -221,8 +225,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChildByModel($model_id_tipo, $options = array()) {
-		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		return $this->getFirstChild($options);
+		return reset($this->getChildrenByModel($model_id_tipo, array('limit' => 1) + $options));
 	}
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "nome"
@@ -242,6 +245,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
+		// Necessário enquanto algumas tabelas ainda tem esse campo numérico
+		$options['where'][] = "model_id_tipo != '0'"; 
 		return $this->getChildren($options);
 	}
 	/**
@@ -740,7 +745,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				'fields' => 'id_tipo',
 				'from' => $this->getTableName() . ' AS main',
 				'where' => array(
-					'model_id_tipo = ' . $this->id_tipo
+					"model_id_tipo = '" . $this->id_tipo . "'"
 				)
 			));
 			
@@ -752,6 +757,35 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_tiposUsingThisModel[$this->id_tipo] = $this;
 		}
 		return $this->_tiposUsingThisModel;
+	}
+	
+	public static function findTipos($options = array()) {
+		$instance = new self();
+		
+		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+		$options['from'] = $instance->getTableName() . ' AS main';
+		if (!$options['where']) {
+			$options['where'][] = '1 = 1';
+		}
+	 	if (!$options['order']) {
+	 		$options['order'] = 'ordem, nome';
+		}
+		// Internal use
+		$options['aliases'] = $instance->getAttributesAliases();
+		$options['campos'] = $instance->getAttributesCampos();
+		
+		$rs = $instance->_executeQuery($options);
+		$tipos = array();
+		
+		while ($row = $rs->FetchNextObj()) {
+			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
+				'db_prefix' => $instance->db_prefix,
+				'class' => $options['class']
+			));
+			$instance->_getAttributesFromRow($row, $tipo, $options);
+			$tipos[] = $tipo;
+		}
+		return $tipos;
 	}
 	
 	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {
@@ -799,4 +833,23 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getTagFilters() {
 		return "(tags.id_tipo = " . $this->id_tipo . " AND tags.id = 0)";
 	}
+	
+    /**
+     * Returns $_defaultClass.
+     * 
+     * @see InterAdminTipo::$_defaultClass
+     */
+    public static function getDefaultClass() {
+        return self::$_defaultClass;
+    }
+    
+    /**
+     * Sets $_defaultClass.
+     * 
+     * @param object $_defaultClass
+     * @see InterAdminTipo::$_defaultClass
+     */
+    public static function setDefaultClass($defaultClass) {
+        self::$_defaultClass = $defaultClass;
+    }
 }

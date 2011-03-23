@@ -3,17 +3,14 @@
 class Jp7_Bootstrap {
 	
 	public static function run() {
-		global $config, $debugger;
-		
+		global $debugger;
 		$debugger->setExceptionsEnabled(true);
 		
-		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
-		
-		Zend_Registry::set('config', $config);
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
 		Zend_Registry::set('get', new Zend_Filter_Input(null, null, $_GET));
 		
+		self::initConfig();
 		self::initDataBase();
 		self::initFrontController();
 		self::initLanguage();
@@ -21,6 +18,31 @@ class Jp7_Bootstrap {
 		self::preDispatch();
 		self::dispatch();
 		self::postDispatch();		
+	}
+	
+	public static function initConfig() {
+		global $config;
+		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
+		Zend_Registry::set('config', $config);
+		
+		// Iniciando $s_session. Compatibilidade
+		if (is_null($GLOBALS['s_session'])) {
+			if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
+				$_SESSION[$config->name_id]['interadmin'] = array();
+			}
+			$GLOBALS['s_session'] = &$_SESSION[$config->name_id]['interadmin'];
+			$GLOBALS['s_user'] = &$GLOBALS['s_session']['user'];
+		}
+		
+		// Classes padrão
+		$prefix = ucfirst($config->name_id);
+		
+		if (InterAdminTipo::getDefaultClass() == 'InterAdminTipo' && class_exists($prefix . '_InterAdminTipo')) {
+			InterAdminTipo::setDefaultClass($prefix . '_InterAdminTipo');
+		}
+		if (Jp7_Controller_Dispatcher::getDefaultParentClass() == 'Jp7_Controller_Action' && class_exists($prefix . '_Controller_Action')) {
+        	Jp7_Controller_Dispatcher::setDefaultParentClass($prefix . '_Controller_Action');
+		}
 	}
 	
 	public static function initDataBase() {
@@ -117,8 +139,8 @@ class Jp7_Bootstrap {
 			array($c_doc_root . '_default/application/views/scripts'),
 			$view->getScriptPaths()
 		));
-						
 		$view->doctype('XHTML1_STRICT');
+		$view->setEncoding('ISO-8859-1');
 	}
 	
 	public static function preDispatch() {
@@ -131,7 +153,7 @@ class Jp7_Bootstrap {
 			'keywords' => $config->lang->keywords,
 			'copyright' => date('Y') . ' ' . $config->copyright,
 			'robots' => 'all',
-			'author' => 'JP7 - http://jp7.com.br',
+			'author' => 'JP7 - http://www.jp7.com.br',
 			'generator' => 'JP7 InterAdmin'
 		);
 		if ($config->google_site_verification) { 

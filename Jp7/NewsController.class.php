@@ -11,13 +11,10 @@ class Jp7_NewsController extends __Controller_Action {
 			$this->record = $newsTipo->getInterAdminById($id,array(
 				'fields' => array('*', 'date_publish')
 			));
-			$this->view->record = $this->record;
 		} else {
-			$news = $newsTipo->getInterAdmins(array(
+			$this->view->news = $newsTipo->getInterAdmins(array(
 				'fields' => array('titulo', 'date_publish')
 			));
-				
-			$this->view->news = $news;
 		}
 	}
 }
