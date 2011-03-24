@@ -28,10 +28,10 @@
 	public static function getInstance(array $frontOptions = array(), array $backOptions = array())
 	{
 		if (!self::$_instance) {
-			global $debugger;
+			global $debugger, $s_session;
 			$config = Zend_Registry::get('config');
 			
-			if ($config->cache && !$debugger->debugFilename && !$debugger->debugSql) {
+			if ($config->cache && !$debugger->debugFilename && !$debugger->debugSql && !$s_session['preview']) {
 				self::$_enabled = true;
 			}
 			
