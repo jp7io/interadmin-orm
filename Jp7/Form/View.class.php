@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_View extends Zend_View {
+class Jp7_Form_View extends Zend_View {
 	public function __construct($config = array())
     {
     	parent::__construct($config);

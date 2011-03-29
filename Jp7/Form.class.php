@@ -217,5 +217,5 @@ $form->addElements($elements);
 $form->populate($usuarioLogado->attributes);
 
 $form->setAction('atualizar_ok.php');
-echo $form->render(new Zend_View());
+echo $form->render(new Jp7_View());
 */

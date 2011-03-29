@@ -135,10 +135,13 @@ class Jp7_Bootstrap {
 		if (is_dir(APPLICATION_PATH . '/modules/default')) {
 			$view->setScriptPath(APPLICATION_PATH . '/modules/default/views/scripts');
 		}
+		// Permite o uso de templates no _default
 		$view->setScriptPath(array_merge(
 			array($c_doc_root . '_default/application/views/scripts'),
 			$view->getScriptPaths()
 		));
+		// Permite o uso de Helpers customizados da Jp7
+		$view->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
 		$view->doctype('XHTML1_STRICT');
 		$view->setEncoding('ISO-8859-1');
 	}
