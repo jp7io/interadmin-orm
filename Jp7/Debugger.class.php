@@ -15,6 +15,7 @@
  * @package Jp7_Debugger
  */
 class Jp7_Debugger{
+	const EMAIL = 'debug@jp7.com.br';
 	/**
 	 * Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
 	 * @var bool
@@ -51,6 +52,8 @@ class Jp7_Debugger{
 	 */
 	protected $_templateFilename;
 	protected $_exceptionsEnabled = false;
+	protected $_maintenancePage = '/_default/index_manutencao.htm';
+		
 	/**
 	 * Public Constructor, it checks the flags and settings, will do nothing if $c_jp7 is <tt>FALSE</tt>.
 	 *
@@ -309,5 +312,22 @@ class Jp7_Debugger{
 		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
 		
 		jp7_mail($to, $subject, $message, $headers, '', $template, true);
-	}
+	}    
+    /**
+     * Returns $maintenancePage.
+     *
+     * @see Jp7_Debugger::$maintenancePage
+     */
+    public function getMaintenancePage() {
+        return $this->_maintenancePage;
+    }
+    /**
+     * Sets $maintenancePage.
+     *
+     * @param object $maintenancePage
+     * @see Jp7_Debugger::$maintenancePage
+     */
+    public function setMaintenancePage($maintenancePage) {
+        $this->_maintenancePage = $maintenancePage;
+    }
 }
