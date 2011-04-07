@@ -60,7 +60,7 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
 		 	$url[] = $config->server->path;
 		 }
 		 krsort($url);
-		 $url = '/' . jp7_implode('/', $url);
+		 $url = '/' . implode('/', $url);
 		 return $url;
 	}
 }
