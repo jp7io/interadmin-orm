@@ -11,11 +11,11 @@ class Jp7_View_Helper_FormDate extends Zend_View_Helper_FormElement
     public function formDate($name, $value = null, $attribs = null)
     {
         $info = $this->_getInfo($name, $value, $attribs);
-        extract($info); // name, value, attribs, options, listsep, disable
+		 // name, value, attribs, options, listsep, disable
 		
         // build the element
         $disabled = '';
-        if ($disable) {
+        if ($info['disable']) {
             // disabled
             $disabled = ' disabled="disabled"';
         }
@@ -26,13 +26,13 @@ class Jp7_View_Helper_FormDate extends Zend_View_Helper_FormElement
             $endTag= '>';
         }
 		
-		$name = $this->view->escape($name);
-		$id = $this->view->escape($id);
-		$value = new Jp7_Date($value);
+		$name = $this->view->escape($info['name']);
+		$id = $this->view->escape($info['id']);
+		$value = new Jp7_Date($info['value'] ? $info['value'] : '0000-00-00');
 		$sel_d = $value->day();
 		$sel_m = $value->month();
 		$sel_Y = $value->year();
-				
+		
 		$days = '';
 		for ($i = 1; $i <= 31; $i++) {
 			$day = ($i < 10) ?  '0' . $i : $i;

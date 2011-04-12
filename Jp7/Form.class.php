@@ -15,6 +15,7 @@ class Jp7_Form extends Zend_Form {
     public function __construct($options = null)
     {
         parent::__construct($options);
+		// Adicionado para que campos dentro de Jp7/Form possam ser exibidos
 		$this->addPrefixPath('Jp7_Form', 'Jp7/Form/');
     }
 	
@@ -131,14 +132,14 @@ class Jp7_Form extends Zend_Form {
 	 * @param InterAdminTipo $tipo
 	 * @return array
 	 */
-	public function createElements(InterAdminTipo $tipo, $prefix = '', array $options = array()) {
+	public function createElements(array $campos, $prefix = '', array $options = array()) {
 		$options = $options + array(
 			'label_suffix' => ':',
-			'required_suffix' => '*'
+			'required_suffix' => ''
 		);
 		
 		$elements = array();
-		foreach ($tipo->getCampos() as $campo) {
+		foreach ($campos as $campo) {
 			if ($campo['form']) {
 				$element = $this->createElementFromCampo($campo, $prefix, $options);
 				$elements[$element->getId()] = $element;
@@ -148,7 +149,7 @@ class Jp7_Form extends Zend_Form {
 	}
 	
 	public function createElementFromCampo($campo, $prefix, $options) {
-		list($tipo, $subTipo) = explode('_', $campo['tipo']);
+		list($prefixCampo, $suffixCampo) = explode('_', $campo['tipo']);
 		
 		$name = $prefix . $campo['nome_id'];
 		$label_suffix = $options['label_suffix'] . (($campo['obrigatorio']) ? $options['required_suffix'] : ''); 
@@ -159,7 +160,7 @@ class Jp7_Form extends Zend_Form {
 			'required' => (bool) $campo['obrigatorio']
 		);
 		
-		switch ($tipo) {
+		switch ($prefixCampo) {
 			case 'varchar':
 				$element = $this->createElement('text', $name, $options);
 				break;
@@ -211,11 +212,15 @@ class Jp7_Form extends Zend_Form {
 /*
 $usuarioTipo = new Ciintranet_UsuarioTipo();
 $form = new Jp7_Form();
-$elements = $form->createElements($usuarioTipo);
+$elements = $form->createElements($usuarioTipo->getCampos());
 $form->addElements($elements);
 
 $form->populate($usuarioLogado->attributes);
 
 $form->setAction('atualizar_ok.php');
-echo $form->render(new Jp7_View());
+
+// Somente em MVC
+echo $form->render();
+// Somente fora do ambiente MVC
+echo $form->render(new Jp7_Form_View()); 
 */
