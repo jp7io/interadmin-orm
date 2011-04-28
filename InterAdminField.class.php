@@ -206,7 +206,7 @@ class InterAdminField {
 				$campo_nome = $campo_nome_2;
 			}
 		}elseif(strpos($tipo_de_campo,"int_")===0||strpos($tipo_de_campo,"float_")===0){
-			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
+			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()',event)\"";
 			if($campo=="int_key"&&!$valor&&$quantidade>1)$valor=$registros+1+$j;
 			if (strpos($tipo_de_campo,"float_")===0 && $xtra == 'moeda') $valor = number_format($valor, '2', ',', '.');
 			$form="<input type=\"text\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".$valor."\" maxlength=\"255\"".(($obrigatorio)?" obligatory=\"yes\"":"")." style=\"width:".(($tamanho)?$tamanho."em":"70px")."\"".$readonly.$onkeypress." />";
@@ -215,17 +215,17 @@ class InterAdminField {
 			if (strpos($tipo_de_campo, 'varchar_') === 0) {
 				switch($xtra){
 					case "id": // ID
-						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_')\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
 						if ($id && !$s_user['sa']) $onkeypress .= " disabled=\"disabled\""; // Impede alteração
 						break;
 					case "id_email": // ID E-Mail
-						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_@.-')\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_@.-',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
 						break;
 					case "email": // E-Mail
-						$onkeypress=" xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.')\"";
+						$onkeypress=" xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.',event)\"";
 						break;
 					case "num": // Número
-						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
+						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()',event)\"";
 						break;
 					case "cpf": // CPF
 						$onkeypress=" xtype=\"cpf\"";
