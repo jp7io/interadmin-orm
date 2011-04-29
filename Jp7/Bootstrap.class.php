@@ -54,9 +54,9 @@ class Jp7_Bootstrap {
 		if (!$config->db->type) {
 			$config->db->type = 'mysql';
 		}
-		include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
-		$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
-		$ADODB_LANG = 'pt-br';
+		if (!function_exists('ADONewConnection')) {
+			include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
+		}
 		$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
 		$db = ADONewConnection($dsn);
 		/* /DB Connection */
@@ -162,19 +162,22 @@ class Jp7_Bootstrap {
 		if ($config->google_site_verification) { 
 			$metas['google-site-verification'] = $config->google_site_verification;
  		}
+		
+		defined('DEFAULT_PATH') || define('DEFAULT_PATH', '/_default/');
+		
 		$scripts = array(
-			'/_default/js/interdyn.js',
-			'/_default/js/interdyn_checkflash.js',
-			'/_default/js/interdyn_form.js',
-			'/_default/js/interdyn_form_lang_' . $lang->lang . '.js',
-			'/_default/js/swfobject.js',
-			'/_default/js/jquery/jquery-1.3.2.min.js',
-			'/_default/js/interdyn_menu.js',
+			DEFAULT_PATH . 'js/interdyn.js',
+			DEFAULT_PATH . 'js/interdyn_checkflash.js',
+			DEFAULT_PATH . 'js/interdyn_form.js',
+			DEFAULT_PATH . 'js/interdyn_form_lang_' . $lang->lang . '.js',
+			DEFAULT_PATH . 'js/swfobject.js',
+			DEFAULT_PATH . 'js/jquery/jquery-1.3.2.min.js',
+			DEFAULT_PATH . 'js/interdyn_menu.js',
 			'js/functions.js'
 		);
 		
 		$links = array(
-			'/_default/css/7_w3c.css',
+			DEFAULT_PATH . 'css/7_w3c.css',
 			'css/main.css'
 		);
 		
