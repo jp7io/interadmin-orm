@@ -670,10 +670,10 @@ abstract class InterAdminAbstract {
 		if (is_null($fields)) {
 			$fields = array_keys($this->attributes);
 		}
+		$existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
+		$fields = array_intersect($fields, $existingFields);
+		// Esvaziando valores para forçar atualização
 		foreach ($fields as $key) {
-			if (in_array($key, array('id', 'id_tipo'))) {
-				continue;
-			}
 			unset($this->attributes[$key]);
 		}
 		$isAliased = $this->staticConst('DEFAULT_FIELDS_ALIAS');
@@ -741,6 +741,7 @@ abstract class InterAdminAbstract {
 	abstract function getAttributesCampos();
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();
+	abstract function getAdminAttributes();
 	abstract function getTableName();
 	
 	public static function getPublishedFilters($table, $alias) {

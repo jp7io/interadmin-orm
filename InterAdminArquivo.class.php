@@ -195,4 +195,10 @@ class InterAdminArquivo extends InterAdminAbstract {
 	public function getTagFilters() {
 		return '';
 	} 
+ 	/**
+     * @see InterAdminAbstract::getAdminAttributes()
+     */
+    public function getAdminAttributes() {
+        return array();
+    }
 }

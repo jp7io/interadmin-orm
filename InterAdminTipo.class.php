@@ -852,4 +852,11 @@ class InterAdminTipo extends InterAdminAbstract {
     public static function setDefaultClass($defaultClass) {
         self::$_defaultClass = $defaultClass;
     }
+	
+    /**
+     * @see InterAdminAbstract::getAdminAttributes()
+     */
+    public function getAdminAttributes() {
+        return array();
+    }
 }

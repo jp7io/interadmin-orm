@@ -698,4 +698,11 @@ class InterAdmin extends InterAdminAbstract {
 	public function getTagFilters() {
 		return "(tags.id = " . $this->id . " AND tags.id_tipo = '" . $this->getTipo()->id_tipo . "')";
 	}
+    
+    /**
+     * @see InterAdminAbstract::getAdminAttributes()
+     */
+    public function getAdminAttributes() {
+		return array('id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+    }
 }
