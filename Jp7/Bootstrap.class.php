@@ -55,7 +55,7 @@ class Jp7_Bootstrap {
 			$config->db->type = 'mysql';
 		}
 		if (!function_exists('ADONewConnection')) {
-			include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
+			include ROOT_PATH . '/inc/3thparty/adodb/adodb.inc.php';
 		}
 		$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
 		$db = ADONewConnection($dsn);
@@ -128,8 +128,6 @@ class Jp7_Bootstrap {
 	}	
 	
 	public static function initLayout() {
-		global $c_doc_root;
-		
 		Zend_Layout::startMvc(APPLICATION_PATH . '/layouts/scripts');
 		$view = Zend_Layout::getMvcInstance()->getView();
 		if (is_dir(APPLICATION_PATH . '/modules/default')) {
@@ -137,7 +135,7 @@ class Jp7_Bootstrap {
 		}
 		// Permite o uso de templates no _default
 		$view->setScriptPath(array_merge(
-			array($c_doc_root . '_default/application/views/scripts'),
+			array(ROOT_PATH . '/_default/application/views/scripts'),
 			$view->getScriptPaths()
 		));
 		// Permite o uso de Helpers customizados da Jp7
