@@ -13,6 +13,13 @@ class Jp7_Rewrite {
 RewriteEngine On
 RewriteBase /{$config->name_id}/
 
+# AUTO REDIRECT #
+# Cliente como root - /cliente/* -> /*
+RewriteCond %{THE_REQUEST} ^([^/]*)/{$config->name_id}/
+RewriteCond %{THE_REQUEST} !^([^/]*)/{$config->name_id}/\.\.
+RewriteRule ^(.*)$ ../$1 [R=301,L]
+# End: AUTO REDIRECT #
+
 # Image Autosize
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteCond %{REQUEST_FILENAME} ^(.*).(jpg|jpeg|gif|png)$
