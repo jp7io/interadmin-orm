@@ -59,6 +59,10 @@ class Jp7_Bootstrap {
 		}
 		$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
 		$db = ADONewConnection($dsn);
+		
+		if (!$db) {
+			throw new Exception('Unable to connect to the database ' . $dsn);
+		}
 		/* /DB Connection */
 	}
 	
