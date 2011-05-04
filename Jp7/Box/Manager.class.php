@@ -95,6 +95,8 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 		if ($layout) {
 			$position = self::$positions[$layout];
 			$columns[$position]->content = true;
+			$columns[$position]->boxes = array();
+			$columns[$position]->width = self::$widths[$layout];
 		}
 		
 		// Loading data
