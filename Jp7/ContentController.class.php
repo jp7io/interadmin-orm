@@ -13,7 +13,7 @@ class Jp7_ContentController extends __Controller_Action {
 			));
 		} else {
 			$this->view->records = $contentTipo->getInterAdmins(array(
-				'fields' => array('titulo', 'date_publish')
+				'fields' => array('*', 'date_publish')
 			));
 		}
 	}
