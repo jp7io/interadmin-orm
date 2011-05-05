@@ -43,6 +43,8 @@ class Jp7_Bootstrap {
 		if (Jp7_Controller_Dispatcher::getDefaultParentClass() == 'Jp7_Controller_Action' && class_exists($prefix . '_Controller_Action')) {
         	Jp7_Controller_Dispatcher::setDefaultParentClass($prefix . '_Controller_Action');
 		}
+		
+		$config->build = interadmin_get_version($config->name_id, '{build}');
 	}
 	
 	public static function initDataBase() {
