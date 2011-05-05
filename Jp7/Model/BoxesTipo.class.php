@@ -23,19 +23,8 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract {
 		parent::__construct();
 		
 		if (!self::$_children) {
-			$tipos = InterAdminTipo::findTipos(array(
-				'where' => array(
-					"model_id_tipo = 'BoxesBox'",
-					"admin <> ''"
-				)
-			));
-			
-			$child = reset($tipos);
-			if (!$child) {
-				throw new Exception('Could not find a Tipo using the model "BoxesBox".');
-			} else {
-				self::$_children = $child->id_tipo . '{,}Boxes{,}{,}{;}';
-			}
+			$boxesBox = $this->_findChildByModel('BoxesBox');
+			self::$_children = $boxesBox->id_tipo . '{,}Boxes{,}{,}{;}';
 		}
 		$this->children = self::$_children;
 	}

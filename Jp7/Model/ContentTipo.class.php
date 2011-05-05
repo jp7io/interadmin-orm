@@ -1,6 +1,9 @@
 <?php
 
 class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
+	
+	protected static $_children;
+	
 	public $attributes = array(
 		'id_tipo' => 'Content',
 		'nome' => 'Conteúdo',
@@ -35,4 +38,13 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
 		'layout' => 4,
 		'layout_registros' => 4
 	);
+	
+	public function __construct() {
+		parent::__construct();
+		if (!self::$_children) {
+			$contentSubitem = $this->_findChildByModel('ContentSubitem');
+			self::$_children = $contentSubitem->id_tipo . '{,}Sub-itens{,}{,}{;}';
+		}		
+		$this->children = self::$_children;
+	}
 }

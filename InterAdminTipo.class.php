@@ -545,6 +545,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $url;
 	}
 	/**
+	 * Saves this InterAdminTipo.
+	 * @return void
+	 */
+	public function save() {
+		$this->id_tipo_string = toId($this->nome);
+		return parent::save();
+	}
+	/**
 	 * Sets this row as deleted as saves it.
 	 * 
 	 * @return
@@ -553,7 +561,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->deleted_tipo = 'S';
 		$this->save();
 	}
-	
 	/**
 	 * Deletes all the InterAdmins.
 	 * 
@@ -758,7 +765,21 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return $this->_tiposUsingThisModel;
 	}
-	
+	/**
+	 * Retrieves the first InterAdminTipo from the database.
+	 * 
+	 * @param 	array $options [optional]
+	 * @return 	InterAdminTipo
+	 */
+	public static function findFirstTipo($options = array()) {
+		return reset(self::findTipos(array('limit' => 1) + $options)); 
+	}
+	/**
+	 * Retrieves multiple InterAdminTipo's from the database.
+	 * 
+	 * @param 	array $options [optional]
+	 * @return 	InterAdminTipo[]
+	 */
 	public static function findTipos($options = array()) {
 		$instance = new self();
 		
