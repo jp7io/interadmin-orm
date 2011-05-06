@@ -148,12 +148,11 @@ class Jp7_Bootstrap {
 		$view->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
 		$view->doctype('XHTML1_STRICT');
 		$view->setEncoding('ISO-8859-1');
-	}
-	
-	public static function preDispatch() {
+		
+		// Adicionando JS e CSS padrão
 		$config = Zend_Registry::get('config');
 		$lang = Zend_Registry::get('lang');
-				
+		
 		$metas = array(
 			'language' => $lang->lang,
 			'description' => $config->lang->description,
@@ -169,6 +168,7 @@ class Jp7_Bootstrap {
 		
 		defined('DEFAULT_PATH') || define('DEFAULT_PATH', '/_default/');
 		
+		// JS
 		$scripts = array(
 			DEFAULT_PATH . 'js/interdyn.js',
 			DEFAULT_PATH . 'js/interdyn_checkflash.js',
@@ -179,15 +179,18 @@ class Jp7_Bootstrap {
 			DEFAULT_PATH . 'js/interdyn_menu.js',
 			'js/functions.js'
 		);
-		
-		$links = array(
-			DEFAULT_PATH . 'css/7_w3c.css',
-			'css/main.css'
-		);
+		foreach ($scripts as $file) {
+			$view->headScript()->appendFile($file);
+		}
+		// CSS
+		$view->headLink()->appendStylesheet(DEFAULT_PATH . 'css/7_w3c.css');
+		$view->headLink()->appendStylesheet('css/main.css');
 		
 		Zend_Registry::set('metas', $metas);
-		Zend_Registry::set('scripts', $scripts);
-		Zend_Registry::set('links', $links);
+	}
+	
+	public static function preDispatch() {
+		
 	}
 	
 	public static function dispatch() {
@@ -200,5 +203,4 @@ class Jp7_Bootstrap {
 			 Jp7_Cache_Output::getInstance()->end();
 		}
 	}
-	
 }

@@ -18,13 +18,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 */
 	protected $record;
 	
-	public function init() {
-		if (!Zend_Registry::isRegistered('originalRequest')) {
-			Zend_Registry::set('originalRequest', clone $this->getRequest());
-		}
-	}
-	
-    public function preDispatch() {
+	public function preDispatch() {
     	if (!$this->actionExists()) {
 			$this->forwardToTemplate();
 			return;
@@ -43,14 +37,6 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		 * @var array $metas Metatags no formato $nome => $valor
 		 */
 		$metas = Zend_Registry::get('metas');
-		/**
-		 * @var array $scripts Arquivos de Javascript
-		 */
-		$scripts = Zend_Registry::get('scripts');
-		/**
-		 * @var array $links Arquivos de CSS
-		 */
-    	$links = Zend_Registry::get('links');
 		// TODO Late Static Binding static::getTipo()
 		$tipo = $this->getTipo();
 		
@@ -76,14 +62,6 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=ISO-8859-1');
 		foreach ($metas as $key => $value) {
 			$this->view->headMeta()->appendName($key, $value);
-		}
-		// Javascripts
-		foreach ($scripts as $file) {
-			$this->view->headScript()->appendFile($file);
-		}
-		// CSS
-		foreach ($links as $file) {
-			$this->view->headLink()->appendStylesheet($file);
 		}
 	}
 	/**

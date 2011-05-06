@@ -27,14 +27,8 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
     public function assemble($userParams, $name = null, $reset = false, $encode = true){
     	 $config = Zend_Registry::get('config');
 		 $lang = Zend_Registry::get('lang');
-		 $request = Zend_Registry::get('originalRequest');
 		 
-		 $current = array(
-		 	'lang' => $lang->lang,
-		 	'module' => $request->getModuleName(),
-			'controller' => $request->getControllerName(),
-			'action' => $request->getActionName()
-		 );
+		 $current = Zend_Controller_Front::getInstance()->getRequest()->getParams();
 		 
 		 $extraParams = array_diff_key($userParams, $current);
 		 $userParams = $userParams + $current;
