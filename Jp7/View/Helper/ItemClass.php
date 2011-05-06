@@ -5,10 +5,10 @@ class Jp7_View_Helper_ItemClass extends Zend_View_Helper_Abstract {
 	public function ItemClass($count, $key, $item = null) {
 		$classes = array();
 		if ($key == 0) {
-			$classes[] = 'first';
+			$classes[] = 'first-child';
 		}
 		if ($key + 1 == $count) {
-			$classes[] = 'last';
+			$classes[] = 'last-child';
 		}
 		if ($key % 2) {
 			$classes[] = 'even';
