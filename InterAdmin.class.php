@@ -438,6 +438,17 @@ class InterAdmin extends InterAdminAbstract {
 		return $link;
 	}
 	/**
+	 * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
+	 * 
+	 * @param array $attributes
+	 * @return void
+	 */
+	public function setAttributesSafely(array $attributes) {
+		$editableFields = array_flip($this->getAttributesAliases());
+		$filteredAttributes = array_intersect_key($attributes, $editableFields);
+		return $this->setAttributes($filteredAttributes);
+	}
+	/**
 	 * Sets the tags for this record. It DELETES the previous records.
 	 * 
 	 * @param array $tags Array of object to be saved as tags.
