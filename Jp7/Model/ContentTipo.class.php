@@ -7,24 +7,6 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
 	public $attributes = array(
 		'id_tipo' => 'Content',
 		'nome' => 'Conteúdo',
-		/*
-		1 - tipo
-		2 - nome
-		3 - ajuda
-		4 - tamanho
-		5 - obrigatorio
-		6 - separador
-		7 - xtra
-		8 - lista
-		9 - orderby
-		10 - combo
-		11 - readonly
-		12 - form
-		13 - label
-		14 - permissoes
-		15 - default
-		16 - nome_id
-		*/
 		'campos' => 'varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}subtitle{;}text_1{,}Resumo{,}{,}3{,}{,}{,}html_light{,}{,}{,}{,}{,}{,}{,}{,}{,}summary{;}text_2{,}Texto{,}{,}20{,}{,}S{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}text{;}file_1{,}Imagem{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}image{;}int_key{,}Ordem{,}{,}{,}{,}{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
 		'children' => '',
 		'arquivos_ajuda' => '',
@@ -43,7 +25,9 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
 		parent::__construct();
 		if (!self::$_children) {
 			$contentSubitem = $this->_findChildByModel('ContentSubitem');
-			self::$_children = $contentSubitem->id_tipo . '{,}Sub-itens{,}{,}{;}';
+			$images = $this->_findChildByModel('Images');
+			self::$_children = $contentSubitem->id_tipo . '{,}Sub-itens{,}{,}{;}' .
+				$images->id_tipo . '{,}Imagens{,}{,}{;}';
 		}		
 		$this->children = self::$_children;
 	}

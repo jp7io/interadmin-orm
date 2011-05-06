@@ -38,7 +38,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 					$child = new InterAdminTipo();
 					$child->parent_id_tipo = $classesTipo->id_tipo;
 					$child->model_id_tipo = $model_id_tipo;
-					$child->nome = $model_id_tipo;
+					$child->nome = 'Modelo - ' . $model_id_tipo;
 					$child->mostrar = 'S';
 					$child->admin = 'S';
 					$child->save();

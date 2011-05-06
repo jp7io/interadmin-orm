@@ -9,17 +9,17 @@ class Jp7_ContentController extends __Controller_Action {
 		
 		if ($id = $this->_getParam('id')) {
 			$this->record = $contentTipo->getInterAdminById($id, array(
-				'fields' => array('*', 'date_publish')
+				'fields' => array('*')
 			));
 			if (!$this->record) {
 				$this->_redirect($contentTipo->getUrl());
 			}
 			$this->record->subitens = $this->record->getSubItens(array(
-				'fields' => array('*', 'date_publish')
+				'fields' => array('*')
 			));
 		} else {
 			$this->view->records = $contentTipo->getInterAdmins(array(
-				'fields' => array('*', 'date_publish')
+				'fields' => array('*')
 			));
 		}
 	}

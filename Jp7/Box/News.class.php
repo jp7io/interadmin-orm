@@ -18,5 +18,10 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 			$this->news = array();	
 		}
     }
-   
+    /**
+     * @see Jp7_Box_BoxAbstract::_getEditorTitle()
+     */
+    protected function _getEditorTitle() {
+        return 'Notícias';
+    }
 }
