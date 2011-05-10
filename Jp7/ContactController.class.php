@@ -30,7 +30,8 @@ class Jp7_ContactController extends __Controller_Action {
 					$this->_sendEmail($record);
 					$this->_redirect($contactTipo->getUrl() . '/ok');
 				} catch (Exception $e) {
-					$this->_redirect($contactTipo->getUrl() . '/ok?error=1');
+					$this->view->errorMessage = 'Problema ao enviar a mensagem. Por favor, tente novamente.';
+					//$this->_redirect($contactTipo->getUrl() . '/ok?error=1');
 				}
 				// Fim do fluxo
 			}
@@ -95,12 +96,7 @@ class Jp7_ContactController extends __Controller_Action {
 	}
 	
 	public function okAction() {
-		if ($this->_getParam('error')) {
-			$this->view->title = 'Problema ao enviar a mensagem.';
-			$this->view->message = 'Por favor, tente mais tarde.';
-		} else {
-			$this->view->title = 'Mensagem enviada com sucesso!';
-			$this->view->message = 'Agradecemos o seu contato.<br />Por favor, aguarde nosso retorno em breve.';
-		}
+		$this->view->title = 'Mensagem enviada com sucesso!';
+		$this->view->message = 'Agradecemos o seu contato.<br />Por favor, aguarde nosso retorno em breve.';
 	}
 }
