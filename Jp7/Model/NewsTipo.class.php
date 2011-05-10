@@ -13,6 +13,8 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 		'class' => '',
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
-		'tabela' => ''
+		'tabela' => '',
+		'layout' => 4,
+		'layout_registros' => 4
 	);
 }

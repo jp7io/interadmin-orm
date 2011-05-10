@@ -119,7 +119,9 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				} else {
 					list($controller, $action) = $templateArr;
 				}
-				
+				if ($action == '$action') {
+					$action = $this->_getParam('action');
+				}
 				static $loop_count = 0;
 				$loop_count++;
 				if ($loop_count === 1) {
