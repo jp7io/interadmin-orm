@@ -41,7 +41,8 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 		'facebook' => 'Jp7_Box_Facebook',
 		'news' => 'Jp7_Box_News',
 		'images' => 'Jp7_Box_Images',
-		'slideshow' => 'Jp7_Box_Slideshow'
+		'slideshow' => 'Jp7_Box_Slideshow',
+		'offices' => 'Jp7_Box_Offices'
 	);
 	
 	/**
