@@ -63,6 +63,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		foreach ($metas as $key => $value) {
 			$this->view->headMeta()->appendName($key, $value);
 		}
+		// Metas Customizadas
+		$this->_prepareMetas();
 	}
 	/**
 	 * Função responsável por montar o título da página.
@@ -87,6 +89,41 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				$secao = $secao->getParent();
 			}
 		}
+	}
+	
+	protected function _prepareMetas() {
+		if ($settings = $this->getSettings()) { // TODO Late Static Binding static::getSettings()
+			$metas = Zend_Registry::get('metas');
+			$tipo = self::getTipo();
+			
+			if (!$settings->title) {
+				$tipo->getFieldsValues('nome');
+				if ($tipo->nome != 'Home') {
+					$metas['keywords'] = $tipo->nome . ',' . $metas['keywords'];				
+				}
+				if ($this->record instanceof InterAdmin) {
+					$metas['keywords'] = $this->record->getFieldsValues('varchar_key') . ',' . $metas['keywords'];
+				}
+				$this->view->headMeta()->setName('keywords', $metas['keywords']);
+			}
+			
+			if ($settings instanceof InterAdmin) {
+				if ($title = $settings->title) {
+					$this->view->headTitle($title, Zend_View_Helper_Placeholder_Container_Abstract::SET);
+				}
+				if ($keywords = $settings->keywords) {
+					if ($settings->sobrescrever_keywords) {
+						$this->view->headMeta()->setName('keywords', $keywords);
+					} else {
+						$metas['keywords'] = $keywords . ',' . $metas['keywords'];
+						$this->view->headMeta()->setName('keywords', $metas['keywords']);
+					}
+				}
+				if ($description = $settings->description) {
+					$this->view->headMeta()->setName('description', $description);
+				}
+			}
+		}	
 	}
 	
 	/**
@@ -229,5 +266,16 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			$item->subitens = $item->getChildren($options);
 		}
 		return $menu;
+	}
+	
+	public static function getSettings() {
+		if ($tipo = self::getTipo()) {
+			$settingsTipo = $tipo->getFirstChildByModel('Settings');
+			if ($settingsTipo instanceof InterAdminTipo) {
+				return $settingsTipo->getFirstInterAdmin(array(
+					'fields' => array('title', 'keywords', 'description', 'overwrite_keywords')
+				));
+			}
+		}
 	}
 }
