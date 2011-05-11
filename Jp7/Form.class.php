@@ -34,7 +34,8 @@ class Jp7_Form extends Zend_Form {
 			'template' => 'templates/email.phtml',
 			'title' => '',
 			'subject' => '',
-			'config' => $config
+			'config' => $config,
+			'recipientsTipo' => null
 		);
 		$options = $options + $default;
 		
@@ -49,6 +50,27 @@ class Jp7_Form extends Zend_Form {
 		$mail->setSubject($options['subject']);
 		$mail->setBodyHtml($html);
 		$mail->setBodyText($text);
+		
+		// Definindo destinatários
+		if ($options['recipientsTipo']) {
+			if ($config->isProducao()) {
+				$recipients = $options['recipientsTipo']->getInterAdmins(array(
+					'fields' => array('name', 'email')
+				));
+				if ($recipients) {
+					// Primeiro é To
+					$recipient = array_shift($recipients);
+					$mail->addTo($recipient->email, $recipient->name);
+					// Restante é CC
+					foreach ($recipients as $recipient) {
+						$mail->addCc($recipient->email, $recipient->name);
+					}
+				}
+				$mail->addBcc($config->name_id . '@sites.jp7.com.br');
+			} else {
+				$mail->addTo('debug+' . $config->name_id . '@jp7.com.br');
+			}
+		}
 		
 		return $mail;
 	}

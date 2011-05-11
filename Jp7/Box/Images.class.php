@@ -8,12 +8,20 @@ class Jp7_Box_Images extends Jp7_Box_BoxAbstract {
     	$view = Zend_Layout::getMvcInstance()->getView();
 		
 		$this->images = array();
-    	if ($tipo = $view->tipo) {
-			if ($imagesTipo = $tipo->getFirstChildByModel('Images')) {
-				$view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
-				$view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
-				$view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
-				
+		$view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
+		$view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
+		$view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
+		
+		if ($view->record) {
+			try {
+				$this->images = $view->record->getImagens(array(
+					'fields' => array('*')
+				));
+			} catch (Exception $e) {
+				// Do nothing, method getImagens doesnt exist
+			}
+		} elseif ($view->tipo) {
+			if ($imagesTipo = $view->tipo->getFirstChildByModel('Images')) {
 				$this->images = $imagesTipo->getInterAdmins(array(
 					'fields' => '*'
 				));

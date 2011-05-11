@@ -8,76 +8,57 @@ class Jp7_ContactController extends __Controller_Action {
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.maskedinput-1.2.2.min.js');
 		
 		$contactTipo = self::getTipo();
-		$this->view->records = $contactTipo->getInterAdmins(array(
+		// Introdução
+		$introductionTipo = $contactTipo->getFirstChildByModel('ContentSubitem');
+		$this->view->records = $introductionTipo->getInterAdmins(array(
 			'fields' => '*'
 		));
-		$this->view->form = '';
 		
-		if ($formTipo = $contactTipo->getFirstChildByModel('ContactReceived')) {
-			$record = null;
+		// Formulário
+		$record = null;
+		
+		// Recebeu POST
+		if ($this->getRequest()->isPost()) {
+			// Salvando registro
+			$attributes = @array_map('reset', $_POST);
 			
-			// recebeu POST
-			if ($this->getRequest()->isPost()) {
-				// Salvando registro
-				$attributes = @array_map('reset', $_POST);
-				
-				$record = $formTipo->createInterAdmin();
-				$record->setAttributesSafely($attributes);
-				$record->save();
-				
-				// Utilizado para preparar o email, não tem jeito melhor, por enquanto
-				try {
-					$this->_sendEmail($record);
-					$this->_redirect($contactTipo->getUrl() . '/ok');
-				} catch (Exception $e) {
-					$this->view->errorMessage = 'Problema ao enviar a mensagem. Por favor, tente novamente.';
-					//$this->_redirect($contactTipo->getUrl() . '/ok?error=1');
-				}
-				// Fim do fluxo
+			$record = $contactTipo->createInterAdmin();
+			$record->setAttributesSafely($attributes);
+			$record->save();
+			
+			// Utilizado para preparar o email, não tem jeito melhor, por enquanto
+			try {
+				$this->_sendEmail($record);
+				$this->_redirect($contactTipo->getUrl() . '/ok');
+			} catch (Exception $e) {
+				$this->view->errorMessage = 'Problema ao enviar a mensagem. Por favor, tente novamente.';
 			}
-			
-			// Construindo HTML do form
-			$this->view->form = $this->_getFormHtml($formTipo, $record);
 		}
+		
+		// Construindo HTML do form
+		$this->view->form = $this->_getFormHtml($contactTipo->getCampos(), $record);
+		
 	}
 	
 	protected function _sendEmail($record) {
 		$contactTipo = self::getTipo();
 		$config = Zend_Registry::get('config');
 		
+		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
+		
 		$formHelper = new Jp7_Form();
 		$mail = $formHelper->createMail($record, array(
 			'subject' => 'Site ' . $config->name . ' - Contato',
-			'title' => 'Contato'
+			'title' => 'Contato',
+			'recipientsTipo' => $recipientsTipo
 		));
 		$mail->setFrom($record->email, $record->name);
-		
-		// Definindo destinatários
-		if ($config->isProducao()) {
-			$recipientTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
-			$recipients = $recipientTipo->getInterAdmins(array(
-				'fields' => array('name', 'email')
-			));
-			if ($recipients) {
-				// Primeiro é To
-				$recipient = array_shift($recipients);
-				$mail->addTo($recipient->email, $recipient->name);
-				// Restante é CC
-				foreach ($recipients as $recipient) {
-					$mail->addCc($recipient->email, $recipient->name);
-				}
-			}
-			$mail->addBcc($config->name_id . '@sites.jp7.com.br');
-		} else {
-			$mail->addTo('debug+' . $config->name_id . '@jp7.com.br');
-		}
-		
 		$mail->send();
 	}
 	
-	protected function _getFormHtml($formTipo, $record) {
+	protected function _getFormHtml($campos, $record) {
 		ob_start();
-		foreach ($formTipo->getCampos() as $campo) {
+		foreach ($campos as $campo) {
 			if ($campo['form']) {
 				// Para usar o alias ao invés do nome do campo
 				$campo['tipo_de_campo'] = $campo['tipo'];
