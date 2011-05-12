@@ -158,6 +158,7 @@ class InterSite {
 				// Domínios Alternativos - Não redirecionam
 				if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
 					$this->server = $this->servers[$host] = $server;
+					$this->server->host = $host;
 					break 2;  // Exit foreach and while.
 				}
 				// Aliases - Redirecionam
