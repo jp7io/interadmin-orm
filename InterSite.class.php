@@ -155,7 +155,12 @@ class InterSite {
 						break 2;  // Exit foreach and while.
 					}
 				}
-				// Aliases
+				// Domínios Alternativos - Não redirecionam
+				if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
+					$this->server = $this->servers[$host] = $server;
+					break 2;  // Exit foreach and while.
+				}
+				// Aliases - Redirecionam
 				if (in_array($host, $server->aliases)) {
 					$this->server = $this->servers[$host] = $server;
 					$this->hostType = self::HOST_ALIAS;
@@ -205,6 +210,7 @@ class InterSite {
 		
 		$host = $_SERVER['HTTP_HOST'];
 		if (strpos($host, ':80') !== false) {
+			// O browser não envia a porta junto com o host, mas alguns bots enviam
 			$host = preg_replace('/:80$/', '', $host);
 		}
 		$this->init($host);
