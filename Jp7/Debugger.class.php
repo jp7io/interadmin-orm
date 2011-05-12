@@ -295,7 +295,7 @@ class Jp7_Debugger{
 	 * Envia o trace do erro para debug+CLIENTE@jp7.com.br
 	 * 
 	 * @param string $backtrace
-	 * @return void
+	 * @return bool
 	 */
 	public function sendTraceByEmail($backtrace) {
 		global $config, $s_interadmin_cliente, $jp7_app;
@@ -311,7 +311,7 @@ class Jp7_Debugger{
 		$headers = 'To: ' . $to . " <" . $to . ">\r\n";
 		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
 		
-		jp7_mail($to, $subject, $message, $headers, '', $template, true);
+		return jp7_mail($to, $subject, $message, $headers, '', $template, true);
 	}    
     /**
      * Returns $maintenancePage.
