@@ -149,6 +149,9 @@ class InterSite {
 				if ($jp7_app) {
 					$remotes = $server->interadmin_remote;
 					if (in_array($host, $remotes) || in_array('www.' . $host, $remotes)) {
+						if ($server->vars['check_dns'] && !dns_get_record($server->host) && $server->alias_domains) {
+							$server->host = $server->alias_domains[0];
+						}
 						$this->server = $this->servers[$host] = $server;
 						$this->interadmin_remote = $host;
 						$this->hostType = self::HOST_REMOTE;
