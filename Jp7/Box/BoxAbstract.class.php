@@ -6,7 +6,7 @@ abstract class Jp7_Box_BoxAbstract {
 			foreach ($record->attributes as $key => $value) {
 				$this->$key = $value;
 			}
-			if ($record->params) {
+			if (is_string($record->params)) {
 				$this->params = unserialize($record->params);
 			}
 		}
@@ -46,9 +46,9 @@ abstract class Jp7_Box_BoxAbstract {
 		?>
 		<div class="icons">
 			<?php if ($hasFields) { ?>
-				<img class="icon-cog" src="/_default/img/cog.png" onclick="toggleConfig(this);" />
+				<div class="icon icon-toggle" onclick="toggleConfig(this);"></div>
 			<?php } ?>
-			<img class="icon-delete" src="/_default/img/delete.png" onclick="deleteBox(this);" />
+			<div class="icon icon-delete" onclick="deleteBox(this);"></div>
 		</div>		
 		<?php
 	}
@@ -69,15 +69,36 @@ abstract class Jp7_Box_BoxAbstract {
 	/**
 	 * Helper for Checkbox.
 	 * 
-	 * @param string $name
-	 * @param bool $value
+	 * @param string 	$name			Parameter's name, e.g. header is $this->params->header
+	 * @param bool 		$default_value	Default value for when the value is NULL
 	 * @return string
 	 */
-	protected function _checkbox($name) {
+	protected function _checkbox($name, $default_value = false) {
+		if (is_null($this->params->$name)) {
+			$this->params->$name = $default_value;
+		}
 		ob_start();
 		?>
 		<input type="hidden" value="<?php echo $this->params->$name ? '1' : '0'; ?>" name="<?php echo $this->id_box; ?>[<?php echo $name; ?>][]" />
 		<input type="checkbox" class="checkbox" <?php echo $this->params->$name ? 'checked="checked"' : ''; ?> onclick="$(this).prev().val(this.checked ? 1 : 0)" />
+		<?php
+		return ob_get_clean();
+	}	
+	/**
+	 * Helper for Selectbox's options.
+	 * 
+	 * @param array 	$options
+	 * @param int 		$value
+	 * @return string
+	 */
+	protected function _options($options, $value) {
+		ob_start();
+		?>
+		<option value="">Selecione</option>
+		<option value="">-------------------------------</option>
+		<?php foreach ($options as $option) { ?>
+			<option value="<?php echo $option->id_tipo; ?>" <?php echo ($option->id_tipo == $value) ? 'selected="selected"' : ''; ?>><?php echo $option->nome; ?></option>
+		<?php } ?>
 		<?php
 		return ob_get_clean();
 	}

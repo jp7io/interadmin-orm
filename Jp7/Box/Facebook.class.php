@@ -7,22 +7,26 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
     	ob_start();
 		?>
 		<div class="fields">
-			<label>Href:</label>
-			<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href; ?>" 
-				name="<?php echo $this->id_box; ?>[href][]" />
-			<div style="clear: both;"></div>
+			<div class="field">
+				<label>Href:</label>
+				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : 'http://www.facebook.com/platform'; ?>" 
+					name="<?php echo $this->id_box; ?>[href][]" />
+			</div>
 			
-			<label>Show Faces:</label>
-			<?php echo $this->_checkbox('show_faces'); ?>
-			<div style="clear: both;"></div>
+			<div class="field">
+				<label>Show Faces:</label>
+				<?php echo $this->_checkbox('show_faces', true); ?>
+			</div>
 			
-			<label>Stream:</label>
-			<?php echo $this->_checkbox('stream'); ?>
-			<div style="clear: both;"></div>
+			<div class="field">
+				<label>Stream:</label>
+				<?php echo $this->_checkbox('stream'); ?>
+			</div>
 			
-			<label>Header:</label>
-			<?php echo $this->_checkbox('header'); ?>
-			<div style="clear: both;"></div>
+			<div class="field">
+				<label>Header:</label>
+				<?php echo $this->_checkbox('header'); ?>
+			</div>
 		</div>
 		<?php
 		return ob_get_clean();

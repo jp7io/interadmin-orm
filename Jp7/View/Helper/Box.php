@@ -10,7 +10,7 @@ class Jp7_View_Helper_Box extends Zend_View_Helper_Abstract {
 		
 		$fakeRecord = new InterAdmin();
 		$fakeRecord->id_box = $id_box;
-		$fakeRecord->params = serialize($params);
+		$fakeRecord->params = $params;
 		
 		$box = new $classe($fakeRecord);
 		if (!$box instanceof Jp7_Box_BoxAbstract) {

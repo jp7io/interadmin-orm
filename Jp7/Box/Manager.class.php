@@ -42,7 +42,8 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 		'news' => 'Jp7_Box_News',
 		'images' => 'Jp7_Box_Images',
 		'slideshow' => 'Jp7_Box_Slideshow',
-		'offices' => 'Jp7_Box_Offices'
+		'offices' => 'Jp7_Box_Offices',
+		'content' => 'Jp7_Box_Content'
 	);
 	
 	/**
