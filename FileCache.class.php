@@ -59,7 +59,7 @@ class FileCache {
 		);
 		extract($options + $default);
 		
-		global $c_doc_root, $c_path, $config, $c_cache, $c_cache_delay;
+		global $c_doc_root, $c_cache, $c_cache_delay;
 		global $debugger, $s_session, $interadmin_gerar_menu;
 		
 		// Cache not desired
@@ -68,7 +68,7 @@ class FileCache {
 		}
 		
 		$this->fileRoot = $c_doc_root;
-		$this->cachePath = $this->fileRoot . $config->name_id . '/' . $cachePath . '/';
+		$this->cachePath = $this->getCachePath($this->fileRoot, $cachePath);
 		
 		if ($partial) {
 			$nocache_force = $_GET['nocache_partial'];
@@ -76,25 +76,10 @@ class FileCache {
 		} else {
 			$nocache_force = $_GET['nocache_force'];
 			// Retirando query string e $c_path
-			$this->fileName = preg_replace('/\/' . addcslashes($c_path, '/') . '([^?]*)(.*)/', '\1', $_SERVER['REQUEST_URI']);
-			$this->fileName = jp7_path($this->fileName, true);
-			
-			// Parsing ID for dynamic content
-			if ($storeId){
-				preg_match('/\.([^\.]+)$/', $this->cachePath . $this->fileName, $matches);    
-				if ($ext = $matches[1]) {
-					$ext = '.' . $ext;
-				}
-				$this->fileName = dirname($this->fileName) . '/' . basename($this->fileName, $ext) . '/' . $storeId . $ext;
-			} elseif (strpos($this->fileName, '.') === false) {
-				$this->fileName .= (($this->fileName) ? '/' : '') . 'index';
+			$this->fileName = self::getFileName($_SERVER['REQUEST_URI'], $storeId);
+			if (!$this->fileName) {
+				return; // Falha de segurança.	
 			}
-			
-			// Falha de segurança. Passou com conteúdo inválido. Investigar depois.
-			if (preg_match('(%|:|=|\.\.|\*|\?)', $this->fileName) || strlen($this->fileName) > 200) {
-				return;
-			}
-			$this->fileName .= '.cache';
 		}
 			
 		// Other Settings
@@ -213,6 +198,36 @@ class FileCache {
 		readfile($this->cachePath . $this->fileName);
 		$this->isCached = true;
 	}
+	
+	public static function getCachePath($fileRoot, $cachePath = 'cache') {
+		global $config; 
+		return $fileRoot . $config->name_id . '/' . $cachePath . '/';
+	}
+	
+	public static function getFileName($request_uri, $storeId = null) {
+		global $c_path;
+		$fileName = preg_replace('/\/' . addcslashes($c_path, '/') . '([^?]*)(.*)/', '\1', $request_uri);
+		$fileName = jp7_path($fileName, true);
+		
+		// Parsing ID for dynamic content
+		if ($storeId){
+			preg_match('/\.([^\.]+)$/', $this->cachePath . $fileName, $matches);    
+			if ($ext = $matches[1]) {
+				$ext = '.' . $ext;
+			}
+			$fileName = dirname($fileName) . '/' . basename($fileName, $ext) . '/' . $storeId . $ext;
+		} elseif (strpos($fileName, '.') === false) {
+			$fileName .= (($fileName) ? '/' : '') . 'index';
+		}
+		
+		// Falha de segurança. Passou com conteúdo inválido. Investigar depois.
+		if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || strlen($fileName) > 200) {
+			return false;
+		}
+		$fileName .= '.cache';
+		return $fileName;
+	}
+
 	/**
 	 * Checks if the log file is newer than the cached file,  and if the cached file is older than 1 day.
 	 * 
