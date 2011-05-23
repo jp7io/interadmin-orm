@@ -76,7 +76,7 @@ class FileCache {
 		} else {
 			$nocache_force = $_GET['nocache_force'];
 			// Retirando query string e $c_path
-			$this->fileName = self::getFileName($_SERVER['REQUEST_URI'], $storeId);
+			$this->fileName = self::getFileName($_SERVER['REQUEST_URI'], $storeId, $this->cachePath);
 			if (!$this->fileName) {
 				return; // Falha de segurança.	
 			}
@@ -204,14 +204,14 @@ class FileCache {
 		return $fileRoot . $config->name_id . '/' . $cachePath . '/';
 	}
 	
-	public static function getFileName($request_uri, $storeId = null) {
+	public static function getFileName($request_uri, $storeId = null, $cachePath = '') {
 		global $c_path;
 		$fileName = preg_replace('/\/' . addcslashes($c_path, '/') . '([^?]*)(.*)/', '\1', $request_uri);
 		$fileName = jp7_path($fileName, true);
 		
 		// Parsing ID for dynamic content
 		if ($storeId){
-			preg_match('/\.([^\.]+)$/', $this->cachePath . $fileName, $matches);    
+			preg_match('/\.([^\.]+)$/', $cachePath . $fileName, $matches);    
 			if ($ext = $matches[1]) {
 				$ext = '.' . $ext;
 			}
