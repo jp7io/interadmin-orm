@@ -15,6 +15,6 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract {
 		'model_id_tipo' => 0,
 		'tabela' => '',
 		'layout' => Jp7_Box_Manager::COL_3,
-		'layout_registros' => Jp7_Box_Manager::COL_3
+		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT
 	);
 }
