@@ -434,7 +434,10 @@ abstract class InterAdminAbstract {
 						if (!$childrenArr[$joinNome]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
 						}
-						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo']);
+						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
+							'db_prefix' => $this->db_prefix,
+							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+						));
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $joinTipo->getInterAdminsTableName() .
