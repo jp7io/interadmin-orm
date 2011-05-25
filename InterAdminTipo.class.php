@@ -166,6 +166,16 @@ class InterAdminTipo extends InterAdminAbstract {
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
+	public function getBreadcrumb() {
+		$parents = array();
+		$parent = $this;
+		do {
+			$parents[] = $parent;
+		} while (($parent = $parent->getParent()) && $parent->id_tipo);
+		
+		return array_reverse($parents);
+	}
+	
 	/**
 	 * Sets the parent InterAdminTipo or InterAdmin object for this record, changing the $_parent property.
 	 *
