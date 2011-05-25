@@ -15,6 +15,9 @@ class Jp7_OfficesController extends __Controller_Action {
 				$this->_redirect($officesTipo->getUrl());
 			}
 		} else {
+			
+			$this->view->headScript()->appendFile('http://maps.google.com/maps/api/js?sensor=true');
+			
 			$this->view->records = $officesTipo->getInterAdmins(array(
 				'fields' => array('*', 'state' => array('sigla'))
 			));
