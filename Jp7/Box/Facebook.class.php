@@ -7,7 +7,7 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
     	ob_start();
 		?>
 		<div class="fields">
-			<div class="field">
+			<div class="field obligatory">
 				<label>Href:</label>
 				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : 'http://www.facebook.com/platform'; ?>" 
 					name="<?php echo $this->id_box; ?>[href][]" />

@@ -20,4 +20,7 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 		'texto' => 'Contém as mensagens recebidas através do formulário de contato.' 
 	);
 	
+	public function createChildren(InterAdminTipo $tipo) {
+		parent::createBoxesAndSettings($tipo);
+	}
 }

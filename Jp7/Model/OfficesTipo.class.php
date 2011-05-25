@@ -17,4 +17,8 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract {
 		'layout' => Jp7_Box_Manager::COL_3,
 		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT
 	);
+	
+	public function createChildren(InterAdminTipo $tipo) {
+		parent::createBoxesAndSettings($tipo);
+	}
 }

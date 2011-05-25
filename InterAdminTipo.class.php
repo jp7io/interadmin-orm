@@ -714,6 +714,15 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $record;
 	}
 	
+	public function createChild($model_id_tipo = 0) {
+		$child = new InterAdminTipo();
+		$child->db_prefix = $this->db_prefix;
+		$child->model_id_tipo = $model_id_tipo;
+		$child->parent_id_tipo = $this->id_tipo;
+		$child->mostrar = 'S';
+		return $child;
+	}
+	
 	/**
 	 * Returns the InterAdmins having the given tags.
 	 * 

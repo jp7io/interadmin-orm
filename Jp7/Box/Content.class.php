@@ -8,7 +8,8 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 			if ($this->sectionTipo = InterAdminTipo::getInstance($section)) {
 				$this->title = ($this->params->title) ? $this->params->title : $this->sectionTipo->getNome();
 				$this->records = $this->sectionTipo->getInterAdmins(array(
-					'fields' => array('*')
+					'fields' => array('*'),
+					'limit' => $this->params->limit
 				));
 			}
 		}
@@ -35,7 +36,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 					value="<?php echo $this->params->title ? $this->params->title : ''; ?>"	/>
 			</div>
 			
-			<div class="field">
+			<div class="field obligatory">
 				<label>Seção:</label>
 				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box; ?>[section][]">
 					<?php
@@ -45,6 +46,13 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 					?>
 					<?php echo $this->_options($tipos,  $this->params->section); ?>					
 				</select>
+			</div>
+			<div class="field">
+				<label>Limite:</label>
+				<input type="text" class="numeric textbox" label="Limite" placeholder="Todos"
+					onkeypress="return DFonlyThisChars(true, false, ' -.,()', event)" 
+					name="<?php echo $this->id_box; ?>[limit][]"
+					value="<?php echo $this->params->limit ? $this->params->limit : ''; ?>"	/>
 			</div>
 		</div>
 		<?php

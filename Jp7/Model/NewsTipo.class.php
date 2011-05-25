@@ -17,4 +17,8 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 		'layout' => 4,
 		'layout_registros' => 4
 	);
+	
+	public function createChildren(InterAdminTipo $tipo) {
+		parent::createBoxesAndSettings($tipo);
+	}
 }

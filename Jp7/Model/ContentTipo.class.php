@@ -1,7 +1,6 @@
 <?php
 
-class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
-	
+class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {	
 	protected static $_children;
 	
 	public $attributes = array(
@@ -30,5 +29,9 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
 				$images->id_tipo . '{,}Imagens{,}{,}{;}';
 		}		
 		$this->children = self::$_children;
+	}
+	
+	public function createChildren(InterAdminTipo $tipo) {
+		parent::createBoxesAndSettings($tipo);
 	}
 }

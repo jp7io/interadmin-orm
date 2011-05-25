@@ -50,4 +50,28 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			return $child;
 		}
 	}
+	
+	/**
+	 * Trigger executado após inserir um tipo com esse modelo.
+	 * @param InterAdminTipo $tipo
+	 * @return void
+	 */
+	public function createChildren(InterAdminTipo $tipo) {
+		
+	}
+	
+	public function createBoxesAndSettings(InterAdminTipo $tipo) {
+		if (!$tipo->getFirstChildByModel('Boxes')) {
+			$boxes = $tipo->createChild('Boxes');
+			$boxes->nome = 'Boxes';
+			$boxes->ordem = 10;
+	        $boxes->save();
+		}
+		if (!$tipo->getFirstChildByModel('Settings')) {
+			$settings = $tipo->createChild('Settings');
+			$settings->nome = 'Configurações';
+			$settings->ordem = 20;
+	        $settings->save();
+		}
+	}
 }
