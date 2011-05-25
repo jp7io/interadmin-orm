@@ -247,7 +247,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * 
 	 * @return 
 	 */
-	public static function getMenu() {
+	public function getMenu() {
 		$lang = Zend_Registry::get('lang');
 		
 		$options = array(
@@ -256,14 +256,23 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		);
 		
 		if ($lang->prefix) {
+			// Performance, não é necessário, mas diminui as queries
 			$options['fields'] = 'nome' . $lang->prefix; 
 		}
 		
 		//Retrieves all the menus
 		$rootTipo = self::getRootTipo();
 		$menu = $rootTipo->getChildren($options);
+		
 		foreach ($menu as $item) {
+			$item->active = ($this->getTipo() == $item->id_tipo);
 			$item->subitens = $item->getChildren($options);
+			foreach ($item->subitens as $subitem) {
+				if ($this->getTipo() == $subitem->id_tipo) {
+					$item->active = true;
+					$subitem->active = true;
+				}
+			}
 		}
 		return $menu;
 	}
