@@ -1,6 +1,7 @@
 <?php
 
-class Jp7_Box_Manager {    const COL_1_LEFT = 1;
+class Jp7_Box_Manager {
+    const COL_1_LEFT = 1;
 	const COL_1_CENTER = 2;
 	const COL_1_RIGHT = 3;
 	const COL_2_LEFT = 4;
@@ -33,6 +34,10 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 		self::COL_2_RIGHT 	=> 2,
 		self::COL_3 		=> 3
 	);
+	/**
+	 * @var	Zend_View
+	 */
+	private static $view = null;
 	
 	/**
      * @var array
@@ -43,7 +48,8 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 		'images' => 'Jp7_Box_Images',
 		'slideshow' => 'Jp7_Box_Slideshow',
 		'offices' => 'Jp7_Box_Offices',
-		'content' => 'Jp7_Box_Content'
+		'content' => 'Jp7_Box_Content',
+		'_content' => 'Jp7_Box_PageContent'
 	);
 	
 	/**
@@ -61,7 +67,18 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
         return self::$array;
     }
 	/**
+     * Returns the keys on $array.
+     * 
+     * @return array
+     */
+    public static function getKeys() {
+        return array_keys(self::$array);
+    }
+	/**
 	 * Sets a classname to the given box id.
+	 * 
+	 * @param string $id
+	 * @param string $className
 	 * @return void
 	 */
 	public static function set($id, $className) {
@@ -69,14 +86,43 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 	}
 	/**
 	 * Gets the classname for the given box id.
+	 * 
+	 * @param string $id
 	 * @return string
 	 */
 	public static function get($id) {
 		return self::$array[$id];
 	}
-	
+	/**
+	 * Removes an item from the array.
+	 * 
+	 * @param string $id
+	 * @return void
+	 */
 	public static function remove($id) {
 		unset(self::$array[$id]);
+	}
+	/**
+	 * Creates a Jp7_Box_BoxAbstract from a record.
+	 * 
+	 * @param InterAdmin $record
+	 * @return Jp7_Box_BoxAbstract
+	 */
+	public static function createBox($record) {
+		if ($classe = self::get($record->id_box)) {
+			$box = new $classe($record);
+			if (!$box instanceof Jp7_Box_BoxAbstract) {
+				throw new Exception('Expected an instance of Jp7_Box_BoxAbstract, received a ' . get_class($box) . '.');
+			}
+			$box->view = self::$view;
+			return $box;
+		}
+	}
+	
+	public static function createBoxFromId($id_box) {
+		$fakeRecord = new InterAdmin();
+		$fakeRecord->id_box = $id_box;
+		return self::createBox($fakeRecord);
 	}
 	
 	/**
@@ -98,9 +144,10 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 		$layout = $pageRecord ? $parentTipo->layout_registros : $parentTipo->layout;
 		if ($layout) {
 			$position = self::$positions[$layout];
-			$columns[$position]->content = true;
-			$columns[$position]->boxes = array();
-			$columns[$position]->width = self::$widths[$layout];
+			if (!$columns[$position]->boxes) {
+				$columns[$position]->width = self::$widths[$layout];
+				$columns[$position]->boxes = array(self::createBoxFromId('_content'));
+			}
 		}
 		
 		// Loading data
@@ -126,15 +173,28 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
 			));
 			$column->boxes = array();
 			foreach ($records as $record) {
-				if ($classe = self::get($record->id_box)) {
-					$box = new $classe($record);
-					if (!$box instanceof Jp7_Box_BoxAbstract) {
-						throw new Exception('Expected an instance of Jp7_Box_BoxAbstract, received a ' . get_class($box) . '.');
-					}
+				if ($box = self::createBox($record)) {
 					$column->boxes[] = $box;
 				}
 			}
 		}
 		return $columns;
 	}
+	/**
+     * Returns $view.
+     *
+     * @see Jp7_Box_Manager::$view
+     */
+    public static function getView() {
+        return self::$view;
+    }
+    /**
+     * Sets $view.
+     *
+     * @param object $view
+     * @see Jp7_Box_Manager::$view
+     */
+    public static function setView($view) {
+		self::$view = $view;
+    }
 }

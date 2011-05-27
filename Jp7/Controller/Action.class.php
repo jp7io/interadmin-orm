@@ -50,6 +50,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		if ($tipo instanceof InterAdminTipo) {
 			$boxTipo = $tipo->getFirstChildByModel('Boxes');
 			if ($boxTipo) {
+				Jp7_Box_Manager::setView($this->view);
 				$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxTipo, $this->record);
 			}
 		}

@@ -102,4 +102,22 @@ abstract class Jp7_Box_BoxAbstract {
 		<?php
 		return ob_get_clean();
 	}
+	/**
+	 * Helper a numeric input field.
+	 *  
+	 * @param string $name
+	 * @param string $label
+	 * @param string $placeholder [optional]
+	 * @return string
+	 */
+	protected function _numericField($name, $label, $placeholder = '') {
+		ob_start();
+		?>
+		<input type="text" class="numeric textbox" label="<?php echo $label; ?>" placeholder="<?php echo $placeholder; ?>"
+			onkeypress="return DFonlyThisChars(true, false, ' -.,()', event)" 
+			name="<?php echo $this->id_box; ?>[<?php echo $name; ?>][]"
+			value="<?php echo $this->params->$name ? $this->params->$name : ''; ?>"	/>
+		<?php
+		return ob_get_clean();
+	}
 }

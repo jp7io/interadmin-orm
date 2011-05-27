@@ -9,7 +9,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 		));
 		if ($newsTipo) {
 			$this->news = $newsTipo->getInterAdmins(array(
-				'fields' => array('titulo', 'date_publish'),
+				'fields' => array('title', 'date_publish'),
 				'fields_alias' => true, // Não dá para garantir que está true por padrão
 				'limit' => 3
 			));
@@ -22,5 +22,28 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
      */
     protected function _getEditorTitle() {
         return 'Notícias';
+    }
+	
+	protected function _getEditorFields() {
+    	ob_start();
+		?>
+		<div class="fields">
+			<div class="field">
+				<label>Título:</label>
+				<input type="text" class="textbox" label="Título" placeholder="Automático" 
+					name="<?php echo $this->id_box; ?>[title][]"
+					value="<?php echo $this->params->title ? $this->params->title : ''; ?>"	/>
+			</div>
+			<div class="field">
+				<label>Destaques:</label>
+				<?php echo $this->_checkbox('featured'); ?>
+			</div>
+			<div class="field">
+				<label>Limite:</label>
+				<?php echo $this->_numericField('limit', 'Limite', 'Todos'); ?>
+			</div>
+		</div>
+		<?php
+		return ob_get_clean();
     }
 }

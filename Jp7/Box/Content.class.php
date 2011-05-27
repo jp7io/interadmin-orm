@@ -35,24 +35,25 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 					name="<?php echo $this->id_box; ?>[title][]"
 					value="<?php echo $this->params->title ? $this->params->title : ''; ?>"	/>
 			</div>
-			
 			<div class="field obligatory">
 				<label>Seção:</label>
 				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box; ?>[section][]">
 					<?php
 					$tipos = InterAdminTipo::findTipos(array(
-						'where' => array("model_id_tipo = 'Content'")
+						'where' => array("model_id_tipo = 'Content'"),
+						'order' => 'parent_id_tipo, ordem'
 					));
 					?>
 					<?php echo $this->_options($tipos,  $this->params->section); ?>					
 				</select>
 			</div>
 			<div class="field">
+				<label>Destaques:</label>
+				<?php echo $this->_checkbox('featured'); ?>
+			</div>
+			<div class="field">
 				<label>Limite:</label>
-				<input type="text" class="numeric textbox" label="Limite" placeholder="Todos"
-					onkeypress="return DFonlyThisChars(true, false, ' -.,()', event)" 
-					name="<?php echo $this->id_box; ?>[limit][]"
-					value="<?php echo $this->params->limit ? $this->params->limit : ''; ?>"	/>
+				<?php echo $this->_numericField('limit', 'Limite', 'Todos'); ?>
 			</div>
 		</div>
 		<?php

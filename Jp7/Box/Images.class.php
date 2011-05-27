@@ -5,23 +5,21 @@ class Jp7_Box_Images extends Jp7_Box_BoxAbstract {
      * @see Jp7_Box_BoxAbstract::prepareData()
      */
     public function prepareData() {
-    	$view = Zend_Layout::getMvcInstance()->getView();
+    	$this->images = array();
+		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
+		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
+		$this->view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
 		
-		$this->images = array();
-		$view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
-		$view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
-		$view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
-		
-		if ($view->record) {
+		if ($this->view->record) {
 			try {
-				$this->images = $view->record->getImagens(array(
+				$this->images = $this->view->record->getImagens(array(
 					'fields' => array('*')
 				));
 			} catch (Exception $e) {
 				// Do nothing, method getImagens doesnt exist
 			}
-		} elseif ($view->tipo) {
-			if ($imagesTipo = $view->tipo->getFirstChildByModel('Images')) {
+		} elseif ($this->view->tipo) {
+			if ($imagesTipo = $this->$view->tipo->getFirstChildByModel('Images')) {
 				$this->images = $imagesTipo->getInterAdmins(array(
 					'fields' => '*'
 				));
