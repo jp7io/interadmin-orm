@@ -15,17 +15,17 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 			
 			<div class="field">
 				<label>Show Faces:</label>
-				<?php echo $this->_checkbox('show_faces', true); ?>
+				<?php echo $this->checkbox('show_faces', true); ?>
 			</div>
 			
 			<div class="field">
 				<label>Stream:</label>
-				<?php echo $this->_checkbox('stream'); ?>
+				<?php echo $this->checkbox('stream'); ?>
 			</div>
 			
 			<div class="field">
 				<label>Header:</label>
-				<?php echo $this->_checkbox('header'); ?>
+				<?php echo $this->checkbox('header'); ?>
 			</div>
 		</div>
 		<?php

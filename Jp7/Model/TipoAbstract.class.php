@@ -60,7 +60,13 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		
 	}
 	
-	public function createBoxesAndSettings(InterAdminTipo $tipo) {
+	public function createBoxesSettingsAndIntroduction(InterAdminTipo $tipo) {
+		if (!$tipo->getFirstChildByModel('Introduction')) {
+			$introduction = $tipo->createChild('Introduction');
+			$introduction->nome = 'Introdução';
+			$introduction->ordem = -1;
+	        $introduction->save();
+		}
 		if (!$tipo->getFirstChildByModel('Boxes')) {
 			$boxes = $tipo->createChild('Boxes');
 			$boxes->nome = 'Boxes';
@@ -73,5 +79,15 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			$settings->ordem = 20;
 	        $settings->save();
 		}
+	}
+	
+	/**
+	 * Returns the fields when editting the boxes.
+	 * 
+	 * @param Jp7_Box_BoxAbstract $box
+	 * @return string	HTML
+	 */
+	public function getEditorFields(Jp7_Box_BoxAbstract $box) {
+		// do nothing
 	}
 }

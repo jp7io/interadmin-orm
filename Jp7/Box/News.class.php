@@ -8,11 +8,16 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 			'where' => array("model_id_tipo = 'News'")
 		));
 		if ($newsTipo) {
-			$this->news = $newsTipo->getInterAdmins(array(
-				'fields' => array('title', 'date_publish'),
+			$options = array(
+				'fields' => array('title', 'image', 'date_publish'),
 				'fields_alias' => true, // Não dá para garantir que está true por padrão
-				'limit' => 3
-			));
+				'limit' => $this->params->limit
+			);
+			if ($this->params->featured) {
+				$options['where'][] = "featured <> ''";
+			}
+			$this->title = ($this->params->title) ? $this->params->title : $newsTipo->getNome();
+			$this->news = $newsTipo->getInterAdmins($options);
 		} else {
 			$this->news = array();	
 		}
@@ -36,11 +41,11 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 			</div>
 			<div class="field">
 				<label>Destaques:</label>
-				<?php echo $this->_checkbox('featured'); ?>
+				<?php echo $this->checkbox('featured'); ?>
 			</div>
 			<div class="field">
 				<label>Limite:</label>
-				<?php echo $this->_numericField('limit', 'Limite', 'Todos'); ?>
+				<?php echo $this->numericField('limit', 'Limite', 'Todos'); ?>
 			</div>
 		</div>
 		<?php

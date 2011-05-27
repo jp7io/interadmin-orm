@@ -73,7 +73,7 @@ abstract class Jp7_Box_BoxAbstract {
 	 * @param bool 		$default_value	Default value for when the value is NULL
 	 * @return string
 	 */
-	protected function _checkbox($name, $default_value = false) {
+	public function checkbox($name, $default_value = false) {
 		if (is_null($this->params->$name)) {
 			$this->params->$name = $default_value;
 		}
@@ -91,7 +91,7 @@ abstract class Jp7_Box_BoxAbstract {
 	 * @param int 		$value
 	 * @return string
 	 */
-	protected function _options($options, $value) {
+	public function options($options, $value) {
 		ob_start();
 		?>
 		<option value="">Selecione</option>
@@ -110,7 +110,7 @@ abstract class Jp7_Box_BoxAbstract {
 	 * @param string $placeholder [optional]
 	 * @return string
 	 */
-	protected function _numericField($name, $label, $placeholder = '') {
+	public function numericField($name, $label, $placeholder = '') {
 		ob_start();
 		?>
 		<input type="text" class="numeric textbox" label="<?php echo $label; ?>" placeholder="<?php echo $placeholder; ?>"

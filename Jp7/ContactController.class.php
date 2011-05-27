@@ -9,7 +9,7 @@ class Jp7_ContactController extends __Controller_Action {
 		
 		$contactTipo = self::getTipo();
 		// Introdução
-		$introductionTipo = $contactTipo->getFirstChildByModel('ContentSubitem');
+		$introductionTipo = $contactTipo->getFirstChildByModel('Introduction');
 		$this->view->records = $introductionTipo->getInterAdmins(array(
 			'fields' => '*'
 		));

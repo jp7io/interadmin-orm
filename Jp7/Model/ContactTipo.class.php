@@ -21,6 +21,6 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 	);
 	
 	public function createChildren(InterAdminTipo $tipo) {
-		parent::createBoxesAndSettings($tipo);
+		parent::createBoxesSettingsAndIntroduction($tipo);
 	}
 }

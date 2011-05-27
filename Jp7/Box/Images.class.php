@@ -19,7 +19,7 @@ class Jp7_Box_Images extends Jp7_Box_BoxAbstract {
 				// Do nothing, method getImagens doesnt exist
 			}
 		} elseif ($this->view->tipo) {
-			if ($imagesTipo = $this->$view->tipo->getFirstChildByModel('Images')) {
+			if ($imagesTipo = $this->view->tipo->getFirstChildByModel('Images')) {
 				$this->images = $imagesTipo->getInterAdmins(array(
 					'fields' => '*'
 				));

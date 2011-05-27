@@ -17,7 +17,8 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
 		'model_id_tipo' => 0,
 		'tabela' => '',
 		'layout' => Jp7_Box_Manager::COL_2_LEFT,
-		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT
+		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
+		'editar' => 'S'
 	);
 	
 	public function __construct() {
@@ -32,6 +33,19 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {
 	}
 	
 	public function createChildren(InterAdminTipo $tipo) {
-		parent::createBoxesAndSettings($tipo);
+		parent::createBoxesSettingsAndIntroduction($tipo);
+	}
+	
+	public function getEditorFields(Jp7_Box_BoxAbstract $box) {
+		ob_start();
+		?>
+		<div class="fields">
+			<div class="field">
+				<label>Crop Imagens:</label>
+				<?php echo $box->checkbox('crop', true); ?>
+			</div>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 }

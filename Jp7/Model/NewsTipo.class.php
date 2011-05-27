@@ -14,11 +14,12 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
 		'tabela' => '',
-		'layout' => 4,
-		'layout_registros' => 4
+		'layout' => Jp7_Box_Manager::COL_2_LEFT,
+		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
+		'editar' => 'S'
 	);
 	
 	public function createChildren(InterAdminTipo $tipo) {
-		parent::createBoxesAndSettings($tipo);
+		parent::createBoxesSettingsAndIntroduction($tipo);
 	}
 }

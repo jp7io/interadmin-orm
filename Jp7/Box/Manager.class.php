@@ -183,7 +183,7 @@ class Jp7_Box_Manager {
 	/**
      * Returns $view.
      *
-     * @see Jp7_Box_Manager::$view
+     * @return Zend_View
      */
     public static function getView() {
         return self::$view;
@@ -191,10 +191,10 @@ class Jp7_Box_Manager {
     /**
      * Sets $view.
      *
-     * @param object $view
+     * @param Zend_View $view
      * @see Jp7_Box_Manager::$view
      */
-    public static function setView($view) {
+    public static function setView(Zend_View $view) {
 		self::$view = $view;
     }
 }

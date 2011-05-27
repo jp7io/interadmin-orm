@@ -7,10 +7,15 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
     	if ($section = $this->params->section) {
 			if ($this->sectionTipo = InterAdminTipo::getInstance($section)) {
 				$this->title = ($this->params->title) ? $this->params->title : $this->sectionTipo->getNome();
-				$this->records = $this->sectionTipo->getInterAdmins(array(
+				
+				$options = array(
 					'fields' => array('*'),
 					'limit' => $this->params->limit
-				));
+				);
+				if ($this->params->featured) {
+					$options['where'][] = "featured <> ''";
+				}				
+				$this->records = $this->sectionTipo->getInterAdmins($options);
 			}
 		}
     }
@@ -44,16 +49,16 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 						'order' => 'parent_id_tipo, ordem'
 					));
 					?>
-					<?php echo $this->_options($tipos,  $this->params->section); ?>					
+					<?php echo $this->options($tipos,  $this->params->section); ?>					
 				</select>
 			</div>
 			<div class="field">
 				<label>Destaques:</label>
-				<?php echo $this->_checkbox('featured'); ?>
+				<?php echo $this->checkbox('featured'); ?>
 			</div>
 			<div class="field">
 				<label>Limite:</label>
-				<?php echo $this->_numericField('limit', 'Limite', 'Todos'); ?>
+				<?php echo $this->numericField('limit', 'Limite', 'Todos'); ?>
 			</div>
 		</div>
 		<?php
