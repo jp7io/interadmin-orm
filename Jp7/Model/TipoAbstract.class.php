@@ -1,6 +1,8 @@
 <?php
 
 class Jp7_Model_TipoAbstract extends InterAdminTipo {
+	public $editableByAdmin = false;
+	
 	/**
 	 * $id_tipo não é inteiro
 	 * @return 

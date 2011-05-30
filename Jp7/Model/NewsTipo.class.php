@@ -1,6 +1,7 @@
 <?php
 
 class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
+	public $editableByAdmin = true;
 	
 	protected static $_children;
 	

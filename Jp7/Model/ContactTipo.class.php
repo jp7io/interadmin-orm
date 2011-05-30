@@ -1,6 +1,7 @@
 <?php
 
 class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
+	public $editableByAdmin = true;
 	
 	public $attributes = array(
 		'id_tipo' => 'Contact',

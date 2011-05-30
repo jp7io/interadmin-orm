@@ -1,6 +1,7 @@
 <?php
 
-class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {	
+class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {	public $editableByAdmin = true;
+	
 	protected static $_children;
 	
 	public $attributes = array(
