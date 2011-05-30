@@ -18,6 +18,13 @@ class Jp7_OfficesController extends __Controller_Action {
 				$this->_redirect($officesTipo->getUrl());
 			}
 		} else {
+			// Introdução
+			if ($introductionTipo = $officesTipo->getFirstChildByModel('Introduction')) {
+				$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+					'fields' => '*'
+				));
+			}
+			
 			$this->view->records = $officesTipo->getInterAdmins(array(
 				'fields' => array('*', 'state' => array('sigla'))
 			));

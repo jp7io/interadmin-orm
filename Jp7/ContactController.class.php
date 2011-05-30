@@ -9,10 +9,11 @@ class Jp7_ContactController extends __Controller_Action {
 		
 		$contactTipo = self::getTipo();
 		// Introdução
-		$introductionTipo = $contactTipo->getFirstChildByModel('Introduction');
-		$this->view->records = $introductionTipo->getInterAdmins(array(
-			'fields' => '*'
-		));
+		if ($introductionTipo = $contactTipo->getFirstChildByModel('Introduction')) {
+			$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+				'fields' => '*'
+			));
+		}
 		
 		// Formulário
 		$record = null;

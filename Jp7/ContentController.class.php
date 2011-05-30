@@ -18,6 +18,13 @@ class Jp7_ContentController extends __Controller_Action {
 				'fields' => array('*')
 			));
 		} else {
+			// Introdução
+			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {
+				$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+					'fields' => '*'
+				));
+			}
+			
 			$this->view->records = $contentTipo->getInterAdmins(array(
 				'fields' => array('*')
 			));

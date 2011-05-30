@@ -16,6 +16,7 @@ class Jp7_View_Helper_ItemClass extends Zend_View_Helper_Abstract {
 			$classes[] = 'odd';
 		}
 		if ($item instanceof InterAdmin) {
+			$classes[] = 'ia-record';
 			$classes[] = 'id-' . $item->id;
 			$classes[] = 'tipo-' . $item->id_tipo;
 		}

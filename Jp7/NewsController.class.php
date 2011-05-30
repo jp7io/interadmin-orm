@@ -12,8 +12,15 @@ class Jp7_NewsController extends __Controller_Action {
 				'fields' => array('*', 'date_publish')
 			));
 		} else {
+			// Introdução
+			if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
+				$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+					'fields' => '*'
+				));
+			}
+		
 			$this->view->news = $newsTipo->getInterAdmins(array(
-				'fields' => array('titulo', 'date_publish')
+				'fields' => array('*', 'date_publish')
 			));
 		}
 	}
