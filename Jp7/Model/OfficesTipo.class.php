@@ -1,8 +1,6 @@
 <?php
 
 class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract {
-	public $editableByAdmin = true;
-	
 	public $attributes = array(
 		'id_tipo' => 'Offices',
 		'nome' => 'Unidades',

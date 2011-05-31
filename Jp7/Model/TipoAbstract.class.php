@@ -1,7 +1,7 @@
 <?php
 
 class Jp7_Model_TipoAbstract extends InterAdminTipo {
-	public $editableByAdmin = false;
+	public $isSubTipo = false;
 	
 	/**
 	 * $id_tipo não é inteiro
@@ -55,6 +55,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	
 	/**
 	 * Trigger executado após inserir um tipo com esse modelo.
+	 * 
 	 * @param InterAdminTipo $tipo
 	 * @return void
 	 */
@@ -66,19 +67,19 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		if (!$tipo->getFirstChildByModel('Introduction')) {
 			$introduction = $tipo->createChild('Introduction');
 			$introduction->nome = 'Introdução';
-			$introduction->ordem = -1;
+			$introduction->ordem = -30;
 	        $introduction->save();
 		}
 		if (!$tipo->getFirstChildByModel('Boxes')) {
 			$boxes = $tipo->createChild('Boxes');
 			$boxes->nome = 'Boxes';
-			$boxes->ordem = 10;
+			$boxes->ordem = -20;
 	        $boxes->save();
 		}
 		if (!$tipo->getFirstChildByModel('Settings')) {
 			$settings = $tipo->createChild('Settings');
 			$settings->nome = 'Configurações';
-			$settings->ordem = 20;
+			$settings->ordem = -10;
 	        $settings->save();
 		}
 	}

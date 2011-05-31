@@ -1,6 +1,8 @@
 <?php
 
 class Jp7_Model_ContentSubitemTipo extends Jp7_Model_TipoAbstract {
+	public $isSubTipo = true;
+	
 	public $attributes = array(
 		'id_tipo' => 'ContentSubitem',
 		'nome' => 'Conteúdo - Sub-item',

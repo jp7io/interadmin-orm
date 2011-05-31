@@ -1,6 +1,7 @@
 <?php
 
 class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract {
+	public $isSubTipo = true;
 	
 	protected static $_children;
 	

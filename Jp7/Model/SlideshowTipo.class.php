@@ -1,7 +1,5 @@
 <?php
 class Jp7_Model_SlideshowTipo extends Jp7_Model_TipoAbstract {
-	public $editableByAdmin = true;
-	
 	public $attributes = array(
 		'id_tipo' => 'Slideshow',
 		'nome' => 'Slideshow',

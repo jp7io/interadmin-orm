@@ -1,8 +1,6 @@
 <?php
 
 class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
-	public $editableByAdmin = true;
-	
 	public $attributes = array(
 		'id_tipo' => 'Contact',
 		'nome' => 'Contato',
@@ -23,5 +21,12 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 	
 	public function createChildren(InterAdminTipo $tipo) {
 		parent::createBoxesSettingsAndIntroduction($tipo);
+		
+		if (!$tipo->getFirstChildByModel('ContactRecipients')) {
+			$recipients = $tipo->createChild('ContactRecipients');
+			$recipients->nome = 'Destinatários';
+			$recipients->ordem = -25;
+	        $recipients->save();
+		}
 	}
 }

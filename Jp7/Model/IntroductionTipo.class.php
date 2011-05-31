@@ -1,6 +1,8 @@
 <?php
 
 class Jp7_Model_IntroductionTipo extends Jp7_Model_TipoAbstract {
+	public $isSubTipo = true;
+	
 	public $attributes = array(
 		'id_tipo' => 'Introduction',
 		'nome' => 'Introdução',
