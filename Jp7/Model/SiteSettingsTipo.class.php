@@ -65,7 +65,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				
 				self::_getTit('Cores do Breadcrumb');
 				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
-				self::_getColorField('breadcrumb_color', 'Texto');
+				self::_getColorField('breadcrumb_color', 'Texto', true);
 				
 				self::_getTit('Cores do Conteúdo');
 				self::_getColorField('content_background', 'Cor de Fundo');
