@@ -23,7 +23,35 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			$this->forwardToTemplate();
 			return;
 		}
+		
+		$siteSettingsTipo = InterAdminTipo::findFirstTipo(array(
+			'where' => array(
+				"model_id_tipo = 'SiteSettings'",
+				"admin != ''"
+			)
+		));
+		if ($siteSettingsTipo) {
+			$siteSettings = $siteSettingsTipo->getFirstInterAdmin(array(
+				'fields' => array('header_title', 'header_subtitle', 'template_data')
+			));
+			if ($siteSettings) {
+				$config = Zend_Registry::get('config');
+				foreach ($siteSettings->attributes as $key => $value) {
+					if (!startsWith('id', $key) && $key != 'template_data') {
+						$config->$key = $value;
+					}
+				}
+			}
+			if ($siteSettings->template_data) {
+				$template_data = unserialize($siteSettings->template_data);
+				if ($config->template_path = $template_data['css_template']) {
+					$this->view->headLink()->removeStylesheet('css/main.css');
+					$this->view->headLink()->appendStylesheet($config->template_path . '/css/main.css');
+				}
+			}
+		}
 	}
+	
 	public function postDispatch() {
 		/**
 		 * @var InterSite $config Configuração geral do site, gerada pelo InterSite
