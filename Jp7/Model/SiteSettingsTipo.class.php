@@ -52,35 +52,66 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				$field = new InterAdminField($campo);
 				echo $field->getHtml();
 				
-				self::_getColorField('header_background', 'Cabeçalho Fundo', '#ff0000');
-				self::_getColorField('header_title_color', 'Cabeçalho Título', '#ff0000');
-				self::_getColorField('header_subtitle_color', 'Cabeçalho Subtítulo', '#ff0000', true);
+				self::_getTit('Cores do Cabeçalho');
+				self::_getColorField('header_background', 'Cor de Fundo');
+				self::_getColorField('header_title_color', 'Título');
+				self::_getColorField('header_subtitle_color', 'Subtítulo', true);
 				
-				self::_getColorField('menu_background', 'Menu Fundo', '#ff0000');
-				self::_getColorField('menu_color', 'Menu Cor', '#ff0000');
-				self::_getColorField('menu_active_background', 'Menu Ativo Fundo', '#ff0000');
-				self::_getColorField('menu_active_color', 'Menu Ativo Cor', '#ff0000', true);
+				self::_getTit('Cores do Menu');
+				self::_getColorField('menu_background', 'Cor de Fundo');
+				self::_getColorField('menu_color', 'Itens');
+				self::_getColorField('menu_active_background', 'Fundo dos Itens Ativos');
+				self::_getColorField('menu_active_color', 'Itens Ativos', true);
 				
-				self::_getColorField('content_background', 'Conteúdo Fundo', '#ff0000');
-				self::_getColorField('content_title_color', 'Conteúdo Título', '#ff0000');
-				self::_getColorField('content_subtitle_background', 'Conteúdo Subtítulo', '#ff0000');
-				self::_getColorField('content_color', 'Conteúdo Texto', '#ff0000', true);
+				self::_getTit('Cores do Breadcrumb');
+				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
+				self::_getColorField('breadcrumb_color', 'Texto');
+				
+				self::_getTit('Cores do Conteúdo');
+				self::_getColorField('content_background', 'Cor de Fundo');
+				self::_getColorField('content_title_color', 'Título');
+				self::_getColorField('content_subtitle_color', 'Subtítulo');
+				self::_getColorField('content_color', 'Texto');
+				self::_getColorField('content_a_color', 'Links', true);
+				
+				self::_getTit('Cores dos Boxes');
+				self::_getColorField('box_header_background', 'Fundo do Cabeçalho');
+				self::_getColorField('box_header_color', 'Texto do Cabeçalho');
+				self::_getColorField('box_background', 'Cor de Fundo');
+				self::_getColorField('box_title_color', 'Título');
+				self::_getColorField('box_subtitle_color', 'Subtítulo');
+				self::_getColorField('box_color', 'Texto');
+				self::_getColorField('box_footer_background', 'Fundo do Rodapé');
+				self::_getColorField('box_footer_color', 'Texto do Rodapé', true);
+				
+				self::_getTit('Cores do Rodapé');
+				self::_getColorField('footer_background', 'Cor de Fundo');
+				self::_getColorField('footer_title_color', 'Título');
+				self::_getColorField('footer_color', 'Texto', true);
 				break;
 		}
 	}
 	
-	protected static function _getColorField($nome_id, $nome, $default_value, $separador = '', $options = array()) {
-		$campo = $options + array(
+	protected static function _getColorField($nome_id, $nome, $separador = '') {
+		$campo = array(
 			'tipo' => 'css_' . $nome_id,
 			'tipo_de_campo' => 'varchar',
 			'nome' => $nome,
 			'xtra' => 'cor',
 			'value' => self::$_dados['css_' . $nome_id],
-			'default' => $value,
+			'default' => '',
 			'separador' => $separador
 		);
 		
 		$field = new InterAdminField($campo);
+		echo $field->getHtml();
+	}
+	
+	protected static function _getTit($nome) {
+		$field = new InterAdminField(array(
+			'tipo' => 'tit_' . toId($nome),
+			'nome' => $nome
+		));
 		echo $field->getHtml();
 	}
 	
@@ -118,7 +149,37 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			'*/' .  "\r\n" .
 			self::_getCssBase('header', array('header_background')) .
 			self::_getCssBase('header-title', array('header_title_color')) .
-			self::_getCssBase('header-subtitle', array('header_subtitle_color'));
+			self::_getCssBase('header-subtitle', array('header_subtitle_color')) .
+			
+			self::_getCssBase('menu', array('menu_background')) .
+			self::_getCssBase('menu-a', array('menu_color')) .
+			self::_getCssBase('menu-on', array('menu_active_background')) .
+			self::_getCssBase('menu-a-on', array('menu_active_color')) .
+			
+			self::_getCssBase('breadcrumb', array('breadcrumb_background')) .
+			self::_getCssBase('breadcrumb-a', array('breadcrumb_color')) .
+			
+			self::_getCssBase('content', array('content_background')) .
+			self::_getCssBase('content-title', array('content_title_color')) .
+			self::_getCssBase('content-subtitle', array('content_subtitle_color')) .
+			self::_getCssBase('content-text', array('content_color')) .
+			self::_getCssBase('content-a', array('content_a_color')) .
+			
+			self::_getCssBase('box-header', array('box_header_background')) .
+			self::_getCssBase('box-header-a', array('box_header_color')) .
+			
+			self::_getCssBase('box', array('box_background')) .
+			self::_getCssBase('box-title', array('box_title_color')) .
+			self::_getCssBase('box-subtitle', array('box_subtitle_color')) .
+			self::_getCssBase('box-text', array('box_color')) .
+			
+			self::_getCssBase('box-footer', array('box_footer_background')) .
+			self::_getCssBase('box-footer-a', array('box_footer_color')) .
+			
+			self::_getCssBase('footer', array('footer_background')) .
+			self::_getCssBase('footer-title', array('footer_title_color')) .
+			self::_getCssBase('footer-text', array('footer_color')) .
+			'';
 		
 		file_put_contents($filename, $content);
 		
@@ -145,13 +206,13 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		$css = '@base(' . $base_id . ') {' . "\r\n";
 		foreach ($properties as $property) {
 			if (endsWith('_background', $property)) {
-				$cssProperty = 'background-color';
+				$cssProperty = 'background';
 			} elseif (endsWith('_color', $property)) {
 				$cssProperty = 'color';
 			} else {
-				continue;	
+				continue;
 			}
-			$css .= $cssProperty . ': ' . self::$_dados['css_' . $property] . ';' . "\r\n";
+			$css .= "\t" . $cssProperty . ': ' . self::$_dados['css_' . $property] . ';' . "\r\n";
 		}
 		$css .= '}' . "\r\n";
 		return $css;
