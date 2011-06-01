@@ -6,7 +6,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	public $attributes = array(
 		'id_tipo' => 'SiteSettings',
 		'nome' => 'Configurações Gerais',
-		'campos' => 'tit_1{,}Cabeçalho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Sub-Título{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::teste{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}Template{,}{,}{,}template_path{;}varchar_2{,}Cabeçalho Fundo{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}header_background{;}varchar_3{,}Cabeçalho Título{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title_color{;}varchar_4{,}Cabeçalho Subtítulo{,}{,}{,}{,}S{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle_color{;}varchar_5{,}Menu Fundo{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}menu_background{;}varchar_6{,}Menu Item{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}menu_color{;}varchar_7{,}Menu Item Ativo{,}{,}{,}{,}S{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}menu_active_color{;}varchar_9{,}Conteúdo Fundo{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}content_background{;}varchar_8{,}Conteúdo Título{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}content_title_color{;}varchar_10{,}Conteúdo Subtítulo{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}content_subtitle_color{;}varchar_11{,}Conteúdo Texto{,}{,}{,}{,}{,}cor{,}{,}{,}{,}{,}{,}{,}{,}{,}content_text_color{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
+		'campos' => '    tit_1{,}Cabeçalho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Sub-Título{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::getTemplateFields{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}Template{,}{,}{,}template_path{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
 		'children' => '',
 		'arquivos_ajuda' => '',
 		'arquivos' => '',
@@ -16,10 +16,11 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
 		'tabela' => '',
-		'unico' => ''
+		'unico' => 'S',
+		'disparo' => 'Jp7_Model_SiteSettingsTipo::saveTemplateFields'
 	);
-	
-	public static function teste($campo, $valor, $parte = 'edit') {
+		
+	public static function getTemplateFields($campo, $valor, $parte = 'edit') {
 		switch ($parte) {
 			case 'header':
 				return $campo['label'];
@@ -29,8 +30,9 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				return $value;
 				break;
 			case 'edit':
+				$campo['tipo'] = 'css_template';
 				$campo['tipo_de_campo'] = 'select';
-				$campo['separador'] = '';
+				$campo['separador'] = 'S';
 				$campo['opcoes'] = array();
 				
 				foreach (glob(ROOT_PATH . '/_default/templates/*', GLOB_ONLYDIR) as $templateDir) {
@@ -38,9 +40,54 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					$campo['opcoes'][$relativeDir] = basename($relativeDir);
 				}
 				$field = new InterAdminField($campo);
-				return $field->getHtml();
+				echo $field->getHtml();
+				
+				self::_getColorField('header_background', 'Cabeçalho Fundo', '#ff0000');
+				self::_getColorField('header_title_color', 'Cabeçalho Título', '#ff0000');
+				self::_getColorField('header_subtitle_color', 'Cabeçalho Subtítulo', '#ff0000', true);
+				
+				self::_getColorField('menu_background', 'Menu Fundo', '#ff0000');
+				self::_getColorField('menu_color', 'Menu Cor', '#ff0000');
+				self::_getColorField('menu_active_background', 'Menu Ativo Fundo', '#ff0000');
+				self::_getColorField('menu_active_color', 'Menu Ativo Cor', '#ff0000', true);
+				
+				self::_getColorField('content_background', 'Conteúdo Fundo', '#ff0000');
+				self::_getColorField('content_title_color', 'Conteúdo Título', '#ff0000');
+				self::_getColorField('content_subtitle_background', 'Conteúdo Subtítulo', '#ff0000');
+				self::_getColorField('content_color', 'Conteúdo Texto', '#ff0000', true);
 				break;
 		}
 	}
 	
+	protected static function _getColorField($nome_id, $nome, $value, $separador = '', $options = array()) {
+		$campo = $options + array(
+			'tipo' => 'css_' . $nome_id,
+			'tipo_de_campo' => 'varchar',
+			'nome' => $nome,
+			'xtra' => 'cor',
+			'value' => $value,
+			'separador' => $separador
+		);
+		
+		$field = new InterAdminField($campo);
+		echo $field->getHtml();
+	}
+	
+	public static function saveTemplateFields() {
+		global $id, $interadmin_id;
+		if (!$id) {
+			$id = $interadmin_id;
+		}
+		if ($id) {
+			$tipo = InterAdminTipo::getInstance($_POST['id_tipo']);
+			if ($registro = $tipo->getInterAdminById($id)) {
+				$special_1 = array();
+				foreach ($_POST as $key => $values) {
+					if (startsWith('css_', $key) && !endsWith('_xtra', $key)) {
+						$special_1[$key] = $values[0];
+					}
+				}
+			}
+		}
+	}
 }

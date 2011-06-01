@@ -1078,6 +1078,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 			<?php
 			// callback ?
 			//
+			/*
 			if (is_callable($data)) {
 				$_ = array_values($data);
 				?>
@@ -1088,6 +1089,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 						echo htmlSpecialChars($_[1]);?>();</strong></span>
 				<?php
 				}
+			*/
 			?>
 				
 	</div>
@@ -1275,13 +1277,14 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 			<?php
 			// callback ?
 			//
+			/*
 			if (is_callable($data)) {
 				?>
 				<span class="krumo-callback"> |
 					(<em class="krumo-type">Callback</em>)
 					<strong class="krumo-string"><?php echo htmlSpecialChars($_);?>();</strong></span>
 				<?php
-				}
+				} */
 			?>
 			
 	</div>
