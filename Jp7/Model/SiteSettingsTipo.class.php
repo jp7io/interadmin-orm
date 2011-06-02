@@ -36,45 +36,51 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				return $value;
 				break;
 			case 'theme_editor':
-				$break_table = true;
+				$theme_editor = true;
 				// sem break;
 			case 'edit':
 				// Não sei porque ele coloca &quot;
 				self::$_dados = unserialize(str_replace('&quot;', '"', $value));
 				
-				$campo['tipo'] = 'css_template';
-				$campo['tipo_de_campo'] = 'select';
-				$campo['separador'] = 'S';
-				$campo['value'] = self::$_dados[$campo['tipo']];
-				$campo['opcoes'] = array();
-				
-				foreach (glob(ROOT_PATH . '/_default/templates/*', GLOB_ONLYDIR) as $templateDir) {
-					$relativeDir = str_replace(ROOT_PATH, '', $templateDir);
-					$campo['opcoes'][$relativeDir] = basename($relativeDir);
+				if (!$theme_editor) {
+					$campo['tipo'] = 'css_template';
+					$campo['tipo_de_campo'] = 'select';
+					$campo['separador'] = 'S';
+					$campo['value'] = self::$_dados[$campo['tipo']];
+					$campo['opcoes'] = array();
+					
+					foreach (glob(ROOT_PATH . '/_default/templates/*', GLOB_ONLYDIR) as $templateDir) {
+						$relativeDir = str_replace(ROOT_PATH, '', $templateDir);
+						$campo['opcoes'][$relativeDir] = basename($relativeDir);
+					}
+					$field = new InterAdminField($campo);
+					echo $field->getHtml();
+				} else {
+					?>
+					<input type="hidden" name="css_template[]" value="<?php echo self::$_dados['css_template']; ?>" />
+					<?php	
 				}
-				$field = new InterAdminField($campo);
-				echo $field->getHtml();
 				
 				self::_getTit('Cores do Cabeçalho');
 				self::_getColorField('header_background', 'Cor de Fundo');
 				self::_getColorField('header_title_color', 'Título');
 				self::_getColorField('header_subtitle_color', 'Subtítulo', true);
 				
-				self::_breakTable($break_table);
+				self::_breakTable($theme_editor);
 				
 				self::_getTit('Cores do Menu');
 				self::_getColorField('menu_background', 'Cor de Fundo');
-				self::_getColorField('menu_color', 'Itens');
-				self::_getColorField('menu_active_background', 'Fundo dos Itens Ativos');
-				self::_getColorField('menu_active_color', 'Itens Ativos', true);
+				self::_getColorField('menu_color', 'Texto');
+				self::_getColorField('menu_active_background', 'Fundo Ativo');
+				self::_getColorField('menu_active_color', 'Texto Ativo', true);
 				
-				self::_breakTable($break_table);
+				self::_breakTable($theme_editor);
 				
 				self::_getTit('Cores do Breadcrumb');
 				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
 				self::_getColorField('breadcrumb_color', 'Texto', true);
 				
-				self::_breakTable($break_table);
+				self::_breakTable($theme_editor);
 				
 				self::_getTit('Cores do Conteúdo');
 				self::_getColorField('content_background', 'Cor de Fundo');
@@ -83,19 +89,25 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('content_color', 'Texto');
 				self::_getColorField('content_a_color', 'Links', true);
 				
-				self::_breakTable($break_table);
+				self::_breakTable($theme_editor);
 				
 				self::_getTit('Cores dos Boxes');
-				self::_getColorField('box_header_background', 'Fundo do Cabeçalho');
-				self::_getColorField('box_header_color', 'Texto do Cabeçalho');
 				self::_getColorField('box_background', 'Cor de Fundo');
 				self::_getColorField('box_title_color', 'Título');
 				self::_getColorField('box_subtitle_color', 'Subtítulo');
 				self::_getColorField('box_color', 'Texto');
-				self::_getColorField('box_footer_background', 'Fundo do Rodapé');
+				
+				//self::_breakTable($theme_editor);
+				if ($theme_editor) {
+					//self::_getTit('Cores dos Boxes');
+				}
+				
+				self::_getColorField('box_header_background', 'Cabeçalho');
+				self::_getColorField('box_header_color', 'Texto do Cabeçalho');
+				self::_getColorField('box_footer_background', 'Rodapé');
 				self::_getColorField('box_footer_color', 'Texto do Rodapé', true);
 				
-				self::_breakTable($break_table);
+				self::_breakTable($theme_editor);
 				
 				self::_getTit('Cores do Rodapé');
 				self::_getColorField('footer_background', 'Cor de Fundo');
@@ -131,7 +143,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	protected static function _breakTable($break_table) {
 		if ($break_table) {
 			?>
-			
+			</table>
+			<table class="color-table">
 			<?php
 		}
 	}
