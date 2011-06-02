@@ -20,11 +20,8 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	}
 	
 	protected function _findChildByModel($model_id_tipo) {
-		$child = InterAdminTipo::findFirstTipo(array(
-			'where' => array(
-				"model_id_tipo = '" . $model_id_tipo . "'",
-				"admin <> ''"
-			)
+		$child = InterAdminTipo::findFirstTipoByModel($model_id_tipo, array(
+			'where' => array("admin <> ''")
 		));
 		if (!$child) {
 			// Tenta criar o tipo filho caso ele não exista

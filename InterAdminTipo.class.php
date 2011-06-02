@@ -231,6 +231,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
 	 * 
+	 * @param string|int	$model_id_tipo	
 	 * @param array $options Default array of options. Available keys: fields, where, order, class.
 	 * @return InterAdminTipo
 	 */
@@ -792,6 +793,18 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public static function findFirstTipo($options = array()) {
 		return reset(self::findTipos(array('limit' => 1) + $options)); 
+	}
+	/**
+	 * Retrieves the first InterAdminTipo with the given "model_id_tipo".
+	 * 
+	 * @param	string|int	$model_id_tipo	
+	 * @param	array 		$options [optional]
+	 * @return	InterAdminTipo
+	 */
+	public static function findFirstTipoByModel($model_id_tipo, $options = array()) {
+		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
+		$options['where'][] = "model_id_tipo != '0'";
+		return self::findFirstTipo($options); 
 	}
 	/**
 	 * Retrieves multiple InterAdminTipo's from the database.

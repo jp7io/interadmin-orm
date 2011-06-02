@@ -24,12 +24,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			return;
 		}
 		
-		$siteSettingsTipo = InterAdminTipo::findFirstTipo(array(
-			'where' => array(
-				"model_id_tipo = 'SiteSettings'",
-				"model_id_tipo != '0'",
-				"admin != ''"
-			)
+		$siteSettingsTipo = InterAdminTipo::findFirstTipoByModel('SiteSettings', array(
+			'where' => array("admin != ''")
 		));
 		if ($siteSettingsTipo) {
 			$siteSettings = $siteSettingsTipo->getFirstInterAdmin(array(

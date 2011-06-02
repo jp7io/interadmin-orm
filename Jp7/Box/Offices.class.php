@@ -4,9 +4,7 @@ class Jp7_Box_Offices extends Jp7_Box_BoxAbstract {    /**
      * @see Jp7_Box_BoxAbstract::prepareData()
      */
     public function prepareData() {
-    	$officeTipo = InterAdminTipo::findFirstTipo(array(
-			'where' => array("model_id_tipo = 'Offices'")
-		));
+    	$officeTipo = InterAdminTipo::findFirstTipoByModel('Offices');
 		$this->offices = array();
 		if ($this->officeTipo = $officeTipo) {
 			$options = array(

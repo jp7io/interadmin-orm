@@ -45,7 +45,10 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box; ?>[section][]">
 					<?php
 					$tipos = InterAdminTipo::findTipos(array(
-						'where' => array("model_id_tipo = 'Content'"),
+						'where' => array(
+							"model_id_tipo = 'Content'",
+							"model_id_tipo != '0'"
+						),
 						'order' => 'parent_id_tipo, ordem'
 					));
 					?>
