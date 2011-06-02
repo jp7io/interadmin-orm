@@ -35,6 +35,9 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				// Retorna alguma coisa
 				return $value;
 				break;
+			case 'theme_editor':
+				$break_table = true;
+				// sem break;
 			case 'edit':
 				// Não sei porque ele coloca &quot;
 				self::$_dados = unserialize(str_replace('&quot;', '"', $value));
@@ -57,15 +60,21 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('header_title_color', 'Título');
 				self::_getColorField('header_subtitle_color', 'Subtítulo', true);
 				
+				self::_breakTable($break_table);
+				
 				self::_getTit('Cores do Menu');
 				self::_getColorField('menu_background', 'Cor de Fundo');
 				self::_getColorField('menu_color', 'Itens');
 				self::_getColorField('menu_active_background', 'Fundo dos Itens Ativos');
 				self::_getColorField('menu_active_color', 'Itens Ativos', true);
 				
+				self::_breakTable($break_table);
+				
 				self::_getTit('Cores do Breadcrumb');
 				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
 				self::_getColorField('breadcrumb_color', 'Texto', true);
+				
+				self::_breakTable($break_table);
 				
 				self::_getTit('Cores do Conteúdo');
 				self::_getColorField('content_background', 'Cor de Fundo');
@@ -73,6 +82,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('content_subtitle_color', 'Subtítulo');
 				self::_getColorField('content_color', 'Texto');
 				self::_getColorField('content_a_color', 'Links', true);
+				
+				self::_breakTable($break_table);
 				
 				self::_getTit('Cores dos Boxes');
 				self::_getColorField('box_header_background', 'Fundo do Cabeçalho');
@@ -83,6 +94,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('box_color', 'Texto');
 				self::_getColorField('box_footer_background', 'Fundo do Rodapé');
 				self::_getColorField('box_footer_color', 'Texto do Rodapé', true);
+				
+				self::_breakTable($break_table);
 				
 				self::_getTit('Cores do Rodapé');
 				self::_getColorField('footer_background', 'Cor de Fundo');
@@ -113,6 +126,14 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			'nome' => $nome
 		));
 		echo $field->getHtml();
+	}
+	
+	protected static function _breakTable($break_table) {
+		if ($break_table) {
+			?>
+			
+			<?php
+		}
 	}
 	
 	public static function saveTemplateFields() {
