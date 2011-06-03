@@ -62,6 +62,8 @@ class InterAdmin extends InterAdminAbstract {
 		$this->id = is_numeric($id) ? $id : '0';
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
+		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
+		
 		if ($options['fields'] && $this->id) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
@@ -214,6 +216,7 @@ class InterAdmin extends InterAdminAbstract {
 			}
 			$this->setTipo(InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,
+				'db' => $this->_db,
 				'class' => $options['class']
 			)));
 		}
@@ -300,7 +303,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return array Array of InterAdmin objects.
 	 */
 	public function getChildren($id_tipo, $options = array()) {
-		global $db;
+		$db = $this->getDb();
 		$children = array();
 		if ($id_tipo) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
@@ -387,7 +390,10 @@ class InterAdmin extends InterAdminAbstract {
 		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
-			$arquivo = new $className($row->id_arquivo, array('db_prefix' => $this->getTipo()->db_prefix));
+			$arquivo = new $className($row->id_arquivo, array(
+				'db_prefix' => $this->getTipo()->db_prefix,
+				'db' => $this->_db
+			));
 			$arquivo->setTipo($this->getTipo());
 			$arquivo->setParent($this);
 			$this->_getAttributesFromRow($row, $arquivo, $options);
@@ -455,7 +461,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function setTags(array $tags) {
-		global $db;
+		$db = $this->getDb();
 		$sql = "DELETE FROM " . $this->db_prefix . "_tags WHERE parent_id = " .  $this->id;
 		$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		
@@ -475,7 +481,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getTags($options = array()) {
 		if (!$this->_tags || $options) {
-			global $db;
+			$db = $this->getDb();
 			
 			$options['where'][] = "parent_id = " . $this->id;	
 			$sql = "SELECT * FROM " . $this->db_prefix . "_tags " .

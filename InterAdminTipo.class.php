@@ -71,6 +71,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		$id_tipo = (string) $id_tipo;
 		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
+		
 		if ($options['fields']) {
 			$this->getFieldsValues($options['fields']);
 		}
@@ -210,6 +212,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		while ($row = $rs->FetchNextObj()) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
+				'db' => $this->_db,
 				'class' => $options['class'],
 				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 			));
@@ -377,6 +380,7 @@ class InterAdminTipo extends InterAdminAbstract {
 						$id_tipo = $A[$parameters[0]]['nome'];
 						$A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
 							'db_prefix' => $this->db_prefix,
+							'db' => $this->_db,
 							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 						));
 					}
@@ -414,6 +418,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$fields = array_keys($campos);
 		}
 		$aliases = array();
+		$update = false;
 		foreach ((array) $fields as $field) {
 			if ($campos[$field]['nome_id']) {
 				$aliases[$field] = $campos[$field]['nome_id'];
@@ -429,9 +434,12 @@ class InterAdminTipo extends InterAdminAbstract {
 				$alias = ($alias) ? toId($alias) : $field;
 				$aliases[$field] = $alias;
 				// Cache
+				$update = true;
 				$campos[$field]['nome_id'] = $alias; 
-				$this->_setMetadata('campos', $campos);
 			}
+		}
+		if ($update) {
+			$this->_setMetadata('campos', $campos);
 		}
 		if (is_array($fields)) {
 			return $aliases;
@@ -593,7 +601,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of deleted InterAdmins.
 	 */
 	public function deleteInterAdminsForever($options = array()) {
-		global $db;
+		$db = $this->getDb();
 		
 		if ($this->id_tipo) {
 			$sql = "DELETE FROM " . $this->getInterAdminsTableName() . 
@@ -605,7 +613,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function getAttributesNames() {
-		global $db;
+		$db = $this->getDb();
 		if (!$attributes  = $this->_getMetadata('attributes')) {
 			$attributes = $db->MetaColumnNames($this->getTableName()) or die(jp7_debug($db->ErrorMsg()));
 			$this->_setMetadata('attributes', $attributes);
@@ -680,10 +688,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $table . '_arquivos';
 	}
 	protected function _setMetadata($varname, $value) {
-		self::$_metadata[$this->db_prefix][$this->id_tipo][$varname] = $value;
+		self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
 	}
 	protected function _getMetadata($varname) {
-		return self::$_metadata[$this->db_prefix][$this->id_tipo][$varname];
+		return self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname];
 	}
 	/**
 	 * @return array
@@ -814,6 +822,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public static function findTipos($options = array()) {
 		$instance = new self();
+		if ($options['db']) {
+			$instance->setDb($options['db']);
+		}
+		if ($options['db_prefix']) {
+			$instance->db_prefix = $options['db_prefix'];
+		}
 		
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
 		$options['from'] = $instance->getTableName() . ' AS main';
@@ -833,6 +847,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		while ($row = $rs->FetchNextObj()) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $instance->db_prefix,
+				'db' => $instance->getDb(),
 				'class' => $options['class']
 			));
 			$instance->_getAttributesFromRow($row, $tipo, $options);

@@ -59,6 +59,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			}
 			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
+				'db' => $this->_db,
 				'class' => $options['class']
 			));
 		}

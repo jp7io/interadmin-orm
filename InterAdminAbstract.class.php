@@ -33,6 +33,11 @@ abstract class InterAdminAbstract {
 	protected $_updated = false;
 	protected $_deleted = false;
 	/**
+	 * @var ADOConnection
+	 */
+	protected $_db = null;
+	
+	/**
 	 * Magic get acessor.
 	 * 
 	 * @param string $attributeName
@@ -181,6 +186,8 @@ abstract class InterAdminAbstract {
 	 * @return void
 	 */
 	protected function _update($attributes, $where = '') {
+		$db = $this->getDb();
+		
 		$valuesToSave = array();
 		$aliases = array_flip($this->getAttributesAliases());
 		
@@ -200,9 +207,10 @@ abstract class InterAdminAbstract {
 		
 		$pk = $this->_primary_key;
 		if ($this->$pk) {
-			jp7_db_insert($this->getTableName(), $where . $this->_primary_key, $this->$pk, $valuesToSave);
+			$db->AutoExecute($this->getTableName(), $valuesToSave, 'UPDATE', $pk . ' = ' .  $this->$pk) or die(jp7_debug($db->ErrorMsg()));
 		} else {
-			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $valuesToSave);
+			$db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT');
+			$this->$pk = $db->Insert_ID();
 		}
 	}
 	/**
@@ -276,7 +284,9 @@ abstract class InterAdminAbstract {
 	 * @return ADORecordSet
 	 */
 	protected function _executeQuery($options) {
-		global $db, $debugger;
+		global $debugger;
+		$db = $this->getDb();
+		
 		// Type casting 
 		if (!is_array($options['from'])) {
     		$options['from'] = (array) $options['from'];
@@ -436,6 +446,7 @@ abstract class InterAdminAbstract {
 						}
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
+							'db' => $this->_db,
 							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 						));
 						if (!in_array($table, (array) $options['from_alias'])) {
@@ -708,7 +719,7 @@ abstract class InterAdminAbstract {
 	 * @return 
 	 */
 	public function deleteForever() {
-		global $db;
+		$db = $this->getDb();
 		$pk = $this->_primary_key;
 		if ($this->$pk) {
 			$sql = "DELETE FROM " . $this->getTableName() . 
@@ -775,4 +786,22 @@ abstract class InterAdminAbstract {
 	 * @return string
 	 */
 	abstract public function getTagFilters();
+	
+	/**
+	 * Returns the database object.
+	 * 
+	 * @return ADOConnection
+	 */
+	public function getDb() {
+		return $this->_db;
+	}
+	/**
+	 * Sets the database object.
+	 * 
+	 * @param ADOConnection $db
+	 * @return void
+	 */
+	public function setDb(ADOConnection $db) {
+		$this->_db = $db;
+	}
 }
