@@ -19,19 +19,13 @@ class Jp7_Box_Iframe extends Jp7_Box_BoxAbstract {    /**
 			</div>
 			
 			<div class="field">
-				<label>Height:</label>
-				<input type="text" class="textbox" obligatory="no" maxlength="4"  label="Height" value="<?php echo $this->params->height ? $this->params->height : '300'; ?>" 
-					name="<?php echo $this->id_box; ?>[height][]" /> px
+				<label>Altura:</label>
+				<?php echo $this->numericField('height', 'Altura', '300'); ?> px
 			</div>
 			
 			<div class="field">
-				<label>Put title:</label>
-				<?php echo $this->checkbox('put_title'); ?>
-			</div>
-			
-			<div class="field">
-				<label>Title:</label>
-				<input type="text" class="textbox" obligatory="no" label="Title" value="<?php echo $this->params->title ? $this->params->title : ''; ?>" 
+				<label>Título:</label>
+				<input type="text" class="textbox" obligatory="no" label="Título" placeholder="Nenhum" value="<?php echo $this->params->title ? $this->params->title : ''; ?>" 
 					name="<?php echo $this->id_box; ?>[title][]" />
 			</div>
 		</div>
