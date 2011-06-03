@@ -44,6 +44,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				if ($config->template_path = $template_data['css_template']) {
 					$this->view->headLink()->removeStylesheet('css/main.css');
 					$this->view->headLink()->appendStylesheet($config->template_path . '/css/main.css?clientePath=' . $config->name_id);
+					// Necessário para mudar a ordem
+					$this->view->headLink()->appendStylesheet('css/main.css');
 				}
 			}
 		}
