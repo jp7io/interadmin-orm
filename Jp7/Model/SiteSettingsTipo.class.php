@@ -8,6 +8,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	 * @var array
 	 */
 	private static $_dados = array();
+	private static $_theme_editor = false;
 	
 	public $attributes = array(
 		'id_tipo' => 'SiteSettings',
@@ -38,13 +39,13 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				return $value;
 				break;
 			case 'theme_editor':
-				$theme_editor = true;
+				self::$_theme_editor = true;
 				// sem break;
 			case 'edit':
 				// Não sei porque ele coloca &quot;
 				self::$_dados = unserialize(str_replace('&quot;', '"', $value));
 				
-				if (!$theme_editor) {
+				if (!self::$_theme_editor) {
 					$campo['tipo'] = 'css_template';
 					$campo['tipo_de_campo'] = 'select';
 					$campo['separador'] = 'S';
@@ -78,7 +79,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('header_title_color', 'Título');
 				self::_getColorField('header_subtitle_color', 'Subtítulo', true);
 				
-				self::_breakTable($theme_editor);
+				self::_breakTable();
 				
 				self::_getTit('Cores do Menu');
 				self::_getColorField('menu_background', 'Cor de Fundo');
@@ -86,13 +87,13 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('menu_active_background', 'Fundo Ativo');
 				self::_getColorField('menu_active_color', 'Texto Ativo', true);
 				
-				self::_breakTable($theme_editor);
+				self::_breakTable();
 				
 				self::_getTit('Cores do Breadcrumb');
 				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
 				self::_getColorField('breadcrumb_color', 'Texto', true);
 				
-				self::_breakTable($theme_editor);
+				self::_breakTable();
 				
 				self::_getTit('Cores do Conteúdo');
 				self::_getColorField('content_background', 'Cor de Fundo');
@@ -101,25 +102,19 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('content_color', 'Texto');
 				self::_getColorField('content_a_color', 'Links', true);
 				
-				self::_breakTable($theme_editor);
+				self::_breakTable();
 				
 				self::_getTit('Cores dos Boxes');
 				self::_getColorField('box_background', 'Cor de Fundo');
 				self::_getColorField('box_title_color', 'Título');
 				self::_getColorField('box_subtitle_color', 'Subtítulo');
 				self::_getColorField('box_color', 'Texto');
-				
-				//self::_breakTable($theme_editor);
-				if ($theme_editor) {
-					//self::_getTit('Cores dos Boxes');
-				}
-				
 				self::_getColorField('box_header_background', 'Cabeçalho');
 				self::_getColorField('box_header_color', 'Texto do Cabeçalho');
 				self::_getColorField('box_footer_background', 'Rodapé');
 				self::_getColorField('box_footer_color', 'Texto do Rodapé', true);
 				
-				self::_breakTable($theme_editor);
+				self::_breakTable();
 				
 				self::_getTit('Cores do Rodapé');
 				self::_getColorField('footer_background', 'Cor de Fundo');
@@ -137,7 +132,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			'xtra' => 'cor',
 			'value' => self::$_dados['css_' . $nome_id],
 			'default' => '',
-			'separador' => $separador
+			'separador' => $separador && !self::$_theme_editor
 		);
 		
 		$field = new InterAdminField($campo);
@@ -152,8 +147,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		echo $field->getHtml();
 	}
 	
-	protected static function _breakTable($break_table) {
-		if ($break_table) {
+	protected static function _breakTable() {
+		if (self::$_theme_editor) {
 			?>
 			</table>
 			<table class="color-table">
