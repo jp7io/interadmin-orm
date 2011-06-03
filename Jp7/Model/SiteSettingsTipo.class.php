@@ -27,6 +27,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	);
 		
 	public static function getTemplateFields($campo, $value, $parte = 'edit') {
+		global $c_cliente_url, $s_interadmin_cliente ;
+		
 		switch ($parte) {
 			case 'header':
 				return $campo['label'];
@@ -55,6 +57,16 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					}
 					$field = new InterAdminField($campo);
 					echo $field->getHtml();
+					
+					?>
+					<tr>
+						<td colspan="4">
+							<input type="button" value="Abrir Editor de Cores" 
+							onclick="window.open('<?php echo $c_cliente_url; ?>interadmin/site/<?php echo $s_interadmin_cliente; ?>/theme_editor.php')" />
+						</td>
+					</tr>
+					<?php
+					
 				} else {
 					?>
 					<input type="hidden" name="css_template[]" value="<?php echo self::$_dados['css_template']; ?>" />
@@ -232,7 +244,9 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			} else {
 				continue;
 			}
-			$css .= "\t" . $cssProperty . ': ' . self::$_dados['css_' . $property] . ';' . "\r\n";
+			if ($value = self::$_dados['css_' . $property]) {
+				$css .= "\t" . $cssProperty . ': ' . $value . ';' . "\r\n";
+			}
 		}
 		$css .= '}' . "\r\n";
 		return $css;
