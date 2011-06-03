@@ -174,7 +174,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	}
 	
 	protected static function _saveDynamicCss() {
-		global $c_interadminConfigPath ;
+		global $c_interadminConfigPath, $c_remote;
 		$filename = $c_interadminConfigPath . 'dynamic.css';
 		
 		$content = '/*' . "\r\n" . 
@@ -217,23 +217,9 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		
 		file_put_contents($filename, $content);
 		
-		/*
 		if ($c_remote) {
-			$query = 'remote_files=' . $filename .
-				//'&redirect_1=http://' . $_SERVER['HTTP_HOST'] . '/interadmin/site/' . $s_interadmin_cliente . '/remote_files_cleanup.php' .
-				'&file_path_src=' . 'http://' . $_SERVER['HTTP_HOST'] . '/interadmin/' . $c_interadminConfigPath .
-				'&file_path_dst=' . $s_interadmin_cliente . '/' . $jp7_app . '/' .
-				'&cliente=' . $s_interadmin_cliente;
-			$remotePage = 'http://' . $config->server->host . '/' . $c_interadmin_remote_path . 'interadmin/site/aplicacao/remote_files.php?' . $query;
-			$exportOk = @fopen($remotePage, 'r');
-			if (!$exportOk) {
-				$msg = 'Falha ao gravar backup.';
-				if ($c_jp7) {
-				  $msg .= '<br/> Página: ' . $remotePage;
-				}
-			}
+			interadmin_update_remote_files(array('dynamic.css'));		
 		}
-		*/
 	}
 	
 	protected static function _getCssBase($base_id, $properties) {
