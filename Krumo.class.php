@@ -961,7 +961,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		
 		// recursion detected
 		//
-		if ($_r > 0 && !$ignoreRecursion) {
+		if ($_r > 2 && !$ignoreRecursion) {
 			return Krumo::_recursion($data);
 		}
 
