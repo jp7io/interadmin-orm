@@ -106,6 +106,7 @@ class InterAdmin extends InterAdminAbstract {
 		if ($tipo) {
 			$finalInstance->setTipo($tipo);
 			$finalInstance->db_prefix = $tipo->db_prefix;
+			$finalInstance->setDb($tipo->getDb());
 		}
 		// Fields		
 		if ($options['fields']) {
