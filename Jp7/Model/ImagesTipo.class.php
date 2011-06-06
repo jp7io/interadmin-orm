@@ -1,6 +1,8 @@
 <?php
 
 class Jp7_Model_ImagesTipo extends Jp7_Model_TipoAbstract {
+	public $hasOwnPage = false;
+	
 	public $attributes = array(
 		'id_tipo' => 'Images',
 		'nome' => 'Imagens',

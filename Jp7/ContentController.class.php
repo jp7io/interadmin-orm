@@ -28,6 +28,16 @@ class Jp7_ContentController extends __Controller_Action {
 			$this->view->records = $contentTipo->getInterAdmins(array(
 				'fields' => array('*')
 			));
+			
+			foreach ($this->view->records as $record) {
+				if (!$record->text) {
+					$record->subitens = $record->getSubItens(array(
+						'fields' => array('*')
+					));
+				} else {
+					$record->subitens = array();	
+				}
+			}
 		}
 	}
 }

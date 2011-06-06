@@ -2,6 +2,7 @@
 
 class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	public $isSubTipo = false;
+	public $hasOwnPage = true;
 	
 	/**
 	 * $id_tipo não é inteiro
