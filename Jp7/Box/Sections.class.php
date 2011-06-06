@@ -1,37 +1,11 @@
 <?php
 
-class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
-     * @see Jp7_Box_BoxAbstract::prepareData()
-     */
-    public function prepareData() {
-    	if ($section = $this->params->section) {
-			if ($this->sectionTipo = InterAdminTipo::getInstance($section)) {
-				$this->title = ($this->params->title) ? $this->params->title : $this->sectionTipo->getNome();
-				
-				$options = array(
-					'fields' => array('*'),
-					'limit' => $this->params->limit
-				);
-				if ($this->params->featured) {
-					$options['where'][] = "featured <> ''";
-				}				
-				$this->records = $this->sectionTipo->getInterAdmins($options);
-				
-				// Tamanho das imagens
-				$imgHeight = $this->params->imgHeight ? $this->params->imgHeight : 60;
-				$imgWidth = $this->params->imgWidth ? $this->params->imgWidth : 80;
-				
-				$this->imgSize = $imgWidth . 'x' . $imgHeight;
-				$this->imgCrop = isset($this->params->imgCrop) ? $this->params->imgCrop : true;
-			}
-		}
-    }
-	
+class Jp7_Box_Sections extends Jp7_Box_BoxAbstract {   
     /**
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
     protected function _getEditorTitle() {
-        return 'Conteúdo';
+        return 'Seções';
     }
 	
 	/**
@@ -53,14 +27,14 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 					<?php
 					$tipos = InterAdminTipo::findTipos(array(
 						'where' => array(
-							"model_id_tipo = 'Content'",
-							"model_id_tipo != '0'"
+							"admin = ''",
+							"model_id_tipo NOT IN ('Boxes', 'Settings', 'Introduction', 'Images')"
 						),
 						'order' => 'parent_id_tipo, ordem',
 						'use_published_filters' => true
 					));
 					?>
-					<?php echo $this->tiposOptions($tipos, $this->params->section, true); ?>					
+					<?php echo $this->tiposOptions($tipos,  $this->params->section); ?>			
 				</select>
 			</div>
 			<div class="field">

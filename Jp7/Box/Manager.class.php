@@ -43,14 +43,15 @@ class Jp7_Box_Manager {
      * @var array
      */
 	private static $array = array(
-		'facebook' => 'Jp7_Box_Facebook',
-		'youtube' => 'Jp7_Box_Youtube',
-		'iframe' => 'Jp7_Box_Iframe',
-		'news' => 'Jp7_Box_News',
-		'images' => 'Jp7_Box_Images',
-		'slideshow' => 'Jp7_Box_Slideshow',
-		'offices' => 'Jp7_Box_Offices',
 		'content' => 'Jp7_Box_Content',
+		'facebook' => 'Jp7_Box_Facebook',
+		'iframe' => 'Jp7_Box_Iframe',
+		'images' => 'Jp7_Box_Images',
+		'news' => 'Jp7_Box_News',
+		'offices' => 'Jp7_Box_Offices',
+		'sections' => 'Jp7_Box_Sections',
+		'slideshow' => 'Jp7_Box_Slideshow',
+		'youtube' => 'Jp7_Box_Youtube',
 		'_content' => 'Jp7_Box_PageContent'
 	);
 	

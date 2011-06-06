@@ -97,7 +97,7 @@ abstract class Jp7_Box_BoxAbstract {
 		<option value="">Selecione</option>
 		<option value="">-------------------------------</option>
 		<?php foreach ($options as $option) { ?>
-			<option value="<?php echo $option->id_tipo; ?>" <?php echo ($option->id_tipo == $value) ? 'selected="selected"' : ''; ?>><?php echo $option->nome; ?></option>
+			<option value="<?php echo $option->value; ?>" <?php echo ($option->value == $value) ? 'selected="selected"' : ''; ?>><?php echo $option->text; ?></option>
 		<?php } ?>
 		<?php
 		return ob_get_clean();
@@ -120,4 +120,31 @@ abstract class Jp7_Box_BoxAbstract {
 		<?php
 		return ob_get_clean();
 	}
+	public function tiposOptions($tipos, $value, $show_orphan = false) {
+		$tree = array();
+		foreach ($tipos as $tipo) {
+			$tree[$tipo->parent_id_tipo][] = $tipo;
+		}
+		$options = array();
+		$this->_addTiposRecursively($options, $tree);
+		// Valores que não tem pai publicado
+		if ($show_orphan) {
+			foreach ($tree as $key => $value) {
+				$this->_addTiposRecursively($options, $tree, $key);
+			}
+		}
+		return $this->options($options, $value);
+	}
+	protected function _addTiposRecursively(&$options, &$tree, $parent_id_tipo = 0, $level = 0) {
+		foreach ($tree[$parent_id_tipo] as $tipo) {
+			$options[] = (object) array(
+				'value' => $tipo->id_tipo,
+				'text' => trim(str_repeat('--', $level) . ' ' . $tipo->nome)
+			);
+			if ($tree[$tipo->id_tipo]) {
+				$this->_addTiposRecursively($options, $tree, $tipo->id_tipo, $level + 1);
+			}
+		}
+		unset($tree[$parent_id_tipo]);
+	}	
 }
