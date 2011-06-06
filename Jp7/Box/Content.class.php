@@ -16,6 +16,13 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 					$options['where'][] = "featured <> ''";
 				}				
 				$this->records = $this->sectionTipo->getInterAdmins($options);
+				
+				// Tamanho das imagens
+				$imgHeight = $this->params->imgHeight ? $this->params->imgHeight : 60;
+				$imgWidth = $this->params->imgWidth ? $this->params->imgWidth : 80;
+				
+				$this->imgSize = $imgWidth . 'x' . $imgHeight;
+				$this->imgCrop = isset($this->params->imgCrop) ? $this->params->imgCrop : true;
 			}
 		}
     }
@@ -62,6 +69,21 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 			<div class="field">
 				<label>Limite:</label>
 				<?php echo $this->numericField('limit', 'Limite', 'Todos'); ?>
+			</div>
+			
+			<div class="group">
+				<div class="group-label">Imagens</div>
+				<div class="group-fields">
+					<div class="field">
+						<label>Dimensões:</label>
+						<?php echo $this->numericField('imgWidth', 'Largura', '80'); ?> x
+						<?php echo $this->numericField('imgHeight', 'Altura', '60'); ?> px
+					</div>
+					<div class="field">
+						<label title="Se estiver marcado irá recortar a imagem nas dimensões exatas que foram informadas.">Recortar:</label>
+						<?php echo $this->checkbox('imgCrop', true); ?>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php
