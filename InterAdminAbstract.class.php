@@ -193,15 +193,22 @@ abstract class InterAdminAbstract {
 		
 		foreach ($attributes as $key => $value) {
 			$key = ($aliases[$key]) ? $aliases[$key] : $key;
-			if (is_object($value)) {
-				$valuesToSave[$key] = (string) $value;
-				if ($value instanceof InterAdminFieldFile) {
-					$valuesToSave[$key . '_text'] = $value->text;
-				}
-			} elseif (is_array($value)) {
-				$valuesToSave[$key] = implode(',', $value);
-			} else {
-				$valuesToSave[$key] = $value;
+			switch (gettype($value)) {
+				case 'object':
+					$valuesToSave[$key] = (string) $value;
+					if ($value instanceof InterAdminFieldFile) {
+						$valuesToSave[$key . '_text'] = $value->text;
+					}
+					break;
+				case 'array':
+					$valuesToSave[$key] = implode(',', $value);
+					break;
+				case 'NULL':
+					$valuesToSave[$key] = '';
+					break;
+				default:
+					$valuesToSave[$key] = $value;
+					break;
 			}
 		}
 		
@@ -209,7 +216,7 @@ abstract class InterAdminAbstract {
 		if ($this->$pk) {
 			$db->AutoExecute($this->getTableName(), $valuesToSave, 'UPDATE', $pk . ' = ' .  $this->$pk) or die(jp7_debug($db->ErrorMsg()));
 		} else {
-			$db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT');
+			$db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT') or die(jp7_debug($db->ErrorMsg()));
 			$this->$pk = $db->Insert_ID();
 		}
 	}
