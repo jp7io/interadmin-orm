@@ -1,6 +1,7 @@
 <?php
 
 class Jp7_Model_ContactRecipientsTipo extends Jp7_Model_TipoAbstract {
+	public $hasOwnPage = false;
 	public $isSubTipo = true;
 	
 	public $attributes = array(

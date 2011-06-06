@@ -73,6 +73,12 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			$introduction->ordem = -30;
 	        $introduction->save();
 		}
+		if (!$tipo->getFirstChildByModel('Images')) {
+			$images = $tipo->createChild('Images');
+			$images->nome = 'Images';
+			$images->ordem = -25;
+	        $images->save();
+		}
 		if (!$tipo->getFirstChildByModel('Boxes')) {
 			$boxes = $tipo->createChild('Boxes');
 			$boxes->nome = 'Boxes';
