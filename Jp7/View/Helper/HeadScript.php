@@ -12,6 +12,23 @@ class Jp7_View_Helper_HeadScript extends Zend_View_Helper_HeadScript {
 		}
 	}
 	
+	/**
+	 * Replace file maintaining the same key
+	 * @param string $search Current file
+	 * @param string $replace New file
+	 * @return void
+	 */
+	public function replaceFile($search, $replace) {
+		$stack = $this->getContainer();
+		
+		foreach ($stack as $key => $value) {
+			if ($value->attributes['src'] == $search) {
+				$value->attributes['src'] = $replace;
+				break;
+			}
+		}
+	}
+	
 	public function toString($indent = null) {
 		$config = Zend_Registry::get('config');
 		foreach ($this as $item) {
