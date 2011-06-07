@@ -23,6 +23,18 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 				
 				$this->imgSize = $imgWidth . 'x' . $imgHeight;
 				$this->imgCrop = isset($this->params->imgCrop) ? $this->params->imgCrop : true;
+				
+				$this->view->headStyle()->appendStyle('
+.box-content.id-' . $this->id . ' .img-wrapper {
+	height: ' . $imgHeight . 'px;
+	width: ' . $imgWidth . 'px;
+	line-height: ' . $imgHeight . 'px;
+}
+.box-content.id-' . $this->id . ' .img-wrapper img {
+	max-height: ' . $imgHeight . 'px;
+	max-width: ' . $imgWidth . 'px;
+}
+');
 			}
 		}
     }
