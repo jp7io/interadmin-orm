@@ -90,21 +90,17 @@ abstract class InterAdminAbstract implements Serializable {
 	
 	public function serialize() {
 		$vars = get_object_vars($this);
-		if ($vars['_db']) {
-			$vars['_db'] = $vars['_db']->databaseType . '://' . $vars['_db']->user . ':' . $vars['_db']->password . '@' .  $vars['_db']->host . '/' . $vars['_db']->database;
-		}
+		unset($vars['_db']);
         return serialize($vars);
     }
 	
     public function unserialize($data) {
-    	$vars = unserialize($data);
+    	global $db;
+		$vars = unserialize($data);
     	foreach ($vars as $key => $value) {
     		$this->$key = $value;
     	}
-		// Reconectando ao banco de dados
-		if ($this->_db) {
-			$this->_db = ADONewConnection($this->_db);
-		}
+    	$this->_db = $db;
     }
 	
 	/** 
