@@ -42,6 +42,8 @@ class InterAdminArquivo extends InterAdminAbstract {
 	public function __construct($id_arquivo = 0, $options = array()) {
 		$this->id_arquivo = $id_arquivo;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
+		
 		if ($options['fields']) {
 			$this->getFieldsValues($options['fields']);
 		}
