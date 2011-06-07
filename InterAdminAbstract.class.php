@@ -14,7 +14,7 @@
  *
  * @package InterAdmin
  */
-abstract class InterAdminAbstract {
+abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
 	
@@ -87,6 +87,26 @@ abstract class InterAdminAbstract {
 		$pk = $this->_primary_key;
 		return (string) $this->$pk;
 	}
+	
+	public function serialize() {
+		$vars = get_object_vars($this);
+		if ($vars['_db']) {
+			$vars['_db'] = $vars['_db']->databaseType . '://' . $vars['_db']->user . ':' . $vars['_db']->password . '@' .  $vars['_db']->host . '/' . $vars['_db']->database;
+		}
+        return serialize($vars);
+    }
+	
+    public function unserialize($data) {
+    	$vars = unserialize($data);
+    	foreach ($vars as $key => $value) {
+    		$this->$key = $value;
+    	}
+		// Reconectando ao banco de dados
+		if ($this->_db) {
+			$this->_db = ADONewConnection($this->_db);
+		}
+    }
+	
 	/** 
 	 * Gets values from this record on the database.
 	 *
