@@ -33,19 +33,22 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 				)
 			));
 			if ($sistemaTipo) {
-				$classesTipo = $sistemaTipo->getFirstChildByNome('Classes');
-				if ($classesTipo) {
-					$child = new InterAdminTipo();
-					$child->parent_id_tipo = $classesTipo->id_tipo;
-					$child->model_id_tipo = $model_id_tipo;
-					$child->nome = 'Modelo - ' . $model_id_tipo;
-					$child->mostrar = 'S';
-					$child->admin = 'S';
-					$child->save();
-					return $child;
+				$columns = $sistemaTipo->getDb()->MetaColumns($sistemaTipo->getTableName());
+				if ($columns['MODEL_ID_TIPO']->type == 'varchar') {
+					$classesTipo = $sistemaTipo->getFirstChildByNome('Classes');
+					if ($classesTipo) {
+						$child = new InterAdminTipo();
+						$child->parent_id_tipo = $classesTipo->id_tipo;
+						$child->model_id_tipo = $model_id_tipo;
+						$child->nome = 'Modelo - ' . $model_id_tipo;
+						$child->mostrar = 'S';
+						$child->admin = 'S';
+						$child->save();
+						return $child;
+					}
 				}
 			}
-			throw new Exception('Could not find a Tipo using the model "' . $model_id_tipo . '". You need to create one in Sistema/Classes.');
+			//throw new Exception('Could not find a Tipo using the model "' . $model_id_tipo . '". You need to create one in Sistema/Classes.');
 		} else {
 			return $child;
 		}
