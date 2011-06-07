@@ -16,10 +16,42 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract {
 		'tabela' => '',
 		'layout' => Jp7_Box_Manager::COL_3,
 		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
-		'editar' => 'S'
+		'editar' => 'S',
+		'disparo' => 'Jp7_Model_OfficesTipo::checkLatLng'
 	);
 	
 	public function createChildren(InterAdminTipo $tipo) {
 		parent::createBoxesSettingsAndIntroduction($tipo);
+	}
+	
+	/**
+	 * Disparo no InterAdmin
+	 * @return void
+	 */
+	public static function checkLatLng($from, $id, $id_tipo) {
+		if ($from == 'edit' || $from == 'insert') {
+			if ($id && $id_tipo) {
+				$tipo = InterAdminTipo::getInstance($id_tipo);
+				if ($registro = $tipo->getInterAdminById($id, array('fields' => '*'))) {
+					if (!$registro->latitude && !$registro->longitude) {
+						$fullAddress = jp7_implode(', ', array(
+							$registro->address,
+							$registro->postal_code,
+							$registro->city
+						));
+						if ($registro->state) {
+							$fullAddress .= ' - ' . $registro->state->getByAlias('sigla');
+						}
+						$location = Jp7_GoogleMaps::getLatLngByEndereco($fullAddress);
+						if ($location) {
+							$registro->updateAttributes(array(
+								'latitude' => $location->lat,
+								'longitude' => $location->lng
+							));
+						}
+					}
+				}
+			}
+		}
 	}
 }

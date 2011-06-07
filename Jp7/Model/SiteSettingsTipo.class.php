@@ -156,26 +156,24 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		}
 	}
 	
-	public static function saveTemplateFields() {
-		global $id, $interadmin_id;
-		if (!$id) {
-			$id = $interadmin_id;
-		}
-		if ($id) {
-			$tipo = InterAdminTipo::getInstance($_POST['id_tipo']);
-			if ($registro = $tipo->getInterAdminById($id)) {
-				$special_1 = array();
-				foreach ($_POST as $key => $values) {
-					if (startsWith('css_', $key) && !endsWith('_xtra', $key)) {
-						$special_1[$key] = $values[0];
+	public static function saveTemplateFields($from, $id, $id_tipo) {
+		if ($from == 'edit' || $from == 'insert') {
+			if ($id && $id_tipo) {
+				$tipo = InterAdminTipo::getInstance($id_tipo);
+				if ($registro = $tipo->getInterAdminById($id)) {
+					$special_1 = array();
+					foreach ($_POST as $key => $values) {
+						if (startsWith('css_', $key) && !endsWith('_xtra', $key)) {
+							$special_1[$key] = $values[0];
+						}
 					}
+					$registro->updateAttributes(array(
+						'special_1' => serialize($special_1)
+					));
+					
+					self::$_dados = $special_1;
+					self::_saveDynamicCss();
 				}
-				$registro->updateAttributes(array(
-					'special_1' => serialize($special_1)
-				));
-				
-				self::$_dados = $special_1;
-				self::_saveDynamicCss();
 			}
 		}
 	}
