@@ -97,6 +97,13 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				
 				self::_breakTable();
 				
+				self::_getTit('Cores do Slideshow');
+				self::_getColorField('slideshow_title_color', 'Título');
+				self::_getColorField('slideshow_text_color', 'Subtítulo');
+				self::_getColorField('slideshow_a_color', 'Link', true);				
+				
+				self::_breakTable();
+				
 				self::_getTit('Cores do Conteúdo');
 				self::_getColorField('content_background', 'Cor de Fundo');
 				self::_getColorField('content_title_color', 'Título');
@@ -121,7 +128,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getTit('Cores do Rodapé');
 				self::_getColorField('footer_background', 'Cor de Fundo');
 				self::_getColorField('footer_title_color', 'Título');
-				self::_getColorField('footer_color', 'Texto', true && !self::$_theme_editor);
+				self::_getColorField('footer_color', 'Texto');
+				self::_getColorField('disclaimer_color', 'Disclaimer', true && !self::$_theme_editor);
 				break;
 		}
 	}
@@ -204,6 +212,10 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			self::_getCssBase('breadcrumb', array('breadcrumb_background')) .
 			self::_getCssBase('breadcrumb-a', array('breadcrumb_color')) .
 			
+			self::_getCssBase('slideshow-title', array('slideshow_title_color')) .
+			self::_getCssBase('slideshow-text', array('slideshow_text_color')) .
+			self::_getCssBase('slideshow-a', array('slideshow_a_color')) .
+			
 			self::_getCssBase('content', array('content_background')) .
 			self::_getCssBase('content-title', array('content_title_color')) .
 			self::_getCssBase('content-subtitle', array('content_subtitle_color')) .
@@ -224,6 +236,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			self::_getCssBase('footer', array('footer_background')) .
 			self::_getCssBase('footer-title', array('footer_title_color')) .
 			self::_getCssBase('footer-text', array('footer_color')) .
+			
+			self::_getCssBase('disclaimer', array('disclaimer_color')) .
 			'';
 		
 		file_put_contents($filename, $content);
