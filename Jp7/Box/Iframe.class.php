@@ -9,7 +9,7 @@ class Jp7_Box_Iframe extends Jp7_Box_BoxAbstract {    /**
 		<div class="fields">
 			<div class="field obligatory">
 				<label>Href:</label>
-				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : ''; ?>" 
+				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href; ?>" 
 					name="<?php echo $this->id_box; ?>[href][]" />
 			</div>
 			
@@ -25,7 +25,7 @@ class Jp7_Box_Iframe extends Jp7_Box_BoxAbstract {    /**
 			
 			<div class="field">
 				<label>Título:</label>
-				<input type="text" class="textbox" obligatory="no" label="Título" placeholder="Nenhum" value="<?php echo $this->params->title ? $this->params->title : ''; ?>" 
+				<input type="text" class="textbox" obligatory="no" label="Título" placeholder="Nenhum" value="<?php echo $this->params->title; ?>" 
 					name="<?php echo $this->id_box; ?>[title][]" />
 			</div>
 		</div>

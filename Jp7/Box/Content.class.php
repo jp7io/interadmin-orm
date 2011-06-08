@@ -57,7 +57,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 				<label>Título:</label>
 				<input type="text" class="textbox" label="Título" placeholder="Automático" 
 					name="<?php echo $this->id_box; ?>[title][]"
-					value="<?php echo $this->params->title ? $this->params->title : ''; ?>"	/>
+					value="<?php echo $this->params->title; ?>"	/>
 			</div>
 			<div class="field obligatory">
 				<label>Seção:</label>
