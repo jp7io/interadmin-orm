@@ -86,16 +86,18 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_breakTable();
 				
 				self::_getTit('Cores do Menu');
-				self::_getColorField('menu_background', 'Cor de Fundo');
+				self::_getColorField('menu_background', 'Fundo');
 				self::_getColorField('menu_color', 'Texto');
 				self::_getColorField('menu_active_background', 'Fundo Ativo');
-				self::_getColorField('menu_active_color', 'Texto Ativo', true);
+				self::_getColorField('menu_active_color', 'Texto Ativo');
+				self::_getColorField('menu_hover_background', 'Fundo Hover');
+				self::_getColorField('menu_hover_color', 'Texto Hover', true);
+				
+				self::_breakTable();
 				
 				self::_getTit('Cores do Breadcrumb');
 				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
-				self::_getColorField('breadcrumb_color', 'Texto', true && !self::$_theme_editor);
-				
-				self::_breakTable();
+				self::_getColorField('breadcrumb_color', 'Texto', true );
 				
 				self::_getTit('Cores do Slideshow');
 				self::_getColorField('slideshow_title_color', 'Título');
@@ -109,7 +111,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('content_title_color', 'Título');
 				self::_getColorField('content_subtitle_color', 'Subtítulo');
 				self::_getColorField('content_color', 'Texto');
-				self::_getColorField('content_a_color', 'Links', true && !self::$_theme_editor);
+				self::_getColorField('content_a_color', 'Links');
+				self::_getColorField('content_border_bottom', 'Separador', true);
 				
 				self::_breakTable();
 				
@@ -129,7 +132,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::_getColorField('footer_background', 'Cor de Fundo');
 				self::_getColorField('footer_title_color', 'Título');
 				self::_getColorField('footer_color', 'Texto');
-				self::_getColorField('disclaimer_color', 'Disclaimer', true && !self::$_theme_editor);
+				self::_getColorField('disclaimer_color', 'Disclaimer', true);
 				break;
 		}
 	}
@@ -208,6 +211,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			self::_getCssBase('menu-a', array('menu_color')) .
 			self::_getCssBase('menu-on', array('menu_active_background')) .
 			self::_getCssBase('menu-a-on', array('menu_active_color')) .
+			self::_getCssBase('menu-hover', array('menu_hover_background')) .
+			self::_getCssBase('menu-a-hover', array('menu_hover_color')) .
 			
 			self::_getCssBase('breadcrumb', array('breadcrumb_background')) .
 			self::_getCssBase('breadcrumb-a', array('breadcrumb_color')) .
@@ -221,6 +226,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			self::_getCssBase('content-subtitle', array('content_subtitle_color')) .
 			self::_getCssBase('content-text', array('content_color')) .
 			self::_getCssBase('content-a', array('content_a_color')) .
+			self::_getCssBase('content-border-bottom', array('content_border_bottom')) .
 			
 			self::_getCssBase('box-header', array('box_header_background')) .
 			self::_getCssBase('box-header-a', array('box_header_color')) .
@@ -250,7 +256,9 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	protected static function _getCssBase($base_id, $properties) {
 		$css = '@base(' . $base_id . ') {' . "\r\n";
 		foreach ($properties as $property) {
-			if (endsWith('_background', $property)) {
+			if (endsWith('_border_bottom', $property)) {
+				$cssProperty = 'border-bottom-color';
+			} elseif (endsWith('_background', $property)) {
 				$cssProperty = 'background';
 			} elseif (endsWith('_color', $property)) {
 				$cssProperty = 'color';
