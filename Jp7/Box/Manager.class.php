@@ -45,6 +45,7 @@ class Jp7_Box_Manager {
 	private static $array = array(
 		'content' => 'Jp7_Box_Content',
 		'facebook' => 'Jp7_Box_Facebook',
+		'html' => 'Jp7_Box_Html',
 		'iframe' => 'Jp7_Box_Iframe',
 		'images' => 'Jp7_Box_Images',
 		'news' => 'Jp7_Box_News',

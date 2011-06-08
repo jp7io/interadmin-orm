@@ -29,4 +29,18 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 	        $recipients->save();
 		}
 	}
+	
+	public function getEditorFields(Jp7_Box_BoxAbstract $box) {
+		ob_start();
+		?>
+		<div class="fields">
+			<?php echo parent::_getEditorImageFields($box); ?>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+	
+	public function prepareData(Jp7_Box_BoxAbstract $box) {
+		parent::_prepareImageData($box);
+	}
 }

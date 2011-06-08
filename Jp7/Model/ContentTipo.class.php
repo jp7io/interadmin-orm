@@ -39,42 +39,13 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {	protected static $
 		ob_start();
 		?>
 		<div class="fields">
-			<div class="group">
-				<div class="group-label">Imagens</div>
-				<div class="group-fields">
-					<div class="field">
-						<label>Dimensões:</label>
-						<?php echo $box->numericField('imgWidth', 'Largura', '80'); ?> x
-						<?php echo $box->numericField('imgHeight', 'Altura', '60'); ?> px
-					</div>
-					<div class="field">
-						<label title="Se estiver marcado irá recortar a imagem nas dimensões exatas que foram informadas.">Recortar:</label>
-						<?php echo $box->checkbox('imgCrop', true); ?>
-					</div>
-				</div>
-			</div>
+			<?php echo parent::_getEditorImageFields($box); ?>
 		</div>
 		<?php
 		return ob_get_clean();
 	}
 	
 	public function prepareData(Jp7_Box_BoxAbstract $box) {
-		$imgHeight = $box->params->imgHeight ? $box->params->imgHeight : 60;
-		$imgWidth = $box->params->imgWidth ? $box->params->imgWidth : 80;
-		
-		$box->view->imgSize = $imgWidth . 'x' . $imgHeight;
-		$box->view->imgCrop = isset($box->params->imgCrop) ? $box->params->imgCrop : true;
-		
-		$box->view->headStyle()->appendStyle('
-.content-content .img-wrapper {
-	height: ' . $imgHeight . 'px;
-	width: ' . $imgWidth . 'px;
-	line-height: ' . $imgHeight . 'px;
-}
-.content-content .img-wrapper img {
-	max-height: ' . $imgHeight . 'px;
-	max-width: ' . $imgWidth . 'px;
-}
-		');
+		parent::_prepareImageData($box);
 	}
 }
