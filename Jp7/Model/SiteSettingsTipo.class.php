@@ -45,11 +45,20 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				// Não sei porque ele coloca &quot;
 				self::$_dados = unserialize(str_replace('&quot;', '"', $value));
 				
+				if (self::$_dados['css_template']) {
+					// Conversão temporária, retirando prefixo css_, TODO retirar código depois
+					foreach (self::$_dados as $key => $value) {
+						self::$_dados[substr($key, 4)] = $value;
+						unset(self::$_dados[$key]);
+					}
+				}
+				
 				if (!self::$_theme_editor) {
-					$campo['tipo'] = 'css_template';
+					$campo['nome_id'] = 'template';
+					$campo['tipo'] = 'css_' . $campo['nome_id'];
 					$campo['tipo_de_campo'] = 'select';
 					$campo['separador'] = 'S';
-					$campo['value'] = self::$_dados[$campo['tipo']];
+					$campo['value'] = self::$_dados[$campo['nome_id']];
 					$campo['opcoes'] = array();
 					
 					foreach (glob(ROOT_PATH . '/_default/templates/*', GLOB_ONLYDIR) as $templateDir) {
@@ -139,11 +148,12 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	
 	protected static function _getColorField($nome_id, $nome, $separador = '') {
 		$campo = array(
+			'nome_id' => $nome_id,
 			'tipo' => 'css_' . $nome_id,
 			'tipo_de_campo' => 'varchar',
 			'nome' => $nome,
 			'xtra' => 'cor',
-			'value' => self::$_dados['css_' . $nome_id],
+			'value' => self::$_dados[$nome_id],
 			'default' => '',
 			'separador' => $separador
 		);
@@ -177,7 +187,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					$special_1 = array();
 					foreach ($_POST as $key => $values) {
 						if (startsWith('css_', $key) && !endsWith('_xtra', $key)) {
-							$special_1[$key] = $values[0];
+							$special_1[substr($key, 4)] = $values[0];
 						}
 					}
 					$registro->updateAttributes(array(
@@ -265,7 +275,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 			} else {
 				continue;
 			}
-			if ($value = self::$_dados['css_' . $property]) {
+			if ($value = self::$_dados[$property]) {
 				$css .= "\t" . $cssProperty . ': ' . $value . ';' . "\r\n";
 			}
 		}

@@ -8,23 +8,20 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 		?>
 		<div class="fields">
 			<div class="field obligatory">
-				<label>Href:</label>
+				<label>URL:</label>
 				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : 'http://www.facebook.com/platform'; ?>" 
 					name="<?php echo $this->id_box; ?>[href][]" />
 			</div>
-			
 			<div class="field">
-				<label>Show Faces:</label>
+				<label>Faces:</label>
 				<?php echo $this->checkbox('show_faces', true); ?>
 			</div>
-			
 			<div class="field">
-				<label>Stream:</label>
+				<label>Atualizações:</label>
 				<?php echo $this->checkbox('stream'); ?>
 			</div>
-			
 			<div class="field">
-				<label>Header:</label>
+				<label>Cabeçalho:</label>
 				<?php echo $this->checkbox('header'); ?>
 			</div>
 		</div>

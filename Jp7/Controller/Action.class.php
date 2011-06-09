@@ -40,11 +40,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				}
 			}
 			if ($siteSettings->template_data) {
-				$template_data = unserialize($siteSettings->template_data);
-				if ($config->template_path = $template_data['css_template']) {
+				$config->template = (object) unserialize($siteSettings->template_data);
+				if ($config->template->template) {
 					$this->view->headLink()->removeStylesheet('css/main.css');
 					// @filemtime(jp7_absolute_path(APPLICATION_PATH . '/../interadmin/dynamic.css'));
-					$this->view->headLink()->appendStylesheet($config->template_path . '/css/main.css?clientePath=' . $config->name_id); // . '&update=' . $dynamicTime
+					$this->view->headLink()->appendStylesheet($config->template->template . '/css/main.css?clientePath=' . $config->name_id); // . '&update=' . $dynamicTime
 					// Necessário para mudar a ordem
 					$this->view->headLink()->appendStylesheet('css/main.css');
 				}

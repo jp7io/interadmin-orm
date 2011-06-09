@@ -52,6 +52,7 @@ class Jp7_Box_Manager {
 		'offices' => 'Jp7_Box_Offices',
 		'sections' => 'Jp7_Box_Sections',
 		'slideshow' => 'Jp7_Box_Slideshow',
+		'twitter' => 'Jp7_Box_Twitter',
 		'youtube' => 'Jp7_Box_Youtube',
 		'_content' => 'Jp7_Box_PageContent'
 	);
