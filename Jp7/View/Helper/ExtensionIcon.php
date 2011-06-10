@@ -1,0 +1,16 @@
+doc
+docx
+flv
+gif
+jpg
+mp3
+pdf
+png
+pps
+ppt
+wan
+wfl
+wmv
+wtl
+xls
+zip
