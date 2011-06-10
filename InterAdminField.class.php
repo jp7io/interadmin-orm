@@ -251,7 +251,7 @@ class InterAdminField {
 				echo "".
 				"<tr>".
 					$_th.
-					"<td><input type=\"text\" label=\"" . $campo_nome . "\" name=\"".$campo."[".$j."]\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . " value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:" . ($campo_array['sem_creditos'] ? 60 : 80) . "px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
+					"<td><input type=\"text\" label=\"" . $campo_nome . "\" name=\"".$campo."[".$j."]\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . " value=\"".$valor."\" xtra=\"".$xtra."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:" . ($campo_array['sem_creditos'] ? 60 : 80) . "px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
 					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . (($valor)?" align=\"center\" onclick=\"openPopup('".$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url):">")."</td>".
 					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . ">".$S_ajuda."</td>".
 				"</tr>\n";

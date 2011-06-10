@@ -127,7 +127,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 				</div>
 				<div class="field">
 					<label title="Se estiver marcado irá recortar a imagem nas dimensões exatas que foram informadas.">Recortar:</label>
-					<?php echo $box->checkbox('imgCrop', true); ?>
+					<?php echo $box->checkbox('imgCrop'); ?>
 				</div>
 			</div>
 		</div>
@@ -140,7 +140,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		$imgWidth = $box->params->imgWidth ? $box->params->imgWidth : 80;
 		
 		$box->view->imgSize = $imgWidth . 'x' . $imgHeight;
-		$box->view->imgCrop = isset($box->params->imgCrop) ? $box->params->imgCrop : true;
+		$box->view->imgCrop = (bool) $box->params->imgCrop;
 		
 		$box->view->headStyle()->appendStyle('
 .content-' . toId($this->id_tipo) . ' .img-wrapper {
