@@ -721,6 +721,11 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 <?php echo join(file(KRUMO_DIR . "krumo.js"));?>
 
 //-->
+if (typeof($) == 'undefined') {
+	var _include = window.document.createElement('script');
+	_include.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
+	window.document.body.appendChild(_include);
+}
 </script>
 <?php
 			}
