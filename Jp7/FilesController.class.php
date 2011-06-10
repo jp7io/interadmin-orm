@@ -6,6 +6,11 @@ class Jp7_FilesController extends __Controller_Action {
 	
 	public function indexAction() {
 		$filesTipo = self::getTipo();
+		
+		$this->view->records = $filesTipo->getInterAdmins(array(
+			'fields' => array('name', 'file')
+		));
+			
 		// Introdução
 		if ($introductionTipo = $filesTipo->getFirstChildByModel('Introduction')) {
 			$this->view->introductionItens = $introductionTipo->getInterAdmins(array(

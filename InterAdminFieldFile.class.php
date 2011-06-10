@@ -40,7 +40,7 @@ class InterAdminFieldFile {
 	}
 	public function getAbsoluteUrl() {
 		global $config;
-		return str_replace('../../upload/', $config->url . 'upload/', $this->url);
+		return jp7_replace_beginning('../../upload/', $config->url . 'upload/', $this->url);
 	}	
 	/**
 	 * Retorna texto para ser usado no "alt" ou "title" da imagem.
@@ -79,4 +79,18 @@ class InterAdminFieldFile {
     public function setParent($parent) {
         $this->_parent = $parent;
     }
+	/**
+	 * Returns the extension of this file.
+	 * 
+	 * @return string Extension, such as 'jpg' or 'gif'.
+	 */
+	public function getExtension() {
+		$url = reset(explode('?', $this->url));
+		return preg_replace('/(.*)\.(.*)$/', '\2', $url);
+	}
+	public function getSize() {
+		$url = reset(explode('?', $this->url));
+		$url = jp7_replace_beginning('../../upload', 'upload', $url);
+		return jp7_file_size($url);
+	}
 }
