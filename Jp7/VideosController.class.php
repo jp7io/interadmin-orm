@@ -9,11 +9,12 @@ class Jp7_VideosController extends __Controller_Action {
 		
 		if ($id = $this->_getParam('id')) {
 			$this->record = $contentTipo->getInterAdminById($id, array(
-				'fields' => array('*')
+				'fields' => array('title', 'video', 'summary')
 			));
 			if (!$this->record) {
 				$this->_redirect($contentTipo->getUrl());
 			}
+			
 		} else {
 			// Introdução
 			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {
@@ -23,7 +24,7 @@ class Jp7_VideosController extends __Controller_Action {
 			}
 			
 			$this->view->records = $contentTipo->getInterAdmins(array(
-				'fields' => array('*')
+				'fields' => array('title', 'thumb', 'summary')
 			));
 		}
 	}

@@ -114,7 +114,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		// do nothing
 	}
 	
-	protected function _getEditorImageFields($box) {
+	protected function _getEditorImageFields($box, $default_width = '80', $default_height = '60') {
 		ob_start();
 		?>
 		<div class="group">
@@ -122,8 +122,8 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			<div class="group-fields">
 				<div class="field">
 					<label>Dimensões:</label>
-					<?php echo $box->numericField('imgWidth', 'Largura', '80'); ?> x
-					<?php echo $box->numericField('imgHeight', 'Altura', '60'); ?> px
+					<?php echo $box->numericField('imgWidth', 'Largura', $default_width); ?> x
+					<?php echo $box->numericField('imgHeight', 'Altura', $default_height); ?> px
 				</div>
 				<div class="field">
 					<label title="Se estiver marcado irá recortar a imagem nas dimensões exatas que foram informadas.">Recortar:</label>
@@ -135,9 +135,9 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		return ob_get_clean();
 	}
 	
-	protected function _prepareImageData($box) {
-		$imgHeight = $box->params->imgHeight ? $box->params->imgHeight : 60;
-		$imgWidth = $box->params->imgWidth ? $box->params->imgWidth : 80;
+	protected function _prepareImageData($box, $default_width = '80', $default_height = '60') {
+		$imgWidth = $box->params->imgWidth ? $box->params->imgWidth : $default_width;
+		$imgHeight = $box->params->imgHeight ? $box->params->imgHeight : $default_height;
 		
 		$box->view->imgSize = $imgWidth . 'x' . $imgHeight;
 		$box->view->imgCrop = (bool) $box->params->imgCrop;

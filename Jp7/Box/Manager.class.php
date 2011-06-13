@@ -57,6 +57,8 @@ class Jp7_Box_Manager {
 		'_content' => 'Jp7_Box_PageContent'
 	);
 	
+	private static $recordMode = false;
+	
 	/**
 	 * Private constructor.
 	 */
@@ -137,16 +139,16 @@ class Jp7_Box_Manager {
 	 * @param 	InterAdmin 		$pageRecord [optional]
 	 * @return 	InterAdmin[]	An array of columns. Each column has an attribute called "boxes".
 	 */
-	public static function buildBoxes($boxTipo, $pageRecord = null) {
+	public static function buildBoxes($boxTipo) {
 		$records = $boxTipo->getInterAdmins(array(
 			'fields' => array('*'),
-			'where' => array($pageRecord ? "records_page <> ''" : "records_page = ''")
+			'where' => array(self::getRecordMode() ? "records_page <> ''" : "records_page = ''")
 		));
 		// Convert to objects
 		$columns = self::createObjects($records);
 		// Layout
 		$parentTipo = $boxTipo->getParent();
-		$layout = $pageRecord ? $parentTipo->layout_registros : $parentTipo->layout;
+		$layout = self::getRecordMode() ? $parentTipo->layout_registros : $parentTipo->layout;
 		if ($layout) {
 			$position = self::$positions[$layout];
 			if (!$columns[$position]->boxes) {
@@ -202,4 +204,11 @@ class Jp7_Box_Manager {
     public static function setView(Zend_View $view) {
 		self::$view = $view;
     }
+	
+	public static function setRecordMode($mode) {
+		self::$recordMode = (bool) $mode;
+	}
+	public static function getRecordMode() {
+		return self::$recordMode;
+	}
 }

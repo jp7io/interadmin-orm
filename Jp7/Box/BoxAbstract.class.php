@@ -15,6 +15,7 @@ abstract class Jp7_Box_BoxAbstract {
 	 * Prepara os dados que vão ser utilizados na view do box mais tarde. 
 	 * Exemplo: Faz a busca das notícias que vão ser exibidas.
 	 * 
+	 * @param bool 	$isRecordPage
 	 * @return void
 	 */
 	public function prepareData() {
@@ -22,6 +23,8 @@ abstract class Jp7_Box_BoxAbstract {
 	}
 	/**
 	 * Retorna o HTML do box
+	 * 
+	 * @param bool 	$isRecordPage
 	 * @return string
 	 */
 	public function getEditorHtml() {
@@ -61,6 +64,8 @@ abstract class Jp7_Box_BoxAbstract {
 	}
 	/**
 	 * Retorna o CSS do box
+	 * 
+	 * @param bool 	$isRecordPage
 	 * @return string
 	 */
 	public function getEditorStyle() {

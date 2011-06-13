@@ -38,6 +38,4 @@ class Jp7_Box_PageContent extends Jp7_Box_BoxAbstract {    /**
 }
 ";
 	}
-	
-	
 }

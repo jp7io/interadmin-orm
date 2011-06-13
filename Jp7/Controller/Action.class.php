@@ -79,7 +79,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			$boxTipo = $tipo->getFirstChildByModel('Boxes');
 			if ($boxTipo) {
 				Jp7_Box_Manager::setView($this->view);
-				$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxTipo, $this->record);
+				Jp7_Box_Manager::setRecordMode($this->record);
+				$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxTipo);
 			}
 		}
 		

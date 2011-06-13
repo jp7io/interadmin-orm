@@ -30,14 +30,32 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 		ob_start();
 		?>
 		<div class="fields">
-			<?php echo parent::_getEditorImageFields($box); ?>
+			<?php if (Jp7_Box_Manager::getRecordMode()) { ?>
+				<div class="group">
+					<div class="group-label">Vídeo</div>
+					<div class="group-fields">
+						<div class="field">
+							<label>Dimensões:</label>
+							<?php echo $box->numericField('videoWidth', 'Largura', '620'); ?> x
+							<?php echo $box->numericField('videoHeight', 'Altura', '380'); ?> px
+						</div>
+					</div>
+				</div>
+			<?php } else { ?>
+				<?php echo parent::_getEditorImageFields($box, 310, 230); ?>
+			<?php } ?>
 		</div>
 		<?php
 		return ob_get_clean();
 	}
 	
 	public function prepareData(Jp7_Box_BoxAbstract $box) {
-		parent::_prepareImageData($box);
+		if (Jp7_Box_Manager::getRecordMode()) {
+			$box->view->videoWidth = $box->params->videoWidth ? $box->params->videoWidth : 620;
+			$box->view->videoHeight = $box->params->videoHeight ? $box->params->videoHeight : 380;
+		} else {
+			parent::_prepareImageData($box, 310, 230);
+		}
 	}
 	
 	public static function checkThumb($from, $id, $id_tipo) {
@@ -47,6 +65,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 				'fields' => array('video', 'thumb')
 			));
 			if ($registro && !$registro->thumb) {
+				// Salvando thumb caso esteja vazio e seja um vídeo do YouTube ou Vimeo
 				if (startsWith('http://www.youtube.com', $registro->video)) {
 					$registro->updateAttributes(array(
 						'thumb' => Jp7_YouTube::getThumbnail($registro->video)
