@@ -2,7 +2,7 @@
 // Necessário para herdar métodos padrão
 return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 
-class Jp7_ContentController extends __Controller_Action {
+class Jp7_VideosController extends __Controller_Action {
 	
 	public function indexAction() {
 		$contentTipo = self::getTipo();
@@ -14,12 +14,6 @@ class Jp7_ContentController extends __Controller_Action {
 			if (!$this->record) {
 				$this->_redirect($contentTipo->getUrl());
 			}
-			$this->record->subitens = $this->record->getSubitens(array(
-				'fields' => array('*')
-			));
-			$this->record->files = $this->record->getArquivosParaDownload(array(
-				'fields' => array('name', 'file')
-			));
 		} else {
 			// Introdução
 			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {
@@ -31,16 +25,6 @@ class Jp7_ContentController extends __Controller_Action {
 			$this->view->records = $contentTipo->getInterAdmins(array(
 				'fields' => array('*')
 			));
-			
-			foreach ($this->view->records as $record) {
-				if (!$record->text) {
-					$record->subitens = $record->getSubitens(array(
-						'fields' => array('*')
-					));
-				} else {
-					$record->subitens = array();	
-				}
-			}
 		}
 	}
 }

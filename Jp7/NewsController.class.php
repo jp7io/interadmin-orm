@@ -14,7 +14,7 @@ class Jp7_NewsController extends __Controller_Action {
 			if (!$this->record) {
 				$this->_redirect($newsTipo->getUrl());
 			}
-			$this->record->subitens = $this->record->getSubItens(array(
+			$this->record->subitens = $this->record->getSubitens(array(
 				'fields' => array('*')
 			));
 			$this->record->files = $this->record->getArquivosParaDownload(array(
