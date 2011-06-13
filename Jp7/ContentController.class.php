@@ -17,9 +17,11 @@ class Jp7_ContentController extends __Controller_Action {
 			$this->record->subitens = $this->record->getSubitens(array(
 				'fields' => array('*')
 			));
+			/*
 			$this->record->files = $this->record->getArquivosParaDownload(array(
 				'fields' => array('name', 'file')
 			));
+			*/
 		} else {
 			// Introdução
 			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {

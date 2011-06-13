@@ -17,9 +17,11 @@ class Jp7_NewsController extends __Controller_Action {
 			$this->record->subitens = $this->record->getSubitens(array(
 				'fields' => array('*')
 			));
+			/*
 			$this->record->files = $this->record->getArquivosParaDownload(array(
 				'fields' => array('name', 'file')
 			));
+			*/
 		} else {
 			// Introdução
 			if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
@@ -27,7 +29,7 @@ class Jp7_NewsController extends __Controller_Action {
 					'fields' => '*'
 				));
 			}
-		
+			
 			$this->view->news = $newsTipo->getInterAdmins(array(
 				'fields' => array('*', 'date_publish')
 			));

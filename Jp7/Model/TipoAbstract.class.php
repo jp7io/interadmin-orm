@@ -82,10 +82,16 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			$images->ordem = -25;
 	        $images->save();
 		}
+		if (!$tipo->getFirstChildByModel('Files')) {
+			$files = $tipo->createChild('Files');
+			$files->nome = 'Arquivos Para Download';
+			$files->ordem = -20;
+	        $files->save();
+		}
 		if (!$tipo->getFirstChildByModel('Boxes')) {
 			$boxes = $tipo->createChild('Boxes');
 			$boxes->nome = 'Boxes';
-			$boxes->ordem = -20;
+			$boxes->ordem = -15;
 	        $boxes->save();
 		}
 		if (!$tipo->getFirstChildByModel('Settings')) {
