@@ -25,8 +25,11 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 		parent::__construct();
 		if (!self::$_children) {
 			$contentSubitem = $this->_findChildByModel('ContentSubitem');
+			$contentFiles = $this->_findChildByModel('ContentFiles');
 			$images = $this->_findChildByModel('Images');
+			
 			self::$_children = $contentSubitem->id_tipo . '{,}Sub-itens{,}{,}{;}' .
+				$contentFiles->id_tipo . '{,}Arquivos para Download{,}{,}{;}' .
 				$images->id_tipo . '{,}Imagens{,}{,}{;}';
 		}
 		$this->children = self::$_children;

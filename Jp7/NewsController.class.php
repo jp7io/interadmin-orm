@@ -11,6 +11,15 @@ class Jp7_NewsController extends __Controller_Action {
 			$this->record = $newsTipo->getInterAdminById($id,array(
 				'fields' => array('*', 'date_publish')
 			));
+			if (!$this->record) {
+				$this->_redirect($newsTipo->getUrl());
+			}
+			$this->record->subitens = $this->record->getSubItens(array(
+				'fields' => array('*')
+			));
+			$this->record->files = $this->record->getArquivosParaDownload(array(
+				'fields' => array('name', 'file')
+			));
 		} else {
 			// Introdução
 			if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
