@@ -816,7 +816,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return ADOConnection
 	 */
 	public function getDb() {
-		return $this->_db;
+		return ($this->_db) ? $this->_db : $GLOBALS['db'];
 	}
 	/**
 	 * Sets the database object.
