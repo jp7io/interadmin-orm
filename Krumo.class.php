@@ -722,9 +722,12 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 
 //-->
 if (typeof($) == 'undefined') {
-	var _include = window.document.createElement('script');
-	_include.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
-	window.document.body.appendChild(_include);
+	setTimeout(function() {
+		var _include = window.document.createElement('script');
+		_include.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
+		console.log(window.document);
+		window.document.body.appendChild(_include);
+	}, 200);
 }
 </script>
 <?php
