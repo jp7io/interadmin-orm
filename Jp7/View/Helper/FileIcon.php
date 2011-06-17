@@ -11,7 +11,9 @@ class Jp7_View_Helper_FileIcon extends Zend_View_Helper_Abstract {
 			<img src="/_default/img/ico_file_<?php echo $ext; ?>.gif" alt="<?php echo $ext; ?>" />
 			<?php
 		} else {
-			echo '.' . $ext;
+			?>
+			<span class="no-icon">.<?php echo $ext; ?></span>
+			<?php
 		}
 		return ob_get_clean();
 	}
