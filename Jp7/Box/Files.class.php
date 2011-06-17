@@ -11,7 +11,7 @@ class Jp7_Box_Files extends Jp7_Box_BoxAbstract {
 					'fields' => array('name', 'file')
 				));
 			} catch (Exception $e) {
-				// Do nothing, method getImagens doesnt exist
+				// Do nothing, method getArquivosParaDownload doesnt exist
 			}
 		} elseif ($this->view->tipo) {
 			if ($filesTipo = $this->view->tipo->getFirstChildByModel('Files')) {

@@ -5,7 +5,7 @@ class Jp7_Model_ContentFilesTipo extends Jp7_Model_TipoAbstract {
 	public $isSubTipo = true;
 	
 	public $attributes = array(
-		'id_tipo' => 'Files',
+		'id_tipo' => 'ContentFiles',
 		'nome' => 'Conteúdo - Arquivos para Download',
 		'campos' => 'varchar_key{,}Nome{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}name{;}file_1{,}Arquivo{,}{,}{,}S{,}S{,}trigger{,}S{,}{,}{,}{,}{,}{,}{,}{,}file{;}int_key{,}Ordem{,}{,}{,}{,}S{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
 		'children' => '',
