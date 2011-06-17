@@ -3,7 +3,7 @@
 class Jp7_View_Helper_FileIcon extends Zend_View_Helper_Abstract {
 	
 	public function FileIcon($file) {
-		$availableIcons = array('doc', 'docx', 'flv', 'gif', 'jpg', 'mp3', 'pdf', 'png', 'pps', 'ppt', 'wan', 'wfl', 'wmv', 'wtl', 'xls', 'zip');
+		$availableIcons = array('doc', 'docx', 'flv', 'gif', 'jpg', 'mp3', 'pdf', 'png', 'pps', 'ppt', 'wan', 'wfl', 'wmv', 'wtl', 'xls', 'zip', 'xlsx');
 		$ext = $file->getExtension();
 		ob_start();
 		if (in_array($ext, $availableIcons)) { 
