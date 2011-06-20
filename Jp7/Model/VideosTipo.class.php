@@ -42,7 +42,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 					</div>
 				</div>
 			<?php } else { ?>
-				<?php echo parent::_getEditorImageFields($box, 310, 230); ?>
+				<?php echo parent::_getEditorImageFields($box, false, 310, 230); ?>
 			<?php } ?>
 		</div>
 		<?php
@@ -51,8 +51,9 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 	
 	public function prepareData(Jp7_Box_BoxAbstract $box) {
 		if (Jp7_Box_Manager::getRecordMode()) {
-			$box->view->videoWidth = $box->params->videoWidth ? $box->params->videoWidth : 620;
-			$box->view->videoHeight = $box->params->videoHeight ? $box->params->videoHeight : 380;
+			$box->params->videoWidth = $box->params->videoWidth ? $box->params->videoWidth : 620;
+			$box->params->videoHeight = $box->params->videoHeight ? $box->params->videoHeight : 380;
+			$box->view->params = $box->params;
 		} else {
 			parent::_prepareImageData($box, 310, 230);
 		}

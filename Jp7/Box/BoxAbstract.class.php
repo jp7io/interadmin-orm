@@ -134,7 +134,7 @@ abstract class Jp7_Box_BoxAbstract {
 		$this->_addTiposRecursively($options, $tree);
 		// Valores que não tem pai publicado
 		if ($show_orphan) {
-			foreach ($tree as $key => $value) {
+			foreach ($tree as $key => $orphan_node) {
 				$this->_addTiposRecursively($options, $tree, $key);
 			}
 		}

@@ -44,7 +44,7 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract {	protected static $
 		ob_start();
 		?>
 		<div class="fields">
-			<?php echo parent::_getEditorImageFields($box); ?>
+			<?php echo parent::_getEditorImageFields($box, true); ?>
 		</div>
 		<?php
 		return ob_get_clean();

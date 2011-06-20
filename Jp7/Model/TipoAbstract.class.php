@@ -126,7 +126,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		// do nothing
 	}
 	
-	protected function _getEditorImageFields($box, $default_width = '80', $default_height = '60') {
+	protected function _getEditorImageFields($box, $lightbox = false, $default_width = '80', $default_height = '60') {
 		ob_start();
 		?>
 		<div class="group">
@@ -141,6 +141,12 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 					<label title="Se estiver marcado irá recortar a imagem nas dimensões exatas que foram informadas.">Recortar:</label>
 					<?php echo $box->checkbox('imgCrop'); ?>
 				</div>
+				<?php if ($lightbox) { ?>
+					<div class="field">
+						<label title="Exibe visualizador com a imagem ampliada.">Ampliar:</label>
+						<?php echo $box->checkbox('lightbox'); ?>
+					</div>
+				<?php } ?>
 			</div>
 		</div>
 		<?php
@@ -148,21 +154,30 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	}
 	
 	protected function _prepareImageData($box, $default_width = '80', $default_height = '60') {
-		$imgWidth = $box->params->imgWidth ? $box->params->imgWidth : $default_width;
-		$imgHeight = $box->params->imgHeight ? $box->params->imgHeight : $default_height;
+		$params = $box->params; // facilita
+		$view = $box->view;
 		
-		$box->view->imgSize = $imgWidth . 'x' . $imgHeight;
-		$box->view->imgCrop = (bool) $box->params->imgCrop;
+		$params->imgWidth = $params->imgWidth ? $params->imgWidth : $default_width;
+		$params->imgHeight = $params->imgHeight ? $params->imgHeight : $default_height;
+		$params->imgSize = $params->imgWidth . 'x' . $params->imgHeight; 
 		
-		$box->view->headStyle()->appendStyle('
+		$view->params = $params;
+		
+		if ($params->lightbox) {
+			$view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
+			$view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
+			$view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
+		}
+				
+		$view->headStyle()->appendStyle('
 .content-' . toId($this->id_tipo) . ' .img-wrapper {
-	height: ' . $imgHeight . 'px;
-	width: ' . $imgWidth . 'px;
-	line-height: ' . $imgHeight . 'px;
+	height: ' . $params->imgHeight  . 'px;
+	width: ' . $params->imgWidth . 'px;
+	line-height: ' . $params->imgHeight  . 'px;
 }
 .content-' . toId($this->id_tipo) . ' .img-wrapper img {
-	max-height: ' . $imgHeight . 'px;
-	max-width: ' . $imgWidth . 'px;
+	max-height: ' . $params->imgHeight  . 'px;
+	max-width: ' . $params->imgWidth . 'px;
 }
 ');
 	}
