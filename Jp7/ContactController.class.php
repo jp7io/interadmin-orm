@@ -69,7 +69,7 @@ class Jp7_ContactController extends __Controller_Action {
 				'Agradecemos o seu contato.<br />' .
 				'Por favor, aguarde nosso retorno em breve.<br /><br />',
 		));
-		$reply->setFrom($record->email, $record->name);
+		$reply->setFrom($config->admin_email, $config->admin_name);
 		$reply->send();
 	}
 	

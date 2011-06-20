@@ -12,8 +12,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	
 	public $attributes = array(
 		'id_tipo' => 'SiteSettings',
-		'nome' => 'Configurações Gerais',
-		'campos' => 'tit_1{,}Cabeçalho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Sub-Título{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::getTemplateFields{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}Template{,}{,}{,}template_data{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
+		'nome' => 'Configurações do Site',
+		'campos' => 'tit_1{,}Cabeçalho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_3{,}Dados do Administrador{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_3{;}varchar_2{,}Nome{,}Nome utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_name{;}varchar_3{,}E-mail{,}E-mail utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_email{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::getTemplateFields{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}Template{,}{,}{,}template_data{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
 		'children' => '',
 		'arquivos_ajuda' => '',
 		'arquivos' => '',

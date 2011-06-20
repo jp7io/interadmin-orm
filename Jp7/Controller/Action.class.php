@@ -29,14 +29,19 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		));
 		if ($siteSettingsTipo) {
 			$siteSettings = $siteSettingsTipo->getFirstInterAdmin(array(
-				'fields' => array('header_title', 'header_subtitle', 'template_data')
+				'fields' => array('*')
 			));
 			if ($siteSettings) {
 				$config = Zend_Registry::get('config');
-				foreach ($siteSettings->attributes as $key => $value) {
-					if (!startsWith('id', $key) && $key != 'template_data') {
-						$config->$key = $value;
-					}
+				$attributes = $siteSettings->attributes;
+				// Retirando atributos que não interessam ao config
+				unset($attributes['id_tipo']);
+				unset($attributes['id']);
+				unset($attributes['mostrar']);
+				unset($attributes['template_data']);
+				
+				foreach ($attributes as $key => $value) {
+					$config->$key = $value;
 				}
 			}
 			if ($siteSettings->template_data) {
