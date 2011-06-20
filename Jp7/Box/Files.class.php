@@ -14,7 +14,7 @@ class Jp7_Box_Files extends Jp7_Box_BoxAbstract {
 				// Do nothing, method getArquivosParaDownload doesnt exist
 			}
 		} elseif ($this->view->tipo) {
-			if ($filesTipo = $this->view->tipo->getFirstChildByModel('Files')) {
+			if ($filesTipo = $this->view->tipo->getFirstChildByModel('ContentFiles')) {
 				$this->files = $filesTipo->getInterAdmins(array(
 					'fields' => array('name', 'file')
 				));

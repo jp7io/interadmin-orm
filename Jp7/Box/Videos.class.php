@@ -14,8 +14,8 @@ class Jp7_Box_Videos extends Jp7_Box_BoxAbstract {
 				// Do nothing, method getVideos doesnt exist
 			}
 		} elseif ($this->view->tipo) {
-			if ($videosTipo = $this->view->tipo->getFirstChildByModel('Videos')) {
-				$this->videos = $filesTipo->getInterAdmins(array(
+			if ($videosTipo = $this->view->tipo->getFirstChildByModel('ContentVideos')) {
+				$this->videos = $videosTipo->getInterAdmins(array(
 					'fields' => array('*')
 				));
 			}
