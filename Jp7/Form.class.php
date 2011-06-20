@@ -34,16 +34,20 @@ class Jp7_Form extends Zend_Form {
 			'template' => 'templates/email.phtml',
 			'title' => '',
 			'subject' => '',
+			'message' => '',
 			'config' => $config,
-			'recipientsTipo' => null
+			'recipients' => false
 		);
 		$options = $options + $default;
 		
 		// Layout
-		$html = $this->prepareMailHtml($record, $options);
-		$text = strip_tags($html);
 		$view = Zend_Layout::getMvcInstance()->getView();
-		$html = $view->partial($options['template'], $options + array('message' => $html));
+		// Html
+		$options['message'] .= $this->prepareMailHtml($record, $options);;
+		$html = $view->partial($options['template'], $options);
+		
+		// Text Plain
+		$text = strip_tags($html);
 		
 		// Email
 		$mail = new Jp7_Mail();
@@ -51,18 +55,15 @@ class Jp7_Form extends Zend_Form {
 		$mail->setBodyHtml($html);
 		$mail->setBodyText($text);
 		
-		// Definindo destinatários
-		if ($options['recipientsTipo']) {
+		// Definindo destinatários somente se recipients estiver setado
+		if ($options['recipients'] !== false) {
 			if ($config->isProducao()) {
-				$recipients = $options['recipientsTipo']->getInterAdmins(array(
-					'fields' => array('name', 'email')
-				));
-				if ($recipients) {
+				if (is_array($options['recipients']) && count($options['recipients'])) {
 					// Primeiro é To
-					$recipient = array_shift($recipients);
+					$recipient = array_shift($options['recipients']);
 					$mail->addTo($recipient->email, $recipient->name);
 					// Restante é CC
-					foreach ($recipients as $recipient) {
+					foreach ($options['recipients'] as $recipient) {
 						$mail->addCc($recipient->email, $recipient->name);
 					}
 				}

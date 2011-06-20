@@ -25,7 +25,7 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 		if (!$tipo->getFirstChildByModel('ContactRecipients')) {
 			$recipients = $tipo->createChild('ContactRecipients');
 			$recipients->nome = 'Destinatários';
-			$recipients->ordem = -24;
+			$recipients->ordem = -5;
 	        $recipients->save();
 		}
 	}

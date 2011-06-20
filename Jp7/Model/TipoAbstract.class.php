@@ -73,25 +73,31 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		if (!$tipo->getFirstChildByModel('Introduction')) {
 			$introduction = $tipo->createChild('Introduction');
 			$introduction->nome = 'Introdução';
-			$introduction->ordem = -30;
+			$introduction->ordem = -60;
 	        $introduction->save();
 		}
 		if (!$tipo->getFirstChildByModel('Images')) {
 			$images = $tipo->createChild('Images');
 			$images->nome = 'Images';
-			$images->ordem = -25;
+			$images->ordem = -50;
 	        $images->save();
 		}
-		if (!$tipo->getFirstChildByModel('Files')) {
-			$files = $tipo->createChild('Files');
+		if ($tipo->model_id_tipo !== 'Videos' && !$tipo->getFirstChildByModel('ContentVideos')) {
+			$videos = $tipo->createChild('ContentVideos');
+			$videos->nome = 'Vídeos';
+			$videos->ordem = -40;
+	        $videos->save();
+		}
+		if ($tipo->model_id_tipo !== 'Files' && !$tipo->getFirstChildByModel('ContentFiles')) {
+			$files = $tipo->createChild('ContentFiles');
 			$files->nome = 'Arquivos Para Download';
-			$files->ordem = -20;
+			$files->ordem = -30;
 	        $files->save();
 		}
 		if (!$tipo->getFirstChildByModel('Boxes')) {
 			$boxes = $tipo->createChild('Boxes');
 			$boxes->nome = 'Boxes';
-			$boxes->ordem = -15;
+			$boxes->ordem = -20;
 	        $boxes->save();
 		}
 		if (!$tipo->getFirstChildByModel('Settings')) {

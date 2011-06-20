@@ -46,15 +46,31 @@ class Jp7_ContactController extends __Controller_Action {
 		$config = Zend_Registry::get('config');
 		
 		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
+		$recipients = $recipientsTipo->getInterAdmins(array(
+			'fields' => array('name', 'email')
+		));
 		
 		$formHelper = new Jp7_Form();
+		// E-mail normal para os destinatários do site
 		$mail = $formHelper->createMail($record, array(
 			'subject' => 'Site ' . $config->name . ' - Contato',
 			'title' => 'Contato',
-			'recipientsTipo' => $recipientsTipo
+			'recipients' => $recipients
 		));
 		$mail->setFrom($record->email, $record->name);
 		$mail->send();
+		
+		// E-mail de resposta para o usuário
+		$reply = $formHelper->createMail($record, array(
+			'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - Contato',
+			'title' => 'Contato',
+			'recipients' => array($record), // Envia para o próprio usuário
+			'message' => 
+				'Agradecemos o seu contato.<br />' .
+				'Por favor, aguarde nosso retorno em breve.<br /><br />',
+		));
+		$reply->setFrom($record->email, $record->name);
+		$reply->send();
 	}
 	
 	protected function _getFormHtml($campos, $record) {
