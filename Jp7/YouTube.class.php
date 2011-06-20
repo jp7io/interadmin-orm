@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_Youtube {
+class Jp7_YouTube {
 	
 	/**
 	 * Gets the link for embedding from the YouTube URL.
@@ -62,7 +62,7 @@ class Jp7_Youtube {
 			return preg_replace('~(.*)/u/([0-9]*)/(.*)~', '\3', $youTubeVideoUrl);
 		} else {
 			// Normal link
-			return preg_replace('/.*(watch\?v=|v\/)([^&]*).*/', '\2', $youTubeVideoUrl);
+			return preg_replace('/.*(\?v=|v\/|&v=)([^&]*).*/', '\2', $youTubeVideoUrl);
 		}
 	}
 	
