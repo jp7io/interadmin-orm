@@ -25,6 +25,6 @@ class Jp7_Box_Files extends Jp7_Box_BoxAbstract {
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
     protected function _getEditorTitle() {
-        return 'Arquivos';
+        return 'Arq. para Download';
     }
 }

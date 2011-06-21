@@ -27,16 +27,28 @@ class Jp7_NewsController extends __Controller_Action {
 			));
 			*/
 		} else {
-			// Introdução
-			if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
-				$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
-					'fields' => '*'
-				));
+			$pagination = new Pagination(array(
+				'records' => $newsTipo->getInterAdminsCount(),
+				'next_char' => 'Próxima',
+				'back_char' => 'Anterior',
+				'show_first_and_last' => true 
+			));
+			
+			$this->view->introductionItens = array();
+			if ($pagination->page == 1) {
+				// Introdução na primeira página
+				if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
+					$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+						'fields' => '*'
+					));
+				}
 			}
 			
 			$this->view->news = $newsTipo->getInterAdmins(array(
-				'fields' => array('*', 'date_publish')
+				'fields' => array('*', 'date_publish'),
+				'limit'=> $pagination
 			));
+			$this->view->pagination = $pagination;
 		}
 	}
 }

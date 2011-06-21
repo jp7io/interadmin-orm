@@ -18,21 +18,21 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 				$this->records = $this->sectionTipo->getInterAdmins($options);
 				
 				// Tamanho das imagens
-				$imgHeight = $this->params->imgHeight ? $this->params->imgHeight : 60;
-				$imgWidth = $this->params->imgWidth ? $this->params->imgWidth : 80;
+				$this->params->imgHeight = $this->params->imgHeight ? $this->params->imgHeight : 60;
+				$this->params->imgWidth = $this->params->imgWidth ? $this->params->imgWidth : 80;
 				
-				$this->imgSize = $imgWidth . 'x' . $imgHeight;
-				$this->imgCrop = isset($this->params->imgCrop) ? $this->params->imgCrop : true;
+				$this->params->imgSize = $this->params->imgWidth . 'x' . $this->params->imgHeight;
+				$this->params->imgCrop = isset($this->params->imgCrop) ? $this->params->imgCrop : true;
 				
 				$this->view->headStyle()->appendStyle('
 .box-content.id-' . $this->id . ' .img-wrapper {
-	height: ' . $imgHeight . 'px;
-	width: ' . $imgWidth . 'px;
+	height: ' . $this->params->imgHeight . 'px;
+	width: ' . $this->params->imgWidth . 'px;
 	line-height: ' . $imgHeight . 'px;
 }
 .box-content.id-' . $this->id . ' .img-wrapper img {
-	max-height: ' . $imgHeight . 'px;
-	max-width: ' . $imgWidth . 'px;
+	max-height: ' . $this->params->imgHeight . 'px;
+	max-width: ' . $this->params->imgWidth . 'px;
 }
 ');
 			}

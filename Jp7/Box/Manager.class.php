@@ -50,6 +50,7 @@ class Jp7_Box_Manager {
 		'iframe' => 'Jp7_Box_Iframe',
 		'images' => 'Jp7_Box_Images',
 		'news' => 'Jp7_Box_News',
+		'news-archive' => 'Jp7_Box_NewsArchive',
 		'offices' => 'Jp7_Box_Offices',
 		'sections' => 'Jp7_Box_Sections',
 		'slideshow' => 'Jp7_Box_Slideshow',

@@ -128,6 +128,10 @@ class Pagination {
 			}
 		}
 		
+		if ($show_first_and_last) {
+			$numbers_limit -= 1;
+		}
+		
 		if ($this->total) { // Se houverem paginas
 			if ($this->total > 1) { // E se houver mais de uma pagina
 				// Validação				
@@ -149,7 +153,7 @@ class Pagination {
 				$this->htm_numbers_extra = $this->htm_numbers = '<div class="numbers"><ul>';
 				
 				// First
-				if ($page !=1 && $this->total > 2 && $page > 2) {
+				if (!$show_first_and_last && $this->total > 2 && $page > 2) {
 					$this->htm_numbers_extra .= $this->_createLink(1, $first_char , ' class="' . (($page == 1) ? 'back-off"' :'bgleft_plus"'));
 				}
 				// Previous
@@ -158,14 +162,32 @@ class Pagination {
 				} else {
 					$this->htm_numbers_extra .= $this->_createLink($page - 1, $back_char, ' class="bgleft"');	
 				}
-				// Pages...			
+				// Pages...	
+				if ($show_first_and_last && $min > 1) {
+					$this->htm_numbers_extra .= $this->_createLink(1, 1, (1 == $page) ? ' class="on"' : '');
+					$this->htm_numbers_extra .= '<li class="separator">' . $separador.'</li>';
+					if ($min > 2) {
+						$this->htm_numbers_extra .= $this->_createLink(2, 2, (2 == $page) ? ' class="on"' : '');
+						$this->htm_numbers_extra .= '<li class="separator">' . $separador.'</li>';
+					}
+					if ($min > 3) {
+						$this->htm_numbers_extra .= '<li class="gap"><span>...</span></li>';
+						$this->htm_numbers_extra .= '<li class="separator">' . $separador.'</li>';
+					}
+				}
 				for ($i = $min; $i <= $max; $i++) {
 					$this->htm_numbers .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
 					$this->htm_numbers_extra .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
 					if ($i != $max) {
-						$this->htm_numbers .= '<li class="separator">' . $separador."</li>";
+						$this->htm_numbers .= '<li class="separator">' . $separador.'</li>';
 						$this->htm_numbers_extra .= '<li class="separator">' . $separador . '</li>';
 					}
+				}
+				if ($show_first_and_last && $max < $this->total) {
+					$this->htm_numbers_extra .= '<li class="separator">' . $separador.'</li>';
+					$this->htm_numbers_extra .= '<li class="gap"><span>...</span></li>';
+					$this->htm_numbers_extra .= '<li class="separator">' . $separador.'</li>';
+					$this->htm_numbers_extra .= $this->_createLink($this->total, $this->total, ($this->total == $page) ? ' class="on"' : '');
 				}
 				// Next
 				if ($page >= $this->total) {
@@ -174,7 +196,7 @@ class Pagination {
 					$this->htm_numbers_extra .= $this->_createLink($page + 1, $next_char, ' class="bgright"');	
 				}
 				// Last
-				if ($this->total > 2 && $page < ($this->total - 1)) {
+				if (!$show_first_and_last && $this->total > 2 && $page < ($this->total - 1)) {
 					$this->htm_numbers_extra .= $this->_createLink($this->total, $last_char, ' class="' . (($page == $this->total) ? 'go-off"' : 'bgright_plus"'));
 				}
 				$this->htm_numbers_extra .= '</ul></div>';
