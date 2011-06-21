@@ -5,9 +5,13 @@ return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 class Jp7_NewsController extends __Controller_Action {
 	
 	public function indexAction() {
+		$id = $this->_getParam('id');
+		// Irá cachear uma página diferente para cada registro
+		Jp7_Cache_Output::getInstance()->start((string) $id);
+		
 		$newsTipo = self::getTipo();
 		
-		if ($id = $this->_getParam('id')) {
+		if ($id) {
 			$this->record = $newsTipo->getInterAdminById($id,array(
 				'fields' => array('*', 'date_publish')
 			));

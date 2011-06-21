@@ -5,12 +5,16 @@ return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 class Jp7_OfficesController extends __Controller_Action {
 	
 	public function indexAction() {
+		$id = $this->_getParam('id');
+		// Irá cachear uma página diferente para cada registro
+		Jp7_Cache_Output::getInstance()->start((string) $id);
+		
 		$officesTipo = self::getTipo();
 		
 		$this->view->headScript()->appendFile('http://maps.google.com/maps/api/js?sensor=true');
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
 		
-		if ($id = $this->_getParam('id')) {
+		if ($id) {
 			$this->record = $officesTipo->getInterAdminById($id, array(
 				'fields' => array('*', 'state' => array('sigla'))
 			));

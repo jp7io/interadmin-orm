@@ -5,9 +5,13 @@ return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 class Jp7_ContentController extends __Controller_Action {
 	
 	public function indexAction() {
+		$id = $this->_getParam('id');
+		// Irá cachear uma página diferente para cada registro
+		Jp7_Cache_Output::getInstance()->start((string) $id);
+		
 		$contentTipo = self::getTipo();
 		
-		if ($id = $this->_getParam('id')) {
+		if ($id) {
 			$this->record = $contentTipo->getInterAdminById($id, array(
 				'fields' => array('*')
 			));
