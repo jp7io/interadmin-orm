@@ -435,7 +435,6 @@ function Auth_OpenID_discoverWithYadis($uri, &$fetcher,
     $response = call_user_func_array($discover_function,
                                      array($uri, &$fetcher));
 									 
-									 krumo($response);
 
     $yadis_url = $response->normalized_uri;
     
@@ -465,7 +464,6 @@ function Auth_OpenID_discoverWithYadis($uri, &$fetcher,
     $openid_services = call_user_func_array($endpoint_filter,
                                             array(&$openid_services));
 											
-											krumo($openid_services);
     return array($yadis_url, $openid_services);
 }
 
@@ -534,7 +532,6 @@ function Auth_OpenID_discover($uri, &$fetcher)
     // If the fetcher doesn't support SSL, we can't interact with
     // HTTPS server URLs; remove those endpoints from the list.
     if (!$fetcher->supportsSSL()) {
-    	    	krumo('TESTING fetcher supportsSSL.');
         $http_endpoints = array();
         list($new_uri, $endpoints) = $result;
 
