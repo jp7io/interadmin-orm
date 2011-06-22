@@ -519,6 +519,7 @@ function Auth_OpenID_discover($uri, &$fetcher)
     // If the fetcher (i.e., PHP) doesn't support SSL, we can't do
     // discovery on an HTTPS URL.
     if ($fetcher->isHTTPS($uri) && !$fetcher->supportsSSL()) {
+    	die('impossible');
         return array($uri, array());
     }
 
