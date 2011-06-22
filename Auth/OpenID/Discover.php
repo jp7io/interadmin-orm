@@ -527,6 +527,8 @@ function Auth_OpenID_discover($uri, &$fetcher)
     } else {
         $result = Auth_OpenID_discoverURI($uri, $fetcher);
     }
+	
+	krumo($result);
 
     // If the fetcher doesn't support SSL, we can't interact with
     // HTTPS server URLs; remove those endpoints from the list.
