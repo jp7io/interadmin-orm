@@ -522,6 +522,8 @@ function Auth_OpenID_discover($uri, &$fetcher)
         return array($uri, array());
     }
 
+krumo($uri);
+
     if (Auth_Yadis_identifierScheme($uri) == 'XRI') {
         $result = Auth_OpenID_discoverXRI($uri, $fetcher);
     } else {
