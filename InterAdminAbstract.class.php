@@ -230,9 +230,11 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		$pk = $this->_primary_key;
 		if ($this->$pk) {
-			$db->AutoExecute($this->getTableName(), $valuesToSave, 'UPDATE', $pk . ' = ' .  $this->$pk) or die(jp7_debug($db->ErrorMsg()));
+			$db->AutoExecute($this->getTableName(), $valuesToSave, 'UPDATE', $pk . ' = ' .  $this->$pk) 
+				or die(jp7_debug('Error while updating values in `' . $this->getTableName() .  '` ' . $db->ErrorMsg(), print_r($valuesToSave, true)));
 		} else {
-			$db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT') or die(jp7_debug($db->ErrorMsg()));
+			$db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT') 
+				or die(jp7_debug('Error while inserting data into `' . $this->getTableName() . '` ' . $db->ErrorMsg(), print_r($valuesToSave, true)));
 			$this->$pk = $db->Insert_ID();
 		}
 	}
