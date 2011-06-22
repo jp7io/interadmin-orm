@@ -468,7 +468,7 @@ function Auth_OpenID_discoverWithYadis($uri, &$fetcher,
 
 function Auth_OpenID_discoverURI($uri, &$fetcher)
 {
-   // $uri = Auth_OpenID::normalizeUrl($uri);
+    $uri = Auth_OpenID::normalizeUrl($uri);
     return Auth_OpenID_discoverWithYadis($uri, $fetcher);
 }
 
@@ -529,8 +529,6 @@ krumo($uri);
     } else {
         $result = Auth_OpenID_discoverURI($uri, $fetcher);
     }
-	
-	krumo($result);
 
     // If the fetcher doesn't support SSL, we can't interact with
     // HTTPS server URLs; remove those endpoints from the list.
