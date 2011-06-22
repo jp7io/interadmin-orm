@@ -464,7 +464,8 @@ function Auth_OpenID_discoverWithYadis($uri, &$fetcher,
 
     $openid_services = call_user_func_array($endpoint_filter,
                                             array(&$openid_services));
-
+											
+											krumo($openid_services);
     return array($yadis_url, $openid_services);
 }
 
