@@ -143,7 +143,7 @@ class Auth_OpenID_Mapping {
      * Returns true if $thing is an Auth_OpenID_Mapping object; false
      * if not.
      */
-    static function isA($thing)
+    function isA($thing)
     {
         return (is_object($thing) &&
                 strtolower(get_class($thing)) == 'auth_openid_mapping');
@@ -442,7 +442,7 @@ class Auth_OpenID_Message {
         return $this->getOpenIDNamespace() == Auth_OpenID_OPENID2_NS;
     }
 
-    static function fromPostArgs($args)
+    function fromPostArgs($args)
     {
         // Construct a Message containing a set of POST arguments
         $obj = new Auth_OpenID_Message();
@@ -477,7 +477,7 @@ class Auth_OpenID_Message {
         }
     }
 
-    static function fromOpenIDArgs($openid_args)
+    function fromOpenIDArgs($openid_args)
     {
         // Takes an array.
 
@@ -594,7 +594,7 @@ class Auth_OpenID_Message {
         return $this->_openid_ns_uri;
     }
 
-    static function fromKVForm($kvform_string)
+    function fromKVForm($kvform_string)
     {
         // Create a Message from a KVForm string
         return Auth_OpenID_Message::fromOpenIDArgs(
@@ -887,11 +887,6 @@ class Auth_OpenID_Message {
 
     function getAliasedArg($aliased_key, $default = null)
     {
-        if ($aliased_key == 'ns') {
-            // Return the namespace URI for the OpenID namespace
-            return $this->getOpenIDNamespace();
-        }
-
         $parts = explode('.', $aliased_key, 2);
 
         if (count($parts) != 2) {
@@ -917,4 +912,4 @@ class Auth_OpenID_Message {
     }
 }
 
-
+?>
