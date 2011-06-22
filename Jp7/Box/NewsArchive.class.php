@@ -1,26 +1,19 @@
 <?php
 
-class Jp7_Box_NewsArchive extends Jp7_Box_BoxAbstract {    /**
+class Jp7_Box_NewsArchive extends Jp7_Box_BoxAbstract {
+    /**
      * @see Jp7_Box_BoxAbstract::prepareData()
      */
     public function prepareData() {
-    	/*
-    	$newsTipo = InterAdminTipo::findFirstTipoByModel('News');
-		if ($newsTipo) {
-			$options = array(
-				'fields' => array('title', 'image', 'date_publish'),
-				'fields_alias' => true, // Não dá para garantir que está true por padrão
-				'limit' => $this->params->limit
-			);
-			if ($this->params->featured) {
-				$options['where'][] = "featured <> ''";
-			}
-			$this->title = ($this->params->title) ? $this->params->title : $newsTipo->getNome();
-			$this->news = $newsTipo->getInterAdmins($options);
-		} else {
-			$this->news = array();	
+    	$tipo = $this->view->tipo;
+    	if ($tipo && $tipo->model_id_tipo == 'News') {
+    		$this->tipo = $tipo;
+			$this->archives = $tipo->getInterAdmins(array(
+				'fields' => array('date_publish'),
+				'group' => 'MONTH(date_publish), YEAR(date_publish)',
+				'order' => 'date_publish DESC'
+			));
 		}
-		*/
     }
     /**
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()

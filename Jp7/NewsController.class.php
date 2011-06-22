@@ -27,16 +27,28 @@ class Jp7_NewsController extends __Controller_Action {
 			));
 			*/
 		} else {
+			$options = array(
+				'fields' => array('*', 'date_publish')
+			);
+			if ($archive = $this->_getParam('archive')) {
+				$archiveArr = array_map('intval', explode('/', $archive));
+				if (checkdate($archiveArr[1], 1, $archiveArr[0])) {
+					$this->view->archive = new Jp7_Date($archiveArr[0] . '-' . $archiveArr[1] . '-01');
+					$options['where'][] = 'YEAR(date_publish) = ' . $archiveArr[0];
+					$options['where'][] = 'MONTH(date_publish) = ' . $archiveArr[1];
+				}
+			}
+			
 			$pagination = new Pagination(array(
-				'records' => $newsTipo->getInterAdminsCount(),
+				'records' => $newsTipo->getInterAdminsCount($options),
 				'next_char' => 'Próxima',
 				'back_char' => 'Anterior',
 				'show_first_and_last' => true 
 			));
 			
 			$this->view->introductionItens = array();
-			if ($pagination->page == 1) {
-				// Introdução na primeira página
+			if (!$this->view->archive && $pagination->page == 1) {
+				// Introdução na primeira página (Menos em página de Arquivo Mensal)
 				if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
 					$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
 						'fields' => '*'
@@ -44,10 +56,7 @@ class Jp7_NewsController extends __Controller_Action {
 				}
 			}
 			
-			$this->view->news = $newsTipo->getInterAdmins(array(
-				'fields' => array('*', 'date_publish'),
-				'limit'=> $pagination
-			));
+			$this->view->news = $newsTipo->getInterAdmins($options + array('limit' => $pagination));
 			$this->view->pagination = $pagination;
 		}
 	}
