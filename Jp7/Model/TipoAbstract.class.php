@@ -90,7 +90,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		}
 		if ($tipo->model_id_tipo !== 'Files' && !$tipo->getFirstChildByModel('ContentFiles')) {
 			$files = $tipo->createChild('ContentFiles');
-			$files->nome = 'Arquivos Para Download';
+			$files->nome = 'Arquivos para Download';
 			$files->ordem = -30;
 	        $files->save();
 		}
