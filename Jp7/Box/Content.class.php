@@ -28,7 +28,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 .box-content.id-' . $this->id . ' .img-wrapper {
 	height: ' . $this->params->imgHeight . 'px;
 	width: ' . $this->params->imgWidth . 'px;
-	line-height: ' . $imgHeight . 'px;
+	line-height: ' . $this->params->imgHeight . 'px;
 }
 .box-content.id-' . $this->id . ' .img-wrapper img {
 	max-height: ' . $this->params->imgHeight . 'px;
