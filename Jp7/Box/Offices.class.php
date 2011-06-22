@@ -1,6 +1,7 @@
 <?php
 
-class Jp7_Box_Offices extends Jp7_Box_BoxAbstract {    /**
+class Jp7_Box_Offices extends Jp7_Box_BoxAbstract {
+    /**
      * @see Jp7_Box_BoxAbstract::prepareData()
      */
     public function prepareData() {
@@ -23,17 +24,19 @@ class Jp7_Box_Offices extends Jp7_Box_BoxAbstract {    /**
 			$this->params->imgSize = $this->params->imgWidth . 'x' . $this->params->imgHeight;
 			$this->params->imgCrop = isset($this->params->imgCrop) ? $this->params->imgCrop : true;
 			
-			$this->view->headStyle()->appendStyle('
-.box-offices.id-' . $this->id . ' .img-wrapper {
-height: ' . $this->params->imgHeight . 'px;
-width: ' . $this->params->imgWidth . 'px;
-line-height: ' . $this->params->imgHeight . 'px;
-}
-.box-offices.id-' . $this->id . ' .img-wrapper img {
-max-height: ' . $this->params->imgHeight . 'px;
-max-width: ' . $this->params->imgWidth . 'px;
-}
-');
+			if ($this->view) {
+				$this->view->headStyle()->appendStyle('
+	.box-offices.id-' . $this->id . ' .img-wrapper {
+	height: ' . $this->params->imgHeight . 'px;
+	width: ' . $this->params->imgWidth . 'px;
+	line-height: ' . $this->params->imgHeight . 'px;
+	}
+	.box-offices.id-' . $this->id . ' .img-wrapper img {
+	max-height: ' . $this->params->imgHeight . 'px;
+	max-width: ' . $this->params->imgWidth . 'px;
+	}
+	');
+			}
 		}
     }
 	
