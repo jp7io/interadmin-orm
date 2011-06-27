@@ -168,7 +168,8 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @return string Extension, such as 'jpg' or 'gif'.
 	 */
 	public function getExtension() {
-		return preg_replace('/(.*)\.(.*)$/', '\2', $this->url);
+		$url = reset(explode('?', $this->url));
+		return preg_replace('/(.*)\.(.*)$/', '\2', $url);
 	}
 	
     function getAttributesAliases() {
@@ -204,4 +205,9 @@ class InterAdminArquivo extends InterAdminAbstract {
     public function getAdminAttributes() {
         return array();
     }
+	public function getSize() {
+		$url = reset(explode('?', $this->url));
+		$url = jp7_replace_beginning('../../upload', 'upload', $url);
+		return jp7_file_size($url);
+	}
 }
