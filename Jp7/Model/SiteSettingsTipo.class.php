@@ -57,7 +57,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					$campo['nome_id'] = 'template';
 					$campo['tipo'] = 'css_' . $campo['nome_id'];
 					$campo['tipo_de_campo'] = 'select';
-					$campo['separador'] = 'S';
+					$campo['separador'] = '';
 					$campo['value'] = self::$_dados[$campo['nome_id']];
 					$campo['opcoes'] = array();
 					
@@ -70,79 +70,77 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					
 					?>
 					<tr>
-						<td colspan="4">
+						<th title="css_template (template)"></th>
+						<td colspan="3">
 							<input type="button" value="Abrir Editor de Cores" 
 							onclick="window.open('<?php echo $c_cliente_url; ?>interadmin/site/<?php echo $s_interadmin_cliente; ?>/theme_editor.php')" />
 						</td>
 					</tr>
+					<tr><td height="10" style="padding:0px" colspan="4"></td></tr>
 					<?php
 					
 				} else {
-					?>
-					<input type="hidden" name="css_template[]" value="<?php echo self::$_dados['css_template']; ?>" />
-					<?php	
+					self::_getTit('Cores de Fundo');
+					self::_getColorField('body_background', 'Corpo da Página');
+					self::_getColorField('master_background', 'Wrapper', true);
+									
+					self::_getTit('Cores do Cabeçalho');
+					self::_getColorField('header_background', 'Cor de Fundo');
+					self::_getColorField('header_title_color', 'Título');
+					self::_getColorField('header_subtitle_color', 'Subtítulo', true);
+					
+					self::_breakTable();
+					
+					self::_getTit('Cores do Menu');
+					self::_getColorField('menu_background', 'Fundo');
+					self::_getColorField('menu_color', 'Texto');
+					self::_getColorField('menu_active_background', 'Fundo Ativo');
+					self::_getColorField('menu_active_color', 'Texto Ativo');
+					self::_getColorField('menu_hover_background', 'Fundo Hover');
+					self::_getColorField('menu_hover_color', 'Texto Hover', true);
+					
+					self::_breakTable();
+					
+					self::_getTit('Cores do Breadcrumb');
+					self::_getColorField('breadcrumb_background', 'Cor de Fundo');
+					self::_getColorField('breadcrumb_color', 'Texto', true );
+					
+					self::_getTit('Cores do Slideshow');
+					self::_getColorField('slideshow_title_color', 'Título');
+					self::_getColorField('slideshow_text_color', 'Subtítulo');
+					self::_getColorField('slideshow_a_color', 'Link', true);				
+					
+					self::_breakTable();
+					
+					self::_getTit('Cores do Conteúdo');
+					self::_getColorField('content_background', 'Cor de Fundo');
+					self::_getColorField('content_title_color', 'Título');
+					self::_getColorField('content_subtitle_color', 'Subtítulo');
+					self::_getColorField('content_color', 'Texto');
+					self::_getColorField('content_a_color', 'Links');
+					self::_getColorField('content_border_bottom', 'Separador', true);
+					
+					self::_breakTable();
+					
+					self::_getTit('Cores dos Boxes');
+					self::_getColorField('box_background', 'Cor de Fundo');
+					self::_getColorField('box_title_color', 'Título');
+					self::_getColorField('box_subtitle_color', 'Subtítulo');
+					self::_getColorField('box_color', 'Texto');
+					self::_getColorField('box_header_background', 'Cabeçalho');
+					self::_getColorField('box_header_color', 'Texto do Cabeçalho');
+					self::_getColorField('box_footer_background', 'Rodapé');
+					self::_getColorField('box_footer_color', 'Texto do Rodapé', true && !self::$_theme_editor);
+					
+					self::_breakTable();
+					
+					self::_getTit('Cores do Rodapé');
+					self::_getColorField('footer_background', 'Cor de Fundo');
+					self::_getColorField('footer_title_color', 'Título');
+					self::_getColorField('footer_color', 'Texto');
+					self::_getColorField('disclaimer_color', 'Disclaimer', true);
+					break;
 				}
-				
-				self::_getTit('Cores de Fundo');
-				self::_getColorField('body_background', 'Corpo da Página');
-				self::_getColorField('master_background', 'Wrapper', true);
-								
-				self::_getTit('Cores do Cabeçalho');
-				self::_getColorField('header_background', 'Cor de Fundo');
-				self::_getColorField('header_title_color', 'Título');
-				self::_getColorField('header_subtitle_color', 'Subtítulo', true);
-				
-				self::_breakTable();
-				
-				self::_getTit('Cores do Menu');
-				self::_getColorField('menu_background', 'Fundo');
-				self::_getColorField('menu_color', 'Texto');
-				self::_getColorField('menu_active_background', 'Fundo Ativo');
-				self::_getColorField('menu_active_color', 'Texto Ativo');
-				self::_getColorField('menu_hover_background', 'Fundo Hover');
-				self::_getColorField('menu_hover_color', 'Texto Hover', true);
-				
-				self::_breakTable();
-				
-				self::_getTit('Cores do Breadcrumb');
-				self::_getColorField('breadcrumb_background', 'Cor de Fundo');
-				self::_getColorField('breadcrumb_color', 'Texto', true );
-				
-				self::_getTit('Cores do Slideshow');
-				self::_getColorField('slideshow_title_color', 'Título');
-				self::_getColorField('slideshow_text_color', 'Subtítulo');
-				self::_getColorField('slideshow_a_color', 'Link', true);				
-				
-				self::_breakTable();
-				
-				self::_getTit('Cores do Conteúdo');
-				self::_getColorField('content_background', 'Cor de Fundo');
-				self::_getColorField('content_title_color', 'Título');
-				self::_getColorField('content_subtitle_color', 'Subtítulo');
-				self::_getColorField('content_color', 'Texto');
-				self::_getColorField('content_a_color', 'Links');
-				self::_getColorField('content_border_bottom', 'Separador', true);
-				
-				self::_breakTable();
-				
-				self::_getTit('Cores dos Boxes');
-				self::_getColorField('box_background', 'Cor de Fundo');
-				self::_getColorField('box_title_color', 'Título');
-				self::_getColorField('box_subtitle_color', 'Subtítulo');
-				self::_getColorField('box_color', 'Texto');
-				self::_getColorField('box_header_background', 'Cabeçalho');
-				self::_getColorField('box_header_color', 'Texto do Cabeçalho');
-				self::_getColorField('box_footer_background', 'Rodapé');
-				self::_getColorField('box_footer_color', 'Texto do Rodapé', true && !self::$_theme_editor);
-				
-				self::_breakTable();
-				
-				self::_getTit('Cores do Rodapé');
-				self::_getColorField('footer_background', 'Cor de Fundo');
-				self::_getColorField('footer_title_color', 'Título');
-				self::_getColorField('footer_color', 'Texto');
-				self::_getColorField('disclaimer_color', 'Disclaimer', true);
-				break;
 		}
 	}
 	
@@ -183,8 +181,15 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		if ($from == 'edit' || $from == 'insert') {
 			if ($id && $id_tipo) {
 				$tipo = InterAdminTipo::getInstance($id_tipo);
-				if ($registro = $tipo->getInterAdminById($id)) {
+				$registro = $tipo->getInterAdminById($id, array(
+					'fields' => array('special_1'),
+					'fields_alias' => false
+				));
+				if ($registro) {
 					$special_1 = array();
+					if ($registro->special_1) {
+						$special_1 = unserialize($registro->special_1);
+					}
 					foreach ($_POST as $key => $values) {
 						if (startsWith('css_', $key) && !endsWith('_xtra', $key)) {
 							$special_1[substr($key, 4)] = $values[0];
