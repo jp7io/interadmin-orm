@@ -328,16 +328,16 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$options['aliases'] = array();
 		}
-		// Resolve Alias and Joins for 'fields' and 'from'
-		$this->_resolveFieldsAlias($options);
-		// Resolve Alias and Joins for 'where', 'group' and 'order';
-		$clauses = $this->_resolveSqlClausesAlias($options);
-		
 		if (array_key_exists('use_published_filters', $options)) {
 			$use_published_filters = $options['use_published_filters'];
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
+		// Resolve Alias and Joins for 'fields' and 'from'
+		$this->_resolveFieldsAlias($options);
+		// Resolve Alias and Joins for 'where', 'group' and 'order';
+		$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
+		
 		if ($use_published_filters) {
 			foreach ($options['from'] as $key => $from) {
 				list($table, $alias) = explode(' AS ', $from);
@@ -379,7 +379,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param string $clause
 	 * @return 
 	 */
-	protected function _resolveSqlClausesAlias(&$options = array()) {
+	protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters) {
 		$campos = &$options['campos'];
 		$aliases = &$options['aliases'];
 		
@@ -435,9 +435,26 @@ abstract class InterAdminAbstract implements Serializable {
 				
 				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
 					$table = $existsMatches[2];
-					if ($table == 'tags') { // TODO unificar lógica
+					// TODO unificar lógica
+					if ($table == 'tags') { 
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table . 
-						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
+							' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
+					} elseif (strpos($table, 'children_') === 0) {
+						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
+						$childrenArr = $this->getInterAdminsChildren($joinNome);
+						if (!$childrenArr[$joinNome]) {
+							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
+						}
+						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
+							'db_prefix' => $this->db_prefix,
+							'db' => $this->_db,
+							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+						));
+						
+						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
+						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
+							' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
+							(($existsMatches[4]) ? ' AND ' : '');
 					}
 					
 					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
