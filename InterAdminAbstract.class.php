@@ -547,6 +547,16 @@ abstract class InterAdminAbstract implements Serializable {
 		$campos = &$options['campos'];
 		$aliases = &$options['aliases'];
 		$fields = $options['fields'];
+		
+		foreach ($fields as $key => $campo) {
+			// Traduzindo 'join.campo' para 'join' => array('campo')
+			if (is_string($campo) && strpos($campo, '.') && strpos($campo, '(') === false) {
+				list($join, $nome) = explode('.', $campo);
+				$fields[$join][] = $nome;
+				unset($fields[$key]);
+			}
+		}
+		
 		foreach ($fields as $join => $campo) {
 			// Com join
 			if (is_array($campo)) {
