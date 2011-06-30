@@ -725,7 +725,6 @@ if (typeof($) == 'undefined') {
 	setTimeout(function() {
 		var _include = window.document.createElement('script');
 		_include.setAttribute('src', 'https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
-		console.log(window.document);
 		window.document.body.appendChild(_include);
 	}, 200);
 }
