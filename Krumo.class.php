@@ -1034,7 +1034,33 @@ if (typeof($) == 'undefined') {
 	*/
 	private static function _recursion($data = null) {
 		if (is_object($data)) {
-			$texto = get_class($data) . (($useToString && method_exists($data, '__toString')) ? ' - ' . $data : '');
+			$texto = get_class($data);
+			$vars = '';
+			ob_start();
+			foreach ($data as $key => $value) {
+				if (is_int($value)) {
+					self::_integer($value, $key);
+				} elseif (is_string($value)) {
+					self::_string($value, $key);
+				} elseif (is_array($value)) {
+					$vars2 = '';
+					ob_start();
+					foreach ($value as $key2 => $value2) {
+						if (is_int($value2)) {
+							self::_integer($value2, $key2);
+						} elseif (is_string($value2)) {
+							self::_string($value2, $key2);
+						} else {
+							self::_stringVal($value2, $key2);
+						}
+					}
+					$vars2 .= ob_get_clean();
+					self::_stringVal($value, $key, $vars2);
+				} else {
+					self::_stringVal($value, $key);
+				}
+			}
+			$vars .= ob_get_clean();
 		} else {
 			$texto = gettype($data);
 		}
@@ -1048,8 +1074,8 @@ if (typeof($) == 'undefined') {
 					<a class="krumo-name"><big>&#8734;</big></a>
 					<em class="krumo-type">Recursion</em> (<?php echo $texto ?>)
 			</div>
-		
 		</li>
+		<?php echo $vars; ?>
 	</ul>
 </div>
 <?php
@@ -1130,7 +1156,7 @@ if (typeof($) == 'undefined') {
 
 			<a class="krumo-name"><?php echo $name;?></a>
 			(<em class="krumo-type">Object</em>) 
-			<strong class="krumo-class"><?php echo get_class($data) . (($useToString && method_exists($data, '__toString') && !$data instanceof Zend_Form_Element) ? ' - ' . $data : '');?></strong>
+			<strong class="krumo-class"><?php echo get_class($data) . ((self::$useToString && method_exists($data, '__toString') && !$data instanceof Zend_Form_Element) ? '</strong> (' . $data . ')<strong>' : '');?></strong>
 	</div>
 
 	<?php if (count($data)) {
@@ -1221,6 +1247,32 @@ if (typeof($) == 'undefined') {
 <?php
 		}
 
+	private static function _stringVal($data, $name, $innerdata = '') {
+?>
+<li class="krumo-child">
+
+	<div class="krumo-element <?php if ($innerdata) { ?>krumo-expand<?php } ?>"
+		onMouseOver="krumo.over(this);"
+		onMouseOut="krumo.out(this);">
+		
+			<a class="krumo-name"><big>&#8734;</big> <em class="krumo-type">Recursion</em> (<?php echo $name;?>)</a>
+			(<em class="krumo-type"><?php echo gettype($data);?></em>)
+		
+	</div>
+
+</li>
+
+<?php if ($innerdata) { ?>
+	<div class="krumo-nest">
+		<ul class="krumo-node">
+			<?php echo $innerdata;?>
+		</ul>
+	</div>
+<?php } ?>
+
+<?php
+		}
+		
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 	/**
