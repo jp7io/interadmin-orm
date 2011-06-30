@@ -955,7 +955,7 @@ if (typeof($) == 'undefined') {
 	* @access private
 	* @static
 	*/
-	private static function _vars(&$data, $ignoreRecursion = false) {
+	private static function _vars(&$data, $show = false) {
 
 		$_is_object = is_object($data);
 		
@@ -969,10 +969,10 @@ if (typeof($) == 'undefined') {
 		
 		// recursion detected
 		//
-		if ($_r > 2 && !$ignoreRecursion) {
+		if ($_r > 2 && !$show) {
 			return Krumo::_recursion($data);
 		}
-
+		
 		// stain it
 		//
 		Krumo::_hive($data);
@@ -980,7 +980,7 @@ if (typeof($) == 'undefined') {
 		// render it
 		//
 		?>
-<div class="krumo-nest" style="display:none;">
+<div class="krumo-nest" <?php echo ($show) ? '' : 'style="display:none;"'; ?>>
 	<ul class="krumo-node">
 	<?php
 
@@ -1251,7 +1251,7 @@ if (typeof($) == 'undefined') {
 ?>
 <li class="krumo-child">
 
-	<div class="krumo-element <?php if ($innerdata) { ?>krumo-expand<?php } ?>"
+	<div class="krumo-element <?php if ($innerdata) { ?>krumo-expand" onclick="krumo.toggle(this);<?php } ?>"
 		onMouseOver="krumo.over(this);"
 		onMouseOut="krumo.out(this);">
 		
@@ -1259,16 +1259,16 @@ if (typeof($) == 'undefined') {
 			(<em class="krumo-type"><?php echo gettype($data);?></em>)
 		
 	</div>
-
+	<?php if ($innerdata) { ?>
+		<div class="krumo-nest" style="display: none;">
+			<ul class="krumo-node">
+				<?php echo $innerdata;?>
+			</ul>
+		</div>
+	<?php } ?>
 </li>
 
-<?php if ($innerdata) { ?>
-	<div class="krumo-nest">
-		<ul class="krumo-node">
-			<?php echo $innerdata;?>
-		</ul>
-	</div>
-<?php } ?>
+
 
 <?php
 		}
