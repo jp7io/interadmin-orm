@@ -962,7 +962,11 @@ if (typeof($) == 'undefined') {
 		// prevent endless recursion loops
 		//
 		$_recursion_marker = Krumo::_marker();
-		$_r = ($_is_object)	? @$data->$_recursion_marker : @$data[$_recursion_marker];
+		try {
+			$_r = ($_is_object)	? @$data->$_recursion_marker : @$data[$_recursion_marker];
+		} catch (Exception $e) {
+			// do nothing
+		}
 		$_r = (integer) $_r;
 		
 		
