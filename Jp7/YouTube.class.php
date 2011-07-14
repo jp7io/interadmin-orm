@@ -1,6 +1,8 @@
 <?php
 
 class Jp7_YouTube {
+	const URL_PREFIX = 'http://www.youtube.com/v/';
+	const SHORT_URL_PREFIX = 'http://youtu.be/';
 	
 	/**
 	 * Gets the link for embedding from the YouTube URL.
@@ -10,7 +12,7 @@ class Jp7_YouTube {
 	 */
 	public static function getEmbedLink($youTubeVideoUrl) {
 		if ($id = self::getId($youTubeVideoUrl)) {
-			return 'http://www.youtube.com/v/' . $id;
+			return self::URL_PREFIX . $id;
 		} else {
 			return $youTubeVideoUrl;
 		}
@@ -38,6 +40,11 @@ class Jp7_YouTube {
 	 * @return string
 	 */
 	public static function getHtml($youTubeVideoUrl, $width = 310, $height = 230) {
+		if (startsWith(self::SHORT_URL_PREFIX, $youTubeVideoUrl)) {
+			$youTubeVideoUrl = str_replace(self::SHORT_URL_PREFIX, self::URL_PREFIX, $youTubeVideoUrl);
+		}
+		
+		
 		$youTubeVideoUrl = self::getEmbedLink($youTubeVideoUrl);
 		return '
 			<object width="' . $width . '" height="' . $height . '">
