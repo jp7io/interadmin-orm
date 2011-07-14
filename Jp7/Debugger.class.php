@@ -14,7 +14,7 @@
  *
  * @package Jp7_Debugger
  */
-class Jp7_Debugger{
+class Jp7_Debugger {
 	const EMAIL = 'debug@jp7.com.br';
 	/**
 	 * Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
@@ -303,11 +303,19 @@ class Jp7_Debugger{
 	/**
 	 * Envia o trace do erro para debug+CLIENTE@jp7.com.br
 	 * 
-	 * @param string $backtrace
+	 * @param string|Exception $backtraceOrException
 	 * @return bool
 	 */
-	public function sendTraceByEmail($backtrace) {
+	public function sendTraceByEmail($backtraceOrException) {
 		global $config, $s_interadmin_cliente, $jp7_app;
+		
+		if ($backtraceOrException instanceof Exception) {
+			$e = $backtraceOrException;
+			$backtrace = $this->getBacktrace($e->getMessage() . ' - ' . $e->getFile() . ':' . $e->getLine(), '', $e->getTrace());
+		} else {
+			$backtrace = $backtraceOrException;
+		}
+		
 		$nome_app = ($jp7_app) ? $jp7_app : 'Site';
 		if (trim($config->name_id)) {
 			$cliente = $config->name_id;
