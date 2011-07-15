@@ -247,12 +247,16 @@ class InterAdminField {
 			if(strpos($tipo_de_campo,"tit_")===0){
 				
 			}elseif(strpos($tipo_de_campo,"file_")===0){
-				$url = interadmin_uploaded_file_url($valor);
+				if ($valor) {
+					$url = interadmin_uploaded_file_url($valor);
+				} else {
+					$url = '/_default/img/px.png';
+				}
 				echo "".
 				"<tr>".
 					$_th.
 					"<td><input type=\"text\" label=\"" . $campo_nome . "\" name=\"".$campo."[".$j."]\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . " value=\"".$valor."\" xtra=\"".$xtra."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:" . ($campo_array['sem_creditos'] ? 60 : 80) . "px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
-					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . (($valor)?" align=\"center\" onclick=\"openPopup('".$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url):">")."</td>".
+					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . " align=\"center\" onclick=\"openPopup('".$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview" . ($valor ? '': ' placeholder') . "\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url) . "</td>".
 					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . ">".$S_ajuda."</td>".
 				"</tr>\n";
 				
