@@ -574,7 +574,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		//
 		$_ = debug_backtrace();
 		while($d = array_pop($_)) {
-			if ((strToLower($d['function']) == 'krumo') || (strToLower(@$d['class']) == 'krumo')) {
+			if (strToLower($d['function']) == 'krumo' || strToLower($d['function']) == 'kd' || strToLower(@$d['class']) == 'krumo') {
 				break;
 				}
 			}
