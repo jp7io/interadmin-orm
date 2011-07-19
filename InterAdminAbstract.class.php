@@ -166,7 +166,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
 	 * @return void
 	 * @todo Verificar necessidade de $force_magic_quotes_gpc no jp7_db_insert
-	 * @deprecated Utilizar save()
+	 * @deprecated Utilizar save() ou updateAttributes()
 	 */
 	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = false) {
 		$pk = $this->_primary_key;
@@ -441,7 +441,7 @@ abstract class InterAdminAbstract implements Serializable {
 							' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
 					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
-						$childrenArr = $this->getInterAdminsChildren($joinNome);
+						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
 						}
@@ -482,7 +482,7 @@ abstract class InterAdminAbstract implements Serializable {
 					// Joins com children
 					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
-						$childrenArr = $this->getInterAdminsChildren($joinNome);
+						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
 						}

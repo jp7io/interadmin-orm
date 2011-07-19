@@ -612,6 +612,21 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $db->Affected_Rows();
 	}
 	
+	/**
+	 * Updates all the InterAdmins.
+	 * 
+	 * @param array $attributes Attributes to be updated
+	 * @param array $options [optional]
+	 * @return int Count of updated InterAdmins.
+	 */
+	public function updateInterAdmins($attributes, $options = array()) {
+		$records = $this->getInterAdmins($options);
+		foreach ($records as $record) {
+			$record->updateAttributes($attributes);
+		}
+		return count($records);
+	}
+	
 	public function getAttributesNames() {
 		$db = $this->getDb();
 		if (!$attributes  = $this->_getMetadata('attributes')) {
@@ -694,6 +709,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		return self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname];
 	}
 	/**
+	 * Returns metadata about the children tipos that the InterAdmins have.
+	 *  
 	 * @return array
 	 */
 	public function getInterAdminsChildren() {
@@ -711,6 +728,25 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return $children;
 	}
+	
+	/**
+	 * Returns a InterAdminTipo if the $nome_id is found in getInterAdminsChildren().
+	 * 
+	 * @param string $nome_id	Camel Case name, e.g.: DadosPessoais
+	 * @return InterAdminTipo
+	 */
+	public function getInterAdminsChildrenTipo($nome_id) {
+		$childrenTipos = $this->getInterAdminsChildren();
+		$id_tipo = $childrenTipos[$nome_id]['id_tipo'];
+		if ($id_tipo) {
+			return InterAdminTipo::getInstance($id_tipo, array(
+				'db_prefix' => $this->db_prefix,
+				'db' => $this->_db,
+				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+			));
+		}
+	}
+	
 	/**
 	 * Creates a record with id_tipo, mostrar, date_insert and date_publish filled.
 	 * 
