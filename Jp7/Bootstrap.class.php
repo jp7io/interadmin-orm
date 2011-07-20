@@ -59,7 +59,7 @@ class Jp7_Bootstrap {
 		if (!function_exists('ADONewConnection')) {
 			include ROOT_PATH . '/inc/3thparty/adodb/adodb.inc.php';
 		}
-		$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
+		$dsn = jp7_formatDsn($config->db);
 		$db = ADONewConnection($dsn);
 		
 		if (!$db) {

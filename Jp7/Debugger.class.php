@@ -61,7 +61,9 @@ class Jp7_Debugger {
 	 */	
 	public function __construct() {
 		global $c_jp7;
-		if (!$c_jp7) return; // Only by Devs
+		if (!$c_jp7) {
+			return; // Only by Devs
+		}
 		$this->startTime();
 		// Debug - SQL
 		$this->debugSql = $_GET['debug_sql'];
@@ -70,14 +72,18 @@ class Jp7_Debugger {
 			setcookie('debug_filename', $_GET['debug_filename'], 0, '/');
 			$_COOKIE['debug_filename'] = $_GET['debug_filename'];
 		}
-		if ($_COOKIE['debug_filename']) $this->debugFilename = $_COOKIE['debug_filename'];
+		if ($_COOKIE['debug_filename']) {
+			$this->debugFilename = $_COOKIE['debug_filename'];
+		}
 		// Debug - Toolbar
-		if (isset($_GET['debug_toolbar'])){
+		if (isset($_GET['debug_toolbar'])) {
 			setcookie('debug_toolbar', $_GET['debug_toolbar'], 0, '/');
 			$_COOKIE['debug_toolbar'] = $_GET['debug_toolbar'];
 		}
 		// Setting it as active
-		if ($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) $this->active = true;
+		if ($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) {
+			$this->active = true;
+		}
 	}
 	/**
 	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
@@ -94,13 +100,17 @@ class Jp7_Debugger {
 	 * @param bool Sets whether the time will be outputted or not.
 	 * @return void
 	 */	
-	public function getTime($output = FALSE) {
-		if (!count($this->_startTime)) return;
+	public function getTime($output = FALSE, $msg = 'Processed in') {
+		if (!count($this->_startTime)) {
+			return;
+		}
 		$debug_mtime = explode(' ', microtime());
 		// Retrieves and deletes the last value
 		$debug_starttime = array_pop($this->_startTime);
 		$debug_totaltime = round(($debug_mtime[0] + $debug_mtime[1] - $debug_starttime) * 1000);
-		if ($output && $this->isSafePoint()) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
+		if ($output && $this->isSafePoint()) {
+			echo '<div class="debug_msg">' . $msg . ': ' . $debug_totaltime . 'ms.</div>';
+		}
 		return $debug_totaltime;
 	}
 	/**
@@ -112,7 +122,9 @@ class Jp7_Debugger {
 	 */	
 	public function showFilename($filename) {
 		global $c_doc_root;
-		if ($this->debugFilename && $this->isSafePoint()) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+		if ($this->debugFilename && $this->isSafePoint()) {
+			echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+		}
 		if ($this->active) {
 			// Creates a new log entry for this file
 			$this->addLog($filename, 'file');
@@ -132,8 +144,12 @@ class Jp7_Debugger {
 			ob_flush();
 			flush();
 		}
-		if (!$this->isSafePoint()) return;
-		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace('/(SELECT | FROM | WHERE | ORDER BY |HAVING|GROUP BY|LEFT JOIN)/','<b>\1</b>', $sql) . '</div>';
+		if (!$this->isSafePoint()) {
+			return;
+		}
+		if ($this->debugSql || $forceDebug) {
+			echo '<div class="debug_sql" style="' . $style . '">' . preg_replace('/(SELECT | FROM | WHERE | ORDER BY |HAVING|GROUP BY|LEFT JOIN)/','<b>\1</b>', $sql) . '</div>';
+		}
 	}
 	/**
 	 * Formats and returns the backtrace.
@@ -286,12 +302,17 @@ class Jp7_Debugger {
  	 * @return void
 	 */
 	public function showToolbar() {
-		if (!$this->active || !$this->isSafePoint()) return;
+		if (!$this->active || !$this->isSafePoint()) {
+			return;
+		}
 		
-		if ($this->_templateFilename ) echo ('Template: ' . $this->_templateFilename);
-		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
+		if ($this->_templateFilename) {
+			echo ('Template: ' . $this->_templateFilename);
+		} else {
+			echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
+		}
 		
-		jp7_print_r($this->_log);
+		krumo($this->_log);
 		$this->getTime(true);
 	}
 	public function isSafePoint() {
