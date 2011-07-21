@@ -285,7 +285,7 @@ class InterAdminField {
 					"<td>".$S_ajuda."</td>".
 				"</tr>";
 				echo $S;
-			}elseif(strpos($tipo_de_campo,"password_")===0&&$valor&&$xtra){
+			}elseif(strpos($tipo_de_campo,"password_")===0&&$valor){ // &&$xtra
 				echo "".
 				"<tr>".
 					$_th.
