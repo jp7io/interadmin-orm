@@ -163,7 +163,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer {
             if ($this->_session !== null) {
                 $this->_session->identity = $id;
                 $this->_session->claimed_id = $claimedId;
-				if ($server == 'https://www.google.com/accounts/o8/ud') {
+				if (strpos($server, 'https://www.google.com/accounts/o8/ud') === 0) {
 				  	$this->_session->identity = 'http://specs.openid.net/auth/2.0/identifier_select';
 				 	$this->_session->claimed_id = 'http://specs.openid.net/auth/2.0/identifier_select';
 				}
@@ -171,7 +171,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer {
                 $_SESSION["zend_openid"] = array(
                     "identity" => $id,
                     "claimed_id" => $claimedId);
-				if ($server == 'https://www.google.com/accounts/o8/ud') {
+				if (strpos($server, 'https://www.google.com/accounts/o8/ud') === 0) {
 					$_SESSION['zend_openid']['identity'] = 'http://specs.openid.net/auth/2.0/identifier_select';
 					$_SESSION['zend_openid']['claimed_id'] = 'http://specs.openid.net/auth/2.0/identifier_select';
 				}
@@ -181,7 +181,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer {
                 $this->_session->identity = $id;
                 $this->_session->claimed_id = $claimedId;
             }
-			if ($server == 'https://www.google.com/accounts/o8/ud') {
+			if (strpos($server, 'https://www.google.com/accounts/o8/ud') === 0) {
 				$params['openid.identity'] = 'http://specs.openid.net/auth/2.0/identifier_select';
 				$params['openid.claimed_id'] = 'http://specs.openid.net/auth/2.0/identifier_select';
 			}
