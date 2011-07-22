@@ -650,7 +650,7 @@ class Auth_OpenID_GenericConsumer {
      *
      * @access private
      */
-    function complete($message, $endpoint, $return_to)
+    function complete($message, &$endpoint, $return_to)
     {
         $mode = $message->getArg(Auth_OpenID_OPENID_NS, 'mode',
                                  '<no mode set>');
@@ -666,7 +666,7 @@ class Auth_OpenID_GenericConsumer {
                                         '_completeInvalid');
 
         return call_user_func_array(array($this, $method),
-                                    array($message, $endpoint, $return_to));
+                                    array($message, &$endpoint, $return_to));
     }
 
     /**
