@@ -9,16 +9,22 @@ class Jp7_Rewrite {
 	public static function createHtaccess($content) {
 		global $config;
 		
-		return <<<STR
-RewriteEngine On
-RewriteBase /{$config->name_id}/
-
-# AUTO REDIRECT #
+		if (!$config->server->path) {
+		$auto_redirect = "# AUTO REDIRECT #
 # Cliente como root - /cliente/* -> /*
 RewriteCond %{THE_REQUEST} ^([^/]*)/{$config->name_id}/
 RewriteCond %{THE_REQUEST} !^([^/]*)/{$config->name_id}/\.\.
 RewriteRule ^(.*)$ ../$1 [R=301,L]
-# End: AUTO REDIRECT #
+# End: AUTO REDIRECT #";
+		} else {
+			$auto_redirect = '';
+		}
+		
+		return <<<STR
+RewriteEngine On
+RewriteBase /{$config->name_id}/
+
+{$auto_redirect}
 
 # Image Autosize
 RewriteCond %{REQUEST_FILENAME} -f
