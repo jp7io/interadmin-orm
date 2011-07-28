@@ -56,10 +56,12 @@ class Jp7_JSMin extends JSMin {
         } else {
             $min_content = file_get_contents($cache_file);
         }
-        
-        header('Content-Type: application/javascript');
+		
+		header('Pragma: ');
+		header('Cache-Control: ');
+		header('Content-Type: application/javascript');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
         header('Expires: ' . gmdate('D, d M Y H:i:s', strtotime('+1 month')) . ' GMT');
-                
         return $min_content;
     }
 }
