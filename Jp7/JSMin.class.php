@@ -1,7 +1,7 @@
 <?php 
 class Jp7_JSMin extends JSMin {
 
-    public static function groupJavascript($files, $cache_dir = './cache', $cache_filename = 'head.js') {
+    public static function groupJavascript($files, $cache_dir = './cache/js', $cache_filename = 'head.js') {
         $cache_file = $cache_dir . '/' . $cache_filename;
         
 		foreach ($files as $key => $file) {
@@ -52,6 +52,10 @@ class Jp7_JSMin extends JSMin {
             
             $min_content = self::minify($outputs);
             //$min_content = $outputs;
+			if (!is_dir($cache_dir)) {
+				@mkdir($cache_dir);
+				@chmod($cache_dir, 0777);
+			}
             file_put_contents($cache_file, $min_content);
         } else {
             $min_content = file_get_contents($cache_file);
