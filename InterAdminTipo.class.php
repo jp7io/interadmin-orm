@@ -71,7 +71,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$id_tipo = (string) $id_tipo;
 		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
+		$this->_db = $options['db'];
 		
 		if ($options['fields']) {
 			$this->getFieldsValues($options['fields']);

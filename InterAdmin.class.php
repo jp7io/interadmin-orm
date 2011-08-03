@@ -62,7 +62,7 @@ class InterAdmin extends InterAdminAbstract {
 		$this->id = is_numeric($id) ? $id : '0';
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
-		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
+		$this->_db = $options['db'];
 		
 		if ($options['fields'] && $this->id) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
