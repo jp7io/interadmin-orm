@@ -39,4 +39,16 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 		);
 		return self::retrieveObjects($this->_db, $options, 'Jp7_WordPress_Option');
 	}
+	
+	public function getNome() {
+		$option = $this->getOptionByName('blogname');		
+		
+		return $option->option_value;		
+	}
+	
+	public function getUrl() {
+		$option = $this->getOptionByName('siteurl');		
+		
+		return $option->option_value;	
+	}
 }
