@@ -2,7 +2,7 @@
 
 abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
 	protected $_table;
-	
+		
 	public function __construct($db, $table) {
 		$this->_db = $db;
 		$this->_table = $table;
@@ -17,6 +17,14 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
 		foreach ($attributes as $key => $value) {
 			$this->$key = $value;
 		}
+	}
+	
+	public function getAttributes() {
+		return jp7_get_object_vars($this);
+	}
+	
+	public function save() {
+		$this->_update($this->getAttributes());
 	}
 	
 	protected function _update($attributes) {
@@ -43,7 +51,7 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
 		}
 				
 		$pk = $this->staticConst('PK');
-		if (!$pk || !$this->$pk) {
+		if (!$pk) {
 			throw new Exception('Undefined primary key.');	
 		};
 		if (!$this->_table) {
