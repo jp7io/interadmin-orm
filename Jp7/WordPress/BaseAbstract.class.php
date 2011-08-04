@@ -50,7 +50,7 @@ abstract class Jp7_WordPress_BaseAbstract {
 		
 		$array = array();
 		while ($row = $rs->FetchNextObj()) {
-			$object = new $className($db);
+			$object = new $className($db, $options['from']);
 			foreach ($row as $key => $value) {
 				$object->$key = $value;
 			}
