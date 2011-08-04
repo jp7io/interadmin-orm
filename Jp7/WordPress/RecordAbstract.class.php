@@ -74,4 +74,9 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
     public function setTable($table) {
         $this->_table = $table;
     }
+	
+	public function __toString() {
+		$pk = $this->staticConst('PK');
+		return (string) $this->$pk;
+	}
 }

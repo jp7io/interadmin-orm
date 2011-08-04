@@ -13,7 +13,8 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract {	protected static $pref
 	
 	public function getBlogs($options = array()) {
 		$options += array(
-			'from' => self::$prefix . 'blogs'
+			'from' => self::$prefix . 'blogs',
+			'fields' => '*'
 		);
 		return self::retrieveObjects($this->_db, $options, __CLASS__ . '_Blog');
 	}
@@ -24,9 +25,27 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract {	protected static $pref
 	
 	public function getPosts($options = array()) {
 		$options += array(
-			'from' => self::$prefix . 'posts'
+			'from' => self::$prefix . 'posts',
+			'fields' => '*'
 		);
 		return self::retrieveObjects($this->_db, $options, __CLASS__ . '_Post');
+	}
+	
+	public function getOptionByName($name, $options = array()) {
+		$options['where'][] = "name = '" . $name . "'";
+		return $this->getFirstOption($options);
+	}
+	
+	public function getFirstOption($options = array()) {
+		return reset($this->getOptions(array('limit' => 1) + $options));
+	}
+	
+	public function getOptions($options = array()) {
+		$options += array(
+			'from' => self::$prefix . 'options',
+			'fields' => '*'
+		);
+		return self::retrieveObjects($this->_db, $options, __CLASS__ . '_Option');
 	}
 	
 	public static function setPrefix($prefix) {
