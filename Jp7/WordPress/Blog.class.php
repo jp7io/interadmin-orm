@@ -16,7 +16,14 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 			'from' => $this->getPrefix() . 'posts',
 			'fields' => '*'
 		);
-		return self::retrieveObjects($this->_db, $options, 'Jp7_WordPress_Post');
+		
+		if ($options['class']) {
+			$class = $options['class'];
+		} else {
+			$class = 'Jp7_WordPress';
+		}
+		
+		return self::retrieveObjects($this->_db, $options, $class . '_Post');
 	}
 	
 	public function getOptionByName($name, $options = array()) {
@@ -37,7 +44,14 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 			'from' => $this->getPrefix() . 'options',
 			'fields' => '*'
 		);
-		return self::retrieveObjects($this->_db, $options, 'Jp7_WordPress_Option');
+		
+		if ($options['class']) {
+			$class = $options['class'];
+		} else {
+			$class = 'Jp7_WordPress';
+		}
+		
+		return self::retrieveObjects($this->_db, $options, $class . '_Option');
 	}
 	
 	public function getNome() {
@@ -50,6 +64,34 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 		$option = $this->getOptionByName('siteurl');		
 		
 		return $option->option_value;	
+	}
+
+	public function getImagem() {
+		$option = $this->getOptionByName('widget_text');		
+		
+		$array = $option->option_value;
+		
+		if (is_array($array)) {
+			foreach ($array as $item) {
+				if ($content = $item['text']) {
+					if (stripos($content, '<img') !== false) {
+			            $imgsrc_regex = '#<\s*img [^\>]*src\s*=\s*(["\'])(.*?)\1#im';
+			            preg_match($imgsrc_regex, $content, $matches);
+			            unset($imgsrc_regex);
+			            unset($content);
+			            if (is_array($matches) && !empty($matches)) {
+			            	if ($url = $matches[2]) {
+			            		return $url;	
+			            	}                
+			            } else {
+			                continue;
+			            }
+			        } else {
+			            continue;
+			        }
+				}
+			}
+		}		
 	}
 	
 	public function getPrefix() {
