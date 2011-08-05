@@ -39,7 +39,7 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
 					$valuesToSave[$key] = (string) $value;
 					break;
 				case 'array':
-					$valuesToSave[$key] = implode(',', $value);
+					$valuesToSave[$key] = serialize($value);
 					break;
 				case 'NULL':
 					$valuesToSave[$key] = '';

@@ -33,7 +33,7 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract {	protected static $pref
 	}
 	
 	public function getOptionByName($name, $options = array()) {
-		$options['where'][] = "name = '" . $name . "'";
+		$options['where'][] = "option_name = '" . $name . "'";
 		return $this->getFirstOption($options);
 	}
 	
@@ -83,7 +83,7 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract {	protected static $pref
 		   'user_status' => '0',
 		   'display_name' => '',
 		   'spam' => '0',
-		   'deleted' => '0',
+		   'deleted' => '0'
 		));
 		return $user;
 	}

@@ -52,10 +52,14 @@ abstract class Jp7_WordPress_BaseAbstract {
 		while ($row = $rs->FetchNextObj()) {
 			$object = new $className($db, $options['from']);
 			foreach ($row as $key => $value) {
-				$object->$key = $value;
+				if (jp7_is_serialized($value)) {
+					$object->$key = unserialize($value);
+				} else {
+					$object->$key = $value;
+				}
 			}
 			$array[] = $object;
-		}		
+		}
 		return $array;
 	}
 }

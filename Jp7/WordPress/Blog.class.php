@@ -13,7 +13,7 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 		}
 		
 		$options += array(
-			'from' => Jp7_WordPress::getPrefix() . (($this->blog_id > 1) ? $this->blog_id . '_' : '') . 'posts',
+			'from' => $this->getPrefix() . 'posts',
 			'fields' => '*'
 		);
 		return self::retrieveObjects($this->_db, $options, 'Jp7_WordPress_Post');
@@ -34,7 +34,7 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 		}
 		
 		$options += array(
-			'from' => Jp7_WordPress::getPrefix() . (($this->blog_id > 1) ? $this->blog_id . '_' : '') . 'options',
+			'from' => $this->getPrefix() . 'options',
 			'fields' => '*'
 		);
 		return self::retrieveObjects($this->_db, $options, 'Jp7_WordPress_Option');
@@ -50,5 +50,9 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 		$option = $this->getOptionByName('siteurl');		
 		
 		return $option->option_value;	
+	}
+	
+	public function getPrefix() {
+		return Jp7_WordPress::getPrefix() . (($this->blog_id > 1) ? $this->blog_id . '_' : '');
 	}
 }
