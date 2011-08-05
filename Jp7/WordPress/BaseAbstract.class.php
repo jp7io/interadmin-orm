@@ -53,7 +53,7 @@ abstract class Jp7_WordPress_BaseAbstract {
 			$object = new $className($db, $options['from']);
 			foreach ($row as $key => $value) {
 				if (jp7_is_serialized($value)) {
-					$object->$key = unserialize($value);
+					$object->$key = unserialize(utf8_encode($value));
 				} else {
 					$object->$key = $value;
 				}
