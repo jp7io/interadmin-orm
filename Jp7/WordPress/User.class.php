@@ -82,5 +82,22 @@ class Jp7_WordPress_User extends Jp7_WordPress_RecordAbstract {
 	public function getUserLevel(Jp7_WordPress_Blog $blog) {
 		$key = $blog->getPrefix() . 'user_level';
 		return $this->getMetaByKey($key);
+	}
+	
+	public function addTo(Jp7_WordPress_Blog $blog, $user_level) {
+		$capArray = array(
+			self::LEVEL_ADMINISTRATOR => 'administrator',
+			self::LEVEL_CONTRIBUTOR => 'contributor',
+			self::LEVEL_SUBSCRIBER => 'subscriber'
+		);
+		
+		$cap = $capArray[$user_level];
+		
+		$capabilities = $this->createMeta($blog->getPrefix() . 'capabilities',  array($cap => 1));
+		$capabilities->save();
+		
+		$userLevel = $this->createMeta($blog->getPrefix() . 'user_level', $user_level);
+		$userLevel->save();
 	}	
+	
 }
