@@ -62,6 +62,7 @@ Class Krumo {
     
     public static $showProtected = false;
 	public static $useToString = true;
+	public static $open = false;
     
 	/**
 	* Return Krumo version
@@ -1103,7 +1104,7 @@ if (typeof($) == 'undefined') {
 ?>
 <li class="krumo-child">
 	
-	<div class="krumo-element<?php echo count($data) > 0 ? ' krumo-expand' : '';?>"
+	<div class="krumo-element<?php echo self::$open ? ' krumo-opened' : ''; ?><?php echo count($data) > 0 ? ' krumo-expand' : '';?>"
 		<?php if (count($data) > 0) {?> onClick="krumo.toggle(this);"<?php } ?>
 		onMouseOver="krumo.over(this);"
 		onMouseOut="krumo.out(this);">
@@ -1136,7 +1137,7 @@ if (typeof($) == 'undefined') {
 	</div>
 
 	<?php if (count($data)) {
-		Krumo::_vars($data, $name == 'attributes');
+		Krumo::_vars($data, self::$open || $name == 'attributes');
 		} ?>
 </li>
 <?php
@@ -1156,24 +1157,29 @@ if (typeof($) == 'undefined') {
 ?>
 <li class="krumo-child">
 
-	<div class="krumo-element<?php echo count($data) > 0 ? ' krumo-expand' : '';?>"
+	<div class="krumo-element<?php echo self::$open ? ' krumo-opened' : ''; ?><?php echo count($data) > 0 ? ' krumo-expand' : '';?>"
 		<?php if (count($data) > 0) {?> onClick="krumo.toggle(this);"<?php } ?>
 		onMouseOver="krumo.over(this);"
 		onMouseOut="krumo.out(this);">
 
 			<a class="krumo-name"><?php echo $name;?></a>
 			(<em class="krumo-type">Object</em>) 
-			<strong class="krumo-class"><?php echo get_class($data) . ((self::$useToString && method_exists($data, '__toString') && !$data instanceof Zend_Form_Element) ? '</strong> (' . $data . ')<strong>' : '');?></strong>
+			<strong class="krumo-class"><?php echo get_class($data) . self::getStringValue($data);?></strong>
 	</div>
 
 	<?php if (count($data)) {
-		Krumo::_vars($data);
+		self::_vars($data, self::$open);
 		} ?>
 </li>
 <?php
 		}
 
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+	private static function getStringValue($data) {
+		if (self::$useToString && (method_exists($data, '__toString') || $data instanceof SimpleXMLElement) && !$data instanceof Zend_Form_Element) {
+			return '</strong> (' . jp7_string_left($data, 100) . ')<strong>';
+		}
+	}
 
 	/**
 	* Render a dump for a resource
