@@ -17,21 +17,7 @@ class Salesforce_Client extends SforceEnterpriseClient {
 	 */
 	public function query($options) {
 		if (is_array($options)) {
-			// Prepares SOQL parameters
-			$query = "SELECT " . implode(',', (array) $options['fields']) .
-				" FROM " . $options['from'];
-			if ($options['where']) {
-				$query .= " WHERE " . implode(' AND ', (array) $options['where']);
-			}
-			if ($options['group']) {
-				$query .= " GROUP BY " . $options['group'];
-			}
-			if ($options['order']) {
-				$query .= " ORDER BY " . $options['order'];
-			}
-			if ($options['debug']) {
-				krumo($query);
-			}
+			$query = $this->_parseOptions($options);
 			if ($options['limit']) {
 				// Begin: Faking OFFSET, LIMIT, Salesforce doesn't support OFFSET inside the LIMIT clause
 				$limitArr = explode(',', $options['limit']);
@@ -56,6 +42,42 @@ class Salesforce_Client extends SforceEnterpriseClient {
 			 $query = $options;
 		}
 		return parent::query($query);
+	}
+	
+	protected function _parseOptions($options) {
+		// Prepares SOQL parameters
+		$query = "SELECT " . implode(',', (array) $options['fields']) .
+			" FROM " . $options['from'];
+		if ($options['where']) {
+			$query .= " WHERE " . implode(' AND ', (array) $options['where']);
+		}
+		if ($options['group']) {
+			$query .= " GROUP BY " . $options['group'];
+		}
+		if ($options['order']) {
+			$query .= " ORDER BY " . $options['order'];
+		}
+		if ($options['debug']) {
+			krumo($query);
+		}
+		return $query;
+	}
+	
+	public function queryNoLimits($options) {
+		if (is_array($options)) {
+			$query = $this->_parseOptions($options);
+			
+			$result = parent::query($query);
+			$allRecords = $result->records;
+			while($result->size > count($allRecords)) {
+				$result = $this->queryMore($result->queryLocator);
+				$allRecords = array_merge($allRecords, $result->records);
+			}
+			$result->records = $allRecords;
+			return $result;
+		} else {
+			throw new Exception('Salesforce_Client->queryNoLimits expects $options to be an array.');	
+		}
 	}
 	
 	/**
