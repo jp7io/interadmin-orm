@@ -586,7 +586,9 @@ class InterAdmin extends InterAdminAbstract {
 			$valoresCombo = $this->getFieldsValues($camposCombo);
 			$stringValue = array();
 			foreach ($valoresCombo as $key => $value) {
-				if (is_object($value)) {
+				if ($value instanceof InterAdminFieldFile) {
+					continue;
+				} elseif ($value instanceof InterAdminAbstract) {
 					 $value = $value->getStringValue();
 				}
 				$stringValue[] = $value;
