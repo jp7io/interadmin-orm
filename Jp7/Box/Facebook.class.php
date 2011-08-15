@@ -13,6 +13,18 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 					name="<?php echo $this->id_box; ?>[href][]" />
 			</div>
 			<div class="field">
+				<label>Cores:</label>
+				<select class="selectbox" obligatory="yes" label="Cores" name="<?php echo $this->id_box; ?>[colorscheme][]">
+					<?php
+					$options = array(
+						(object) array('value' => 'light', 'text' => 'Claras / Light'),
+						(object) array('value' => 'dark', 'text' => 'Escuras / Dark')
+					);
+					?>
+					<?php echo $this->options($options, $this->params->colorscheme ? $this->params->colorscheme : 'light'); ?>					
+				</select>
+			</div>
+			<div class="field">
 				<label>Faces:</label>
 				<?php echo $this->checkbox('show_faces', true); ?>
 			</div>
