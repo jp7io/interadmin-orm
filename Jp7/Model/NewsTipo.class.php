@@ -45,14 +45,14 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 		ob_start();
 		?>
 		<div class="fields">
-			<?php echo parent::_getEditorImageFields($box, true, Jp7_Box_Manager::getRecordMode() ? 295 : 80, Jp7_Box_Manager::getRecordMode() ? 221 : 60); ?>
+			<?php echo parent::_getEditorImageFields($box, true, Jp7_Box_Manager::getRecordMode() ? 300 : 90, Jp7_Box_Manager::getRecordMode() ? 200 : 60); ?>
 		</div>
 		<?php
 		return ob_get_clean();
 	}
 	
 	public function prepareData(Jp7_Box_BoxAbstract $box) {
-		parent::_prepareImageData($box, Jp7_Box_Manager::getRecordMode() ? 295 : 80, Jp7_Box_Manager::getRecordMode() ? 221 : 60);
+		parent::_prepareImageData($box, Jp7_Box_Manager::getRecordMode() ? 300 : 90, Jp7_Box_Manager::getRecordMode() ? 200 : 60);
 		
 		$params = $box->params; // facilita
 		$view = $box->view;
