@@ -1,17 +1,12 @@
 <?php
 
-class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
+class Jp7_Box_FacebookComments extends Jp7_Box_BoxAbstract {    /**
      * @see Jp7_Box_BoxAbstract::_getEditorFields()
      */
     protected function _getEditorFields() {
     	ob_start();
 		?>
 		<div class="fields">
-			<div class="field obligatory">
-				<label>URL:</label>
-				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : 'http://www.facebook.com/platform'; ?>" 
-					name="<?php echo $this->id_box; ?>[href][]" />
-			</div>
 			<div class="field">
 				<label>Cores:</label>
 				<select class="selectbox" obligatory="yes" label="Cores" name="<?php echo $this->id_box; ?>[colorscheme][]">
@@ -25,16 +20,12 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 				</select>
 			</div>
 			<div class="field">
-				<label>Faces:</label>
-				<?php echo $this->checkbox('show_faces', true); ?>
+				<label>Nº de Posts:</label>
+				<?php echo $this->numericField('num_posts', 'Nº de Posts', '10'); ?>
 			</div>
 			<div class="field">
-				<label>Atualizações:</label>
-				<?php echo $this->checkbox('stream'); ?>
-			</div>
-			<div class="field">
-				<label>Cabeçalho:</label>
-				<?php echo $this->checkbox('header'); ?>
+				<label>Largura:</label>
+				<?php echo $this->numericField('width', 'Largura', '645'); ?> px
 			</div>
 		</div>
 		<?php
@@ -47,12 +38,11 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 	background: #3b5997;
 	color: white;
 }
-.box-{$this->id_box} label {
+.box-{$this->id_box} label,
+.box-{$this->id_box} div {
 	color: white;
 }
 ";
 	}
-	protected function _getEditorTitle() {
-		return 'Facebook Like Box';
-	}
+	
 }

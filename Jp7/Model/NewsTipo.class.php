@@ -40,4 +40,29 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 	public function createChildren(InterAdminTipo $tipo) {
 		parent::createBoxesSettingsAndIntroduction($tipo);
 	}
+	
+	public function getEditorFields(Jp7_Box_BoxAbstract $box) {
+		ob_start();
+		?>
+		<div class="fields">
+			<?php echo parent::_getEditorImageFields($box, true, Jp7_Box_Manager::getRecordMode() ? 295 : 80, Jp7_Box_Manager::getRecordMode() ? 221 : 60); ?>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+	
+	public function prepareData(Jp7_Box_BoxAbstract $box) {
+		parent::_prepareImageData($box, Jp7_Box_Manager::getRecordMode() ? 295 : 80, Jp7_Box_Manager::getRecordMode() ? 221 : 60);
+		
+		$params = $box->params; // facilita
+		$view = $box->view;
+		
+		$view->headStyle()->appendStyle('
+.content-news div.subitem .image, 
+.content-news div.record .image {
+	width: ' . $params->imgWidth . 'px;
+}
+');
+	}
+
 }

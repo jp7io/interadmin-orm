@@ -35,6 +35,14 @@ class Jp7_Box_Youtube extends Jp7_Box_BoxAbstract {    /**
 	/**
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
+
+	public function getEditorStyle() {
+		return "
+.box-{$this->id_box} {
+	background: #FFDDDD;
+}
+";
+	}
     protected function _getEditorTitle() {
         return 'YouTube';
     }

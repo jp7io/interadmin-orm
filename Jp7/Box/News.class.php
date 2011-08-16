@@ -16,6 +16,8 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 			}
 			$this->title = ($this->params->title) ? $this->params->title : $newsTipo->getNome();
 			$this->news = $newsTipo->getInterAdmins($options);
+			
+			$this->_prepareDataImages();
 		} else {
 			$this->news = array();	
 		}
@@ -45,6 +47,8 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 				<label>Limite:</label>
 				<?php echo $this->numericField('limit', 'Limite', 'Todos'); ?>
 			</div>
+			
+			<?php $this->_getEditorFieldsImages(); ?>
 		</div>
 		<?php
 		return ob_get_clean();
