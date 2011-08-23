@@ -43,6 +43,7 @@ class FileCache {
 	 * @var bool
 	 */
 	public $isCached;
+	protected static $placeholderEnabled = false;
 	/**
 	 * Public Constructor, defines the path and filename and starts caching or loading it.
 	 *
@@ -72,7 +73,11 @@ class FileCache {
 		
 		if ($partial) {
 			$nocache_force = $_GET['nocache_partial'];
-			$this->fileName = '_partial_' . $storeId . '.cache';
+			if ($options['keepUri']) {
+				$this->fileName = self::getFileName($_SERVER['REQUEST_URI'], '_partial_' . $storeId, $this->cachePath);
+			} else {
+				$this->fileName = '_partial_' . $storeId . '.cache';
+			}
 		} else {
 			$nocache_force = $_GET['nocache_force'];
 			// Retirando query string e $c_path
@@ -126,7 +131,7 @@ class FileCache {
 			return;
 		}
 
-		$file_content = ob_get_contents();
+		$file_content = ob_get_clean();
 		
 		/* Comentando, estava gerando resultados diferentes entre conteudo cacheado ou não
 		$file_content = str_replace(chr(9), '', $file_content); 
@@ -152,7 +157,11 @@ class FileCache {
 			@fwrite($file, $file_content);
 			@chmod($this->cachePath . $this->fileName, 0777);
 		}
-		ob_end_flush();
+		if ($this->partial) {
+			echo $file_content;
+		} else {
+			echo $this->replacePlaceholders($file_content);	
+		}
 	}
 	/**
 	 * Opens the cached file and outputs it.
@@ -160,10 +169,14 @@ class FileCache {
 	 * @return void
 	 */
 	public function getCache() {
-		if (!$this->partial) {
+		$file_content = file_get_contents($this->cachePath . $this->fileName);
+		if ($this->partial) {
+			echo $file_content;
+			$this->isCached = true;
+		} else {
+			echo $this->replacePlaceholders($file_content);
+			
 			global $debugger, $c_jp7;
-			//ob_start('ob_gzhandler');
-			readfile($this->cachePath . $this->fileName);
 			
 			// Debug
             if ($c_jp7 && strpos($this->fileName, 'xml') === false) {
@@ -193,10 +206,7 @@ class FileCache {
 			// Finaliza
 			//ob_end_flush();
 		 	exit();
-		}
-		
-		readfile($this->cachePath . $this->fileName);
-		$this->isCached = true;
+		}	
 	}
 	
 	public static function getCachePath($fileRoot, $cachePath = 'cache') {
@@ -222,12 +232,15 @@ class FileCache {
 		
 		// Falha de segurança. Passou com conteúdo inválido. Investigar depois.
 		if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || strlen($fileName) > 200) {
+			die('entrou');
 			return false;
 		}
 		$fileName .= '.cache';
 		return $fileName;
 	}
-
+	public function replacePlaceholders($filecontent) {
+		return $filecontent;
+	}
 	/**
 	 * Checks if the log file is newer than the cached file,  and if the cached file is older than 1 day.
 	 * 
@@ -267,5 +280,27 @@ class FileCache {
 	public function getLogFilename() {
 		global $config;
 		return $this->fileRoot . $config->name_id . '/interadmin/interadmin.log';
+	}
+	public static function getPlaceholder($name, $vars = array()) {
+		return '{CACHE:' . $name . '|' . serialize($vars) . '}' . "\n";
+	}
+	
+	public static function isPlaceholderEnabled() {
+		return self::$placeholderEnabled;
+	}
+	
+	protected function _replacePlaceholder($name, $include, $filecontent) {
+		if (strpos($filecontent, '{CACHE:' . $name) !== false) {
+			preg_match('/{CACHE:' . $name . '\|(.*)}/', $filecontent, $matches);
+			$vars = unserialize($matches[1]);
+			extract($vars);
+			
+			ob_start();
+			include $include;
+			$include_content = ob_get_clean();
+			
+			$filecontent = preg_replace('/{CACHE:' . $name . '\|(.*)}/', $include_content, $filecontent);
+		}
+		return $filecontent;
 	}
 }
