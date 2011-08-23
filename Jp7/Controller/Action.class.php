@@ -116,11 +116,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		}
 		// Adiciona breadcrumb to tipo
 		if ($secao = $this->getTipo()) { // TODO Late static Binding
-			if ($secao->getFieldsValues('nome') == 'Home' && !$secao->getParent()->id_tipo) {
+			if ($secao->getNome() == 'Home' && !$secao->getParent()->id_tipo) {
 				return; // Home
 			}
 			while ($secao->id_tipo) {
-				$this->view->headTitle($secao->getFieldsValues('nome'));
+				$this->view->headTitle($secao->getNome());
 				$secao = $secao->getParent();
 			}
 		}
