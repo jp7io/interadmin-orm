@@ -302,7 +302,7 @@ class FileCache {
 			include $include;
 			$include_content = ob_get_clean();
 			
-			$filecontent = preg_replace('/{CACHE:' . $name . '\|(.*)}/', $include_content, $filecontent);
+			$filecontent = preg_replace('/{CACHE:' . $name . '\|(.*)}/', preg_replacement_quote($include_content), $filecontent);
 		}
 		return $filecontent;
 	}
