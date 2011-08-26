@@ -79,6 +79,8 @@ class FileCache {
 				$this->fileName = '_partial_' . $storeId . '.cache';
 			}
 		} else {
+			self::$placeholderEnabled = true;
+			
 			$nocache_force = $_GET['nocache_force'];
 			// Retirando query string e $c_path
 			$this->fileName = self::getFileName($_SERVER['REQUEST_URI'], $storeId, $this->cachePath);
@@ -239,6 +241,7 @@ class FileCache {
 		return $fileName;
 	}
 	public function replacePlaceholders($filecontent) {
+		self::$placeholderEnabled = false;
 		return $filecontent;
 	}
 	/**
