@@ -41,19 +41,15 @@
 				'lifetime' => 86400 // 1 dia
 			);
 			$backDefault = array(
-				'cache_dir' => self::$_cachedir,
-                'cache_file_umask' => 0777,
-				'file_name_prefix' => 'zf',
-				'hashed_directory_level' => 1,
-				'hashed_directory_umask' => 0777
+				'cache_dir' => self::$_cachedir
 			);
-
+			
 			self::$_cachedir = $backDefault['cache_dir'];
 			
 			$frontend = new self::$_className($frontOptions + $frontDefault);
-
+			
 			if (is_dir(self::$_cachedir)) {
-				$backend = new Zend_Cache_Backend_File($backOptions + $backDefault);
+				$backend = new Jp7_Cache_Backend_File($backOptions + $backDefault);
 			} else {
 				$backend = new Zend_Cache_Backend_Test();
 				self::$_enabled = false;
