@@ -79,14 +79,18 @@ class InterAdminField {
 			}
 			$valor = $valor_default;
 		}
-		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
-		if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
-		if ($readonly == "hidden") {
+		$temPermissao = $s_user['sa'] || $campo_array['permissoes'] == $s_user['tipo'] || ($campo_array['permissoes'] == 'admin' && $s_user['admin']);
+		$readonlyPermissao = $readonly || ($campo_array['permissoes'] && !$temPermissao);
+		
+		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' .
+			"\"" . (($obrigatorio || $readonlyPermissao) ? " class=\"".(($obrigatorio)?"obrigatorio":"").(($readonlyPermissao)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
+		if ($ajuda) {
+			$S_ajuda = "<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" title=\"" . $ajuda . "\" onclick=\"alert(this.title)\" />";
+		}
+		if ($readonly == 'hidden') {
 			$readonly_hidden = true;
 		}
-		
-		$temPermissao = $s_user['sa'] || $campo_array['permissoes'] == $s_user['tipo'] || ($campo_array['permissoes'] == 'admin' && $s_user['admin']);
-		if ($readonly || ($campo_array['permissoes'] && !$temPermissao)) {
+		if ($readonlyPermissao) {
 			$readonly = ' disabled="disabled"';
 		}
 		
