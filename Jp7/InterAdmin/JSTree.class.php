@@ -1,0 +1,67 @@
+<?php
+
+class Jp7_InterAdmin_JSTree {
+	protected $tree = array();
+	protected $tipos = array();
+	
+	public function __construct($options = array()) {
+		$options = InterAdmin::mergeOptions(array(
+			'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo'),
+			'use_published_filters' => true,
+			'class' => 'InterAdminTipo'	
+		), $options);
+		
+		$all = InterAdminTipo::findTipos($options);
+		
+		$this->tipos = self::groupByParent($all);
+		
+		foreach ($this->tipos[0] as $tipo) {
+			$this->addTipo($this->tree, $tipo);
+		}
+	}
+	
+	public static function groupByParent($all) {
+		$tipos = array();
+		foreach ($all as $one) {
+			$tipos[$one->parent_id_tipo][] = $one;
+		}
+		return $tipos;
+	}
+	
+	public function addTipo(&$tree, $tipo, $nivel = 0) {
+		global $tipos;
+		
+		$node = (object) array(
+			'data' => utf8_encode($tipo->nome),
+			'attr' => array(),
+			'metadata' => array(
+				'id_tipo' => $tipo->id_tipo,
+				'model_id_tipo' => $tipo->model_id_tipo
+			),
+			'children' => array()
+		);
+		/*
+		if (in_array($tipo->id_tipo, $s_session['tree_opened'])) {
+			$node->state = 'open';	
+		}
+		*/
+		
+		$children = $this->tipos[$tipo->id_tipo];
+		if ($children) {
+			$nivel++;
+			foreach ($children as $childTipo) {
+				$this->addTipo($node->children, $childTipo, $nivel);
+			}
+		}
+		
+		if (!$node->children) {
+			unset($node->children); // Bug jsTree progressive_render
+		}
+		
+		$tree[] = $node;
+	}
+	
+	public function toJson() {
+		return json_encode($this->tree);	
+	}
+}
