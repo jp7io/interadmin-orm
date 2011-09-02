@@ -49,7 +49,7 @@ class Jp7_Collections {
 	 * @param string $clause Similar to SQL WHERE Clause, only supports simple comparations for now.
 	 * @return array
 	 */
-	public static function filter($array, $clause) {
+	public static function filter($array, $clause, $debug = false) {
 		if (is_array($clause)) {
 			$clause = implode(' AND ', $clause);
 		}
@@ -59,6 +59,9 @@ class Jp7_Collections {
 		$clause = str_replace('.', '->', $clause);
 		$clause = str_replace(' $a->OR ', ' OR ', $clause);
 		$fnBody = 'return ' . $clause . ';';
+		if ($debug) {
+			krumo($fnBody);
+		}
 		return array_filter($array, create_function('$a', $fnBody));
 	}
 	/**
@@ -93,7 +96,7 @@ class Jp7_Collections {
      * @param string $clause A string specifying how to sort the array similar to SQL ORDER BY clause.
      * @return array 
      */ 
-    public static function sort($array, $clause) {
+    public static function sort($array, $clause, $debug = false) {
         $dirMap = array('desc' => 1, 'asc' => -1); 
 		
 		$clause = preg_replace('/\s+/', ' ', $clause);
@@ -141,6 +144,9 @@ class Jp7_Collections {
 			}
 			$retorno = &$fnBody;
         }
+		if ($debug) {
+			krumo($fnBody);
+		}
 		if ($fnBody) {
             usort($array, create_function('$a,$b', $fnBody));        
         }

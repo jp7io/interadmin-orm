@@ -1,12 +1,12 @@
 <?php
 
 class Jp7_InterAdmin_JSTree {
-	protected $tree = array();
-	protected $tipos = array();
+	public $tree = array();
+	public $tipos = array();
 	
 	public function __construct($options = array()) {
 		$options = InterAdmin::mergeOptions(array(
-			'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo'),
+			'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo', 'admin'),
 			'use_published_filters' => true,
 			'class' => 'InterAdminTipo'	
 		), $options);
@@ -14,10 +14,6 @@ class Jp7_InterAdmin_JSTree {
 		$all = InterAdminTipo::findTipos($options);
 		
 		$this->tipos = self::groupByParent($all);
-		
-		foreach ($this->tipos[0] as $tipo) {
-			$this->addTipo($this->tree, $tipo);
-		}
 	}
 	
 	public static function groupByParent($all) {
@@ -61,7 +57,14 @@ class Jp7_InterAdmin_JSTree {
 		$tree[] = $node;
 	}
 	
-	public function toJson() {
-		return json_encode($this->tree);	
+	public function createTree() {
+		foreach ($this->tipos[0] as $tipo) {
+			$this->addTipo($this->tree, $tipo);
+		}
+		return $this->tree;
+	}
+	
+	public function toJson(){
+		return json_encode($this->createTree());	
 	}
 }
