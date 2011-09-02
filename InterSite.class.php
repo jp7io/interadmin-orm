@@ -138,6 +138,9 @@ class InterSite {
 	public function init($host) {
 		global $jp7_app;
 		
+		// Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
+		$host = strtolower($host);
+		
 		// This server is a main host
 		$this->server = $this->servers[$host];
 		$this->hostType = self::HOST_MAIN;
