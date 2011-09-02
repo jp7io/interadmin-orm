@@ -292,7 +292,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		
 		if ($lang->prefix) {
 			// Performance, não é necessário, mas diminui as queries
-			$options['fields'] = 'nome' . $lang->prefix; 
+			$options['fields'][] = 'nome' . $lang->prefix; 
 		}
 		
 		//Retrieves all the menus
