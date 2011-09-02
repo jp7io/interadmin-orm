@@ -38,9 +38,11 @@ class Jp7_InterAdmin_JSTree {
 		$nome_lang = ($lang->prefix && $tipo->{'nome' . $lang->prefix}) ? $tipo->{'nome' . $lang->prefix} : $tipo->nome;
 		$node = (object) array(
 			'data' => utf8_encode($nome_lang),
-			//'attr' => array(),
+			'attr' => array(
+				'id' => $tipo->id_tipo
+			),
 			'metadata' => array(
-				'id_tipo' => $tipo->id_tipo,
+				//'id_tipo' => $tipo->id_tipo,
 				'model_id_tipo' => $tipo->model_id_tipo
 			),
 			'children' => array()
