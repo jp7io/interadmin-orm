@@ -33,7 +33,20 @@ class Jp7_InterAdmin_JSTree {
 	}
 	
 	public function addTipo(&$tree, $tipo, $nivel = 0) {
-		global $tipos, $lang;
+		if ($nivel >= 20) {
+			return; // Too much recursion
+		}
+		
+		$node = $this->createTipoNode($tipo, $nivel);
+		if ($node === false) {
+			return;
+		}
+				
+		$tree[] = $node;
+	}
+	
+	public function createTipoNode($tipo, $nivel) {
+		global $lang;
 		
 		$nome_lang = ($lang->prefix && $tipo->{'nome' . $lang->prefix}) ? $tipo->{'nome' . $lang->prefix} : $tipo->nome;
 		$node = (object) array(
@@ -47,11 +60,6 @@ class Jp7_InterAdmin_JSTree {
 			),
 			'children' => array()
 		);
-		/*
-		if (in_array($tipo->id_tipo, $s_session['tree_opened'])) {
-			$node->state = 'open';	
-		}
-		*/
 		
 		$children = $this->tipos[$tipo->id_tipo];
 		if ($children) {
@@ -60,12 +68,10 @@ class Jp7_InterAdmin_JSTree {
 				$this->addTipo($node->children, $childTipo, $nivel);
 			}
 		}
-		
 		if (!$node->children) {
 			unset($node->children); // Bug jsTree progressive_render
 		}
-		
-		$tree[] = $node;
+		return $node;
 	}
 	
 	public function createTree() {
