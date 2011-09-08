@@ -77,10 +77,7 @@ class InterSite {
 		if ($_SERVER['HTTP_HOST'] == 'localhost') {
 			return true;
 		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
-			// Has no dots
-			if (strpos($_SERVER['HTTP_HOST'], '.') === false || $_SERVER['SERVER_ADDR'] == $_SERVER['HTTP_HOST']) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
