@@ -155,7 +155,7 @@ class Social {
 			Social::removeSocials ($remove);
 		}
 	}
-	public function displayBookmark ($limiter = 5, $url = false, $title = '', $target = '_blank') {
+	public function displayBookmark ($limiter = 5, $url = false, $title = '', $target = '_blank', $customUrl = array()) {
 		// Must create a social first
 		if (!$this->displaySocials) {
 			exit('You must creat a social first.');
@@ -196,6 +196,10 @@ class Social {
 		$count = 1;
 		foreach($this->displaySocials as $key => $value) {
 			if (is_array($value)) {
+				if ($customUrl[$key]) {
+					$url = $customUrl[$key];
+				}			
+				
 				$value['url'] = str_replace('%url%', urlencode(utf8_encode($url)), $value['url']);
 				$value['url'] = str_replace('%title%', urlencode(utf8_encode($title)), $value['url']);
 				$html .= '<li class="at15t at15t_' . $key . '"><a href="' . $value['url'] . '" id="social_' . $key . '" target="' . $target . '">' . $value['title'] . '</a></li>' . "\n";
@@ -256,12 +260,12 @@ class Social {
 	/* Send to a friend */
 
 	/* Embedeed */
-	public function displayEmbedded($title = 'Clique aqui', $url = false, $type = 'link', $label = 'Endereço:') {
+	public function displayEmbedded($title = 'Clique aqui', $url = false, $type = 'link', $label = 'Endereço:', $divId = 'embedded') {
 		if (!$url) {
 			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
 		
-		$html = '<div id="embedded">' . "\n";
+		$html = '<div id="' . $divId . '">' . "\n";
 		if ($label) {
 			$html .= '<label for="embeddedUrl' . ucfirst(strtolower($key)) . '">' . $label . '</label>' . "\n";
 		}
