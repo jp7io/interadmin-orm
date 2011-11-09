@@ -64,7 +64,7 @@ class Jp7_Debugger {
 		if (!$c_jp7) {
 			return; // Only by Devs
 		}
-		$this->startTime();
+		$this->_startTime[] = $_SERVER['REQUEST_TIME'];
 		// Debug - SQL
 		$this->debugSql = $_GET['debug_sql'];
 		// Debug - Filename
