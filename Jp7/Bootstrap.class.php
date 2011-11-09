@@ -3,8 +3,11 @@
 class Jp7_Bootstrap {
 	
 	public static function run() {
+		//$GLOBALS['debugger']->startTime();
+				
 		global $debugger;
 		$debugger->setExceptionsEnabled(true);
+		//$debugger->setSafePoint(true);
 		
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
@@ -195,6 +198,7 @@ class Jp7_Bootstrap {
 	}
 	
 	public static function dispatch() {
+		//$GLOBALS['debugger']->getTime(true, 'Bootstrap');
 		Zend_Controller_Front::getInstance()->dispatch();
 	}
 	
@@ -203,5 +207,7 @@ class Jp7_Bootstrap {
 		if (Jp7_Cache_Output::hasStarted()) {
 			 Jp7_Cache_Output::getInstance()->end();
 		}
+		
+		//$GLOBALS['debugger']->getTime(true, 'Página inteira');
 	}
 }
