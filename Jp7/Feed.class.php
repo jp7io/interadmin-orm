@@ -153,6 +153,9 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed {
      */
     public function export($type, $ignoreExceptions = false) {
     	if (!$this->getDateModified()) {
+    		if ($this->lastDateModified == 0) {
+    			$this->lastDateModified = null;
+    		}
 			$this->setDateModified($this->lastDateModified);
 		}
 		return parent::export($type, $ignoreExceptions = false);
