@@ -6,7 +6,7 @@ class Jp7_Feed_Entry extends Zend_Feed_Writer_Entry {
      * @see Zend_Feed_Writer_Entry::setContent()
      */
     public function setContent($content) {
-        parent::setContent(utf8_encode($content));
+        parent::setContent(Jp7_Utf8::encode($content));
     }
     
     /**
@@ -35,14 +35,14 @@ class Jp7_Feed_Entry extends Zend_Feed_Writer_Entry {
      * @see Zend_Feed_Writer_Entry::setDescription()
      */
     public function setDescription($description) {
-		parent::setDescription(utf8_encode($description));
+		parent::setDescription(Jp7_Utf8::encode($description));
     }
     
     /**
      * @see Zend_Feed_Writer_Entry::setTitle()
      */
     public function setTitle($title) {
-        parent::setTitle(utf8_encode($title));
+        parent::setTitle(Jp7_Utf8::encode($title));
     } 
 }
 ?>

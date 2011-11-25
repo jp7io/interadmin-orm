@@ -57,16 +57,25 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed {
 				if ($category) {
 					$entry->addCategory(array('term' => $category));
 				}
-				if ($entryData->$helpers['content']) {
-					$entry->setContent($entryData->texto);
+				
+				if ($entryData->$helpers['content']) {					
+					$entry->setContent($entryData->$helpers['content']);
 				}
 				
 				$entry->setId($methodId ? $entry->$methodId() : $helpers['id']);
 				
-				$dateModified = $entryData->getByAlias($helpers['date_modified'])->getTimestamp();
+				if ($entryData->getByAlias($helpers['date_modified'])->isValid()) {
+					$dateModified = $entryData->getByAlias($helpers['date_modified'])->getTimestamp();				
+					$entry->setDateModified($dateModified);
+				} else {
+					$entry->setDateModified(null);
+				}
 				
-				$entry->setDateModified($dateModified);
-				$entry->setDateCreated($entryData->getByAlias($helpers['date_created'])->getTimestamp());
+				if ($entryData->getByAlias($helpers['date_created'])->isValid()) {
+					$entry->setDateCreated($entryData->getByAlias($helpers['date_created'])->getTimestamp());
+				} else {
+					$entry->setDateCreated(null);
+				}
 				
 				if ($entryData->$helpers['description']) {
 					$entry->setDescription($entryData->$helpers['description']);
@@ -114,28 +123,28 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed {
      * @see Zend_Feed_Writer_Feed_FeedAbstract::setDescription()
      */
     public function setDescription($description) {
-		parent::setDescription(utf8_encode($description));
+		parent::setDescription(Jp7_Utf8::encode($description));
     }
 	
     /**
      * @see Zend_Feed_Writer_Feed_FeedAbstract::setTitle()
      */
     public function setTitle($title) {
-		parent::setTitle(utf8_encode($title));
+		parent::setTitle(Jp7_Utf8::encode($title));
     }
 	 
     /**
      * @see Zend_Feed_Writer_Feed_FeedAbstract::setCopyright()
      */
     public function setCopyright($copyright) {
-    	parent::setCopyright(utf8_encode($copyright));
+    	parent::setCopyright(Jp7_Utf8::encode($copyright));
     }
 	 
     /**
      * @see Zend_Feed_Writer_Feed::createEntry()
      */
     public function createEntry() {
-        $entry = new Jp7_Feed_Entry;
+        $entry = new Jp7_Feed_Entry();
         if ($this->getEncoding()) {
             $entry->setEncoding($this->getEncoding());
         }
