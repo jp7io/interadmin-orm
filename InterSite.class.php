@@ -190,7 +190,7 @@ class InterSite {
 			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
 				$this->db->host = $this->db->host_internal;
 			}
-			foreach($this->server->vars as $var => $value) {
+			foreach((array) $this->server->vars as $var => $value) {
 				$this->$var = $value;
 			}
 			$this->url = 'http://' . $this->server->host . '/' . jp7_path($this->server->path);
@@ -281,7 +281,7 @@ class InterSite {
 		$GLOBALS['c_nobackup'] = $this->nobackup;
 		foreach ($this->servers as $host => $server) {
 			$GLOBALS['c_cliente_domains'][] = $host;
-			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], $server->aliases);
+			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
 		}
 		foreach($this->langs as $sigla => $lang) {
 			$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
