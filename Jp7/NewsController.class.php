@@ -6,12 +6,12 @@ class Jp7_NewsController extends __Controller_Action {
 	
 	public function indexAction() {
 		$id = $this->_getParam('id');
-		// Irá cachear uma página diferente para cada registro
-		Jp7_Cache_Output::getInstance()->start((string) $id);
-		
 		$newsTipo = self::getTipo();
 		
 		if ($id) {
+			// Irá cachear uma página diferente para cada registro
+			Jp7_Cache_Output::getInstance()->start((string) $id);
+		
 			$this->record = $newsTipo->getInterAdminById($id,array(
 				'fields' => array('*', 'date_publish')
 			));
@@ -27,10 +27,15 @@ class Jp7_NewsController extends __Controller_Action {
 			));
 			*/
 		} else {
+			$archive = $this->_getParam('archive');
+			
+			// Irá cachear uma página diferente para cada registro
+			Jp7_Cache_Output::getInstance()->start($archive);
+			
 			$options = array(
 				'fields' => array('*', 'date_publish')
 			);
-			if ($archive = $this->_getParam('archive')) {
+			if ($archive) {
 				$archiveArr = array_map('intval', explode('/', $archive));
 				if (checkdate($archiveArr[1], 1, $archiveArr[0])) {
 					$this->view->archive = new Jp7_Date($archiveArr[0] . '-' . $archiveArr[1] . '-01');
