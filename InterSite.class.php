@@ -193,7 +193,7 @@ class InterSite {
 			foreach((array) $this->server->vars as $var => $value) {
 				$this->$var = $value;
 			}
-			$this->url = 'http://' . $this->server->host . '/' . jp7_path($this->server->path);
+			$this->url = ($_SERVER['HTTPS'] ? 'https' : 'http') . '://' . $this->server->host . '/' . jp7_path($this->server->path);
 			
 			foreach($this->langs as $sigla => $lang) {
 				if ($lang->default) {
