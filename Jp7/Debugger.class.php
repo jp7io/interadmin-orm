@@ -123,12 +123,14 @@ class Jp7_Debugger {
 	public function showFilename($filename) {
 		global $c_doc_root;
 		if ($this->debugFilename && $this->isSafePoint()) {
-			echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+			echo '<div class="debug_msg">' . str_replace($c_doc_root, '/', str_replace('\\', '/', $filename)) . '</div>';
 		}
+		/*
 		if ($this->active) {
 			// Creates a new log entry for this file
 			$this->addLog($filename, 'file');
 		}
+		*/
 		return $filename;
 	}
 	/**
@@ -148,7 +150,15 @@ class Jp7_Debugger {
 			return;
 		}
 		if ($this->debugSql || $forceDebug) {
-			echo '<div class="debug_sql" style="' . $style . '">' . preg_replace('/(SELECT | FROM | WHERE | ORDER BY |HAVING|GROUP BY|LEFT JOIN)/','<b>\1</b>', $sql) . '</div>';
+			if (!defined('PARSER_LIB_ROOT')) {
+				define('PARSER_LIB_ROOT', ROOT_PATH . '/inc/3thparty/sqlparserlib/');
+				echo '<style>';
+				readfile(PARSER_LIB_ROOT . 'sqlsyntax.css');
+				echo '</style>';
+			}
+			require_once PARSER_LIB_ROOT . 'sqlparser.lib.php';
+			
+			echo '<div class="debug_sql" style="' . $style . '">' . PMA_SQP_formatHtml(PMA_SQP_parse($sql)) . '</div>';
 		}
 	}
 	/**
@@ -316,10 +326,10 @@ class Jp7_Debugger {
 		$this->getTime(true);
 	}
 	public function isSafePoint() {
-		return $this->_savePoint || headers_sent();
+		return $this->_safePoint || headers_sent();
 	}
 	public function setSafePoint($bool) {
-		$this->_savePoint = $bool;
+		$this->_safePoint = $bool;
 	}
 	/**
 	 * Envia o trace do erro para debug+CLIENTE@jp7.com.br

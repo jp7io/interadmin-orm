@@ -5,6 +5,8 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
      */
     public function prepareData() {
     	$newsTipo = InterAdminTipo::findFirstTipoByModel('News');
+		$this->sectionTipo = $newsTipo;
+		
 		if ($newsTipo) {
 			$options = array(
 				'fields' => array('title', 'image', 'date_publish'),
@@ -14,7 +16,9 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 			if ($this->params->featured) {
 				$options['where'][] = "featured <> ''";
 			}
-			$this->title = ($this->params->title) ? $this->params->title : $newsTipo->getNome();
+			
+			global $lang;
+			$this->title = ($this->params->{'title' . $lang->prefix}) ? $this->params->{'title' . $lang->prefix} : $newsTipo->getNome();
 			$this->news = $newsTipo->getInterAdmins($options);
 			
 			$this->_prepareDataImages();
@@ -30,15 +34,26 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
     }
 	
 	protected function _getEditorFields() {
+		global $config;
     	ob_start();
 		?>
 		<div class="fields">
-			<div class="field">
-				<label>Título:</label>
-				<input type="text" class="textbox" label="Título" placeholder="Automático" 
-					name="<?php echo $this->id_box; ?>[title][]"
-					value="<?php echo $this->params->title; ?>"	/>
-			</div>
+			<?php foreach ($config->langs as $key => $lang) { ?>
+				<?php
+				$sufix = ($lang->default) ? '' : '_' . $key;
+				?>
+				<div class="field">
+					<label>
+						<?php if (count($config->langs) > 1) { ?>
+							<img src="/_default/img/icons/<?php echo $key; ?>.png" style="vertical-align:middle;" />
+						<?php } ?>
+					Título:</label>
+					<input type="text" class="textbox" label="Título" placeholder="Automático" 
+						name="<?php echo $this->id_box; ?>[title<?php echo $sufix; ?>][]"
+						value="<?php echo $this->params->{'title' . $sufix}; ?>"	/>
+				</div>
+			<?php } ?>
+			
 			<div class="field">
 				<label>Destaques:</label>
 				<?php echo $this->checkbox('featured'); ?>

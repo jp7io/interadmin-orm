@@ -17,6 +17,7 @@ class Jp7_Model_ContentFilesTipo extends Jp7_Model_TipoAbstract {
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
 		'tabela' => '',
-		'editar' => 'S'
+		'editar' => 'S',
+		'icone' => 'page_white_put'
 	);
 }

@@ -16,7 +16,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	/**
 	 * @var InterAdmin
 	 */
-	protected $record;
+	protected static $record;
 	
 	public function preDispatch() {
     	if (!$this->actionExists()) {
@@ -73,18 +73,20 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		// TODO Late Static Binding static::getTipo()
 		$tipo = $this->getTipo();
 		
+		$record = self::getRecord();
+		
 		// View
 		$this->view->config = $config;
 		$this->view->lang = $lang;
 		$this->view->tipo = $tipo; 
-		$this->view->record = $this->record;
+		$this->view->record = $record;
 		
 		// Boxes editáveis pelo InterAdmin
 		if ($tipo instanceof InterAdminTipo) {
 			$boxTipo = $tipo->getFirstChildByModel('Boxes');
 			if ($boxTipo) {
 				Jp7_Box_Manager::setView($this->view);
-				Jp7_Box_Manager::setRecordMode($this->record);
+				Jp7_Box_Manager::setRecordMode($record);
 				$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxTipo);
 			}
 		}
@@ -107,10 +109,13 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @return string
 	 */
 	protected function _prepareTitle() {
+		$record = self::getRecord();
+		
 		$this->view->headTitle()->setSeparator(' | ');
+		
 		// Adiciona o nome do registro atual ao título
-		if ($this->record) {
-			if ($titulo = $this->record->getFieldsValues('varchar_key')) {
+		if ($record) {
+			if ($titulo = $record->getFieldsValues('varchar_key')) {
 				$this->view->headTitle($titulo);
 			}
 		}
@@ -130,14 +135,14 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		if ($settings = $this->getSettings()) { // TODO Late Static Binding static::getSettings()
 			$metas = Zend_Registry::get('metas');
 			$tipo = self::getTipo();
-			
+			$record = self::getRecord();
 			if (!$settings->title) {
 				$tipo->getFieldsValues('nome');
 				if ($tipo->nome != 'Home') {
 					$metas['keywords'] = $tipo->nome . ',' . $metas['keywords'];				
 				}
-				if ($this->record instanceof InterAdmin) {
-					$metas['keywords'] = $this->record->getFieldsValues('varchar_key') . ',' . $metas['keywords'];
+				if ($record instanceof InterAdmin) {
+					$metas['keywords'] = $record->getFieldsValues('varchar_key') . ',' . $metas['keywords'];
 				}
 				$this->view->headMeta()->setName('keywords', $metas['keywords']);
 			}
@@ -262,6 +267,15 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	public static function setTipo(InterAdminTipo $tipo = null) {
 		self::$tipo = $tipo;
 	}
+	
+	public static function getRecord() {
+		return self::$record;
+	}
+	
+	public static function setRecord(InterAdmin $record = null) {
+		self::$record = $record;
+	}
+	
 	/**
 	 * Checks if the request Action exists.
 	 * @return bool

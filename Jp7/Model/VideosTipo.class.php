@@ -19,7 +19,8 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
 		'editar' => 'S',
 		'texto' => 'Cadastro de vídeos do YouTube e Vimeo.',
-		'disparo' => 'Jp7_Model_VideosTipo::checkThumb'
+		'disparo' => 'Jp7_Model_VideosTipo::checkThumb',
+		'icone' => 'film'
 	);
 	
 	public function createChildren(InterAdminTipo $tipo) {

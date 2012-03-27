@@ -16,7 +16,8 @@ class Jp7_Model_SettingsTipo extends Jp7_Model_TipoAbstract {
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
 		'tabela' => '',
-		'unico' => 'S'
+		'unico' => 'S',
+		'icone' => 'cog'
 	);
 	
 }

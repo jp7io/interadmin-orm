@@ -17,7 +17,8 @@ class Jp7_Model_FilesTipo extends Jp7_Model_TipoAbstract {
 		'tabela' => '',
 		'layout' => Jp7_Box_Manager::COL_2_LEFT,
 		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
-		'editar' => 'S'
+		'editar' => 'S',
+		'icone' => 'page_white_put'
 	);
 	
 	public function createChildren(InterAdminTipo $tipo) {

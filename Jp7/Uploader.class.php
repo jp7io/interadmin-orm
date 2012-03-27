@@ -32,6 +32,10 @@ class Jp7_Uploader {	protected $fieldName;
 		$this->typesFilter = $typesFilter;
 	}
 	
+	public function count() {
+		return count($_FILES[$this->fieldName]['name']);
+	}
+	
 	/**
 	 * Saves the file to the given destination (keeping the uploaded extension).
 	 * 

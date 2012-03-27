@@ -57,7 +57,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	public function getTipo($options = array()) {
 		if (!$this->_tipo) {
 			if (!$this->id_tipo) {
-				$this->id_tipo = jp7_fields_values($this->db_prefix . $this->table, 'id', $this->id, 'id_tipo');
+				$this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
 			}
 			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
@@ -84,10 +84,13 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function getParent($options = array()) {
-		if ($this->_parent) return $this->_parent;
-		if ($this->id || $this->getFieldsValues('id')) {
-			return $this->_parent = InterAdmin::getInstance($this->id, $options);
+		if (!$this->_parent) {
+			$tipo = $this->getTipo();
+			if ($this->id || $this->getFieldsValues('id')) {
+				$this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
+			}
 		}
+		return $this->_parent;
 	}
 	/**
 	 * Sets the parent InterAdmin object for this record, changing the $_parent property.
@@ -146,13 +149,22 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder =  $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$folder = $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
+		// Mkdir if needed
+		if (!is_dir(dirname($newurl))) {
+			@mkdir(dirname($newurl));
+			@chmod(dirname($newurl), 0777);
+		}
+		
 		// Movendo arquivo temporário
 		@rename($this->url, $newurl);
-		$this->url = $newurl;
+		
+		$clientSideFolder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$this->url = $clientSideFolder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
+		
 		// Movendo o thumb
 		if ($this->url_thumb) {
 			$newurl_thumb = $folder . $id_arquivo_banco . '_t.' . $fieldsValues['tipo'];

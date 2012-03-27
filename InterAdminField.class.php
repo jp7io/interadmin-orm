@@ -72,9 +72,16 @@ class InterAdminField {
 		}
 		if (!$valor && !$id) {
 			if (strpos($tipo_de_campo, 'select_') === 0 && $valor_default && !is_numeric($valor_default)) {
-				$valorTipo = ($campo_array['nome'] instanceof InterAdminTipo) ? $campo_array['nome'] : InterAdminTipo::getInstance($campo_nome);
-				if ($valorObj = $valorTipo->getInterAdminByIdString($valor_default)) {
-					$valor_default = $valorObj->id;
+				$valor_default_arr = array();
+				$valor_string_arr = jp7_explode(',', $valor_default);
+				foreach ($valor_string_arr as $_value) {
+					$valorTipo = ($campo_array['nome'] instanceof InterAdminTipo) ? $campo_array['nome'] : InterAdminTipo::getInstance($campo_nome);
+					if ($valorObj = $valorTipo->getInterAdminByIdString($_value)) {
+						$valor_default_arr[] = $valorObj->id;
+					}
+				}
+				if ($valor_default_arr) {
+					$valor_default = implode(',', $valor_default_arr);
 				}
 			}
 			$valor = $valor_default;
@@ -82,6 +89,7 @@ class InterAdminField {
 		$temPermissao = $s_user['sa'] || $campo_array['permissoes'] == $s_user['tipo'] || ($campo_array['permissoes'] == 'admin' && $s_user['admin']);
 		$readonlyPermissao = $readonly || ($campo_array['permissoes'] && !$temPermissao);
 		
+		$_tr = '<tr class="' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . '-tr">';
 		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' .
 			"\"" . (($obrigatorio || $readonlyPermissao) ? " class=\"".(($obrigatorio)?"obrigatorio":"").(($readonlyPermissao)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if ($ajuda) {
@@ -257,7 +265,7 @@ class InterAdminField {
 					$url = '/_default/img/px.png';
 				}
 				echo "".
-				"<tr>".
+				$_tr.
 					$_th.
 					"<td><input type=\"text\" label=\"" . $campo_nome . "\" name=\"".$campo."[".$j."]\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . " value=\"".$valor."\" xtra=\"".$xtra."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:" . ($campo_array['sem_creditos'] ? 60 : 80) . "px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
 					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . " align=\"center\" onclick=\"openPopupImage(this);\" class=\"image_preview" . ($valor ? '': ' placeholder') . "\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url) . "</td>".
@@ -272,7 +280,7 @@ class InterAdminField {
 				}
 			}elseif(strpos($tipo_de_campo,"date_")===0){
 				$S="".
-				"<tr>".
+				$_tr.
 					$_th.
 					"<td colspan=\"2\">".
 						((strpos($xtra,"calendar_")!==false)?"<input type=\"hidden\" id=\"".$campo."_calendar_value_".$j."\" value=\"".$valor."\" value=\"".$xtra."\">":"").
@@ -291,7 +299,7 @@ class InterAdminField {
 				echo $S;
 			}elseif(strpos($tipo_de_campo,"password_")===0&&$valor){ // &&$xtra
 				echo "".
-				"<tr>".
+				$_tr.
 					$_th.
 					"<td colspan=\"2\">".
 						"<table width=\"100%\">".
@@ -325,7 +333,7 @@ class InterAdminField {
 			}else{
 				if(!$readonly_hidden){
 					echo "".
-					"<tr".(($s_session['mode']=="light"&&strpos($tipo_de_campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+					"<tr class=\"" . ($campo_array['nome_id'] ?  $campo_array['nome_id']  :  toId($campo_nome)) . "-tr\" ".(($s_session['mode']=="light"&&strpos($tipo_de_campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
 						"<th title=\"" . $campo . ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 						"<td colspan=\"2\">".$form."</td>".
 						"<td>".$S_ajuda."</td>".
@@ -340,7 +348,7 @@ class InterAdminField {
 				echo "</tbody>";
 				$tit_start=false;
 			}
-			echo "<tr><td height=\"".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
+			echo "<tr class=\"separator-tr\"><td height=\"".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
 		}
 	}
 	/**
@@ -373,7 +381,11 @@ class InterAdminField {
 	public static function getCampoHeader($campo) {
 		$key = $campo['tipo'];
 		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
-			return $campo['nome']($campo, '', 'header');
+			if (is_callable($campo['nome'])) {
+				return call_user_func($campo['nome'], $campo, '', 'header');
+			} else {
+				echo 'Função ' . $campo['nome'] . ' não encontrada.';
+			}
 		} elseif (strpos($key, 'select_') === 0) {
 			if ($campo['label']) {
 				return $campo['label'];
@@ -387,5 +399,55 @@ class InterAdminField {
 		} else {
 			return $campo['nome'];
 		}
+	}
+	
+	// função incompleta
+	public static function getCampoList($campo, $valor, $parte = 'list') {
+		$key = $campo['tipo'];
+		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
+			if (is_callable($campo['nome'])) {
+				return call_user_func($campo['nome'], $campo, $valor, $parte);
+			} else {
+				echo 'Função ' . $campo['nome'] . ' não encontrada.';
+			}
+		} elseif (strpos($key, 'date_') === 0) {	
+			return jp7_date_format($valor, 'd/m/Y - H:i');
+		} elseif (strpos($key, 'select_') === 0) {
+			if ($valor) {
+				$registros = array();
+				foreach (jp7_explode(',', $valor) as $valor_i) {
+					if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras())) {
+						$registros[] = jp7_string_left(interadmin_tipos_nome($valor_i), 10);
+					} else {
+						$registro = $campo['nome']->getInterAdminById($valor_i);
+						if ($registro) {
+							$registros[] = $registro->getStringValue();
+						}
+					}
+				}
+				return implode('<br />', $registros);
+			}
+		} elseif (strpos($key, 'file_') === 0) {
+			global $c_cliente_physical_path, $c_remote;
+			
+			$url = interadmin_uploaded_file_url($valor);
+			$ext = jp7_extension($url);
+			$url_size = '';
+			if (!in_array($ext, array('gif','jpg','jpeg','png','---'))) {
+				// Size
+				if ($c_remote) {
+					$url_size = '<span class="filesize" presrc="' . $url . '"></span>';
+				} else {
+                    $url_size = interadmin_filesize(str_replace('../../', $c_cliente_physical_path, $valor));
+				}
+			}
+			?>
+			<div style="width:100%;cursor:pointer;color:#fff;font-size:9px" onclick="interadmin_arquivos_banco_preview('<?php echo $url ?>')">
+				<?php echo @interadmin_arquivos_preview($url,'',true,true); ?><?php if ($url_size) { ?> - <?php echo $url_size ?><?php } ?>
+			</div>
+			<?php
+		} else {
+			return htmlspecialchars($valor);
+		}	
 	}
 }

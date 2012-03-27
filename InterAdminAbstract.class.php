@@ -18,7 +18,9 @@ abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
 	
-	protected $_primary_key = 'id';	
+	private static $_cache = false;
+	
+	protected $_primary_key = 'id';
 	/**
 	 * Array of all the attributes with their names as keys and the values of the attributes as values.
 	 * @var array 
@@ -146,6 +148,7 @@ abstract class InterAdminAbstract implements Serializable {
 			} elseif ($row = $rs->FetchNextObj()) {
 				$this->_getAttributesFromRow($row, $this, $options); 
 			}
+			$rs->Close();
 		}
 		if (is_array($fields)) {
 			// returns only the fields requested on $fields
@@ -333,43 +336,68 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
-		// Resolve Alias and Joins for 'fields' and 'from'
-		$this->_resolveFieldsAlias($options);
-		// Resolve Alias and Joins for 'where', 'group' and 'order';
-		$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
-		
-		if ($use_published_filters) {
-			foreach ($options['from'] as $key => $from) {
-				list($table, $alias) = explode(' AS ', $from);
-				/*
-				if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
-					continue;
-				}*/
-				if ($alias == 'main') {
-					// @todo PHP 5.3, trocar $this por static
-					$filters = $this->getPublishedFilters($table, $alias);
-				} else {
-					$join = explode(' ON', $alias);
-					// @todo PHP 5.3, trocar $this por static
-					$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+		$cache = null;
+		if (self::$_cache) {
+			$cache = new Jp7_Cache_Recordset($options);
+		}
+		if (!$cache || !($rs = $cache->load())) {
+			// Resolve Alias and Joins for 'fields' and 'from'
+			$this->_resolveFieldsAlias($options);
+			// Resolve Alias and Joins for 'where', 'group' and 'order';
+			$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
+			
+			if ($use_published_filters) {
+				foreach ($options['from'] as $key => $from) {
+					list($table, $alias) = explode(' AS ', $from);
+					/*
+					if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
+						continue;
+					}*/
+					if ($alias == 'main') {
+						// @todo PHP 5.3, trocar $this por static
+						$filters = $this->getPublishedFilters($table, $alias);
+					} else {
+						$join = explode(' ON', $alias);
+						// @todo PHP 5.3, trocar $this por static
+						$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+					}
 				}
 			}
-		}
-		
-		// Sql
-		$sql = "SELECT " . implode(',', $options['fields']) .
-			" FROM " . implode(' LEFT JOIN ', $options['from']) .
-			" WHERE " . $filters . $clauses .
-			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		// Debug
-		if ($debugger) {
-			$debugger->showSql($sql, $options['debug']);
-			$debugger->startTime();
-		}
-		// Run SQL
-		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		if ($debugger) {
-			$debugger->getTime($options['debug']);
+			
+		    $joins = '';
+		    if ($options['joins']) {
+			    foreach ($options['joins'] as $alias => $join) {
+				    list($joinType, $tipo, $on) = $join;
+				    $onClause = array(
+					    'joins' => $options['joins'],
+					    'where' => $on
+				    );
+				    $table = $tipo->getInterAdminsTableName();
+				    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
+					    $this->getPublishedFilters($table, $alias) . 
+					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSqlClausesAlias($onClause, $use_published_filters);
+			    }
+		    }
+		    
+			// Sql
+			$sql = "SELECT " . implode(',', $options['fields']) .
+				" FROM " . implode(' LEFT JOIN ', $options['from']) .
+			    $joins .
+				" WHERE " . $filters . $clauses .
+				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+			// Debug
+			if ($debugger) {
+				$debugger->showSql($sql, $options['debug']);
+				$debugger->startTime();
+			}
+			// Run SQL
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+			if ($debugger) {
+				$debugger->getTime($options['debug']);
+			}
+			if ($cache) {
+				$rs = $cache->save($rs);
+			}
 		}
 		return $rs;
 	}
@@ -443,7 +471,8 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
-							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
+							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' . 
+								'Expected a child named "' . $joinNome . '". Found: ' . implode(', ', array_keys($childrenArr)));
 						}
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
@@ -501,10 +530,14 @@ abstract class InterAdminAbstract implements Serializable {
 					} else {
 						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
-						if (!in_array($table, (array) $options['from_alias'])) {
-							$this->_addJoinAlias($options, $table, $campos[$joinNome]);
-						}
-						$joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						if ($options['joins'] && $options['joins'][$table]) {
+							$joinTipo = $options['joins'][$table][1];
+						} else {
+						    if (!in_array($table, (array) $options['from_alias'])) {
+							    $this->_addJoinAlias($options, $table, $campos[$joinNome]);
+						    }
+						    $joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						}						
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
 					// TEMPORARIO FIXME, necessario melhor maneira
@@ -562,10 +595,15 @@ abstract class InterAdminAbstract implements Serializable {
 			if (is_array($campo)) {
 				$nome = ($aliases[$join]) ? $aliases[$join] : $join;
 				if ($nome) {
-					$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					// Join e Recursividade
-					$this->_addJoinAlias($options, $join, $campos[$nome]);
-					$joinTipo = $this->getCampoTipo($campos[$nome]);
+					if ($options['joins'] && $options['joins'][$join]) {
+						$joinTipo = $options['joins'][$join][1];
+					} else {
+					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
+					    // Join e Recursividade
+					    $this->_addJoinAlias($options, $join, $campos[$nome]);
+					    $joinTipo = $this->getCampoTipo($campos[$nome]);
+					}
 					if ($fields[$join] == array('*')) {
 						$fields[$join] = $joinTipo->getCamposNames();
 					}
@@ -596,8 +634,10 @@ abstract class InterAdminAbstract implements Serializable {
 					$options['order'] .= ($options['order'] ? "," : "") . $aggrCampo;
 				}
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
+				$_tmp = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
 				 	' AS `' . $table . $aggregateAlias . '`';
+				$_tmp = str_replace('main.NULL', 'NULL', $_tmp);
+				$fields[$join] = $_tmp;
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
@@ -623,9 +663,9 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	protected function _addJoinAlias(&$options = array(), $alias, $campo, $table = 'main') {
 		$joinTipo = $this->getCampoTipo($campo);
-		if (!$joinTipo) {
+		if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
-		}		
+		}
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
 		// @todo testar
 		if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {

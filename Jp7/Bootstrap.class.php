@@ -7,13 +7,14 @@ class Jp7_Bootstrap {
 				
 		global $debugger;
 		$debugger->setExceptionsEnabled(true);
-		//$debugger->setSafePoint(true);
+		$debugger->setSafePoint(true);
 		
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
 		Zend_Registry::set('get', new Zend_Filter_Input(null, null, $_GET));
 		
 		self::initConfig();
+		self::initAdminBar();
 		self::initDataBase();
 		self::initFrontController();
 		self::initLanguage();
@@ -50,6 +51,33 @@ class Jp7_Bootstrap {
 		$config->build = interadmin_get_version($config->name_id, '{build}');
 	}
 	
+	public static function initAdminBar() {
+		global $c_jp7;
+		$config = Zend_Registry::get('config');
+		
+		// Dados da admin bar - Somente se estiver logado
+		if ($GLOBALS['s_user']) {
+			if (isset($_GET['ia_hook'])) {
+				$GLOBALS['s_session']['no_hook'] = !$_GET['ia_hook'];
+			}
+			if (isset($_GET['ia_preview'])) {
+				$GLOBALS['s_session']['preview'] = (bool) $_GET['ia_preview'];
+			}			
+			
+			$admin_bar_data = array(
+				'server' => $config->server->interadmin_remote ? reset($config->server->interadmin_remote) : $_SERVER['HTTP_HOST'],
+				'cliente' => $config->name_id,
+				'preview' => (bool) $GLOBALS['s_session']['preview'],
+				'no_hook' => (bool) $GLOBALS['s_session']['no_hook'],
+				'c_jp7' => $c_jp7
+			);
+			
+			setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');
+		} elseif ($_COOKIE['ia_admin_bar']) {
+			setcookie('ia_admin_bar', '', 1, '/');
+		}	
+	}
+	
 	public static function initDataBase() {
 		global $db;
 		$config = Zend_Registry::get('config');
@@ -66,7 +94,8 @@ class Jp7_Bootstrap {
 		$db = ADONewConnection($dsn);
 		
 		if (!$db) {
-			throw new Exception('Unable to connect to the database ' . $dsn);
+			$config->db->pass = '{pass}';
+			throw new Exception('Unable to connect to the database ' . jp7_formatDsn($config->db));
 		}
 		/* /DB Connection */
 	}
@@ -138,7 +167,10 @@ class Jp7_Bootstrap {
 	public static function initLayout() {
 		Zend_Layout::startMvc(APPLICATION_PATH . '/layouts/scripts');
 		//Zend_Layout::startMvc(ROOT_PATH . '/institucional/application/layouts/scripts');
+		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
+		$viewRenderer->setView(new Jp7_View());
 		$view = Zend_Layout::getMvcInstance()->getView();
+		
 		if (is_dir(APPLICATION_PATH . '/modules/default')) {
 			$view->setBasePath(APPLICATION_PATH . '/modules/default/views');
 		}
@@ -150,8 +182,6 @@ class Jp7_Bootstrap {
 		));
 		// Permite o uso de Helpers customizados da Jp7
 		$view->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
-		$view->doctype('XHTML1_STRICT');
-		$view->setEncoding('ISO-8859-1');
 		
 		// Adicionando JS e CSS padrão
 		$config = Zend_Registry::get('config');
@@ -174,12 +204,12 @@ class Jp7_Bootstrap {
 		
 		// JS
 		$scripts = array(
+			DEFAULT_PATH . 'js/jquery/jquery-1.3.2.min.js',
 			DEFAULT_PATH . 'js/interdyn.js',
 			DEFAULT_PATH . 'js/interdyn_checkflash.js',
 			DEFAULT_PATH . 'js/interdyn_form.js',
 			DEFAULT_PATH . 'js/interdyn_form_lang_' . $lang->lang . '.js',
-			DEFAULT_PATH . 'js/swfobject.js',
-			DEFAULT_PATH . 'js/jquery/jquery-1.3.2.min.js',
+			DEFAULT_PATH . 'js/swfobject.js',			
 			DEFAULT_PATH . 'js/interdyn_menu.js',
 			'js/functions.js'
 		);
@@ -209,5 +239,7 @@ class Jp7_Bootstrap {
 		}
 		
 		//$GLOBALS['debugger']->getTime(true, 'Página inteira');
+		//echo memory_get_usage() . ' de Memória<br />';
+		//echo memory_get_peak_usage() . ' de pico de Memória<br />';
 	}
 }

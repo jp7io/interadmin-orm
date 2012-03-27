@@ -3,54 +3,59 @@
 class Jp7_InterAdmin_JSTree {
 	public $tree = array();
 	public $tipos = array();
+	public $options = array();
 	
 	public function __construct($options = array()) {
 		global $lang;
 		
-		if (!$options['static']) {
-			$options = InterAdmin::mergeOptions(array(
-				'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo', 'admin'),
-				'use_published_filters' => true,
-				'class' => 'InterAdminTipo'	
-			), $options);
-			
-			if ($lang->prefix) {
-				$options['fields'][] = 'nome' . $lang->prefix; 
-			}
-			
-			$all = InterAdminTipo::findTipos($options);
-									
-			$this->tipos = self::groupByParent($all);
-		}
-	}
-	
-	public static function groupByParent($all) {
-		$tipos = array();
-		foreach ($all as $one) {
-			$tipos[$one->parent_id_tipo][] = $one;
-		}
-		return $tipos;
-	}
-	
-	public function addTipo(&$tree, $tipo, $nivel = 0) {
-		if ($nivel >= 20) {
-			return; // Too much recursion
-		}
+		$this->options = $options;
 		
-		$node = $this->createTipoNode($tipo, $nivel);
-		if ($node === false) {
-			return;
+		if (!$options['static']) {
+			$this->addTipo($this->tree, new InterAdminTipo(0));
 		}
-				
-		$tree[] = $node;
 	}
-	
-	public function createTipoNode($tipo, $nivel) {
+		
+	public function addTipo(&$tree, $parentTipo, $nivel = 0) {
 		global $lang;
 		
-		$nome_lang = ($lang->prefix && $tipo->{'nome' . $lang->prefix}) ? $tipo->{'nome' . $lang->prefix} : $tipo->nome;
+		$options = array(
+			'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo', 'icone'),
+			'use_published_filters' => true,
+			'class' => 'InterAdminTipo'
+		);
+		
+		if ($nivel == 0) {
+			$options['where'][] = ($this->options['admin']) ? "admin <> ''" : "admin = ''"; 
+		}		
+		if ($nivel < 3) {
+			$options = InterAdmin::mergeOptions($this->options, $options);
+		}	
+		if ($lang->prefix) {
+			$options['fields'][] = 'nome' . $lang->prefix; 
+		}
+		
+		$tipos = $parentTipo->getChildren($options);
+		foreach ($tipos as $tipo) {
+			// Criando o Node JSON
+			$nome_lang = ($lang->prefix && $tipo->{'nome' . $lang->prefix}) ? $tipo->{'nome' . $lang->prefix} : $tipo->nome;
+			$node = $this->createTipoNode($nome_lang, $tipo);
+			if (!$node) {
+				continue;
+			}
+			$tree[] = $node;
+			// Aqui entra a recursão
+			$this->addTipo($node->children, $tipo, $nivel + 1);
+			if (count($node->children) == 0) {
+				unset($node->children); // Bug jsTree progressive_render
+			}
+		}
+	}
+	
+	public function createTipoNode($nome_lang, $tipo) {
 		$node = (object) array(
-			'data' => utf8_encode($nome_lang),
+			'data' => array(
+				'title' => utf8_encode($nome_lang)
+			),
 			'attr' => array(
 				'id' => $tipo->id_tipo
 			),
@@ -60,47 +65,38 @@ class Jp7_InterAdmin_JSTree {
 			),
 			'children' => array()
 		);
-		
-		$children = $this->tipos[$tipo->id_tipo];
-		if ($children) {
-			$nivel++;
-			foreach ($children as $childTipo) {
-				$this->addTipo($node->children, $childTipo, $nivel);
-			}
-		}
-		if (!$node->children) {
-			unset($node->children); // Bug jsTree progressive_render
+		if ($tipo->icone) {
+			$node->data['icon'] = $this->getIconeUrl($tipo->icone);
 		}
 		return $node;
 	}
 	
-	public function createTree() {
-		if (!$this->tree) {
-			if ($this->tipos[0]) {
-				foreach ($this->tipos[0] as $tipo) {
-					$this->addTipo($this->tree, $tipo);
-				}
-			}
-		}
-		return $this->tree;
-	}
-	
 	public function toJson(){
-		return json_encode($this->createTree());	
+		return json_encode($this->tree);	
 	}
 	
-	public function addNode($label, $callback = array()) {
-		$node = $this->createNode($label, $callback);
+	public function addNode($label, $callback = '', $icone = '') {
+		$node = $this->createNode($label, $callback, $icone);
 		$this->tree[] = $node;
 		return $node;
 	}
 	
-	public function createNode($label, $callback = array()) {
-		return (object) array(
-			'data' => Jp7_Utf8::encode($label),
+	public function createNode($label, $callback = '', $icone = '') {
+		$node = (object) array(
+			'data' => array(
+				'title' => Jp7_Utf8::encode($label)
+			),
 			'metadata' => array(
 				'callback' => utf8_encode($callback)
 			)
 		);
+		if ($icone) {
+			$node->data['icon'] = $this->getIconeUrl($icone);
+		}
+		return $node;
+	}
+	
+	public function getIconeUrl($icone) {
+		return '/_default/img/icons/' . $icone . '.png';
 	}
 }

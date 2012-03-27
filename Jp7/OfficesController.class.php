@@ -15,12 +15,13 @@ class Jp7_OfficesController extends __Controller_Action {
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
 		
 		if ($id) {
-			$this->record = $officesTipo->getInterAdminById($id, array(
+			$record = $officesTipo->getInterAdminById($id, array(
 				'fields' => array('*', 'state' => array('sigla'))
 			));
-			if (!$this->record) {
+			if (!$record) {
 				$this->_redirect($officesTipo->getUrl());
 			}
+			self::setRecord($record);
 		} else {
 			// Introdução
 			if ($introductionTipo = $officesTipo->getFirstChildByModel('Introduction')) {

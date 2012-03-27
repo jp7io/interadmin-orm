@@ -13,9 +13,8 @@ abstract class Jp7_Box_BoxAbstract {
 	}
 	/**
 	 * Prepara os dados que vão ser utilizados na view do box mais tarde. 
-	 * Exemplo: Faz a busca das notícias que vão ser exibidas.
-	 * 
-	 * @param bool 	$isRecordPage
+	 * Exemplo: Faz a busca das notícias que vão ser exibidas e seta $this->news.
+	 *
 	 * @return void
 	 */
 	public function prepareData() {
@@ -183,13 +182,15 @@ abstract class Jp7_Box_BoxAbstract {
 		return $this->options($options, $value);
 	}
 	protected function _addTiposRecursively(&$options, &$tree, $parent_id_tipo = 0, $level = 0) {
-		foreach ($tree[$parent_id_tipo] as $tipo) {
-			$options[] = (object) array(
-				'value' => $tipo->id_tipo,
-				'text' => trim(str_repeat('--', $level) . ' ' . $tipo->nome)
-			);
-			if ($tree[$tipo->id_tipo]) {
-				$this->_addTiposRecursively($options, $tree, $tipo->id_tipo, $level + 1);
+		if (is_array($tree[$parent_id_tipo])) {
+			foreach ($tree[$parent_id_tipo] as $tipo) {
+				$options[] = (object) array(
+					'value' => $tipo->id_tipo,
+					'text' => trim(str_repeat('--', $level) . ' ' . $tipo->nome)
+				);
+				if ($tree[$tipo->id_tipo]) {
+					$this->_addTiposRecursively($options, $tree, $tipo->id_tipo, $level + 1);
+				}
 			}
 		}
 		unset($tree[$parent_id_tipo]);

@@ -12,13 +12,13 @@ class Jp7_VideosController extends __Controller_Action {
 		$contentTipo = self::getTipo();
 		
 		if ($id) {
-			$this->record = $contentTipo->getInterAdminById($id, array(
+			$record = $contentTipo->getInterAdminById($id, array(
 				'fields' => array('title', 'video', 'summary')
 			));
-			if (!$this->record) {
+			if (!$record) {
 				$this->_redirect($contentTipo->getUrl());
 			}
-			
+			self::setRecord($record);
 		} else {
 			// Introdução
 			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {

@@ -16,18 +16,23 @@
  */
 class Jp7_Inflector {
 	
+	private static $plural_cache = array();
+	
 	/**
 	 * Regular expressions for plurals, each item is composed of $pattern => $replacement.
 	 * Default inflections are in pt-BR.
 	 * @var
 	 */	
 	public static $plural_inflections = array(
-		'/(m)$/' => 'ns',
-		'/([r|z])$/' => '\1es', 
-		'/([i])l$/' => '\1s',
-		'/([a|e|o|u])l$/' => '\1is',
-		'/^(m)[e|ê]s$/i' => '\1eses',
-		'/([^s])$/' => '\1s'
+		'/m$/' => 'ns', // Bem -> Bens
+		'/([r|z])$/' => '\1es', // Paz -> Pazes, Bar -> Bares
+		'/([i])l$/' => '\1s', // Barril -> Barris
+		'/([a|e|o|u])l$/' => '\1is', // Sal -> Sais
+		'/^(m)[e|ê]s$/i' => '\1eses', // Mês -> Meses
+		'/^(c|p|escriv|alem|capel|capit)ão$/i' => '\1ães', // Cão -> Cães
+		'/^(m|irm|pag|gr|ch|benç|orf|sót|órg)ão$/i' => '\1ãos', // Mão -> Mãos
+		'/ão$/' => '\1ões', // Reunião -> Reuniões
+		'/([^s])$/' => '\1s' // Plural padrão
 	);
 	
 	/**
@@ -38,8 +43,6 @@ class Jp7_Inflector {
 	 * @return string
 	 */
 	public static function plural($word, $itens = null) {
-		static $resolved = array();
-				
 		if (is_null($itens)) {
 			$itens = 0;
 		} else {
@@ -50,15 +53,19 @@ class Jp7_Inflector {
 		}
 		
 		if (is_numeric($itens) && $itens != 1) {
-			if (!isset($resolved[$word])) {
-				foreach (self::$plural_inflections as $pattern => $replacement) {
-					if (preg_match($pattern, $word)) {
-						$resolved[$word] = preg_replace($pattern, $replacement, $word);
-						break;
+			if (!isset(self::$plural_cache[$word])) {
+				while (true) {
+					foreach (self::$plural_inflections as $pattern => $replacement) {
+						if (preg_match($pattern, $word)) {
+							self::$plural_cache[$word] = preg_replace($pattern, $replacement, $word);
+							break 2;
+						}
 					}
-				}		
+					self::$plural_cache[$word] = $word;
+					break;
+				}
 			}
-			$word = $resolved[$word];
+			$word = self::$plural_cache[$word];
 		}
 		
 		return $prefix . $word;
@@ -71,7 +78,7 @@ class Jp7_Inflector {
 	 * @return string
 	 */
 	public static function underscore($camelCasedWord) {
-		return strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', $camelCasedWord));
+		return strtolower(trim(preg_replace('/([A-Z])/', '_\1', $camelCasedWord), '_'));
 	}
 	
 	/**

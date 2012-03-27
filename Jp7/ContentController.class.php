@@ -12,20 +12,23 @@ class Jp7_ContentController extends __Controller_Action {
 		$contentTipo = self::getTipo();
 		
 		if ($id) {
-			$this->record = $contentTipo->getInterAdminById($id, array(
+			$record = $contentTipo->getInterAdminById($id, array(
 				'fields' => array('*')
 			));
-			if (!$this->record) {
+			if (!$record) {
 				$this->_redirect($contentTipo->getUrl());
 			}
-			$this->record->subitens = $this->record->getSubitens(array(
+			$record->subitens = $record->getSubitens(array(
 				'fields' => array('*')
 			));
+			
 			/*
-			$this->record->files = $this->record->getArquivosParaDownload(array(
+			$record->files = $record->getArquivosParaDownload(array(
 				'fields' => array('name', 'file')
 			));
 			*/
+			
+			self::setRecord($record);
 		} else {
 			// Introdução
 			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {

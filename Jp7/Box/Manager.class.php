@@ -161,13 +161,22 @@ class Jp7_Box_Manager {
 			}
 		}
 		
+		$widthCount = 0;
+		$i = 0;
+		$rows = array();
 		// Loading data
 		foreach ($columns as $column) {
 			foreach ($column->boxes as $box) {
+				$box->width = $column->width;
 				$box->prepareData();
 			}
+			$rows[$i][] = $column;
+			$widthCount += $column->width;
+			if (!($widthCount % 3)) {
+				$i++;	
+			}
 		}
-		return $columns;
+		return $rows;
 	}
 	/**
 	 * Creates objects from records using their respective classes.

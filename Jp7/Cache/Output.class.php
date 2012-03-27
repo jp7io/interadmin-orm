@@ -16,7 +16,7 @@
 	protected static $_logdir = './interadmin/';
 	protected static $_delay = 0;
 	protected static $_className = __CLASS__;
-	 
+	protected static $placeholderEnabled = false;	
 	 /**
 	  * Retorna uma instância configurada do Jp7_Cache_Page.
 	  * 
@@ -38,13 +38,16 @@
 			self::$_delay = intval($config->cache_delay);
 			
 			$frontDefault = array(
-				'lifetime' => 86400 // 1 dia
+				'lifetime' => 86400, // 1 dia
+				'class_name' => self::$_className
 			);
 			$backDefault = array(
 				'cache_dir' => self::$_cachedir
 			);
-			
+			$frontOptions = $frontOptions + $frontDefault;
+			// Necessário pela falta do PHP 5.3 e late static bind
 			self::$_cachedir = $backDefault['cache_dir'];
+			self::$_className = $frontOptions['class_name'];
 			
 			$frontend = new self::$_className($frontOptions + $frontDefault);
 			
@@ -84,18 +87,57 @@
 	 	if (isset($_GET['nocache_force'])) {
 	 		$this->remove($id);
 	 	}
-	 	
-	 	$retorno = parent::start($id);
-
-	 	if ($retorno) {
+		
+	 	/* CODIGO ORIGINAL DA ZEND */
+		$data = $this->load($id, false);
+        if ($data !== false) {
+        	echo $this->replacePlaceholders($data);	 // JP7
+            $retorno = true;
+        } else {
+	        ob_start();
+	        ob_implicit_flush(false);
+	        $this->_idStack[] = $id;
+	        $retorno = false;
+		}
+		/* Fim: CODIGO ORIGINAL DA ZEND */
+		if ($retorno) {
 	 		$this->_showDebug($id, $logTime);
 	 		exit;
 	 	}
-
+		self::$placeholderEnabled = true;
 	 	self::$_started = true;
 
 	 	return $retorno;
 	}
+	
+	/**
+     * Stop the cache
+     *
+     * @param  array   $tags             Tags array
+     * @param  int     $specificLifetime If != false, set a specific lifetime for this cache record (null => infinite lifetime)
+     * @param  string  $forcedDatas      If not null, force written datas with this
+     * @param  boolean $echoData         If set to true, datas are sent to the browser
+     * @param  int     $priority         integer between 0 (very low priority) and 10 (maximum priority) used by some particular backends
+     * @return void
+     */
+    public function end($tags = array(), $specificLifetime = false, $forcedDatas = null, $echoData = true, $priority = 8)
+    {
+    	/* CODIGO ORIGINAL DA ZEND */
+        if ($forcedDatas === null) {
+            $data = ob_get_clean();
+        } else {
+            $data =& $forcedDatas;
+        }
+        $id = array_pop($this->_idStack);
+        if ($id === null) {
+            Zend_Cache::throwException('use of end() without a start()');
+        }
+        $this->save($data, $id, $tags, $specificLifetime, $priority);
+		if ($echoData) {
+			echo $this->replacePlaceholders($data); // Jp7
+        }
+		/* Fim: CODIGO ORIGINAL DA ZEND */
+    }
 	
 	/**
 	 * Cancela o cache.
@@ -116,7 +158,47 @@
 		return self::$_started;
 	}
 	 
-	 
+	/**
+	 * Gera marcador para página cacheada
+	 * 
+	 * @param string $name
+	 * @param mixed $vars [optional]
+	 * @return 
+	 */
+	public static function getPlaceholder($name, $vars = array()) {
+		return '{CACHE:' . $name . '|' . serialize($vars) . '}' . "\n";
+	}
+	
+	/**
+	 * Substitui o marcador por conteúdo real.
+	 * 
+	 * @param string $filecontent
+	 * @return string
+	 */
+	public function replacePlaceholders($filecontent) {
+		self::$placeholderEnabled = false;
+		return $filecontent;
+	}
+	
+	public static function isPlaceholderEnabled() {
+		return self::$placeholderEnabled;
+	}
+	
+	protected function _replacePlaceholder($name, $include, $filecontent) {
+		if (strpos($filecontent, '{CACHE:' . $name) !== false) {
+			preg_match('/{CACHE:' . $name . '\|(.*)}/', $filecontent, $matches);
+			$vars = unserialize($matches[1]);
+			extract($vars);
+			
+			//include $include;
+			$view = Zend_Layout::getMvcInstance()->getView();
+			$include_content = $view->render($include);
+			
+			$filecontent = preg_replace('/{CACHE:' . $name . '\|(.*)}/', preg_replacement_quote($include_content), $filecontent);
+		}
+		return $filecontent;
+	}
+	
 	 /**
 	  * Cria um ID na forma: controller_action_lang_module_SUFIXO
 	  * 
@@ -194,7 +276,12 @@
 
 			$title = implode('&#013;', $title);
 			
-			$urlNoCache = preg_replace('/^([^&]*)([&]?)([^&]*)$/', '$1?$3$2nocache_force=true', str_replace('?', '&', $_SERVER['REQUEST_URI']));
+			$pos = strpos($_SERVER['REQUEST_URI'], '?');
+			if ($pos === false) {
+				$urlNoCache = $_SERVER['REQUEST_URI'] . '?nocache_force=true';
+			} else {
+				$urlNoCache = substr($_SERVER['REQUEST_URI'], 0, $pos) . '?nocache_force=true&' . substr($_SERVER['REQUEST_URI'], $pos + 1);
+			}
             $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta página?\')) window.location = \'' . $urlNoCache . '\'"';
 	 		
 	 		echo '<div style="' . $css . 'left:0px;" title="' . $title . '" ' . $event . '>CACHE</div>';

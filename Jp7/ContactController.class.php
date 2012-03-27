@@ -5,6 +5,8 @@ return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 class Jp7_ContactController extends __Controller_Action {
 	
 	public function indexAction() {
+		include_once ROOT_PATH . '/inc/7.form.lib.php';
+		
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.maskedinput-1.2.2.min.js');
 		
 		$contactTipo = self::getTipo();
@@ -21,18 +23,19 @@ class Jp7_ContactController extends __Controller_Action {
 		// Recebeu POST
 		if ($this->getRequest()->isPost()) {
 			// Salvando registro
-			$attributes = @array_map('reset', $_POST);
-			
-			$record = $contactTipo->createInterAdmin();
-			$record->setAttributesSafely($attributes);
-			$record->save();
-			
-			// Utilizado para preparar o email, não tem jeito melhor, por enquanto
 			try {
-				$this->_sendEmail($record);
-				$this->_redirect($contactTipo->getUrl() . '/ok');
+				$record = $this->_saveRecord($contactTipo);
+				
+				// Utilizado para preparar o email, não tem jeito melhor, por enquanto
+				try {
+					$this->_sendEmail($record);
+					$this->_redirect($contactTipo->getUrl() . '/ok');
+				} catch (Exception $e2) {
+					throw new Exception('Problema ao enviar a mensagem. Por favor, tente novamente.');
+				}
 			} catch (Exception $e) {
-				$this->view->errorMessage = 'Problema ao enviar a mensagem. Por favor, tente novamente.';
+				// Permite customizar mensagem de erro
+				$this->view->errorMessage = $e->getMessage();
 			}
 		}
 		
@@ -41,8 +44,20 @@ class Jp7_ContactController extends __Controller_Action {
 		
 	}
 	
-	protected function _sendEmail($record) {
+	protected function _saveRecord() {
 		$contactTipo = self::getTipo();
+		$attributes = @array_map('reset', $_POST);
+			
+		$record = $contactTipo->createInterAdmin();
+		$record->setAttributesSafely($attributes);
+		$record->save();
+		
+		return $record;
+	}
+	
+	protected function _sendEmail($record, $sendReply = true) {
+		$contactTipo = self::getTipo();
+		$contactTipo->getFieldsValues('nome');
 		$config = Zend_Registry::get('config');
 		
 		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
@@ -53,24 +68,26 @@ class Jp7_ContactController extends __Controller_Action {
 		$formHelper = new Jp7_Form();
 		// E-mail normal para os destinatários do site
 		$mail = $formHelper->createMail($record, array(
-			'subject' => 'Site ' . $config->name . ' - Contato',
-			'title' => 'Contato',
+			'subject' => 'Site ' . $config->name . ' - ' . $contactTipo->nome,
+			'title' => $contactTipo->nome,
 			'recipients' => $recipients
 		));
 		$mail->setFrom($record->email, $record->name);
 		$mail->send();
 		
-		// E-mail de resposta para o usuário
-		$reply = $formHelper->createMail($record, array(
-			'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - Contato',
-			'title' => 'Contato',
-			'recipients' => array($record), // Envia para o próprio usuário
-			'message' => 
-				'Agradecemos o seu contato.<br />' .
-				'Por favor, aguarde nosso retorno em breve.<br /><br />',
-		));
-		$reply->setFrom($config->admin_email, $config->admin_name);
-		$reply->send();
+		if ($sendReply) {
+			// E-mail de resposta para o usuário
+			$reply = $formHelper->createMail($record, array(
+				'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - ' . $contactTipo->nome,
+				'title' => $contactTipo->nome,
+				'recipients' => array($record), // Envia para o próprio usuário
+				'message' => 
+					'Agradecemos o seu contato.<br />' .
+					'Por favor, aguarde nosso retorno em breve.<br /><br />',
+			));
+			$reply->setFrom($config->admin_email, $config->admin_name);
+			$reply->send();
+		}
 	}
 	
 	protected function _getFormHtml($campos, $record) {
@@ -85,9 +102,22 @@ class Jp7_ContactController extends __Controller_Action {
 					$campo['value'] = null;
 				}
 				$campo['tipo'] = $campo['nome_id'];
-				
-				$field = new InterAdminField($campo);
-				echo $field->getHtml();
+				if (startsWith('char_', $campo['tipo_de_campo'])) {
+					global $j;
+					$form = jp7_db_checkbox($campo['tipo'] . "[".$j."]","S", $campo['tipo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
+					?>
+					<tr>
+						<th></th>
+						<td colspan="2" class="checkbox-container">
+							<?php echo $form; ?><span><?php echo $campo['nome']; ?></span>
+						</td>
+						<td></td>
+					</tr>
+					<?php
+				} else {
+					$field = new InterAdminField($campo);
+					echo $field->getHtml();
+				}
 			}
 		}
 		return ob_get_clean();

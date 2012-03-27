@@ -107,5 +107,22 @@ class Jp7_InterAdmin_Util {
 			}
 		}
 	}
-		
+	
+	public static function syncTipos($model) {
+		$inheritedTipos = InterAdminTipo::findTiposByModel($model->id_tipo, array(
+			'class' => 'InterAdminTipo'
+		));
+		?>
+		&bull; <?php echo $model->id_tipo; ?> - <?php echo $model->nome; ?> <br />
+		<div class="indent">
+			<?php foreach ($inheritedTipos as $key => $tipo) { ?>
+				<?php
+				$tipo->syncInheritance();
+				$tipo->updateAttributes($tipo->attributes);
+				?>
+				<?php self::syncTipos($tipo); ?>
+			<?php } ?>
+		</div>
+		<?php
+	}
 }

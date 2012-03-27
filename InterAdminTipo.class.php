@@ -20,6 +20,9 @@
 class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;
 	
+	private static $inheritedFields = array('class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela', 'template', 'children', 'campos', 'language');
+	private static $privateFields = array('children', 'campos', 'language');
+	
 	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
 	 * @var array 
@@ -45,8 +48,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	protected $_parent;
 	
-	// @todo Remove this
-	protected $_loadedfrommodel;
 	protected $_tiposUsingThisModel;
 	
 	/**
@@ -77,7 +78,19 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->getFieldsValues($options['fields']);
 		}
 	}
-	
+	public function &__get($attributeName) {
+		if (isset($this->attributes[$attributeName])) {
+			return $this->attributes[$attributeName];
+		} else {
+			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'language', 'layout', 'layout_registros');
+			if (in_array($attributeName, $inheritArr)) {
+				$this->getFieldsValues($attributeName);
+				return $this->attributes[$attributeName];
+			} else {
+				return null;
+			}
+		}
+	}
 	/**
 	 * Returns an InterAdminTipo instance. If $options['class'] is passed, 
 	 * it will be returned an object of the given class, otherwise it will search 
@@ -123,35 +136,6 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 		}
 		return parent::getFieldsValues($fields);
-	}
-	/**
-	 * Retrieves magic properties.
-	 *
-	 * @param string $var Magic property 'interadminsOrderby' or 'class'.
-	 * @return mixed
-	 */
-	public function &__get($var) {
-		$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros');
-		if (in_array($var, $inheritArr)) {
-			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
-				$modelo = $this;
-				while ($modelo->id_tipo) {
-					$modelo->getFieldsValues(array($var, 'model_id_tipo'));
-					if ($modelo->attributes[$var]) {
-						$this->$var = $modelo->attributes[$var];
-						$this->_loadedfrommodel[$var] = true;
-						break;
-					}
-					if (is_numeric($modelo->model_id_tipo) || !$modelo->model_id_tipo) {
-						$modelo = new InterAdminTipo($modelo->model_id_tipo);
-					} else {
-						$className = 'Jp7_Model_' . $modelo->model_id_tipo . 'Tipo';
-						$modelo = new $className();	
-					}
-				}
-			}
-		}
-		return parent::__get($var);
 	}
 	/**
 	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
@@ -220,6 +204,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $tipo, $options);
 			$tipos[] = $tipo;
 		}
+		$rs->Close();
 		return $tipos;
 	}
 	/**
@@ -289,6 +274,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
+		$rs->Close();
 		return $records;
 	}
 	/**
@@ -357,10 +343,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getCampos() {
 		if (!$A = $this->_getMetadata('campos')) {
-			$model = $this->getModel();
-			
-			$campos = $model->getFieldsValues('campos');
-			unset($model->campos);
+			$campos = $this->getFieldsValues('campos');
+			//unset($model->campos);
 			$campos_parameters = array(
 				'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
 				'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
@@ -396,11 +380,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array
 	 */
 	public function getCamposNames(){
-		$invalid_fields = array('tit', 'func');
 		$fields = array_keys($this->getCampos());
 		foreach ($fields as $key => $field) {
-			$field_arr = explode('_', $field);
-			if (in_array($field_arr[0], $invalid_fields)) {
+			if (strpos($field, 'tit_') === 0 || strpos($field, 'func_') === 0) {
 				unset($fields[$key]);
 			}
 		}
@@ -568,8 +550,70 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
-		$this->id_tipo_string = toId($this->nome);
-		return parent::save();
+		// id_tipo_string
+		if (isset($this->nome)) {
+			$this->id_tipo_string = toId($this->nome);
+		}
+		// log
+		if ($this->id_tipo && !isset($this->log)) {
+			// Evita bug em que um tipo despublicado tem seu log zerado
+			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
+			$this->getFieldsValues('log');
+			InterAdmin::setPublishedFiltersEnabled($old_value);
+		}
+		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
+		
+		// Inheritance
+		$this->syncInheritance();
+		$retorno = parent::save();
+		
+		// Inheritance - Tipos inheriting from this Tipo
+		if ($this->id_tipo) {
+			$inheritingTipos = InterAdminTipo::findTiposByModel($this->id_tipo, array(
+				'class' => 'InterAdminTipo'
+			));
+			foreach ($inheritingTipos as $tipo) {
+				$tipo->syncInheritance();
+				$tipo->updateAttributes($tipo->attributes);
+			}
+		}
+		return $retorno;
+	}
+	
+	public function syncInheritance() {
+		// cache dos atributos herdados
+		$this->getFieldsValues(array_merge(array('model_id_tipo', 'inherited'), self::$inheritedFields));
+		
+		// Retornando ao valor real
+		foreach (jp7_explode(',', $this->inherited) as $inherited_var) {
+			$this->attributes[$inherited_var] = '';
+		}
+		$this->inherited = array();
+		// Atualizando cache com dados do modelo
+		if ($this->model_id_tipo) {
+			if (is_numeric($this->model_id_tipo)) {
+				$modelo = new InterAdminTipo($this->model_id_tipo);
+				$modelo->getFieldsValues(self::$inheritedFields);
+			} else {
+				$className = 'Jp7_Model_' . $this->model_id_tipo . 'Tipo';
+				if (class_exists($className)) {
+					$modelo = new $className();
+				} else {
+					echo 'Erro: Class ' . $className . ' not found';
+				}
+			}
+			if ($modelo) {
+				foreach (self::$inheritedFields as $field) {
+					if ($modelo->$field) {
+						if (!$this->$field || in_array($field, self::$privateFields)) {
+							$this->inherited[] = $field;
+							$this->$field = $modelo->$field;
+						}
+					}
+				}
+			}
+		}
+		$this->inherited = implode(',', $this->inherited);
 	}
 	/**
 	 * Sets this row as deleted as saves it.
@@ -676,15 +720,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getInterAdminsTableName() {
-		global $lang;
-		$table = $this->db_prefix .	(($this->tabela) ? '_' . $this->tabela : '');
-		if (!isset($this->language)) {
-			$this->getFieldsValues('language');
-		}
-		if ($this->language) {
-			$table .= $lang->prefix;
-		}
-		return $table;
+		return $this->_getTableLang() . (($this->tabela) ? '_' . $this->tabela : '');
 	}
 	/**
 	 * Returns the table name for the files.
@@ -692,6 +728,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getArquivosTableName() {
+		return $this->_getTableLang() . '_arquivos';
+	}
+	/**
+	 * Returns $db_prefix OR $db_prefix + $lang->prefix.
+	 * @return string
+	 */	
+	protected function _getTableLang() {
 		global $lang;
 		$table = $this->db_prefix;
 		if (!isset($this->language)) {
@@ -700,8 +743,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->language) {
 			$table .= $lang->prefix;
 		}
-		return $table . '_arquivos';
-	}
+		return $table;
+	}	
 	protected function _setMetadata($varname, $value) {
 		self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
 	}
@@ -715,12 +758,17 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getInterAdminsChildren() {
 		if (!$children = $this->_getMetadata('children')) {
-			$model = $this->getModel();
+			//$model = $this->getModel();
 			
 			$children = array();
-			$childrenArr = explode("{;}", $model->getFieldsValues('children'));
+			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
-				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
+				$childrenArrParts = explode('{,}', $childrenArr[$i]);
+				if (count($childrenArrParts) < 4) { // 4 = 'id_tipo', 'nome', 'ajuda', 'netos'
+					// Fix para tipos com estrutura antiga e desatualizada
+					$childrenArrParts = array_pad($childrenArrParts, 4, '');
+				}
+				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), $childrenArrParts);
 				$nome_id = Jp7_Inflector::camelize($child['nome']);
 				$children[$nome_id] = $child;
 			}
@@ -846,9 +894,21 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return	InterAdminTipo
 	 */
 	public static function findFirstTipoByModel($model_id_tipo, $options = array()) {
+		return reset(self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options));
+	}
+	/**
+	 * Retrieves all the InterAdminTipo with the given "model_id_tipo".
+	 * @param string|int 	$model_id_tipo
+	 * @param array			$options [optional]
+	 * @return array
+	 */
+	public static function findTiposByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		$options['where'][] = "model_id_tipo != '0'";
-		return self::findFirstTipo($options); 
+		if ($model_id_tipo != '0') {
+			// Devido à mudança de int para string do campo model_id_tipo, essa linha é necessária
+			$options['where'][] = "model_id_tipo != '0'";
+		}
+		return self::findTipos($options); 
 	}
 	/**
 	 * Retrieves multiple InterAdminTipo's from the database.

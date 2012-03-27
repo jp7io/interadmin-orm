@@ -15,6 +15,7 @@ class Jp7_Model_SlideshowTipo extends Jp7_Model_TipoAbstract {
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
 		'tabela' => '',
-		'editar' => 'S'
+		'editar' => 'S',
+		'icone' => 'application_view_gallery'
 	);
 }
