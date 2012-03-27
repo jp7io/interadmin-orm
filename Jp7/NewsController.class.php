@@ -31,7 +31,7 @@ class Jp7_NewsController extends __Controller_Action {
 			$archive = $this->_getParam('archive');
 			
 			// Irá cachear uma página diferente para cada registro
-			Jp7_Cache_Output::getInstance()->start($archive);
+			Jp7_Cache_Output::getInstance()->start($archive . $this->_getParam('p_page'));
 			
 			$options = array(
 				'fields' => array('*', 'date_publish')
