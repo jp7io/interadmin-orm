@@ -336,11 +336,13 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
+		/*
 		$cache = null;
 		if (self::$_cache) {
 			$cache = new Jp7_Cache_Recordset($options);
 		}
 		if (!$cache || !($rs = $cache->load())) {
+		*/
 			// Resolve Alias and Joins for 'fields' and 'from'
 			$this->_resolveFieldsAlias($options);
 			// Resolve Alias and Joins for 'where', 'group' and 'order';
@@ -395,10 +397,12 @@ abstract class InterAdminAbstract implements Serializable {
 			if ($debugger) {
 				$debugger->getTime($options['debug']);
 			}
+			/*
 			if ($cache) {
 				$rs = $cache->save($rs);
 			}
 		}
+		*/
 		return $rs;
 	}
 	/**
