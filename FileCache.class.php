@@ -236,7 +236,6 @@ class FileCache {
 		
 		// Falha de segurança. Passou com conteúdo inválido. Investigar depois.
 		if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || strlen($fileName) > 200) {
-			die('entrou');
 			return false;
 		}
 		$fileName .= '.cache';
