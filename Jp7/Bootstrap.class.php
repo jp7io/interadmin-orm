@@ -56,7 +56,7 @@ class Jp7_Bootstrap {
 		$config = Zend_Registry::get('config');
 		
 		// Dados da admin bar - Somente se estiver logado
-		if ($GLOBALS['s_user']) {
+		if ($GLOBALS['s_user'] && $GLOBALS['s_user']['escrita']) {
 			if (isset($_GET['ia_hook'])) {
 				$GLOBALS['s_session']['no_hook'] = !$_GET['ia_hook'];
 			}
