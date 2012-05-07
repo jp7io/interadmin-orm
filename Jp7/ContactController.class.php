@@ -91,6 +91,8 @@ class Jp7_ContactController extends __Controller_Action {
 	}
 	
 	protected function _getFormHtml($campos, $record) {
+		$translate = Zend_Registry::get('Zend_Translate');
+		
 		ob_start();
 		foreach ($campos as $campo) {
 			if ($campo['form']) {
@@ -102,6 +104,14 @@ class Jp7_ContactController extends __Controller_Action {
 					$campo['value'] = null;
 				}
 				$campo['tipo'] = $campo['nome_id'];
+				// Não prevê special
+				if (strpos($campo['tipo_de_campo'], 'select_') === 0) {
+					$campo['label'] = $translate->_($campo['label']);
+				} else {
+					$campo['nome'] = $translate->_($campo['nome']);
+				}
+				
+				// Só para CHAR - checkbox
 				if (startsWith('char_', $campo['tipo_de_campo'])) {
 					if (!$record->id && $campo['xtra']) {
 						$campo['value'] = 'S';
@@ -117,6 +127,7 @@ class Jp7_ContactController extends __Controller_Action {
 						<td></td>
 					</tr>
 					<?php
+				// OUTROS CAMPOS
 				} else {
 					$field = new InterAdminField($campo);
 					echo $field->getHtml();
