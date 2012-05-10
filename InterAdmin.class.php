@@ -749,4 +749,24 @@ class InterAdmin extends InterAdminAbstract {
     public function getAdminAttributes() {
 		return array('id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
     }
+	
+	/**
+	 * 
+	 * @return 
+	 */
+	public function setFieldBySearch($fieldToSet, $value, $fieldToSearch = 'varchar_key') {
+		$campos = $this->getTipo()->getCampos();
+		$aliases = array_flip($this->getTipo()->getCamposAlias());
+		$nomeCampo = $aliases[$fieldToSet] ? $aliases[$fieldToSet] : $fieldToSet;
+		
+		if (!startsWith('select_', $nomeCampo)) {
+			throw new Exception('Campo precisa ser um select para utilizar a função setFieldBySearch.');	
+		}
+		
+		$campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
+		$record = $campoTipo->getFirstInterAdmin(array(
+			'where' => $fieldToSearch . ' = "' . $value . '"'
+		));
+		$this->$fieldToSet = $record;
+	}
 }
