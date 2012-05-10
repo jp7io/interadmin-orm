@@ -24,7 +24,8 @@ class Jp7_ContactController extends __Controller_Action {
 		if ($this->getRequest()->isPost()) {
 			// Salvando registro
 			try {
-				$record = $this->_saveRecord($contactTipo);
+				$record = $this->_createRecord($contactTipo);
+				$this->_validateAndSave($record);
 				
 				// Utilizado para preparar o email, não tem jeito melhor, por enquanto
 				try {
@@ -44,13 +45,40 @@ class Jp7_ContactController extends __Controller_Action {
 		
 	}
 	
-	protected function _saveRecord() {
+	protected function _validateAndSave($record) {
+		foreach ($record->getTipo()->getCampos() as $campo) {
+			$this->_validateCampo($record, $campo);
+		}
+		$record->save();
+	}
+	
+	protected function _validateCampo($record, $campo) {
+		if (!$campo['form']) {
+			return;
+		}
+		// Validação do campo obrigatório
+		if ($campo['obrigatorio']) {
+			if (!startsWith('char_', $campo['tipo'])) {
+				if (!$record->{$campo['nome_id']}) {
+					$label = startsWith('select_', $campo['tipo']) ? $campo['label'] : $campo['nome'];
+					throw new Exception('Favor preencher campo ' . $label . '.');
+				}
+			}
+		}
+		// Validação e-mail
+		if (startsWith('varchar_', $campo['tipo']) && $campo['xtra'] == 'email') {
+			if (!filter_var($record->{$campo['nome_id']}, FILTER_VALIDATE_EMAIL)) {
+				throw new Exception('Valor inválido do campo ' . $campo['nome'] . '.');
+			}
+		}
+	}
+	
+	protected function _createRecord() {
 		$contactTipo = self::getTipo();
 		$attributes = @array_map('reset', $_POST);
 			
 		$record = $contactTipo->createInterAdmin();
 		$record->setAttributesSafely($attributes);
-		$record->save();
 		
 		return $record;
 	}
