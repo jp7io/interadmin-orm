@@ -88,10 +88,7 @@ class Jp7_ContactController extends __Controller_Action {
 		$contactTipo->getFieldsValues('nome');
 		$config = Zend_Registry::get('config');
 		
-		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
-		$recipients = $recipientsTipo->getInterAdmins(array(
-			'fields' => array('name', 'email')
-		));
+		$recipients = $this->_getRecipients($contactTipo, $record);
 		
 		$formHelper = new Jp7_Form();
 		// E-mail normal para os destinatários do site
@@ -116,6 +113,13 @@ class Jp7_ContactController extends __Controller_Action {
 			$reply->setFrom($config->admin_email, $config->admin_name);
 			$reply->send();
 		}
+	}
+	
+	protected function _getRecipients($contactTipo, $record) {
+		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
+		return $recipientsTipo->getInterAdmins(array(
+			'fields' => array('name', 'email')
+		));
 	}
 	
 	protected function _getFormHtml($campos, $record) {
