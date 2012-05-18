@@ -184,9 +184,11 @@ class InterSite {
 		if ($this->server) {
 			$this->db = clone $this->server->db;
 			// Exceção para funcionamento do InterAdmin Remote nos sites Express
-			if ($this->db->host == '189.126.109.83' && $this->hostType == self::HOST_REMOTE) {
+			/*
+			if ($this->db->host == 'mysql.jp7.com.br' && $this->hostType == self::HOST_REMOTE) {
 				$this->db->host = 'localhost';
 			}
+			*/
 			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
 				$this->db->host = $this->db->host_internal;
 			}
