@@ -272,6 +272,7 @@
 					'  ' . date('d/m/Y H:i:s', $logTime),
 				'# Hora do servidor: ' . date('d/m/Y H:i:s', time()),
 				'# Delay para limpeza: ' . self::$_delay . ' segundos',
+				'# IP Servidor: ' . $_SERVER['SERVER_ADDR']
 			);
 
 			$title = implode('&#013;', $title);
