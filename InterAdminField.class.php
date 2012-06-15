@@ -273,7 +273,7 @@ class InterAdminField {
 				"</tr>\n";
 				
 				if (!$campo_array['sem_creditos']) {
-					echo "<tr>".
+					echo "<tr class=\"" . ($campo_array['nome_id'] ?  $campo_array['nome_id']  :  toId($campo_nome)) . "_text-tr\">".
 						"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">Créditos/Leg.:</th>".
 						"<td><input type=\"text\" name=\"".$campo."_text[]\" value=\"".$GLOBALS[$campo."_text"]."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file\" /></td>".
 					"</tr>\n";
