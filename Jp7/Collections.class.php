@@ -197,4 +197,32 @@ class Jp7_Collections {
 			return implode($separator, $stringArr);
 		}
 	}
+	
+	/**
+	 * Transforms prefixed keys into arrays. Ex: 
+	 * $_POST['foto_id'][] = 1; 
+	 * $_POST['foto_name'][] = 'Teste';
+	 * 
+	 * $foto = prefixToArray($_POST, 'foto');
+	 * 
+	 * Returns:
+	 * $foto[0] = array('id' => 1, 'name' => 'Teste'); 
+	 *  
+	 * @param array $multiarray Such as $_POST.
+	 * @param string $prefix Such as 'foto' for 'foto_'
+	 * @return array
+	 */
+	public static function prefixToArray($multiarray, $prefix) {
+		$newarray = array();
+		$preflen = strlen($prefix) + 1;
+		foreach ($multiarray as $name => $array) {
+			$namekey = substr($name, $preflen);
+			if (strpos($name, $prefix . '_') === 0) {
+				foreach ($array as $key => $value) {
+					$newarray[$key][$namekey] = $value;
+				}
+			}
+		}
+		return $newarray;
+	}
 }
