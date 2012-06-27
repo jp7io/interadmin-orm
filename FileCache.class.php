@@ -193,7 +193,8 @@ class FileCache {
                         '  ' . date('d/m/Y H:i:s', @filemtime($this->getLogFilename())),
                     '# Hora do servidor: ' . date('d/m/Y H:i:s', time()),
                     '# Delay para limpeza: ' . intval($this->delay) . ' segundos',
-					'# IP Servidor: ' . $_SERVER['SERVER_ADDR']
+					'# IP Servidor: ' . $_SERVER['SERVER_ADDR'],
+					'# DB: ' . $config->db->host . '/' . $config->db->name
                 );
 
                 $title = implode('&#013;', $title);
