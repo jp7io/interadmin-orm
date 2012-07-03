@@ -212,7 +212,7 @@ class InterSite {
 	 * @return void
 	 */
 	function __wakeup() {
-		global $debugger, $config;
+		global $debugger;
 		
 		if (!self::isWakeupEnabled()) {
 			return;
@@ -255,7 +255,7 @@ class InterSite {
 			self::DESENVOLVIMENTO => 'Local'
 		);
 		$GLOBALS['c_url'] = $this->url;
-		$config->intermail->server_type = $oldtypes[$this->server->type];
+		$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
 		$GLOBALS['c_site'] = $this->name_id;
 		$GLOBALS['c_menu'] = $this->menu;
 		$GLOBALS['c_cache'] = $this->cache;
@@ -277,13 +277,13 @@ class InterSite {
 		$GLOBALS['ftp']['user'] = $this->server->user;
 		$GLOBALS['ftp']['pass'] = $this->server->pass;
 		// InterAdmin
-		$config->intermail->publish = $this->interadmin_preview;
+		$GLOBALS['c_publish'] = $this->interadmin_preview;
 		$GLOBALS['c_remote'] = $this->interadmin_remote;
 		$GLOBALS['c_cliente_title'] = $this->name;
 		$GLOBALS['c_nobackup'] = $this->nobackup;
 		foreach ($this->servers as $host => $server) {
-			$config->intermail->cliente_domains[] = $host;
-			$config->intermail->cliente_domains = array_merge($config->intermail->cliente_domains, (array) $server->aliases);
+			$GLOBALS['c_cliente_domains'][] = $host;
+			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
 		}
 		foreach($this->langs as $sigla => $lang) {
 			$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);

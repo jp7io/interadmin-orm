@@ -28,7 +28,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	);
 		
 	public static function getTemplateFields($campo, $value, $parte = 'edit') {
-		global $config, $s_interadmin_cliente ;
+		global $c_cliente_url, $s_interadmin_cliente ;
 		
 		switch ($parte) {
 			case 'header':
@@ -73,7 +73,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 						<th title="css_template (template)"></th>
 						<td colspan="3">
 							<input type="button" value="Abrir Editor de Cores" 
-							onclick="window.open('<?php echo $config->intermail->cliente_url; ?>interadmin/site/<?php echo $s_interadmin_cliente; ?>/theme_editor.php')" />
+							onclick="window.open('<?php echo $c_cliente_url; ?>interadmin/site/<?php echo $s_interadmin_cliente; ?>/theme_editor.php')" />
 						</td>
 					</tr>
 					<tr><td height="10" style="padding:0px" colspan="4"></td></tr>
