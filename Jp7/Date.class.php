@@ -328,10 +328,11 @@ class Jp7_Date extends DateTime {
 	}
 	
 	/**
-	 * Returns the difference between two Jp7_Date objects.
+	 * Returns the duration between two Jp7_Date objects.
 	 * 
 	 * @param Jp7_Date $datetime
-	 * @return DateInterval|object
+	 * @param $iso Retorna no formato iso ou num formato mais comum como 4h30m.
+	 * @return string
      */
 	public function duration(Jp7_Date $datetime, $iso = true) {
 		$diff = $this->diff($datetime);
