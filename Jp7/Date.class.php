@@ -326,4 +326,46 @@ class Jp7_Date extends DateTime {
 	public function isValid() {
 		return parent::format('Y') !== '-0001';
 	}
+	
+	/**
+	 * Returns the difference between two Jp7_Date objects.
+	 * 
+	 * @param Jp7_Date $datetime
+	 * @return DateInterval|object
+     */
+	public function duration(Jp7_Date $datetime, $iso = true) {
+		$diff = $this->diff($datetime);
+		
+		if ($iso) {
+			$duration = 'P';
+		} else {
+			$duration = '';
+		}
+		
+		if ($diff->y) {
+			$duration .= $diff->y . 'Y';
+		}
+		if ($diff->m) {
+			$duration .= $diff->m . 'M';
+		}
+		if ($diff->d) {
+			$duration .= $diff->d . 'D';
+		}
+		if ($diff->h || $diff->i || $diff->s) {
+			if ($iso) {
+				$duration .= 'T';
+			}
+			
+			if ($diff->h) {
+				$duration .= $diff->h . 'H';
+			}
+			if ($diff->i) {
+				$duration .= $diff->i . 'M';
+			}
+			if ($diff->s) {
+				$duration .= $diff->s . 'S';
+			}
+		}
+		return $iso ? $duration : strtolower($duration);
+	}
 }
