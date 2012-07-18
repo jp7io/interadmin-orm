@@ -20,8 +20,11 @@
 class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;
 	
-	private static $inheritedFields = array('class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela', 'template', 'children', 'campos', 'language');
-	private static $privateFields = array('children', 'campos', 'language');
+	private static $inheritedFields = array(
+		'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
+		'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo', 'xtra_disabledfields', 'xtra_disabledchildren'
+	);
+	private static $privateFields = array('children', 'campos');
 	
 	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
