@@ -160,9 +160,11 @@ class Jp7_Bootstrap {
 		$language_file = APPLICATION_PATH . '/languages/' . $lang->lang . '.php';
 		if (is_file($language_file)) {
 			$translate = new Zend_Translate('array', $language_file, $lang->lang);
-			Zend_Registry::set('Zend_Translate', $translate);
+		} else {
+			$translate = new Zend_Translate('array', null, $lang->lang, array('disableNotices' => true));
 		}
-	}	
+		Zend_Registry::set('Zend_Translate', $translate);
+	}
 	
 	public static function initLayout() {
 		Zend_Layout::startMvc(APPLICATION_PATH . '/layouts/scripts');
