@@ -82,6 +82,16 @@ class Jp7_Inflector {
 	}
 	
 	/**
+	 * Replaces underscores with dashes in the string.
+	 * 
+	 * @param string $string
+	 * @return string
+	 */
+	public static function dasherize($string) {
+		return str_replace('_', '-', $string);
+	}
+	
+	/**
 	 * Combination of plural and underscore, ex: 'BlueSuedShoe' => 'blue_sued_shoes'
 	 * 
 	 * @param object $camelCasedWord Such as BlueSuedShoe.

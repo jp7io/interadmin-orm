@@ -61,6 +61,9 @@ class Jp7_Box_Manager {
 		'_content' => 'Jp7_Box_PageContent'
 	);
 	
+	/**
+	 * @var bool Define se é uma página de registro (com ID), ou página de Tipo. O que permite variações nos boxes.
+	 */
 	private static $recordMode = false;
 	
 	/**
@@ -94,6 +97,24 @@ class Jp7_Box_Manager {
 	 */
 	public static function set($id, $className) {
 		self::$array[$id] = $className;
+	}
+	/**
+	 * Procura arquivos numa pasta e adiciona usando set().
+	 * 
+	 * @param string $classesPath	Endereço do diretório de classes, ex: ../classes.
+	 * @param string $boxesPath		Endereço do diretório de boxes, ex: Cliente/Box.
+	 * @return void
+	 */
+	public static function setFromFiles($classesPath, $boxesPath) {
+		foreach (glob($classesPath . '/' . $boxesPath . '/*.class.php') as $file) {
+			$baseName = basename($file, '.class.php');
+			if (endsWith('Abstract', $baseName)) {
+				continue;
+			}
+			$className = str_replace('/', '_', $boxesPath) . '_' . $baseName;
+			$id = Jp7_Inflector::dasherize(Jp7_Inflector::underscore($baseName));
+			self::set($id, $className);
+		}
 	}
 	/**
 	 * Gets the classname for the given box id.
