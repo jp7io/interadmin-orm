@@ -97,12 +97,13 @@ class Pagination {
 		}
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
-		$this->page = ($page > $this->total) ? $this->total : $page; // Pagina Atual
+		$page = ($page > $this->total) ? $this->total : $page; // Pagina Atual
 		
-		if (!intval($this->page)) {
-			$page = $this->page = 1;
+		if (!intval($page)) {
+			$page = 1;
 		}
-		
+		$this->page = $page;
+				
 		$this->init = (($this->page - 1) * $limit); // Item inicial
 		$this->limit = $limit; // Itens por pagina
 		
@@ -128,6 +129,8 @@ class Pagination {
 			}
 		}
 		
+		// Se $show_first_and_last for TRUE irá sempre mostrar a página [1] .... [4] [5] ....[1000]
+		// Se $show_first_and_last for FALSE irá mostrar só um range [2][3][4][5][6]
 		if ($show_first_and_last) {
 			$numbers_limit -= 1;
 		}
