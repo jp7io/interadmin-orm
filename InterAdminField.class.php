@@ -107,7 +107,7 @@ class InterAdminField {
 				echo "</tbody>";
 				$tit_start = false;
 			}
-			echo "<tr><th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
+			echo $_tr . "<th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
 			$tit_start = true;
 		// TEXT
 		}elseif(strpos($tipo_de_campo,"text_")===0){
