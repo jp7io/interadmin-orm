@@ -370,7 +370,7 @@ class Jp7_Date extends DateTime {
 			}
 		}
 		if ($diff->h || $diff->i || $diff->s) {
-			if ($iso = Jp7_Date::DURATION_ISO) {
+			if ($iso == Jp7_Date::DURATION_ISO) {
 				$duration .= 'T';
 			}
 			
