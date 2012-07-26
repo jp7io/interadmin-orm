@@ -349,21 +349,21 @@ class Jp7_Date extends DateTime {
 		}
 		
 		if ($diff->y) {
-			if ($iso == DURATION_HUMAN) {
+			if ($iso == Jp7_Date::DURATION_HUMAN) {
 				$duration .= $diff->y . (($diff->y == 1) ? ' ano' : ' anos');
 			} else {
 				$duration .= $diff->y . 'Y';
 			}
 		}
 		if ($diff->m) {
-			if ($iso == DURATION_HUMAN) {
+			if ($iso == Jp7_Date::DURATION_HUMAN) {
 				$duration .= $diff->m . (($diff->m == 1) ? ' mês' : ' meses');
 			} else {
 				$duration .= $diff->m . 'M';
 			}
 		}
 		if ($diff->d) {
-			if ($iso == DURATION_HUMAN) {
+			if ($iso == Jp7_Date::DURATION_HUMAN) {
 				$duration .= $diff->d . (($diff->d == 1) ? ' dia' : ' dias');
 			} else {
 				$duration .= $diff->d . 'D';
@@ -375,21 +375,21 @@ class Jp7_Date extends DateTime {
 			}
 			
 			if ($diff->h) {
-				if ($iso == DURATION_HUMAN) {
+				if ($iso == Jp7_Date::DURATION_HUMAN) {
 					$duration .= $diff->h . (($diff->h == 1) ? ' hora' : ' horas');
 				} else {
 					$duration .= $diff->h . 'H';
 				}
 			}
 			if ($diff->i) {
-				if ($iso == DURATION_HUMAN) {
+				if ($iso == Jp7_Date::DURATION_HUMAN) {
 					$duration .= $diff->i . (($diff->i == 1) ? ' minuto' : ' minutos');
 				} else {
 					$duration .= $diff->i . 'M';
 				}
 			}
 			if ($diff->s) {
-				if ($iso == DURATION_HUMAN) {
+				if ($iso == Jp7_Date::DURATION_HUMAN) {
 					$duration .= $diff->s . (($diff->s == 1) ? ' segundo' : ' segundos');
 				} else {
 					$duration .= $diff->s . 'S';
