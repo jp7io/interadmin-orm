@@ -15,6 +15,11 @@
  * @package Jp7_Date
  */
 class Jp7_Date extends DateTime {
+	
+	const DURATION_LOWERISO = 0;
+	const DURATION_ISO = 1;
+	const DURATION_HUMAN = 2;
+	
 	/**
 	 * @var string
 	 */
@@ -334,23 +339,35 @@ class Jp7_Date extends DateTime {
 	 * @param $iso Retorna no formato iso ou num formato mais comum como 4h30m.
 	 * @return string
      */
-	public function duration(Jp7_Date $datetime, $iso = true) {
+	public function duration(Jp7_Date $datetime, $iso = Jp7_Date::DURATION_ISO) {
 		$diff = $this->diff($datetime);
 		
-		if ($iso) {
+		if ($iso == Jp7_Date::DURATION_ISO) {
 			$duration = 'P';
 		} else {
 			$duration = '';
 		}
 		
 		if ($diff->y) {
-			$duration .= $diff->y . 'Y';
+			if ($iso == DURATION_HUMAN) {
+				$duration .= $diff->y . (($diff->y == 1) ? ' ano' : ' anos');
+			} else {
+				$duration .= $diff->y . 'Y';
+			}
 		}
 		if ($diff->m) {
-			$duration .= $diff->m . 'M';
+			if ($iso == DURATION_HUMAN) {
+				$duration .= $diff->m . (($diff->m == 1) ? ' mês' : ' meses');
+			} else {
+				$duration .= $diff->m . 'M';
+			}
 		}
 		if ($diff->d) {
-			$duration .= $diff->d . 'D';
+			if ($iso == DURATION_HUMAN) {
+				$duration .= $diff->d . (($diff->d == 1) ? ' dia' : ' dias');
+			} else {
+				$duration .= $diff->d . 'D';
+			}
 		}
 		if ($diff->h || $diff->i || $diff->s) {
 			if ($iso) {
@@ -358,15 +375,32 @@ class Jp7_Date extends DateTime {
 			}
 			
 			if ($diff->h) {
-				$duration .= $diff->h . 'H';
+				if ($iso == DURATION_HUMAN) {
+					$duration .= $diff->h . (($diff->h == 1) ? ' hora' : ' horas');
+				} else {
+					$duration .= $diff->h . 'H';
+				}
 			}
 			if ($diff->i) {
-				$duration .= $diff->i . 'M';
+				if ($iso == DURATION_HUMAN) {
+					$duration .= $diff->i . (($diff->i == 1) ? ' minuto' : ' minutos');
+				} else {
+					$duration .= $diff->i . 'M';
+				}
 			}
 			if ($diff->s) {
-				$duration .= $diff->s . 'S';
+				if ($iso == DURATION_HUMAN) {
+					$duration .= $diff->s . (($diff->s == 1) ? ' segundo' : ' segundos');
+				} else {
+					$duration .= $diff->s . 'S';
+				}
 			}
 		}
-		return $iso ? $duration : strtolower($duration);
+		
+		if ($iso == Jp7_Date::DURATION_LOWERISO) {
+			$duration = strtolower($duration);
+		}
+		
+		return $duration;
 	}
 }
