@@ -210,8 +210,8 @@ class Instagram {
      * @param string $name                  Valid tag name
      * @return mixed
      */
-    public function getTagMedia($name) {
-        return $this->_makeCall('tags/'.$name.'/media/recent');
+    public function getTagMedia($name, $auth = false, $params = null) {
+        return $this->_makeCall('tags/' . $name . '/media/recent', $auth, $params);
     }
     
     /**
@@ -262,12 +262,20 @@ class Instagram {
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		
+		if ($_SERVER['SERVER_NAME'] == 'localhost') {
+			//WARNING: this would prevent curl from detecting a 'man in the middle' attack
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		}
         
-        $jsonData = curl_exec($ch);
-        
-        curl_close($ch);
-        
-        return json_decode($jsonData);
+		$jsonData = curl_exec($ch);
+		
+		curl_close($ch);
+		
+        if ($jsonData) {
+        	return json_decode($jsonData);
+        }
     }
     
     /**
