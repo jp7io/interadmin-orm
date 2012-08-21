@@ -113,7 +113,7 @@ class Jp7_Date extends DateTime {
 	 * @param int $to [optional]
 	 * @return int
 	 */
-	public function daysDiff($to = false) {
+	public function daysDiff($to = false, $min = false) {
 		if (isset($this) && $this instanceof self) {
 			$from = $this;
 		} else {
@@ -128,8 +128,27 @@ class Jp7_Date extends DateTime {
 		}
 		// Function itself
 		$diff = $to - $from;
-		$days = round($diff / 86400);
+
+		$days = $min == false ? round($diff / 86400) : $diff / 86400;
 		return $days;
+	}
+
+	public function hoursDiff( $to = false, $min = false ){
+		$daydiff = $this->daysDiff($to, true);
+
+		return $min == false ? floor($daydiff * 24) : $daydiff * 24;
+	}
+
+	public function minutesDiff( $to = false, $sec = false ){
+		$hoursDiff = $this->hoursDiff($to, true);
+
+		return $sec == false ? floor($hoursDiff * 60) : $hoursDiff * 60;
+	}
+
+	public function secondsDiff( $to = false ){
+		$minutesDiff = $this->minutesDiff($to, true);
+
+		return floor($minutesDiff * 60);
 	}
 	
 	/**
