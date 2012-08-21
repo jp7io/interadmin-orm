@@ -170,12 +170,12 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		}
 				
 		$view->headStyle()->appendStyle('
-.content-' . toId($this->id_tipo) . ' .img-wrapper {
+.content-' . toId($this->id_tipo) . ' .item .img-wrapper {
 	height: ' . $params->imgHeight  . 'px;
 	width: ' . $params->imgWidth . 'px;
 	line-height: ' . $params->imgHeight  . 'px;
 }
-.content-' . toId($this->id_tipo) . ' .img-wrapper img {
+.content-' . toId($this->id_tipo) . ' .item .img-wrapper img {
 	max-height: ' . $params->imgHeight  . 'px;
 	max-width: ' . $params->imgWidth . 'px;
 }

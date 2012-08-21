@@ -17,6 +17,9 @@
 class InterAdminField {
 	public $id;
 	public $id_tipo;
+	
+	public static $php5_2_hack_className = 'InterAdminField';
+	
 	/**
 	 * Construtor público.
 	 * 
@@ -194,15 +197,26 @@ class InterAdminField {
 					}
 				} elseif ($xtra) {
 					if ($campo_nome == "all") {
-						ob_start();
-						interadmin_tipos_combo($valor,0);
-						$form.=ob_get_contents();
-						ob_end_clean();
+						if ($campo_array['where']) {
+							$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
+							" WHERE 1 " . $campo_array['where'] .
+							" ORDER BY ordem,nome";
+							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+							while ($row = $rs->FetchNextObj()) {
+								$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
+							}
+							$rs->Close();
+						} else {
+							ob_start();
+							interadmin_tipos_combo($valor,0);
+							$form.=ob_get_contents();
+							ob_end_clean();
+						}
 					}else{
 						$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
 						" WHERE parent_id_tipo=".$campo_nome.
 						" ORDER BY ordem,nome";
-						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 						while ($row = $rs->FetchNextObj()) {
 							$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
 						}
@@ -220,7 +234,9 @@ class InterAdminField {
 		}elseif(strpos($tipo_de_campo,"int_")===0||strpos($tipo_de_campo,"float_")===0){
 			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()',event)\"";
 			if($campo=="int_key"&&!$valor&&$quantidade>1)$valor=$registros+1+$j;
-			if (strpos($tipo_de_campo,"float_")===0 && $xtra == 'moeda') $valor = number_format($valor, '2', ',', '.');
+			if (strpos($tipo_de_campo,"float_")===0 && $xtra == 'moeda') {
+				$valor = number_format((float) $valor, '2', ',', '.');
+			}
 			$form="<input type=\"text\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".$valor."\" maxlength=\"255\"".(($obrigatorio)?" obligatory=\"yes\"":"")." style=\"width:".(($tamanho)?$tamanho."em":"70px")."\"".$readonly.$onkeypress." />";
 		}else{
 			$onkeypress="";
@@ -449,5 +465,99 @@ class InterAdminField {
 		} else {
 			return htmlspecialchars($valor);
 		}	
+	}
+	
+	public static function getForm($campos, $record) {
+		$translate = Zend_Registry::get('Zend_Translate');
+		
+		ob_start();
+		foreach ($campos as $campo) {
+			if ($campo['form']) {
+				// Para usar o alias ao invés do nome do campo
+				$campo['tipo_de_campo'] = $campo['tipo'];
+				if ($record) {
+					$campo['value'] = $record->{$campo['nome_id']};
+				} else {
+					$campo['value'] = null;
+				}
+				$campo['tipo'] = $campo['nome_id'];
+				// Não prevê special
+				if (strpos($campo['tipo_de_campo'], 'select_') === 0) {
+					$campo['label'] = $translate->_($campo['label']);
+				} else {
+					$campo['nome'] = $translate->_($campo['nome']);
+				}
+				//self::_campoHtml($campo);
+				call_user_func(self::$php5_2_hack_className . '::_campoHtml', $campo);
+			}
+		}
+		return ob_get_clean();
+	}
+	
+	public static function _campoHtml($campo) {
+		include_once ROOT_PATH . '/inc/7.app.lib.php';
+		include_once ROOT_PATH . '/inc/7.form.lib.php';
+		
+		// Só para CHAR - checkbox
+		if (startsWith('char_', $campo['tipo_de_campo'])) {
+			if (!$record->id && $campo['xtra']) {
+				$campo['value'] = 'S';
+			}
+			global $j;
+			$form = jp7_db_checkbox($campo['tipo'] . "[".$j."]","S", $campo['tipo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
+			?>
+			<tr>
+				<th></th>
+				<td colspan="2" class="checkbox-container">
+					<?php echo $form; ?><span><?php echo $campo['nome']; ?></span>
+				</td>
+				<td></td>
+			</tr>
+			<?php
+		// OUTROS CAMPOS
+		} elseif (startsWith('file_', $campo['tipo_de_campo'])) {
+			if ($campo['value']) {
+				$url = interadmin_uploaded_file_url($campo['value']);
+			} else {
+				$url = '/_default/img/px.png';
+			}
+			?>
+			<tr class="<?php echo $campo['tipo']; ?>-tr">
+				<th class="<?php echo $campo['obrigatorio'] ? 'obrigatorio' : ''; ?>"><?php echo $campo['nome']; ?>:</th>
+				<td>
+					<input type="file" <?php echo $campo['obrigatorio'] ? 'obligatory="yes"' : ''; ?> label="<?php echo $campo['nome']; ?>" name="<?php echo $campo['tipo']; ?>[<?php echo $j; ?>]" />
+				</td>
+				<td>
+					<?php if ($campo['value'] instanceof InterAdminFieldFile) { ?>
+						<a href="<?php echo $campo['value']->getUrl(); ?>" target="_blank">
+							<?php echo interadmin_arquivos_preview($url); ?>
+						</a>
+					<?php } ?>
+				</td>
+				<td></td>
+			</tr>
+			<?php
+		} else {
+			$field = new InterAdminField($campo);
+			echo $field->getHtml();
+		}
+	}
+	
+	public static function validate($record, $campo) {
+		// Validação do campo obrigatório
+		if ($campo['obrigatorio']) {
+			if (!startsWith('char_', $campo['tipo'])) {
+				if (!$record->{$campo['nome_id']}) {
+					$label = startsWith('select_', $campo['tipo']) ? $campo['label'] : $campo['nome'];
+					throw new Exception('Favor preencher campo ' . $label . '.');
+				}
+			}
+		}
+		// Validação e-mail
+		if (startsWith('varchar_', $campo['tipo']) && $campo['xtra'] == 'email') {
+			if (!filter_var($record->{$campo['nome_id']}, FILTER_VALIDATE_EMAIL)) {
+				throw new Exception('Valor inválido do campo ' . $campo['nome'] . '.');
+			}
+		}
 	}
 }

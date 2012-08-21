@@ -72,7 +72,7 @@ class FileCache {
 		$this->cachePath = $this->getCachePath($this->fileRoot, $cachePath);
 		
 		if ($partial) {
-			$nocache_force = $_GET['nocache_partial'];
+			$nocache_force = $_GET['nocache_force'];
 			if ($options['keepUri']) {
 				$this->fileName = self::getFileName($_SERVER['REQUEST_URI'], '_partial_' . $storeId, $this->cachePath);
 			} else {

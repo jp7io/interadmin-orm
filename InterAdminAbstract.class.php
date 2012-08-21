@@ -311,7 +311,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
 	 * @return ADORecordSet
 	 */
-	protected function _executeQuery($options) {
+	protected function _executeQuery($options, &$select_multi_fields = array()) {
 		global $debugger;
 		$db = $this->getDb();
 		
@@ -397,6 +397,7 @@ abstract class InterAdminAbstract implements Serializable {
 			if ($debugger) {
 				$debugger->getTime($options['debug']);
 			}
+			$select_multi_fields = $options['select_multi_fields'];			
 			/*
 			if ($cache) {
 				$rs = $cache->save($rs);
@@ -488,6 +489,15 @@ abstract class InterAdminAbstract implements Serializable {
 						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
 							' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
 							(($existsMatches[4]) ? ' AND ' : '');
+					} elseif ($options['joins'][$table]) {
+						$joinTipo = $options['joins'][$table][1];
+						$onClause = array(
+						    'joins' => $options['joins'],
+						    'where' => $options['joins'][$table][2]
+					    );
+						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
+						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
+							' WHERE ' . $joinFilter . $this->_resolveSqlClausesAlias($onClause, $use_published_filters) . (($existsMatches[4]) ? ' AND ' : '');
 					}
 					
 					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
@@ -602,24 +612,32 @@ abstract class InterAdminAbstract implements Serializable {
 					// Join e Recursividade
 					if ($options['joins'] && $options['joins'][$join]) {
 						$joinTipo = $options['joins'][$join][1];
+					} elseif (strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
+						$joinTipo = null;
+						$options['select_multi_fields'][$join] = array(
+							'fields' => $fields[$join],
+							'fields_alias' => $options['fields_alias'],
+						);
 					} else {
 					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					    // Join e Recursividade
-					    $this->_addJoinAlias($options, $join, $campos[$nome]);
+						$this->_addJoinAlias($options, $join, $campos[$nome]);
 					    $joinTipo = $this->getCampoTipo($campos[$nome]);
 					}
-					if ($fields[$join] == array('*')) {
-						$fields[$join] = $joinTipo->getCamposNames();
-					}
-					$joinOptions = array(
-						'fields' => $fields[$join],
-						'fields_alias' => $options['fields_alias'],
-						'campos' => $joinTipo->getCampos(),
-						'aliases' => array_flip($joinTipo->getCamposAlias())
-					);
-					$this->_resolveFieldsAlias($joinOptions, $join . '.');
-					foreach ($joinOptions['fields'] as $joinField) {
-						array_push($fields, $joinField);
+					if ($joinTipo) {
+						if ($fields[$join] == array('*')) {
+							$fields[$join] = $joinTipo->getCamposNames();
+						}
+						$joinOptions = array(
+							'fields' => $fields[$join],
+							'fields_alias' => $options['fields_alias'],
+							'campos' => $joinTipo->getCampos(),
+							'aliases' => array_flip($joinTipo->getCamposAlias())
+						);
+						$this->_resolveFieldsAlias($joinOptions, $join . '.');
+						foreach ($joinOptions['fields'] as $joinField) {
+							array_push($fields, $joinField);
+						}
 					}
 					unset($fields[$join]);
 				}
@@ -710,7 +728,17 @@ abstract class InterAdminAbstract implements Serializable {
 				$value = $this->_getByForeignKey($value, $field, $campos[$field], $object);
 				if (is_object($attributes[$alias])) {
 					continue;
-				} 
+				}
+				if ($options['select_multi_fields']) {
+					if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
+						$multi_options = $options['select_multi_fields'][$alias];
+						if ($multi_options) {
+							foreach ($value as $item) {
+								$item->getFieldsValues($multi_options['fields'], false, $multi_options['fields_alias']);
+							}
+						}
+					}
+				}
 				$attributes[$alias] = $value;
 			} else {
 				$joinAlias = '';

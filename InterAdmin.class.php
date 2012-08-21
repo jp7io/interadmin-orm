@@ -765,7 +765,7 @@ class InterAdmin extends InterAdminAbstract {
 		
 		$campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
 		$record = $campoTipo->getFirstInterAdmin(array(
-			'where' => $fieldToSearch . ' = "' . $value . '"'
+			'where' => array($fieldToSearch . " = '" . $value . "'")
 		));
 		$this->$fieldToSet = $record;
 	}

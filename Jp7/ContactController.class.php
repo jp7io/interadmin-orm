@@ -56,21 +56,7 @@ class Jp7_ContactController extends __Controller_Action {
 		if (!$campo['form']) {
 			return;
 		}
-		// Validação do campo obrigatório
-		if ($campo['obrigatorio']) {
-			if (!startsWith('char_', $campo['tipo'])) {
-				if (!$record->{$campo['nome_id']}) {
-					$label = startsWith('select_', $campo['tipo']) ? $campo['label'] : $campo['nome'];
-					throw new Exception('Favor preencher campo ' . $label . '.');
-				}
-			}
-		}
-		// Validação e-mail
-		if (startsWith('varchar_', $campo['tipo']) && $campo['xtra'] == 'email') {
-			if (!filter_var($record->{$campo['nome_id']}, FILTER_VALIDATE_EMAIL)) {
-				throw new Exception('Valor inválido do campo ' . $campo['nome'] . '.');
-			}
-		}
+		return InterAdminField::validate($record, $campo);
 	}
 	
 	protected function _createRecord() {
@@ -123,50 +109,7 @@ class Jp7_ContactController extends __Controller_Action {
 	}
 	
 	protected function _getFormHtml($campos, $record) {
-		$translate = Zend_Registry::get('Zend_Translate');
-		
-		ob_start();
-		foreach ($campos as $campo) {
-			if ($campo['form']) {
-				// Para usar o alias ao invés do nome do campo
-				$campo['tipo_de_campo'] = $campo['tipo'];
-				if ($record) {
-					$campo['value'] = $record->{$campo['nome_id']};
-				} else {
-					$campo['value'] = null;
-				}
-				$campo['tipo'] = $campo['nome_id'];
-				// Não prevê special
-				if (strpos($campo['tipo_de_campo'], 'select_') === 0) {
-					$campo['label'] = $translate->_($campo['label']);
-				} else {
-					$campo['nome'] = $translate->_($campo['nome']);
-				}
-				
-				// Só para CHAR - checkbox
-				if (startsWith('char_', $campo['tipo_de_campo'])) {
-					if (!$record->id && $campo['xtra']) {
-						$campo['value'] = 'S';
-					}
-					global $j;
-					$form = jp7_db_checkbox($campo['tipo'] . "[".$j."]","S", $campo['tipo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
-					?>
-					<tr>
-						<th></th>
-						<td colspan="2" class="checkbox-container">
-							<?php echo $form; ?><span><?php echo $campo['nome']; ?></span>
-						</td>
-						<td></td>
-					</tr>
-					<?php
-				// OUTROS CAMPOS
-				} else {
-					$field = new InterAdminField($campo);
-					echo $field->getHtml();
-				}
-			}
-		}
-		return ob_get_clean();
+		return InterAdminField::getForm($campos, $record);
 	}
 	
 	public function okAction() {

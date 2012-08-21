@@ -17,7 +17,14 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @var InterAdmin
 	 */
 	protected static $record;
-	
+	/*
+	public function init() {
+		global $debugger;
+		$debugger->showFileName('# Module: <b>' . $this->_getParam('module') . '</b>');
+		$debugger->showFileName('# Controller: <b>' . $this->_getParam('controller') . '</b>');
+		$debugger->showFileName('# Action: <b>' . $this->_getParam('action') . '</b>');
+	}
+	*/
 	public function preDispatch() {
     	if (!$this->actionExists()) {
 			$this->forwardToTemplate();

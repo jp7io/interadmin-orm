@@ -255,7 +255,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * Retrieves the records which have this InterAdminTipo's id_tipo.
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
-	 * @return array Array of InterAdmin objects.
+	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
 		$this->_whereArrayFix($options['where']); // FIXME
@@ -267,7 +267,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
-		$rs = $this->_executeQuery($options);
+		$rs = $this->_executeQuery($options, $select_multi_fields);
+		$options['select_multi_fields'] = $select_multi_fields;
+		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
 			$record = InterAdmin::getInstance($row->id, $optionsInstance, $this);
@@ -863,13 +865,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getTiposUsingThisModel($options = array()) {
 		if (!isset($this->_tiposUsingThisModel)) {
-			$rs = $this->_executeQuery(array(
+			
+			$options2 = array(
 				'fields' => 'id_tipo',
 				'from' => $this->getTableName() . ' AS main',
 				'where' => array(
 					"model_id_tipo = '" . $this->id_tipo . "'"
 				)
-			));
+			);
+			$rs = $this->_executeQuery($options2);
 			
 			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';		
 			$this->_tiposUsingThisModel = array();

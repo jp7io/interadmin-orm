@@ -43,14 +43,22 @@ class Jp7_NewsController extends __Controller_Action {
 					$options['where'][] = 'YEAR(date_publish) = ' . $archiveArr[0];
 					$options['where'][] = 'MONTH(date_publish) = ' . $archiveArr[1];
 				}
-			}
+			} 
 			
-			$pagination = new Pagination(array(
-				'records' => $newsTipo->getInterAdminsCount($options),
-				'next_char' => 'Próxima',
-				'back_char' => 'Anterior',
-				'show_first_and_last' => true 
-			));
+			global $config;
+			$paginationClassName = ucfirst($config->name_id . '_Pagination');
+			if (class_exists($paginationClassName)) {
+				$pagination = new $paginationClassName(array(
+					'records' => $newsTipo->getInterAdminsCount($options)
+				));
+			}  else {
+				$pagination = new Pagination(array(
+					'records' => $newsTipo->getInterAdminsCount($options),
+					'next_char' => 'Próxima',
+					'back_char' => 'Anterior',
+					'show_first_and_last' => true 
+				));
+			}
 			
 			$this->view->introductionItens = array();
 			if (!$this->view->archive && $pagination->page == 1) {

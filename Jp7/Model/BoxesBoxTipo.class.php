@@ -15,6 +15,6 @@ class Jp7_Model_BoxesBoxTipo extends Jp7_Model_TipoAbstract {
 		'class' => '',
 		'class_tipo' => '',
 		'model_id_tipo' => 0,
-		'tabela' => ''
+		'tabela' => 'boxes'
 	);
 }
