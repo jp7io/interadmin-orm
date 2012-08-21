@@ -13,8 +13,8 @@ class Jp7_Mail extends Zend_Mail{
 		$allowedMethods = array('addTo', 'setFrom', 'addBcc', 'addCc', 'setReturnPath');
 		
 		if (!in_array($method, $allowedMethods)) throw new Zend_Mail_Exception('Invalid method for this function.');
-		if (!$email) throw new Zend_Mail_Exception('Cannot parse an empty email.');
-	
+		//if (!$email) throw new Zend_Mail_Exception('Cannot parse an empty email.');
+
 		$firstPart = trim(strtok($email, '<>')); // Name or e-mail
 		$secondPart = trim(strtok('<>')); // E-mail or empty
 		
