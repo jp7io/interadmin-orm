@@ -41,6 +41,7 @@ class Salesforce_Client extends SforceEnterpriseClient {
 		} else {
 			 $query = $options;
 		}
+		
 		return parent::query($query);
 	}
 	
