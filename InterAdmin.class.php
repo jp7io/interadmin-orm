@@ -565,14 +565,17 @@ class InterAdmin extends InterAdminAbstract {
 	 * @deprecated Kept for backwards compatibility
 	 * @return mixed
 	 */
-	protected function _getFieldsValuesAsString($sqlRow, $tipoLanguage) {
+	protected function _getFieldsValuesAsString($sqlRow, $fields_alias) {
 		global $lang;
+		$campos = $this->getTipo()->getCampos();
+		
 		foreach((array) $sqlRow as $key => $value) {
 			if (strpos($key, 'select_') === 0) {
+				$tipoObj = $this->getCampoTipo($campos[$key]);
 				$value_arr = explode(',', $value);
 				$str_arr = array();
 				foreach($value_arr as $value_id) {
-					$str_arr[] = jp7_fields_values($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $value_id, 'varchar_key');
+					$str_arr[] = jp7_fields_values($tipoObj->getInterAdminsTableName(), 'id', $value_id, 'varchar_key');
 				}
 				$value = implode(', ', $str_arr);
 			}
@@ -583,12 +586,6 @@ class InterAdmin extends InterAdminAbstract {
 				$alias = $key;
 			}
 			$this->$alias = $sqlRow->$alias = $value;
-		}
-		
-		if (is_array($fields)) {
-			return $sqlRow;
-		} else {
-			return $sqlRow->$fields;
 		}
 	}
 	/**

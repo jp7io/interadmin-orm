@@ -143,10 +143,12 @@ abstract class InterAdminAbstract implements Serializable {
 				//'skip_published_filters' => array('main')
 			);
 			$rs = $this->_executeQuery($options);
-			if ($forceAsString) {
-				//@todo return $this->_getFieldsValuesAsString($sqlRow, $tipoLanguage);
-			} elseif ($row = $rs->FetchNextObj()) {
-				$this->_getAttributesFromRow($row, $this, $options); 
+			if ($row = $rs->FetchNextObj()) {
+				if ($forceAsString) {
+					$this->_getFieldsValuesAsString($row, $fieldsAlias);
+				} else {
+					$this->_getAttributesFromRow($row, $this, $options);
+				}
 			}
 			$rs->Close();
 		}
