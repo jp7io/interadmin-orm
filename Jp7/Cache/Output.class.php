@@ -81,7 +81,7 @@
 	 	$id = $this->_makeId(func_get_args());
 
 	 	// Verifica se o log foi alterado
-	 	$logTime = $this->_checkLog();
+	 	$logTime = $this->_checkLog($id);
 
 	 	// Desabilita o cache individual da página pelo $_GET
 	 	if (isset($_GET['nocache_force'])) {
@@ -232,7 +232,7 @@
 	 * 
 	 * @return int Retorna a data de alteração do arquivo de log. 
 	 */
-	protected function _checkLog()
+	protected function _checkLog($id)
 	{
 		$lastLogFilename = 'logcheck.log';
 		$lastLogTime = intval(@file_get_contents(self::$_cachedir . $lastLogFilename));
@@ -242,7 +242,7 @@
 		
 	 	// Grava último log, se necessário
 	 	if ($logTime != $lastLogTime && $logTime + self::$_delay < time()) {
-	 		$this->clean();
+	 		$this->remove($id);
 	 		file_put_contents(self::$_cachedir . $lastLogFilename, $logTime);
 	 	}
 	 	
