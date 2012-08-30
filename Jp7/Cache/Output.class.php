@@ -39,7 +39,8 @@
 			
 			$frontDefault = array(
 				'lifetime' => 86400, // 1 dia
-				'class_name' => self::$_className
+				'class_name' => self::$_className,
+				'automatic_cleaning_factor' => 100
 			);
 			$backDefault = array(
 				'cache_dir' => self::$_cachedir
