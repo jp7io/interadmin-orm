@@ -70,6 +70,9 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	 * @return void
 	 */
 	public function createBoxesSettingsAndIntroduction(InterAdminTipo $tipo) {
+		if (!$tipo->id_tipo) {
+			throw new Exception('Tipo deveria ter id_tipo.');
+		}
 		if (!$tipo->getFirstChildByModel('Introduction')) {
 			$introduction = $tipo->createChild('Introduction');
 			$introduction->nome = 'Introdução';
