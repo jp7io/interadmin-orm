@@ -237,17 +237,19 @@
 	{
 		$lastLogFilename = 'logcheck.log';
 		$lastLogTime = intval(@file_get_contents(self::$_cachedir . $lastLogFilename));
-
+		
 		// Verificação do log
 	 	$logTime = @filemtime(self::$_logdir . 'interadmin.log');
 		
 	 	// Grava último log, se necessário
-	 	if ($logTime != $lastLogTime && $logTime + self::$_delay < time()) {
+		$outroDia = date('d', $logTime) != date('d');
+		$aposDelay = $logTime + self::$_delay < time();
+		
+	 	if (($logTime != $lastLogTime && $aposDelay) || $outroDia) {
 	 		$this->remove($id);
 	 		file_put_contents(self::$_cachedir . $lastLogFilename, $logTime);
 	 	}
-	 	
-	 	return $logTime;
+		return $logTime;
 	}
 	
 	/**
