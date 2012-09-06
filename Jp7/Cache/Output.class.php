@@ -235,21 +235,24 @@
 	 */
 	protected function _checkLog($id)
 	{
-		$lastLogFilename = 'logcheck.log';
-		$lastLogTime = intval(@file_get_contents(self::$_cachedir . $lastLogFilename));
+		$metas = $this->getMetadatas($id);
+		if (!$metas) {
+			return false;
+		}
+		
+		$cache_time = $metas['mtime'];
 		
 		// Verificação do log
-	 	$logTime = @filemtime(self::$_logdir . 'interadmin.log');
+	 	$log_time = @filemtime(self::$_logdir . 'interadmin.log');
 		
-	 	// Grava último log, se necessário
-		$outroDia = date('d', $logTime) != date('d');
-		$aposDelay = $logTime + self::$_delay < time();
+		$antesDelay = time() - $log_time < self::$_delay;
+		// Outro dia é atualizado o cache
+		$expiradoOuOutroDia = ($log_time >= $cache_time) || date('d', $cache_time) != date('d');
 		
-	 	if (($logTime != $lastLogTime && $aposDelay) || $outroDia) {
+	 	if ($expiradoOuOutroDia && !$antesDelay) {
 	 		$this->remove($id);
-	 		file_put_contents(self::$_cachedir . $lastLogFilename, $logTime);
 	 	}
-		return $logTime;
+		return $cache_time;
 	}
 	
 	/**
