@@ -106,8 +106,8 @@ class Jp7_Date extends DateTime {
 	/**
 	 * Difference of days between 2 timestamps.
 	 * 
-	 * Static: 		daysDiff($from, $to = null)
-	 * Instance: 	daysDiff($to = false)
+	 * Static: 		daysDiff($from, $to = null, $min = false)
+	 * Instance: 	daysDiff($to = false, $min = false)
 	 * 
 	 * @param int $from [only with static calls] 
 	 * @param int $to [optional]
@@ -118,7 +118,8 @@ class Jp7_Date extends DateTime {
 			$from = $this;
 		} else {
 			$from = $to; 
-			$to = @func_get_arg(1);
+			$to = $min;
+			$min = @func_get_arg(2);
 		}
 		$from = self::_toTime($from);
 		if ($to === false) { 
