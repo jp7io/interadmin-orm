@@ -15,23 +15,29 @@ class Jp7_Form_Element_Date extends Zend_Form_Element_Xhtml
     public $helper = 'formDate';
 	
 	public function isValid($value, $context = null) {
-		if (is_array($value)) {
-            $value = $value['__Y'] . '-' . $value['__m'] . '-' . $value['__d'];
-			if ($value == '--') {
-				$value = null;
-            }
-        }
+		$newValue = $this->_foraDeFormato($value);
+		if ($newValue !== false) {
+			$value = $newValue;
+		}		
 		return parent::isValid($value, $context);
 	}
 
 	public function getValue() {
-		if (is_array($this->_value)) {
-			$value = $this->_value['__Y'] . '-' . $this->_value['__m'] . '-' . $this->_value['__d'];
-			if ($value == '--') {
-				$value = null;
-            }
-			$this->setValue($value);
+		$newValue = $this->_foraDeFormato($value);
+		if ($newValue !== false) {
+			$this->setValue($newValue);
 		}
 		return parent::getValue();
+	}
+	
+	private function _foraDeFormato($value) {
+		if (is_array($value)) {
+            $value = $value['__Y'] . '-' . $value['__m'] . '-' . $value['__d'];
+			if ($value == '--' || $value == '0000-00-00') {
+				$value = null;
+            }
+			return $value;
+        }
+		return false;
 	}
 }

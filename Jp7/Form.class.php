@@ -208,18 +208,22 @@ class Jp7_Form extends Zend_Form {
 				$element = $this->createElement('select', $name, $options);
 				break;
 			case 'date':
+				$temHora = $campo['xtra'] === 0 || strpos($campo['xtra'], 'datetime') !== false;
+				
 				if (strpos($campo['xtra'], 'nocombo') === false) {
 					$element = $this->createElement('date', $name, $options);
 				} else {
-					$element = $this->createElement('text', $name, $options);
-					$element->setAttrib('placeholder', 'dd/mm/yyyy');
+					$options['class'] = 'datepicker';
+					$element = $this->createElement('datetext', $name, $options);
+					//$element->setAttrib('placeholder', 'Dia/Mês/Ano' . ($temHora ? ' 00:00' : ''));
 				}
-				if ($campo['obrigatorio']) {
-					$element->addValidator(new Zend_Validate_Date('yyyy-MM-dd'));
-				}
+				$element->addValidator(new Zend_Validate_Date('yyyy-MM-dd'));
 				break;
 			case 'file':
 				$element = $this->createElement('file', $name, $options);
+				break;
+			case 'char':
+				$element = $this->createElement('checkbox', $name, $options);
 				break;
 			default:
 				$element = $this->createElement('text', $name, $options);
