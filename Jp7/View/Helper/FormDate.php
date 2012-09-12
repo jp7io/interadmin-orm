@@ -28,7 +28,7 @@ class Jp7_View_Helper_FormDate extends Zend_View_Helper_FormElement
 		
 		$name = $this->view->escape($info['name']);
 		$id = $this->view->escape($info['id']);
-		$value = new Jp7_Date($info['value'] ? $info['value'] : '0000-00-00');
+		$value = new Jp7_Date(is_string($info['value']) ? $info['value'] : '0000-00-00');
 		$sel_d = $value->day();
 		$sel_m = $value->month();
 		$sel_Y = $value->year();
@@ -44,29 +44,23 @@ class Jp7_View_Helper_FormDate extends Zend_View_Helper_FormElement
 			$months .= $this->_createOption(jp7_date_month($i, true), $month, $sel_m);
 		}
 		$years = '';
-		for ($i = 1910; $i <= 2030; $i++) {
+		for ($i = 1910; $i <= 2032; $i++) {
 			$years .= $this->_createOption($i, $i, $sel_Y);
 		}
 		
-		$script = <<<SCRIPT
-		onchange="$('#$id').val($('#${id}__Y').val() + '-' + $('#${id}__m').val() + '-' + $('#${id}__d').val());";
-SCRIPT;
-		
-		//$this->_htmlAttribs($attribs)
         $xhtml = <<<XHTML
-			<select name="${name}__d" id="${id}__d" class="date-day"$disabled $script>
+			<select name="${name}[__d]" id="${id}__d" class="date-day"$disabled>
 				<option value="00">Dia</option>
 				$days
 			</select>
-			<select name="${name}__m" id="${id}__m" class="date-day"$disabled $script>
+			<select name="${name}[__m]" id="${id}__m" class="date-month"$disabled>
 				<option value="00">Mês</option>
 				$months
 			</select>
-			<select name="${name}__Y" id="${id}__Y" class="date-day"$disabled $script>
+			<select name="${name}[__Y]" id="${id}__Y" class="date-year"$disabled>
 				<option value="0000">Ano</option>
 				$years
 			</select>
-			<input type="hidden" value="$value" name="$name" id="$id"$disabled/>	
 XHTML;
         return $xhtml;
     }

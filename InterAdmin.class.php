@@ -597,8 +597,13 @@ class InterAdmin extends InterAdminAbstract {
 	public function getStringValue() {
 		$campos = $this->getTipo()->getCampos();
 		$camposCombo = array();
+		if (key_exists('varchar_key', $campos)) {
+			$campos['varchar_key']['combo'] = 'S';
+		} elseif (key_exists('select_key', $campos)) {
+			$campos['select_key']['combo'] = 'S';
+		}
 		foreach ($campos as $key => $campo) {
-			if (($campo['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
+			if ($campo['combo']) {
 				$camposCombo[] = $campo['tipo'];
 			}
 		}

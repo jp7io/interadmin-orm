@@ -189,12 +189,17 @@ class Jp7_Form extends Zend_Form {
 				break;
 			case 'text':
 				$element = $this->createElement('textarea', $name, $options);
+				if ($campo['tamanho']) {
+					$element->setOptions(array('rows' => $campo['tamanho']));
+				}
 				break;
 			case 'select':
 				$registros = $campo['nome']->getInterAdmins();
-				$multiOptions = array();
+				$multiOptions = array(
+					'' => '-- selecione --'
+				);
 				foreach ($registros as $registro) {
-					$multiOptions[$registro->__toString()] = $registro->getStringValue();
+					$multiOptions[(string) $registro] = $registro->getStringValue();
 				}
 				$options['multiOptions'] = $multiOptions;
 				// Label não é o $campo['nome'] como nos outros elementos
@@ -203,7 +208,18 @@ class Jp7_Form extends Zend_Form {
 				$element = $this->createElement('select', $name, $options);
 				break;
 			case 'date':
-				$element = $this->createElement('date', $name, $options);
+				if (strpos($campo['xtra'], 'nocombo') === false) {
+					$element = $this->createElement('date', $name, $options);
+				} else {
+					$element = $this->createElement('text', $name, $options);
+					$element->setAttrib('placeholder', 'dd/mm/yyyy');
+				}
+				if ($campo['obrigatorio']) {
+					$element->addValidator(new Zend_Validate_Date('yyyy-MM-dd'));
+				}
+				break;
+			case 'file':
+				$element = $this->createElement('file', $name, $options);
 				break;
 			default:
 				$element = $this->createElement('text', $name, $options);
