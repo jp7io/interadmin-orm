@@ -195,26 +195,35 @@ class Jp7_Form extends Zend_Form {
 				break;
 			case 'select':
 				$registros = $campo['nome']->getInterAdmins();
-				$multiOptions = array(
-					'' => '-- selecione --'
-				);
+				
+				$multiOptions = array();
 				foreach ($registros as $registro) {
 					$multiOptions[(string) $registro] = $registro->getStringValue();
 				}
 				$options['multiOptions'] = $multiOptions;
 				// Label não é o $campo['nome'] como nos outros elementos
 				$options['label'] = $campo['label'] . $label_suffix;
-								
-				$element = $this->createElement('select', $name, $options);
+				
+				if ($campo['xtra'] == 'radio') {
+					if (!$campo['obrigatorio']) {
+						array_unshift($options['multiOptions'], 'Nenhum');
+					}
+					$element = $this->createElement('radio', $name, $options);
+				} elseif ($suffixCampo == 'multi') {
+					$element = $this->createElement('multiCheckbox', $name, $options);
+				} else {
+					array_unshift($options['multiOptions'], '-- selecione --');
+					$element = $this->createElement('select', $name, $options);
+				}
 				break;
 			case 'date':
 				$temHora = $campo['xtra'] === 0 || strpos($campo['xtra'], 'datetime') !== false;
 				
+				$options['showTime'] = $temHora;
 				if (strpos($campo['xtra'], 'nocombo') === false) {
-					$element = $this->createElement('date', $name, $options);
+					$element = $this->createElement('datecombo', $name, $options);
 				} else {
-					$options['class'] = 'datepicker';
-					$element = $this->createElement('datetext', $name, $options);
+					$element = $this->createElement('date', $name, $options);
 					//$element->setAttrib('placeholder', 'Dia/Mês/Ano' . ($temHora ? ' 00:00' : ''));
 				}
 				$element->addValidator(new Zend_Validate_Date('yyyy-MM-dd'));

@@ -6,18 +6,22 @@
  * @package    Jp7_Form
  * @subpackage Element
  */
-class Jp7_Form_Element_Date extends Zend_Form_Element_Xhtml
+class Jp7_Form_Element_Datecombo extends Zend_Form_Element_Xhtml
 {
-	public $helper = 'formDate';
+    /**
+     * Default form view helper to use for rendering
+     * @var string
+     */
+    public $helper = 'formDatecombo';
 	
-   	public function isValid($value, $context = null) {
+	public function isValid($value, $context = null) {
 		$newValue = $this->_foraDeFormato($value);
 		if ($newValue !== false) {
 			$value = $newValue;
-		}
+		}		
 		return parent::isValid($value, $context);
 	}
-	
+
 	public function getValue() {
 		$newValue = $this->_foraDeFormato($value);
 		if ($newValue !== false) {
@@ -28,14 +32,11 @@ class Jp7_Form_Element_Date extends Zend_Form_Element_Xhtml
 	
 	private function _foraDeFormato($value) {
 		if (is_array($value)) {
-			if (preg_match('~^([0-9]{2})/([0-9]{2})/([0-9]{4})$~', $value['date'], $matches)) {
-				list($tudo, $d, $m, $y) = $matches;
-				$value['date'] = $y . '-' . $m . '-' . $d;
-				if ($value['date'] == '0000-00-00') {
-					return null;
-				}
-			}
-			return $value['date'] . ($value['time'] ? ' ' . $value['time'] : '');
+            $value = $value['__Y'] . '-' . $value['__m'] . '-' . $value['__d'];
+			if ($value == '--' || $value == '0000-00-00') {
+				$value = null;
+            }
+			return $value;
         }
 		return false;
 	}
