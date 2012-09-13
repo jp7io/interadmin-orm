@@ -11,7 +11,7 @@ class Jp7_View_Helper_FormDate extends Zend_View_Helper_FormElement
     public function formDate($name, $value = null, $attribs = null)
     {
     	try {
-    		$dateObj = new Jp7_Date((is_string($value) && $value) ? $value : '0000-00-00');
+    		$dateObj = new Jp7_Date($value ? $value : '0000-00-00');
 		} catch (Exception $e) {
 			$dateObj = new Jp7_Date('0000-00-00');
 		}

@@ -30,7 +30,7 @@ class Jp7_View_Helper_FormDatecombo extends Zend_View_Helper_FormElement
 		$id = $this->view->escape($info['id']);
 		
 		try {
-    		$value = new Jp7_Date((is_string($info['value']) && $info['value']) ? $info['value'] : '0000-00-00');
+    		$value = new Jp7_Date($info['value'] ? $info['value'] : '0000-00-00');
 		} catch (Exception $e) {
 			$value = new Jp7_Date('0000-00-00');
 		}

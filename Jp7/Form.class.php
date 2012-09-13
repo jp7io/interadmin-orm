@@ -184,10 +184,12 @@ class Jp7_Form extends Zend_Form {
 		);
 		
 		switch ($prefixCampo) {
-			case 'varchar':
-				$element = $this->createElement('text', $name, $options);
-				break;
 			case 'text':
+				if ($campo['xtra'] == 'S') {
+					$options['class'] = 'html';
+				} elseif ($campo['xtra'] == 'html_light') {
+					$options['class'] = 'html_light';
+				}
 				$element = $this->createElement('textarea', $name, $options);
 				if ($campo['tamanho']) {
 					$element->setOptions(array('rows' => $campo['tamanho']));
@@ -204,15 +206,15 @@ class Jp7_Form extends Zend_Form {
 				// Label não é o $campo['nome'] como nos outros elementos
 				$options['label'] = $campo['label'] . $label_suffix;
 				
-				if ($campo['xtra'] == 'radio') {
+				if ($suffixCampo == 'multi') {
+					$element = $this->createElement('multicheckbox', $name, $options);
+				} elseif ($campo['xtra'] == 'radio') {
 					if (!$campo['obrigatorio']) {
-						array_unshift($options['multiOptions'], 'Nenhum');
+						$options['multiOptions'] = array('' => 'Nenhum') + $options['multiOptions'];
 					}
 					$element = $this->createElement('radio', $name, $options);
-				} elseif ($suffixCampo == 'multi') {
-					$element = $this->createElement('multiCheckbox', $name, $options);
 				} else {
-					array_unshift($options['multiOptions'], '-- selecione --');
+					$options['multiOptions'] = array('' => '-- selecione --') + $options['multiOptions'];
 					$element = $this->createElement('select', $name, $options);
 				}
 				break;
@@ -233,7 +235,9 @@ class Jp7_Form extends Zend_Form {
 				break;
 			case 'char':
 				$element = $this->createElement('checkbox', $name, $options);
+				$element->setCheckedValue('S');
 				break;
+			case 'varchar':
 			default:
 				$element = $this->createElement('text', $name, $options);
 				break;
@@ -244,10 +248,13 @@ class Jp7_Form extends Zend_Form {
 	public function populate($values, $prefix = '') {
 		if ($values instanceof InterAdmin) {
 			$values = $values->attributes;
-			foreach ($values as $key => $value) {
-				if ($value instanceof InterAdmin) {
-					$values[$key] = $value->id;
-				}
+		}
+		foreach ($values as $key => $value) {
+			if ($value instanceof InterAdminAbstract) {
+				$values[$key] = (string) $value;
+			} elseif (is_array($value)) {
+				// Força conversão de objetos em string
+				$values[$key] = explode(',', implode(',', $value)); 
 			}
 		}
 		if ($prefix) {
