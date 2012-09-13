@@ -17,7 +17,9 @@ class Jp7_Form extends Zend_Form {
         parent::__construct($options);
 		// Adicionado para que campos dentro de Jp7/Form possam ser exibidos
 		$this->addPrefixPath('Jp7_Form', 'Jp7/Form/');
-    }
+		// Usado pelos validators
+		//$this->addElementPrefixPath('Jp7', 'Jp7/');
+	}
 	
 	/**
 	 * Creates a Jp7_Mail with the data sent from the form.
@@ -232,6 +234,7 @@ class Jp7_Form extends Zend_Form {
 				break;
 			case 'file':
 				$element = $this->createElement('file', $name, $options);
+				$element->addValidator('ExcludeExtension', false, array('php', 'exe'));
 				break;
 			case 'char':
 				$element = $this->createElement('checkbox', $name, $options);
