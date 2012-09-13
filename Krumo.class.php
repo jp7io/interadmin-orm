@@ -615,7 +615,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 					} catch (Exception $e) {
 						// do nothing
 					}
-				} else {
+				} elseif(is_array($bee)) {
 					unset($hive[$i][$_recursion_marker]);
 				}
 			}
