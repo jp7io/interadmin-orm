@@ -235,6 +235,7 @@ class Jp7_Form extends Zend_Form {
 			case 'file':
 				$element = $this->createElement('filepreview', $name, $options);
 				$element->addValidator('ExcludeExtension', false, array('php', 'exe'));
+				$element->addFilter('Rename', uniqid());
 				break;
 			case 'char':
 				$element = $this->createElement('checkbox', $name, $options);
@@ -270,6 +271,28 @@ class Jp7_Form extends Zend_Form {
 			}
 		}
 		parent::populate($values);
+	}
+	
+	public function setFilesDestination($path) {
+		if (!is_dir($path)) {
+			mkdir($path, 0777, true);
+		}
+		foreach ($this->getElements() as $element) {
+			if ($element instanceof Zend_Form_Element_File) {
+				$element->setDestination($path);	
+			}
+		}
+		/*$fieldsValues = array(
+			'id_tipo' => 0,
+			'id' => 0,
+			'tipo' => $this->getExtension(),
+			'parte' => 0,
+			'keywords' => $this->nome,
+			'lang' => $lang->lang
+		);
+		
+		$banco = new InterAdminArquivoBanco();
+		$id_arquivo_banco = $banco->addFile($fieldsValues);*/
 	}
 }
 

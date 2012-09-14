@@ -8,9 +8,10 @@
  */
 class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
 {
-	public $helper = 'formFilePreview';
+    public $helper = 'formFilePreview';
 	protected $_database_value;
 	protected $_post_value;
+	protected $_fileClass = null;
 	
 	public function loadDefaultDecorators()
     {
@@ -41,21 +42,59 @@ class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
 	public function getValue() {
 		// 	FILES	| POST		| DB		| RESULTADO 
 		//	'a.jpg'	| 'b.jpg'	| 'c.jpg'	| 'a.jpg'
-		//	null	| 'b.jpg'	| 'c.jpg'	| 'b.jpg'
-		//	null	| ''		| 'c.jpg'	| ''
+		//	''		| 'b.jpg'	| 'c.jpg'	| 'b.jpg'
+		//	''		| ''		| 'c.jpg'	| ''
 		//	null	| null		| 'c.jpg'	| 'c.jpg'
-		
-		if (key_exists($this->getName(), $_FILES)) {
-			return parent::getValue();
-		} elseif (!is_null($this->_post_value)) {
-			return $this->_post_value;
-		} else {
-			return $this->_database_value;
+		if ($this->_value === null) {
+			if (key_exists($this->getName(), $_FILES)) {
+				$parent_return = parent::getValue();
+				if ($parent_return !== null) {
+					$this->_value = $this->getFileName();
+				} else {
+					$this->_value = $this->_post_value;
+				}
+			} else {
+				$this->_value = $this->_database_value;
+			}
 		}
+		if ($this->_value && !$this->_value instanceof InterAdminFieldFile) {
+			// windows fix
+			$this->_value = str_replace('\\', '/', $this->_value);
+			// necessário por enquanto
+			$this->_value = jp7_replace_beginning('upload/', '../../upload/', $this->_value);
+			$className = $this->getFileClass();
+			$this->_value = new $className($this->_value);
+			$this->_value->addToArquivosBanco();
+		}
+		return $this->_value;
 	}
 	
 	public function setValue($value) {
 		$this->_database_value = $value;
 		return $this;
 	}
+	
+	/**
+     * Returns $_fileClass.
+     *
+     * @see Jp7_Form_Element_FilePreview::$_fileClass
+     */
+    public function getFileClass() {
+    	if ($this->_fileClass === null) {
+    		$tipoClass = InterAdminTipo::getDefaultClass();
+			$namespace = @constant($tipoClass . '::DEFAULT_NAMESPACE');
+			$this->_fileClass = $namespace . 'InterAdminFieldFile';
+		}
+        return $this->_fileClass;
+    }
+    
+    /**
+     * Sets $_fileClass.
+     *
+     * @param object $_fileClass
+     * @see Jp7_Form_Element_FilePreview::$_fileClass
+     */
+    public function setFileClass($_fileClass) {
+        $this->_fileClass = $_fileClass;
+    }
 }

@@ -140,8 +140,8 @@ class InterAdminArquivo extends InterAdminAbstract {
 			'lang' => $lang->lang
 		);
 		
-		$id_arquivo_banco = jp7_db_insert($this->getTableName() . '_banco', 'id_arquivo_banco', '', $fieldsValues);
-		$id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+		$banco = new InterAdminArquivoBanco(array('db_prefix' => $this->db_prefix));
+		$id_arquivo_banco = $banco->addFile($fieldsValues);
 		
 		// Descobrindo o caminho da pasta
 		$parent = $this->getParent();
