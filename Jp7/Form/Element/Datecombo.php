@@ -32,11 +32,14 @@ class Jp7_Form_Element_Datecombo extends Zend_Form_Element_Xhtml
 	
 	private function _foraDeFormato($value) {
 		if (is_array($value)) {
-            $value = $value['__Y'] . '-' . $value['__m'] . '-' . $value['__d'];
-			if ($value == '--' || $value == '0000-00-00') {
-				$value = null;
+            $newValue = $value['__Y'] . '-' . $value['__m'] . '-' . $value['__d'];
+			if ($newValue == '--' || $newValue == '0000-00-00') {
+				return null;
             }
-			return $value;
+			if ($value['__H']) {
+				$newValue .= ' ' .$value['__H'] . ':' . $value['__i'];
+			}
+			return $newValue;
         }
 		return false;
 	}

@@ -221,7 +221,7 @@ class Jp7_Form extends Zend_Form {
 				}
 				break;
 			case 'date':
-				$temHora = $campo['xtra'] === 0 || strpos($campo['xtra'], 'datetime') !== false;
+				$temHora = $campo['xtra'] == '0' || strpos($campo['xtra'], 'datetime') !== false;
 				
 				$options['showTime'] = $temHora;
 				if (strpos($campo['xtra'], 'nocombo') === false) {
@@ -233,12 +233,15 @@ class Jp7_Form extends Zend_Form {
 				$element->addValidator(new Zend_Validate_Date('yyyy-MM-dd'));
 				break;
 			case 'file':
-				$element = $this->createElement('file', $name, $options);
+				$element = $this->createElement('filepreview', $name, $options);
 				$element->addValidator('ExcludeExtension', false, array('php', 'exe'));
 				break;
 			case 'char':
 				$element = $this->createElement('checkbox', $name, $options);
 				$element->setCheckedValue('S');
+				break;
+			case 'password':
+				$element = $this->createElement('password', $name, $options);
 				break;
 			case 'varchar':
 			default:

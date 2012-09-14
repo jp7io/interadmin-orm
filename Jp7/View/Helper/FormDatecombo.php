@@ -38,6 +38,8 @@ class Jp7_View_Helper_FormDatecombo extends Zend_View_Helper_FormElement
 		$sel_d = $value->day();
 		$sel_m = $value->month();
 		$sel_Y = $value->year();
+		$sel_H = $value->hour();
+		$sel_i = $value->minute();
 		
 		$days = '';
 		for ($i = 1; $i <= 31; $i++) {
@@ -68,6 +70,28 @@ class Jp7_View_Helper_FormDatecombo extends Zend_View_Helper_FormElement
 				$years
 			</select>
 XHTML;
+		if ($attribs['showTime']) {
+			$hours = '';
+			for ($i = 0; $i <= 23; $i++) {
+				$hour = ($i < 10) ?  '0' . $i : $i;
+				$hours .= $this->_createOption($hour, $hour, $sel_H);
+			}
+			$minutes = '';
+			for ($i = 0; $i <= 59; $i++) {
+				$minute = ($i < 10) ?  '0' . $i : $i;
+				$minutes .= $this->_createOption($minute, $minute, $sel_i);
+			}
+			$xhtml .= <<<XHTML
+			- <select name="${name}[__H]" id="${id}__H" class="date-hour"$disabled>
+				<option value="00">H</option>
+				$hours
+			</select>:<select name="${name}[__i]" id="${id}__i" class="date-minute"$disabled>
+				<option value="00">M</option>
+				$minutes
+			</select>
+XHTML;
+		}
+
         return $xhtml;
     }
 	
