@@ -615,6 +615,8 @@ abstract class InterAdminAbstract implements Serializable {
 					if ($options['joins'] && $options['joins'][$join]) {
 						$joinTipo = $options['joins'][$join][1];
 					} elseif (strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
+						$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
+						// Processamento dos campos do select_multi é feito depois
 						$joinTipo = null;
 						$options['select_multi_fields'][$join] = array(
 							'fields' => $fields[$join],
