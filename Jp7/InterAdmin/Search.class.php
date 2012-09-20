@@ -233,7 +233,11 @@ class Jp7_InterAdmin_Search {
 			}
 		}
 		
-		$sql = "SELECT " . implode(',', $fields) . ", "  . $match . " AS relevance " .
+		$hits_field = in_array('hits', $columns) ? ' * IF (hits > 1000, 1.3, 1) ' : '';
+		
+		//$hits_field = in_array('id_tipo', $columns) ? ' + IF (id_tipo IN (1, 23), 5, 1) ' : '';
+		
+		$sql = "SELECT " . implode(',', $fields) . ", "  . $match . $hits_field . " AS relevance " .
 			"FROM `" . $table . "` " .
 			"WHERE " . implode(' AND ', $where) . " " .
 			"HAVING relevance > 0";
