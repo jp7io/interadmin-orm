@@ -10,10 +10,10 @@
 class Jp7_InterAdmin_Search {
 	private $booleanMode = false;
 	
-	public function search($search, $date_filter = false) {
+	public function search($search, $date_filter = false, $exclude_tables = array()) {
 		global $db;
 		
-		$sql = $this->getSql($search, $date_filter);
+		$sql = $this->getSql($search, $date_filter, $exclude_tables);
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		//krumo($sql);
 		
@@ -56,10 +56,10 @@ class Jp7_InterAdmin_Search {
 		return $sql;
 	}
 	
-	public function getSql($search, $date_filter) {
+	public function getSql($search, $date_filter, $exclude_tables = array()) {
 		global $db;
 		
-		$tables = $this->getTables();
+		$tables = array_diff($this->getTables(), $exclude_tables);
 		$sqls = array();
 		foreach ($tables as $table) {
 			$tableSql = $this->getTableSql($table, $search, $date_filter);
