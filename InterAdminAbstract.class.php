@@ -900,11 +900,15 @@ abstract class InterAdminAbstract implements Serializable {
 			return $alias . ".mostrar <> '' AND " . $alias . ".deleted = '' AND ";
 		// Registros
 		} else {
-			return $alias . ".date_publish <= '" . $DbNow . "'" .
+			$return = $alias . ".date_publish <= '" . $DbNow . "'" .
 				" AND (" . $alias . ".date_expire > '" . $DbNow . "' OR " . $alias . ".date_expire = '0000-00-00 00:00:00')" .
 				" AND " . $alias . ".char_key <> ''" .
-				" AND " . $alias . ".deleted = ''" .
-				(($config->interadmin_preview && !$s_session['preview']) ? " AND " . $alias . ".publish <> ''" : "") . " AND ";
+				" AND " . $alias . ".deleted = ''".
+				" AND ";
+				if ($config->interadmin_preview && !$s_session['preview']) {
+					$return .= "(" . $alias . ".publish <> '' OR " . $alias . ".parent_id > 0) AND ";	
+				} 
+			return $return;
 		}
 	}
 	
