@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_Mail extends Zend_Mail{
+class Jp7_Mail extends Zend_Mail {
 	/*
 	 * Parses an e-mail string and passes it to the given Zend_Mail method.
 	 *
@@ -17,7 +17,7 @@ class Jp7_Mail extends Zend_Mail{
 
 		$firstPart = trim(strtok($email, '<>')); // Name or e-mail
 		$secondPart = trim(strtok('<>')); // E-mail or empty
-		
+
 		if ($secondPart) {
 			if ($method == 'setReturnPath' || $method == 'addBcc') $this->$method($secondPart); // Email only
 			else $this->$method($secondPart, $firstPart); // Email, Name
@@ -27,5 +27,20 @@ class Jp7_Mail extends Zend_Mail{
 		
 		return $this;
 	}
-	
+
+	public function setReturnPathAndTransport($email) {
+		$tr = new Zend_Mail_Transport_Sendmail('-f' . $email);
+
+		self::setDefaultTransport($tr);
+
+		$this->parseEmailAndSet('setReturnPath', $email);
+
+		ini_set('sendmail_from', $email);
+	}
+
+	public function restoreReturnPath() {
+		self::clearDefaultTransport();
+		ini_restore('sendmail_from');
+	}
+
 }
