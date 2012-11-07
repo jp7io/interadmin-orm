@@ -369,6 +369,19 @@ class InterAdmin extends InterAdminAbstract {
 		return count($children);
 	}
 	/**
+	 *  Deletes the children of a given $id_tipo forever.
+	 *  
+	 * @param int $id_tipo
+	 * @param array $options [optional]
+	 * @return int Count of deleted InterAdmins.
+	 */
+	public function deleteChildrenForever($id_tipo, $options = array()) {
+		if ($id_tipo) {
+			$tipo = $this->getChildrenTipo($id_tipo);
+			return $tipo->deleteInterAdminsForever($options);
+		}
+	}
+	/**
 	 * Creates a new InterAdminArquivo with id_tipo, id and mostrar set.
 	 * 
 	 * @param array $attributes [optional]

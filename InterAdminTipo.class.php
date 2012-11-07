@@ -655,6 +655,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->id_tipo) {
 			$sql = "DELETE FROM " . $this->getInterAdminsTableName() . 
 				" WHERE id_tipo = " . $this->id_tipo;
+			if ($this->_parent instanceof InterAdmin) {
+				$sql .= " parent_id = " . intval($this->_parent->id);
+			}
 			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		}
 		
