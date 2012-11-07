@@ -312,7 +312,6 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return array Array of InterAdmin objects.
 	 */
 	public function getChildren($id_tipo, $options = array()) {
-		$db = $this->getDb();
 		$children = array();
 		if ($id_tipo) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
@@ -341,6 +340,19 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getFirstChild($id_tipo, $options = array()) {
 		return reset($this->getChildren($id_tipo, array('limit' => 1) + $options));	
+	}
+	/**
+	 * Returns the first Child by ID.
+	 * 
+	 * @param int $id_tipo
+	 * @param int $id
+	 * @param array $options [optional]
+	 * @return InterAdmin
+	 */
+	public function getChildById($id_tipo, $id, $options = array()) {
+		$options['limit'] = 1;
+		$options['where'][] = "id = " . intval($id);
+		return reset($this->getChildren($id_tipo, $options));	
 	}
 	/**
 	 * Deletes all the children of a given $id_tipo.
