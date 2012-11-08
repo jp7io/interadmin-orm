@@ -652,12 +652,30 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function deleteInterAdminsForever($options = array()) {
 		$db = $this->getDb();
 		
+		$options['where'][] = "id_tipo = " . $this->id_tipo;
+		if ($this->_parent instanceof InterAdmin) {
+			$options['where'][] = "parent_id = " . intval($this->_parent->id);
+		}
+		
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
+		// Código para formar o where
+		$options['where'] = implode(' AND ', $options['where']);
+		if (!is_array($options['fields'])) {
+			$options['fields'] = (array) $options['fields'];
+		}
+		if ($options['fields_alias']) {
+			$options['aliases'] = array_flip($options['aliases']);	
+		} else {
+			$options['aliases'] = array();
+		}
+		unset($options['order']);
+		$clauses = $this->_resolveSqlClausesAlias($options, false);
+		
 		if ($this->id_tipo) {
 			$sql = "DELETE FROM " . $this->getInterAdminsTableName() . 
-				" WHERE id_tipo = " . $this->id_tipo;
-			if ($this->_parent instanceof InterAdmin) {
-				$sql .= " AND parent_id = " . intval($this->_parent->id);
-			}
+				" WHERE" . str_replace(' main.', ' ', ' ' . $clauses) . 
+				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+			
 			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		}
 		
