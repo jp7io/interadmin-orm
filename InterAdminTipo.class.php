@@ -54,6 +54,35 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected $_tiposUsingThisModel;
 	
 	/**
+	 * Magic method calls(On Development)
+	 * 
+	 * Available magic methods:
+	 * - getInterAdminBy{Field}(mixed $value, array $options = array())
+	 * - getInterAdminsBy{Field}(mixed $value, array $options = array())
+	 * 
+	 * @param string $methodName
+	 * @return mixed
+	 */
+	public function __call($method, $args) {
+		if (strpos($method, 'get') === 0) {
+			if (preg_match('/getInterAdmin(?<MoreThanOne>s?)By(?<Field>[A-Za-z]+)/', $method, $match)) {
+				$moreThanOne = $match['MoreThanOne'] == 's' ? true : false;
+				$field 		 = $match['Field'];
+				$argument	 = (string)$args[0];
+				$options 	 = $args[1] ?: array();
+
+				$options['where'][] = strtolower($field) . " = '{$argument}'";
+
+				if (!$moreThanOne) {
+					$options['limit'] = 1;
+				}
+
+				return $this->getInterAdmins($options);
+			}
+		}
+	}
+
+	/**
 	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
 	 * This method has 4 possible calls:
 	 * 
@@ -650,36 +679,11 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of deleted InterAdmins.
 	 */
 	public function deleteInterAdminsForever($options = array()) {
-		$db = $this->getDb();
-		
-		$options['where'][] = "id_tipo = " . $this->id_tipo;
-		if ($this->_parent instanceof InterAdmin) {
-			$options['where'][] = "parent_id = " . intval($this->_parent->id);
+		$records = $this->getInterAdmins($options);
+		foreach ($records as $record) {
+			$record->deleteForever();
 		}
-		
-		$this->_prepareInterAdminsOptions($options, $optionsInstance);
-		// Código para formar o where
-		$options['where'] = implode(' AND ', $options['where']);
-		if (!is_array($options['fields'])) {
-			$options['fields'] = (array) $options['fields'];
-		}
-		if ($options['fields_alias']) {
-			$options['aliases'] = array_flip($options['aliases']);	
-		} else {
-			$options['aliases'] = array();
-		}
-		unset($options['order']);
-		$clauses = $this->_resolveSqlClausesAlias($options, false);
-		
-		if ($this->id_tipo) {
-			$sql = "DELETE FROM " . $this->getInterAdminsTableName() . 
-				" WHERE" . str_replace(' main.', ' ', ' ' . $clauses) . 
-				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-			
-			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		}
-		
-		return $db->Affected_Rows();
+		return count($records);
 	}
 	
 	/**
