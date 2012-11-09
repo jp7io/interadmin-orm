@@ -174,7 +174,6 @@ class InterAdmin extends InterAdminAbstract {
 				if ($child = $this->_findChild($nome_id)) {
 					return $this->getChildren($child['id_tipo'], (array) $args[0]);
 				}
-				kd($methodName);
 			}
 		// create{ChildName}
 		} elseif (strpos($methodName, 'create') === 0) {

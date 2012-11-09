@@ -63,7 +63,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param string $methodName
 	 * @return mixed
 	 */
-	public function __call($method, $args) {
+	/*public function __call($method, $args) {
 		if (strpos($method, 'get') === 0) {
 			if (preg_match('/getInterAdmin(?<MoreThanOne>s?)By(?<Field>[A-Za-z]+)/', $method, $match)) {
 				$moreThanOne = $match['MoreThanOne'] == 's' ? true : false;
@@ -80,7 +80,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				return $this->getInterAdmins($options);
 			}
 		}
-	}
+	}*/
 
 	/**
 	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
