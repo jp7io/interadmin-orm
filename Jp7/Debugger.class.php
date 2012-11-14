@@ -173,7 +173,12 @@ class Jp7_Debugger {
 		global $c_doc_root;
 		
 		$S = '';
+		$sqlErrorPattern = '/(.*)right syntax to use near \'(.*)\' at line(.*)/';
+		
 		if ($msgErro) {
+			if ($sql && preg_match($sqlErrorPattern, $msgErro, $matches)) {
+				$sql = str_replace($matches[2], '<b style="color:fuchsia;">' . $matches[2] . '</b>', $sql);
+			}
 			$S .= $this->_getBacktraceLabel('ERRO') . wordwrap($msgErro, 85, "\n") . "\n";
 		}
 		
