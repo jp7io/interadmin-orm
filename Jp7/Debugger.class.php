@@ -150,17 +150,21 @@ class Jp7_Debugger {
 			return;
 		}
 		if ($this->debugSql || $forceDebug) {
-			if (!defined('PARSER_LIB_ROOT')) {
-				define('PARSER_LIB_ROOT', ROOT_PATH . '/inc/3thparty/sqlparserlib/');
-				echo '<style>';
-				readfile(PARSER_LIB_ROOT . 'sqlsyntax.css');
-				echo '</style>';
-			}
-			require_once PARSER_LIB_ROOT . 'sqlparser.lib.php';
-			
-			echo '<div class="debug_sql" style="' . $style . '">' . PMA_SQP_formatHtml(PMA_SQP_parse($sql)) . '</div>';
+			echo $this->syntaxHighlightSql($sql, $style) ;
 		}
 	}
+	
+	public function syntaxHighlightSql($sql, $style = '') {
+		if (!defined('PARSER_LIB_ROOT')) {
+			define('PARSER_LIB_ROOT', ROOT_PATH . '/inc/3thparty/sqlparserlib/');
+			echo '<style>';
+			readfile(PARSER_LIB_ROOT . 'sqlsyntax.css');
+			echo '</style>';
+		}
+		require_once PARSER_LIB_ROOT . 'sqlparser.lib.php';
+		return '<div class="debug_sql" style="' . $style . '">' . PMA_SQP_formatHtml(PMA_SQP_parse($sql)) . '</div>';
+	}
+	
 	/**
 	 * Formats and returns the backtrace.
 	 *
@@ -177,7 +181,7 @@ class Jp7_Debugger {
 		
 		if ($msgErro) {
 			if ($sql && preg_match($sqlErrorPattern, $msgErro, $matches)) {
-				$sql = str_replace($matches[2], '<b style="color:fuchsia;">' . $matches[2] . '</b>', $sql);
+				$sql = str_replace($matches[2], '/* <--- SYNTAX ERROR */' . $matches[2], $sql);
 			}
 			$S .= $this->_getBacktraceLabel('ERRO') . wordwrap($msgErro, 85, "\n") . "\n";
 		}
@@ -186,7 +190,7 @@ class Jp7_Debugger {
 		
 		$S .= '<hr />';
 		if ($sql) {
-			$S .= $this->_getBacktraceLabel('SQL') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
+			$S .= $this->_getBacktraceLabel('SQL') . $this->syntaxHighlightSql($sql) . "\n";
 		}
 		$S .= $this->_getBacktraceLabel('URL') . (($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . "\n";
 		if ($_SERVER['HTTP_REFERER']) {
