@@ -30,10 +30,10 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract {
 			$videos = $this->_findChildByModel('ContentVideos');
 			$contentFiles = $this->_findChildByModel('ContentFiles');
 			
-			self::$_children = $contentSubitem->id_tipo . '{,}Subitens{,}{,}{;}' .
-				$images->id_tipo . '{,}Imagens{,}{,}{;}' .
-				$videos->id_tipo . '{,}Vídeos{,}{,}{;}' .
-				$contentFiles->id_tipo . '{,}Arquivos para Download{,}{,}{;}';
+			self::$_children = $contentSubitem->id_tipo . '{,}Subitens{,}{,}S{;}' .
+				$images->id_tipo . '{,}Imagens{,}{,}S{;}' .
+				$videos->id_tipo . '{,}Vídeos{,}{,}S{;}' .
+				$contentFiles->id_tipo . '{,}Arquivos para Download{,}{,}S{;}';
 		}
 		$this->children = self::$_children;
 	}

@@ -748,6 +748,14 @@ abstract class InterAdminAbstract implements Serializable {
 				$joinAlias = '';
 				$join = ($fields[$table]) ? $fields[$table] : $table;
 				$joinTipo = $this->getCampoTipo($campos[$join]);
+				
+				if (!$joinTipo && $options['joins'][$table]) {
+					// Joins no options
+					list($_joinType, $joinTipo, $_on) = $options['joins'][$table];
+					if (!is_object($attributes[$table])) {
+						$attributes[$table] =  InterAdmin::getInstance(0, array(), $joinTipo);
+					}
+				}
 				if ($joinTipo) {
 					$joinCampos = $joinTipo->getCampos();
 					$joinAlias = $joinTipo->getCamposAlias($field);
