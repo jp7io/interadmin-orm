@@ -236,8 +236,8 @@ class Jp7_Collections {
 				'fields' => $fields,
 				'fields_alias' => $fields_alias,
 				'where' => array('id IN (' . implode(',', $array) . ')'),
-				'order' => 'FIELD(id,' . implode(',', $array) . ')',
-				'debug' => true
+				'order' => 'FIELD(id,' . implode(',', $array) . ')'
+				//'debug' => true
 			));
 			foreach ($retornos as $key => $retorno) {
 				$array[$key]->attributes = $retorno->attributes + $array[$key]->attributes;
