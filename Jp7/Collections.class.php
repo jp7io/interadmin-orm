@@ -225,4 +225,23 @@ class Jp7_Collections {
 		}
 		return $newarray;
 	}
+	
+	public static function getFieldsValues($array, $fields, $fields_alias) {
+		if (count($array) > 0) {
+			$first = reset($array);
+			
+			$tipo = $first->getTipo();
+			$retornos = $tipo->getInterAdmins(array(
+				'class' => 'InterAdmin',
+				'fields' => $fields,
+				'fields_alias' => $fields_alias,
+				'where' => array('id IN (' . implode(',', $array) . ')'),
+				'order' => 'FIELD(id,' . implode(',', $array) . ')',
+				'debug' => true
+			));
+			foreach ($retornos as $key => $retorno) {
+				$array[$key]->attributes = $retorno->attributes + $array[$key]->attributes;
+			}
+		}
+	}
 }

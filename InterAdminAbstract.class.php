@@ -737,9 +737,7 @@ abstract class InterAdminAbstract implements Serializable {
 					if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
 						$multi_options = $options['select_multi_fields'][$alias];
 						if ($multi_options) {
-							foreach ($value as $item) {
-								$item->getFieldsValues($multi_options['fields'], false, $multi_options['fields_alias']);
-							}
+							Jp7_Collections::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
 						}
 					}
 				}
