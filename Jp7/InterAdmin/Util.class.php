@@ -37,8 +37,14 @@ class Jp7_InterAdmin_Util {
 				if ($use_id_string) {
 					$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
 				}
-				$export->_children[$tipoChildren->id_tipo] = $tipoChildren->getInterAdmins($optionsChildren);
+				$children = $tipoChildren->getInterAdmins($optionsChildren);
+				foreach ($children as $child) {
+					$child->setTipo(null);
+					$child->setParent(null);
+				}
+				$export->_children[$tipoChildren->id_tipo] = $children;
 			}
+			$export->setTipo(null);
 		}
 		return $exports;
 	}
