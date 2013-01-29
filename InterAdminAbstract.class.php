@@ -432,8 +432,8 @@ abstract class InterAdminAbstract implements Serializable {
 			preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 			foreach ($matches[1] as $match) {
 				// Filter, DISTINCT para o getInterAdminsCount(), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
-				if ($match[0] != "'" && strpos($options['fields'][0], 'DISTINCT') === false && strpos($options['group'], 'children_') === false) {
-					$options['group'] .= (($options['group']) ? ',' : '') . 'main.id';
+				if (!$options['group'] && $match[0] != "'" && strpos($options['fields'][0], 'DISTINCT') === false) {
+					$options['group'] = 'main.id';
 					break;
 				}
 			}
