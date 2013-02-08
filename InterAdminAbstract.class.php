@@ -817,9 +817,9 @@ abstract class InterAdminAbstract implements Serializable {
 	public function reload($fields = null) {
 		if (is_null($fields)) {
 			$fields = array_keys($this->attributes);
+			$existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
+			$fields = array_intersect($fields, $existingFields);
 		}
-		$existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
-		$fields = array_intersect($fields, $existingFields);
 		// Esvaziando valores para forçar atualização
 		foreach ($fields as $key) {
 			unset($this->attributes[$key]);
