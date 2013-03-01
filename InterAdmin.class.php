@@ -439,6 +439,9 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $arquivos;
 	}
+	public function getFirstArquivo($options = array()) {
+		return reset($this->getArquivos($options + array('limit' => 1)));
+	}
 	/**
 	 * Deletes all the InterAdminArquivo records related with this record.
 	 * 
