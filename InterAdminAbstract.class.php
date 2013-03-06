@@ -415,6 +415,27 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return 
 	 */
 	protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters) {
+		// Group by para wheres com children
+		if (!$options['group'] && strpos($options['fields'][0], 'DISTINCT') === false) {
+			if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // strpos por Performance
+				preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
+				foreach ($matches[1] as $match) {
+					// Filter, DISTINCT para o getInterAdminsCount(), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
+					if ($match[0] != "'") {
+						$options['group'] = 'main.id';
+						break;
+					}
+				}
+			}
+		}
+		$clause = $options['where'] .
+			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
+			(($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
+			(($options['order']) ? " ORDER BY " . $options['order'] : '');
+		
+		return $this->_resolveSql($clause, $options, $use_published_filters);
+	}
+	protected function _resolveSql($clause, &$options = array(), $use_published_filters) {
 		$campos = &$options['campos'];
 		$aliases = &$options['aliases'];
 		
@@ -423,26 +444,9 @@ abstract class InterAdminAbstract implements Serializable {
 		// not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
 		$not_function = '(?![ ]?\()';
 		$reserved = array(
-			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
-			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING'
+				'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
+				'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT'
 		);
-		
-		// Group by para wheres com children
-		if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // strpos por Performance
-			preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
-			foreach ($matches[1] as $match) {
-				// Filter, DISTINCT para o getInterAdminsCount(), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
-				if (!$options['group'] && $match[0] != "'" && strpos($options['fields'][0], 'DISTINCT') === false) {
-					$options['group'] = 'main.id';
-					break;
-				}
-			}
-		}
-		
-		$clause = $options['where'] .
-			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
-			(($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
-			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
 		$offset = 0;
 		while(preg_match('/(' . $quoted . '|' . $keyword . $not_function . '|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
@@ -462,69 +466,69 @@ abstract class InterAdminAbstract implements Serializable {
 				$offset = strlen($inicioRep);
 				continue;
 			}
-			
+				
 			// Joins com EXISTS
 			if ($termo == 'EXISTS') {
 				$inicio = substr($clause, 0, $pos + strlen($termo));
 				$existsClause = substr($clause, $pos + strlen($termo));
-				
+		
 				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
 					$table = $existsMatches[2];
 					// TODO unificar lógica
-					if ($table == 'tags') { 
-						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table . 
-							' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
+					if ($table == 'tags') {
+						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
+						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
 					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
-							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' . 
-								'Expected a child named "' . $joinNome . '". Found: ' . implode(', ', array_keys($childrenArr)));
+							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' .
+									'Expected a child named "' . $joinNome . '". Found: ' . implode(', ', array_keys($childrenArr)));
 						}
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
 							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 						));
-						
+		
 						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
-						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
-							' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
-							(($existsMatches[4]) ? ' AND ' : '');
+						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table .
+						' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
+						(($existsMatches[4]) ? ' AND ' : '');
 					} elseif ($options['joins'][$table]) {
 						$joinTipo = $options['joins'][$table][1];
 						$onClause = array(
-						    'joins' => $options['joins'],
-						    'where' => $options['joins'][$table][2]
-					    );
+							'joins' => $options['joins'],
+							'where' => $options['joins'][$table][2]
+						);
 						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
-						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
-							' WHERE ' . $joinFilter . $this->_resolveSqlClausesAlias($onClause, $use_published_filters) . (($existsMatches[4]) ? ' AND ' : '');
+						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table .
+						' WHERE ' . $joinFilter . $this->_resolveSqlClausesAlias($onClause, $use_published_filters) . (($existsMatches[4]) ? ' AND ' : '');
 					}
-					
+						
 					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
 					$clause = $inicioRep . substr($clause, strlen($inicio . $existsMatches[0]));
 					$offset = strlen($inicioRep);
 					continue;
 				}
 			}
-			
-			if (!is_numeric($termo) && !in_array($termo, $reserved) && $termo[0] != "'") {
+				
+			if ($termo[0] != "'" && !is_numeric($termo) && !in_array($termo, $reserved)) {
 				$len = strlen($termo);
 				$table = 'main';
 				if (strpos($termo, '.') !== false) {
 					list($table, $termo, $subtermo) = explode('.', $termo);
 				}
 				if ($table != 'main') {
-					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins 
+					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					if ($table == 'tags') {
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $table;
-							$options['from'][] = $this->db_prefix . "_tags AS " . $table .		
-								" ON " . $table . ".parent_id = main.id";
+							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
+							" ON " . $table . ".parent_id = main.id";
 						}
 						$joinAliases = array();
-					// Joins com children
+						// Joins com children
 					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
@@ -539,21 +543,21 @@ abstract class InterAdminAbstract implements Serializable {
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $joinTipo->getInterAdminsTableName() .
-                				' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
+							' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
 						}
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
-					// Joins normais
+						// Joins normais
 					} else {
 						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
 						if ($options['joins'] && $options['joins'][$table]) {
 							$joinTipo = $options['joins'][$table][1];
 						} else {
-						    if (!in_array($table, (array) $options['from_alias'])) {
-							    $this->_addJoinAlias($options, $table, $campos[$joinNome]);
-						    }
-						    $joinTipo = $this->getCampoTipo($campos[$joinNome]);
-						}						
+							if (!in_array($table, (array) $options['from_alias'])) {
+								$this->_addJoinAlias($options, $table, $campos[$joinNome]);
+							}
+							$joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						}
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
 					// TEMPORARIO FIXME, necessario melhor maneira
@@ -561,12 +565,12 @@ abstract class InterAdminAbstract implements Serializable {
 						$subtable = $table . '__' . $termo;
 						$subCampos = $joinTipo->getCampos();
 						$subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
-						
+		
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
 						if (!in_array($subtable, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $subtable;
 							$options['from'][] = $subJoinTipo->getInterAdminsTableName() .
-            					' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] . ' AND ' . $subtable . '.id_tipo = ' . $subJoinTipo->id_tipo;
+							' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] . ' AND ' . $subtable . '.id_tipo = ' . $subJoinTipo->id_tipo;
 						}
 						$table = $subtable;
 						$termo = $subtermo;
@@ -581,8 +585,9 @@ abstract class InterAdminAbstract implements Serializable {
 			}
 			$offset = $pos + strlen($termo);
 		}
-		return $clause;
-	}	
+		return $clause;		
+	}
+	
 	/**
 	 * Resolves Aliases on $options fields.
 	 * 
@@ -625,7 +630,9 @@ abstract class InterAdminAbstract implements Serializable {
 					} else {
 					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					    // Join e Recursividade
-						$this->_addJoinAlias($options, $join, $campos[$nome]);
+					    if (!in_array($join, (array) $options['from_alias'])) {
+							$this->_addJoinAlias($options, $join, $campos[$nome]);
+					    }
 					    $joinTipo = $this->getCampoTipo($campos[$nome]);
 					}
 					if ($joinTipo) {
@@ -652,18 +659,7 @@ abstract class InterAdminAbstract implements Serializable {
 				} else {
 					list($campo, $aggregateAlias) = explode(' AS ', $campo);
 				}
-				
-				$aggrTable = $table;
-				if (strpos($campo, 'children_') !== false ) {
-					$aggrTable = '';
-					$aggrCampo = preg_replace('/.*\((.*)\)/', '\1', $campo); // Pega "children_bla.id" de "COUNT(children_bla.id)"
-					$options['order'] .= ($options['order'] ? "," : "") . $aggrCampo;
-				}
-				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$_tmp = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
-				 	' AS `' . $table . $aggregateAlias . '`';
-				$_tmp = str_replace('main.NULL', 'NULL', $_tmp);
-				$fields[$join] = $_tmp;
+				$fields[$join] = $this->_resolveSql($campo, $options, true) . ' AS `' . $table . $aggregateAlias . '`';
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
