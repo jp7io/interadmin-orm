@@ -372,14 +372,10 @@ abstract class InterAdminAbstract implements Serializable {
 		    if ($options['joins']) {
 			    foreach ($options['joins'] as $alias => $join) {
 				    list($joinType, $tipo, $on) = $join;
-				    $onClause = array(
-					    'joins' => $options['joins'],
-					    'where' => $on
-				    );
 				    $table = $tipo->getInterAdminsTableName();
 				    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
 					    $this->getPublishedFilters($table, $alias) . 
-					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSqlClausesAlias($onClause, $use_published_filters);
+					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSql($on, $options, $use_published_filters);
 			    }
 		    }
 		    
