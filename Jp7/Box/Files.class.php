@@ -15,7 +15,7 @@ class Jp7_Box_Files extends Jp7_Box_BoxAbstract {
 			}
 		} elseif ($this->view->tipo) {
 			if ($filesTipo = $this->view->tipo->getFirstChildByModel('ContentFiles')) {
-				$this->files = $filesTipo->getInterAdmins(array(
+				$this->files = $filesTipo->find(array(
 					'fields' => array('name', 'file')
 				));
 			}

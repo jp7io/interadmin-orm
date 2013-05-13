@@ -16,7 +16,7 @@ class Jp7_Box_Offices extends Jp7_Box_BoxAbstract {
 				$options['where'][] = "featured <> ''";
 			}
 			$this->title = ($this->params->title) ? $this->params->title : $officeTipo->getNome();
-			$this->offices = $officeTipo->getInterAdmins($options);
+			$this->offices = $officeTipo->find($options);
 			
 			$this->_prepareDataImages();
 		}

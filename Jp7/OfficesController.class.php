@@ -15,7 +15,7 @@ class Jp7_OfficesController extends __Controller_Action {
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
 		
 		if ($id) {
-			$record = $officesTipo->getInterAdminById($id, array(
+			$record = $officesTipo->findById($id, array(
 				'fields' => array('*', 'state' => array('sigla'))
 			));
 			if (!$record) {
@@ -25,12 +25,12 @@ class Jp7_OfficesController extends __Controller_Action {
 		} else {
 			// Introdução
 			if ($introductionTipo = $officesTipo->getFirstChildByModel('Introduction')) {
-				$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+				$this->view->introductionItens = $introductionTipo->find(array(
 					'fields' => '*'
 				));
 			}
 			
-			$this->view->records = $officesTipo->getInterAdmins(array(
+			$this->view->records = $officesTipo->find(array(
 				'fields' => array('*', 'state' => array('sigla'))
 			));
 		}

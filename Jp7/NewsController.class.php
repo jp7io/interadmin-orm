@@ -12,7 +12,7 @@ class Jp7_NewsController extends __Controller_Action {
 			// Irá cachear uma página diferente para cada registro
 			Jp7_Cache_Output::getInstance()->start((string) $id);
 			
-			$record = $newsTipo->getInterAdminById($id,array(
+			$record = $newsTipo->findById($id,array(
 				'fields' => array('*', 'date_publish')
 			));
 			if (!$record) {
@@ -49,11 +49,11 @@ class Jp7_NewsController extends __Controller_Action {
 			$paginationClassName = ucfirst($config->name_id . '_Pagination');
 			if (class_exists($paginationClassName)) {
 				$pagination = new $paginationClassName(array(
-					'records' => $newsTipo->getInterAdminsCount($options)
+					'records' => $newsTipo->count($options)
 				));
 			}  else {
 				$pagination = new Pagination(array(
-					'records' => $newsTipo->getInterAdminsCount($options),
+					'records' => $newsTipo->count($options),
 					'next_char' => 'Próxima',
 					'back_char' => 'Anterior',
 					'show_first_and_last' => true 
@@ -64,13 +64,13 @@ class Jp7_NewsController extends __Controller_Action {
 			if (!$this->view->archive && $pagination->page == 1) {
 				// Introdução na primeira página (Menos em página de Arquivo Mensal)
 				if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
-					$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+					$this->view->introductionItens = $introductionTipo->find(array(
 						'fields' => '*'
 					));
 				}
 			}
 			
-			$this->view->news = $newsTipo->getInterAdmins($options + array('limit' => $pagination));
+			$this->view->news = $newsTipo->find($options + array('limit' => $pagination));
 			$this->view->pagination = $pagination;
 		}
 	}

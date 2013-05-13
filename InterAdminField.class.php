@@ -79,7 +79,7 @@ class InterAdminField {
 				$valor_string_arr = jp7_explode(',', $valor_default);
 				foreach ($valor_string_arr as $_value) {
 					$valorTipo = ($campo_array['nome'] instanceof InterAdminTipo) ? $campo_array['nome'] : InterAdminTipo::getInstance($campo_nome);
-					if ($valorObj = $valorTipo->getInterAdminByIdString($_value)) {
+					if ($valorObj = $valorTipo->findByIdString($_value)) {
 						$valor_default_arr[] = $valorObj->id;
 					}
 				}
@@ -183,7 +183,7 @@ class InterAdminField {
 						$options = array(
 							'where' => " AND id=".$valor
 						);
-						$rows = $tipoObj->getInterAdmins($options);
+						$rows = $tipoObj->find($options);
 						foreach ($rows as $row) {
 							$form.="<option value=\"".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" selected":"").">".toHTML($row->getStringValue())."</option>";
 						}
@@ -435,7 +435,7 @@ class InterAdminField {
 					if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras())) {
 						$registros[] = jp7_string_left(interadmin_tipos_nome($valor_i), 10);
 					} else {
-						$registro = $campo['nome']->getInterAdminById($valor_i);
+						$registro = $campo['nome']->findById($valor_i);
 						if ($registro) {
 							$registros[] = $registro->getStringValue();
 						}

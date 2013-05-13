@@ -10,7 +10,7 @@ class Jp7_InterAdmin_Soap_Generic {
 	 */
 	public function get($className, $options = array()) {
 		$tipo = Jp7_InterAdmin_Soap::getClassTipo($className);
-		return $tipo->getInterAdmins($options);
+		return $tipo->find($options);
 	}
 	
 	/**

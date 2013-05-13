@@ -15,7 +15,7 @@ class Jp7_Box_Videos extends Jp7_Box_BoxAbstract {
 			}
 		} elseif ($this->view->tipo) {
 			if ($videosTipo = $this->view->tipo->getFirstChildByModel('ContentVideos')) {
-				$this->videos = $videosTipo->getInterAdmins(array(
+				$this->videos = $videosTipo->find(array(
 					'fields' => array('*')
 				));
 			}

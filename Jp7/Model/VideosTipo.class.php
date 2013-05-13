@@ -63,7 +63,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 	public static function checkThumb($from, $id, $id_tipo) {
 		if ($from == 'edit' || $from == 'insert') {
 			$tipo = InterAdminTipo::getInstance($id_tipo);
-			$registro = $tipo->getInterAdminById($id, array(
+			$registro = $tipo->findById($id, array(
 				'fields' => array('video', 'thumb')
 			));
 			if ($registro && !$registro->thumb) {

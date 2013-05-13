@@ -35,7 +35,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			'where' => array("admin != ''")
 		));
 		if ($siteSettingsTipo) {
-			$siteSettings = $siteSettingsTipo->getFirstInterAdmin(array(
+			$siteSettings = $siteSettingsTipo->findFirst(array(
 				'fields' => array('*')
 			));
 			if ($siteSettings) {
@@ -337,7 +337,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		if ($tipo = self::getTipo()) {
 			$settingsTipo = $tipo->getFirstChildByModel('Settings');
 			if ($settingsTipo instanceof InterAdminTipo) {
-				return $settingsTipo->getFirstInterAdmin(array(
+				return $settingsTipo->findFirst(array(
 					'fields' => array('title', 'keywords', 'description', 'overwrite_keywords')
 				));
 			}

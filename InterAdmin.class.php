@@ -140,6 +140,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * - get{Children}(array $options = array())
 	 * - getFirst{Child}(array $options = array())
 	 * - get{Child}ById(int $id, array $options = array())
+	 * - get{Child}ByIdString(int $id, array $options = array())
 	 * - delete{Children}(array $options = array())
 	 * 
 	 * @param string $methodName
@@ -160,6 +161,14 @@ class InterAdmin extends InterAdminAbstract {
 				if ($child = $this->_findChild($nome_id)) {
 					$options = (array) $args[1];
 					$options['where'][] = "id = " . intval($args[0]);
+					return $this->getFirstChild($child['id_tipo'], $options);
+				}
+			// get{ChildName}ByIdString
+			} elseif (substr($methodName, -10) == 'ByIdString') {
+				$nome_id = substr($methodName, strlen('get'), -strlen('ByStringId'));
+				if ($child = $this->_findChild($nome_id)) {
+					$options = (array) $args[1];
+					$options['where'][] = "id_string = " . intval($args[0]);
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
 			// get{ChildName}Count
@@ -315,7 +324,7 @@ class InterAdmin extends InterAdminAbstract {
 		$children = array();
 		if ($id_tipo) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
-			$children = $this->getChildrenTipo($id_tipo)->getInterAdmins($options);
+			$children = $this->getChildrenTipo($id_tipo)->find($options);
 		}
 		return $children;
 	}
@@ -551,7 +560,7 @@ class InterAdmin extends InterAdminAbstract {
 						'fields' => array('varchar_key'),
 						'where' => array('id = ' . $row->id)
 					);
-					$tag_registro = $tag_tipo->getFirstInterAdmin($options);
+					$tag_registro = $tag_tipo->findFirst($options);
 					$tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';
 					$tag_registro->interadmin = $this;
 					$retorno[] = $tag_registro;
@@ -794,7 +803,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		
 		$campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
-		$record = $campoTipo->getFirstInterAdmin(array(
+		$record = $campoTipo->findFirst(array(
 			'where' => array($fieldToSearch . " = '" . $value . "'")
 		));
 		$this->$fieldToSet = $record;

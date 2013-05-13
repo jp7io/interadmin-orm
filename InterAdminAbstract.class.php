@@ -413,10 +413,11 @@ abstract class InterAdminAbstract implements Serializable {
 	protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters) {
 		// Group by para wheres com children
 		if (!$options['group'] && strpos($options['fields'][0], 'DISTINCT') === false) {
-			if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // strpos por Performance
+			// strpos por Performance
+			if (strpos($options['where'] . ' ' . $options['order'], 'children_') !== false || strpos($options['where'] . ' ' . $options['order'], 'tags.') !== false) { 
 				preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 				foreach ($matches[1] as $match) {
-					// Filter, DISTINCT para o getInterAdminsCount(), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
+					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
 					if ($match[0] != "'") {
 						$options['group'] = 'main.id';
 						break;
@@ -441,7 +442,7 @@ abstract class InterAdminAbstract implements Serializable {
 		$not_function = '(?![ ]?\()';
 		$reserved = array(
 				'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
-				'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT'
+				'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS'
 		);
 		
 		$offset = 0;
@@ -653,7 +654,9 @@ abstract class InterAdminAbstract implements Serializable {
 				if (strpos($campo, ' AS ') === false) {
 					$aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
 				} else {
-					list($campo, $aggregateAlias) = explode(' AS ', $campo);
+					$parts = explode(' AS ', $campo);
+					$aggregateAlias = array_pop($parts);
+					$campo = implode(' AS ', $parts);
 				}
 				$fields[$join] = $this->_resolveSql($campo, $options, true) . ' AS `' . $table . $aggregateAlias . '`';
 			// Sem join

@@ -50,7 +50,7 @@ STR;
 	 */
 	public static function getRedirects(InterAdminTipo $redirectTipo) {
 		$redirects = "# Redirects\r\n";
-		$records = $redirectTipo->getInterAdmins(array(
+		$records = $redirectTipo->find(array(
 			'fields' => array('url', 'destino', 'tipo_redirecionamento' => array('nome')),
 			'use_published_filters' => true
 		));

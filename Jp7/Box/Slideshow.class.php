@@ -8,7 +8,7 @@ class Jp7_Box_Slideshow extends Jp7_Box_BoxAbstract {
 			if ($slideshowTipo = $tipo->getFirstChildByModel('Slideshow')) {
 				$this->view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
 				
-				$this->items = $slideshowTipo->getInterAdmins(array(
+				$this->items = $slideshowTipo->find(array(
 					'fields' => '*'
 				));
 			}

@@ -12,7 +12,7 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo {
 	}
 	
 	public function login($username, $password) {
-		$usuario = $this->getFirstInterAdmin(array(
+		$usuario = $this->findFirst(array(
 			'fields' => array('secoes'),
 			'where' => array(
 				"usuario = '" . addslashes($username) . "'",

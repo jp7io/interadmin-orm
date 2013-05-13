@@ -12,7 +12,7 @@ class Jp7_ContentController extends __Controller_Action {
 		$contentTipo = self::getTipo();
 		
 		if ($id) {
-			$record = $contentTipo->getInterAdminById($id, array(
+			$record = $contentTipo->findById($id, array(
 				'fields' => array('*')
 			));
 			if (!$record) {
@@ -32,12 +32,12 @@ class Jp7_ContentController extends __Controller_Action {
 		} else {
 			// Introdução
 			if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {
-				$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+				$this->view->introductionItens = $introductionTipo->find(array(
 					'fields' => '*'
 				));
 			}
 			
-			$this->view->records = $contentTipo->getInterAdmins(array(
+			$this->view->records = $contentTipo->find(array(
 				'fields' => array('*')
 			));
 			

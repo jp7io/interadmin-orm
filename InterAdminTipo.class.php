@@ -60,27 +60,27 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * - getInterAdminBy{Field}(mixed $value, array $options = array())
 	 * - getInterAdminsBy{Field}(mixed $value, array $options = array())
 	 * 
-	 * @param string $methodName
+	 * @param string $method
 	 * @return mixed
 	 */
-	/*public function __call($method, $args) {
-		if (strpos($method, 'get') === 0) {
-			if (preg_match('/getInterAdmin(?<MoreThanOne>s?)By(?<Field>[A-Za-z]+)/', $method, $match)) {
-				$moreThanOne = $match['MoreThanOne'] == 's' ? true : false;
-				$field 		 = $match['Field'];
-				$argument	 = (string)$args[0];
-				$options 	 = $args[1] ?: array();
-
-				$options['where'][] = strtolower($field) . " = '{$argument}'";
-
-				if (!$moreThanOne) {
+	public function __call($method, $args) {
+		if (strpos($method, 'find') === 0) {
+			if (preg_match('/find(First)?By(?<args>.*)/', $method, $match)) {
+				$termos = explode('And', $match['args']);
+				$options = $args[count($termos)];
+				foreach ($termos as $key => $termo) {
+					$options['where'][] = Jp7_Inflector::underscore($termo) . " = '" . addslashes($args[$key]) . "'";
+				}
+				if ($match[1]) {
 					$options['limit'] = 1;
 				}
-
-				return $this->getInterAdmins($options);
+				$retorno = $this->find($options);
+				return ($match[1]) ? reset($retorno) : $retorno;
 			}
 		}
-	}*/
+		// Default error when method doesn´t exist
+		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $method . '()'));
+	}
 
 	/**
 	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
@@ -286,7 +286,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
-	public function getInterAdmins($options = array()) {
+	public function find($options = array()) {
 		$this->_whereArrayFix($options['where']); // FIXME
 		
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
@@ -312,34 +312,77 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $records;
 	}
 	/**
+	 * @deprecated Use find() instead.
+	 * @param array $options
+	 */
+	public function getInterAdmins($options = array()) {
+		return $this->find($options);
+	}
+	
+	/**
 	 * Returns the number of InterAdmins using COUNT(id).
 	 *
 	 * @param array $options Default array of options. Available keys: where.
 	 * @return int Count of InterAdmins found.
 	 */
-	public function getInterAdminsCount($options = array()) {
-		$options['fields'] = array('COUNT(DISTINCT id)');
-		$retorno = $this->getFirstInterAdmin($options);
-		return intval($retorno->count_distinct_id);
+	public function count($options = array()) {
+		if ($options['group'] == 'id') {
+			// O COUNT() precisa trazer a contagem total em 1 linha
+			// Caso exista GROUP BY id, ele traria em várias linhas
+			// Esse é um tratamento especial apenas para o ID
+			// FIXME Se houver GROUP BY com outro campo, retornará a contagem errada
+			$options['fields'] = array('COUNT(DISTINCT id) AS count_id');
+			unset($options['group']);
+		} else {
+			$options['fields'] = array('COUNT(id) AS count_id');
+		}
+		$retorno = $this->findFirst($options);
+		return intval($retorno->count_id);
 	}
+	/**
+	 * @deprecated Use count instead()
+	 * @param unknown $options
+	 */
+	public function getInterAdminsCount($options = array()) {
+		return $this->count($options);
+	}
+	
 	/**
 	 * Retrieves the first records which have this InterAdminTipo's id_tipo.
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, class.
-	 * @return InterAdmin First InterAdmin object found.
+	 * @return InterAdmin 	First InterAdmin object found.
+	 */
+	public function findFirst($options = array()) {
+		return reset($this->find(array('limit' => 1) + $options));
+	}
+	/**
+	 * @deprecated use findFirst() instead.
+	 * @param array $options
+	 * @return InterAdmin
 	 */
 	public function getFirstInterAdmin($options = array()) {
-		return reset($this->getInterAdmins(array('limit' => 1) + $options));
+		return $this->findFirst($options);
 	}
 	/**
 	 * Retrieves the unique record which have this id
 	 * 
 	 * @param int $id Search value.
-	 * @return InterAdmin First InterAdmin object found.
+	 * @param array $options
+	 * @return InterAdmin 	First InterAdmin object found.
+	 */
+	public function findById($id, $options = array()) {
+		$options['where'][] = "id = " . intval($id);
+		return $this->findFirst($options);
+	}
+	/**
+	 * @deprecated use findById() instead.
+	 * @param int $id
+	 * @param array $options
+	 * @return InterAdmin
 	 */
 	public function getInterAdminById($id, $options = array()) {
-		$options['where'][] = "id = " . intval($id);
-		return $this->getFirstInterAdmin($options);
+		return $this->findById($id, $options);
 	}
 	/**
 	 * Retrieves the first record which have this id_string
@@ -347,9 +390,18 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param string $id_string Search value.
 	 * @return InterAdmin First InterAdmin object found.
 	 */
-	public function getInterAdminByIdString($id_string, $options = array()) {
+	public function findByIdString($id_string, $options = array()) {
 		$options['where'][] = "id_string = '" . $id_string . "'";
-		return $this->getFirstInterAdmin($options);
+		return $this->findFirst($options);
+	}
+	/**
+	 * @deprecated use findByIdString() instead.
+	 * @param string $id_string
+	 * @param array $options
+	 * @return InterAdmin
+	 */
+	public function getInterAdminByIdString($id_string, $options = array()) {
+		return $this->findByIdString($id_string, $options);
 	}
 	/**
 	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
@@ -665,7 +717,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of deleted InterAdmins.
 	 */
 	public function deleteInterAdmins($options = array()) {
-		$records = $this->getInterAdmins($options);
+		$records = $this->find($options);
 		foreach ($records as $record) {
 			$record->delete();
 		}
@@ -679,7 +731,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of deleted InterAdmins.
 	 */
 	public function deleteInterAdminsForever($options = array()) {
-		$records = $this->getInterAdmins($options);
+		$records = $this->find($options);
 		foreach ($records as $record) {
 			$record->deleteForever();
 		}
@@ -694,7 +746,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of updated InterAdmins.
 	 */
 	public function updateInterAdmins($attributes, $options = array()) {
-		$records = $this->getInterAdmins($options);
+		$records = $this->find($options);
 		foreach ($records as $record) {
 			$record->updateAttributes($attributes);
 		}
@@ -863,7 +915,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
-	public function getInterAdminsByTags($tags, $options = array()) {
+	public function findByTags($tags, $options = array()) {
 		if (!is_array($tags)) {
 			$tags = array($tags);
 		}
@@ -879,7 +931,16 @@ class InterAdminTipo extends InterAdminAbstract {
 			return array();
 		}		
 		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
-		return $this->getInterAdmins($options);
+		return $this->find($options);
+	}
+	/**
+	 * @deprecated Use findByTags() instead
+	 * @param InterAdmin[] $tags
+	 * @param array $options
+	 * @return InterAdmin[]
+	 */
+	public function getInterAdminsByTags($tags, $options = array()) {
+		return $this->findByTags($tags, $options); 
 	}
 	
 	/**
@@ -992,6 +1053,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
 		
+		$options = $options + array(/*'fields' => '*', */'fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
 			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
@@ -1001,7 +1064,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();
-		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 	}
 	
 	/**

@@ -181,7 +181,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		if ($from == 'edit' || $from == 'insert') {
 			if ($id && $id_tipo) {
 				$tipo = InterAdminTipo::getInstance($id_tipo);
-				$registro = $tipo->getInterAdminById($id, array(
+				$registro = $tipo->findById($id, array(
 					'fields' => array('special_1'),
 					'fields_alias' => false
 				));

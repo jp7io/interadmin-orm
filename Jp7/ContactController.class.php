@@ -12,7 +12,7 @@ class Jp7_ContactController extends __Controller_Action {
 		$contactTipo = self::getTipo();
 		// Introdução
 		if ($introductionTipo = $contactTipo->getFirstChildByModel('Introduction')) {
-			$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+			$this->view->introductionItens = $introductionTipo->find(array(
 				'fields' => '*'
 			));
 		}
@@ -103,7 +103,7 @@ class Jp7_ContactController extends __Controller_Action {
 	
 	protected function _getRecipients($contactTipo, $record) {
 		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
-		return $recipientsTipo->getInterAdmins(array(
+		return $recipientsTipo->find(array(
 			'fields' => array('name', 'email')
 		));
 	}

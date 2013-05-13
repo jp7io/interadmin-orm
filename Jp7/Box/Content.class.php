@@ -17,7 +17,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 				if ($this->params->featured) {
 					$options['where'][] = "featured <> ''";
 				}				
-				$this->records = $this->sectionTipo->getInterAdmins($options);
+				$this->records = $this->sectionTipo->find($options);
 				
 				$this->_prepareDataImages();
 			}

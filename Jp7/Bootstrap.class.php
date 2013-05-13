@@ -222,6 +222,8 @@ class Jp7_Bootstrap {
 		$view->headLink()->appendStylesheet(DEFAULT_PATH . 'css/7_w3c.css');
 		$view->headLink()->appendStylesheet('css/main.css');
 		
+		Jp7_View::readErrors();
+		
 		Zend_Registry::set('metas', $metas);
 	}
 	

@@ -212,6 +212,11 @@ class Jp7_Debugger {
 		if (count($_COOKIE)) {
 			$S .= $this->_getBacktraceLabel('COOKIE') . print_r($_COOKIE, true);
 		}
+		if (Jp7_InterAdmin_Soap::isSoapRequest()) {
+			$S .= $this->_getBacktraceLabel('HTTP_SOAPACTION') . print_r($_SERVER['HTTP_SOAPACTION'], true);
+			$S .= $this->_getBacktraceLabel('CONTENT_TYPE') . print_r($_SERVER['CONTENT_TYPE'], true);
+			$S .= $this->_getBacktraceLabel('PHP INPUT') . htmlspecialchars(print_r(file_get_contents('php://input'), true));
+		}
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
 	
@@ -366,7 +371,7 @@ class Jp7_Debugger {
 		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
 		$to = 'debug+' . $cliente . '@jp7.com.br';
 		$headers = 'To: ' . $to . " <" . $to . ">\r\n";
-		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
+		//$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
 		
 		return jp7_mail($to, $subject, $message, $headers, '', $template, true);
 	}    

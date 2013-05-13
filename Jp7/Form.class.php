@@ -198,7 +198,7 @@ class Jp7_Form extends Zend_Form {
 				}
 				break;
 			case 'select':
-				$registros = $campo['nome']->getInterAdmins();
+				$registros = $campo['nome']->find();
 				
 				$multiOptions = array();
 				foreach ($registros as $registro) {

@@ -19,7 +19,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 			
 			global $lang;
 			$this->title = ($this->params->{'title' . $lang->prefix}) ? $this->params->{'title' . $lang->prefix} : $newsTipo->getNome();
-			$this->news = $newsTipo->getInterAdmins($options);
+			$this->news = $newsTipo->find($options);
 			
 			$this->_prepareDataImages();
 		} else {

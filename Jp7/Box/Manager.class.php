@@ -165,7 +165,7 @@ class Jp7_Box_Manager {
 	 * @return 	InterAdmin[]	An array of columns. Each column has an attribute called "boxes".
 	 */
 	public static function buildBoxes($boxTipo) {
-		$records = $boxTipo->getInterAdmins(array(
+		$records = $boxTipo->find(array(
 			'fields' => array('*'),
 			'where' => array(self::getRecordMode() ? "records_page <> ''" : "records_page = ''")
 		));

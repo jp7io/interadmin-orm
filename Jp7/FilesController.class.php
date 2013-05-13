@@ -9,13 +9,13 @@ class Jp7_FilesController extends __Controller_Action {
 		
 		$filesTipo = self::getTipo();
 		
-		$this->view->records = $filesTipo->getInterAdmins(array(
+		$this->view->records = $filesTipo->find(array(
 			'fields' => array('name', 'file')
 		));
 			
 		// Introdução
 		if ($introductionTipo = $filesTipo->getFirstChildByModel('Introduction')) {
-			$this->view->introductionItens = $introductionTipo->getInterAdmins(array(
+			$this->view->introductionItens = $introductionTipo->find(array(
 				'fields' => '*'
 			));
 		}

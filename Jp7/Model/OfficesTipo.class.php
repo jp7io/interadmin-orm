@@ -32,7 +32,7 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract {
 		if ($from == 'edit' || $from == 'insert') {
 			if ($id && $id_tipo) {
 				$tipo = InterAdminTipo::getInstance($id_tipo);
-				$registro = $tipo->getInterAdminById($id, array(
+				$registro = $tipo->findById($id, array(
 					'fields' => '*',
 					'fields_alias' => true
 				));

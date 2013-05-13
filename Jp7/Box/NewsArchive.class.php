@@ -8,7 +8,7 @@ class Jp7_Box_NewsArchive extends Jp7_Box_BoxAbstract {
     	$tipo = $this->view->tipo;
     	if ($tipo && $tipo->model_id_tipo == 'News') {
     		$this->tipo = $tipo;
-			$this->archives = $tipo->getInterAdmins(array(
+			$this->archives = $tipo->find(array(
 				'fields' => array('date_publish'),
 				'group' => 'MONTH(date_publish), YEAR(date_publish)',
 				'order' => 'date_publish DESC'

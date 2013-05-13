@@ -15,11 +15,9 @@ class Jp7_Collections {
 			if ($options['where']) {
 				$array = self::filter($array, $options['where']);
 			}
-			/*
 			if ($options['group']) {
 				$array = self::group($array, $options['group']);
 			}
-			*/
 			if ($options['order']) {
 				$array = self::sort($array, $options['order']);
 			}
@@ -36,12 +34,25 @@ class Jp7_Collections {
 	 * @param string $clause
 	 * @return array
 	 */
-	/*
 	public static function group($array, $clause) {
-		return $array;
-		// @todo
+		$clause = preg_replace('/\s+/', ' ', $clause);
+		$keys = explode(',', $clause);
+		
+		$novaArray = array();
+		$hashExistente = array();
+		
+		foreach ($array as $item) {
+			$hash = ':';
+			foreach ($keys as $key) {
+				$hash .= strtolower(jp7_normalize($item->$key));
+			}			
+			if (!$hashExistente[$hash]) {
+				$novaArray[] = $item;
+				$hashExistente[$hash]++;
+			}
+		}
+		return $novaArray;
 	}
-	*/
 	/**
 	 * Filters the array using SQL Where.
 	 * 
@@ -231,7 +242,7 @@ class Jp7_Collections {
 			$first = reset($array);
 			
 			$tipo = $first->getTipo();
-			$retornos = $tipo->getInterAdmins(array(
+			$retornos = $tipo->find(array(
 				'class' => 'InterAdmin',
 				'fields' => $fields,
 				'fields_alias' => $fields_alias,
