@@ -20,7 +20,7 @@ class Jp7_Box_Images extends Jp7_Box_BoxAbstract {
 			}
 		} elseif ($this->view->tipo) {
 			if ($imagesTipo = $this->view->tipo->getFirstChildByModel('Images')) {
-				$this->images = $imagesTipo->getInterAdmins(array(
+				$this->images = $imagesTipo->find(array(
 					'fields' => '*'
 				));
 			}
