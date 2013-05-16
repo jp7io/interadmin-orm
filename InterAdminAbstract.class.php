@@ -273,6 +273,8 @@ abstract class InterAdminAbstract implements Serializable {
 			$file = new $class_name($value);
 			$file->setParent($object);
 			return $file;
+		} else {
+			return $value;
 		}
 		
 		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
@@ -280,28 +282,26 @@ abstract class InterAdminAbstract implements Serializable {
 			$tipo = $object->getCampoTipo($campo);
 		}
 		
-		if (isset($isMulti)) {
-			if ($isMulti) {
-				$value_arr = jp7_explode(',', $value);
-				foreach ($value_arr as $key2 => $value2) {
-					if ($value2 && is_numeric($value2)) {
-						if ($isTipo) {
-							$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
-						} else {
-							$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
-						}
+		if ($isMulti) {
+			$value_arr = jp7_explode(',', $value);
+			foreach ($value_arr as $key2 => $value2) {
+				if ($value2 && is_numeric($value2)) {
+					if ($isTipo) {
+						$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
 					} else {
-						//FIXME Retirar quando 7.form.lib parar de salvar N no special
-						unset($value_arr[$key2]);
+						$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
 					}
-				}
-				$value = $value_arr;
-			} elseif ($value && is_numeric($value)) {
-				if ($isTipo) {
-					$value = InterAdminTipo::getInstance($value, $options);
 				} else {
-					$value = InterAdmin::getInstance($value, $options, $tipo);
+					//FIXME Retirar quando 7.form.lib parar de salvar N no special
+					unset($value_arr[$key2]);
 				}
+			}
+			$value = $value_arr;
+		} elseif ($value && is_numeric($value)) {
+			if ($isTipo) {
+				$value = InterAdminTipo::getInstance($value, $options);
+			} else {
+				$value = InterAdmin::getInstance($value, $options, $tipo);
 			}
 		}
 		
