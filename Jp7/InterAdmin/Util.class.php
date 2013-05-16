@@ -31,9 +31,7 @@ class Jp7_InterAdmin_Util {
 			$export->_children = array();
 			foreach ($tiposChildren as $tipoChildren) {
 				$optionsChildren = $options;
-				$tipoChildren = $export->getChildrenTipo($tipoChildren['id_tipo'], array(
-					'class' => 'InterAdminTipo'
-				));
+				$tipoChildren = $export->getChildrenTipo($tipoChildren['id_tipo']/*, array('class' => 'InterAdminTipo')*/);
 				if ($use_id_string) {
 					$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
 				}
@@ -52,18 +50,24 @@ class Jp7_InterAdmin_Util {
 	protected static function _prepareOptionsForIdString($options, $tipo) {
 		$campos = $tipo->getCampos();
 		foreach ($campos as $campo) {
-			if (strpos($campo['tipo'], 'select_') === 0 && strpos($campo['tipo'], 'select_multi_') !== 0 && !in_array($campo['xtra'], InterAdminField::getSelectTipoXtras())) {
+			$isSpecialRegistro = strpos($campo['tipo'], 'special_') === 0 && $campo['xtra'] == 'registros' && $tipo->getCampoTipo($campo) instanceof InterAdminTipo;
+			$isSelectRegistro = strpos($campo['tipo'], 'select_') === 0 && strpos($campo['tipo'], 'select_multi_') !== 0 && !in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
+			if ($isSpecialRegistro || $isSelectRegistro) {
 				$options['fields'][$campo['tipo']] = array('id_string');
 			}
 		}
 		return $options;
 	}
 	
-	protected static function _importAttributeFromIdString($record) {
+	protected static function _importAttributeFromIdString($record, $bind_children = false) {
 		foreach ($record->attributes as $attributeName => $attribute) {
 			if ($attribute instanceof InterAdmin && $attribute->id_string) {
 				if ($attributeTipo = $attribute->getTipo()) {
-					$record->$attributeName = $attributeTipo->findByIdString($attribute->id_string);
+					$options = array();
+					if ($bind_children) {
+						$options['order'] = 'parent_id = ' . $record->parent_id . ' DESC';
+					}
+					$record->$attributeName = $attributeTipo->findByIdString($attribute->id_string, $options);
 				}
 			}
 		}
@@ -74,11 +78,13 @@ class Jp7_InterAdmin_Util {
 	 * 
 	 * @param 	array	$records
 	 * @param 	int 	$id_tipo
-	 * @param 	int 	$parent_id 			[optional] defaults to 0
-	 * @param 	bool 	$import_children 	[optional] defaults to TRUE
-	 * @return 	void
+	 * @param 	int 	$parent_id 			defaults to 0
+	 * @param 	bool 	$import_children 	defaults to TRUE
+	 * @param 	bool	$use_id_string		defaults to FALSE
+	 * @param 	bool 	$bind_children		Children 1 has a relationship with Children 2, when copying, this relationship needs to be recreated
+	 * @return 	void	
 	 */
-	public static function import(array $records, $id_tipo, $parent_id = 0, $import_children = true, $use_id_string = false) {
+	public static function import(array $records, $id_tipo, $parent_id = 0, $import_children = true, $use_id_string = false, $bind_children = false) {
 		foreach ($records as $record) {
 			unset($record->id);
 			
@@ -103,8 +109,8 @@ class Jp7_InterAdmin_Util {
 						$child->parent_id = $record->id;
 						$child->setTipo($child_tipo);
 						
-						if ($use_id_string) {
-							self::_importAttributeFromIdString($child);
+						if ($use_id_string || $bind_children) {
+							self::_importAttributeFromIdString($child, $bind_children);
 						}
 						
 						$child->save();
