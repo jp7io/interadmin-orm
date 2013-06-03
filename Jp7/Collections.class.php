@@ -116,13 +116,16 @@ class Jp7_Collections {
 	    $retorno = 'return 0;';
 		
         for ($i = count($keys) - 1; $i >= 0; $i--) {
-            list($k, $dir) = explode(' ', trim($keys[$i]));
-			
-			if ($dir) {
+            $parts = explode(' ', trim($keys[$i]));
+        	$dir = array_pop($parts);
+        	
+			if (strtolower($dir) == 'asc' || strtolower($dir) == 'desc') {
 				$t = $dirMap[strtolower($dir)];
 			} else {
+				$parts[] = $dir;
 				$t = $dirMap['asc'];
 			}
+			$k = implode(' ', $parts);
             $f = -1 * $t;
 			
 			if ($k == 'RAND()') {
@@ -131,15 +134,21 @@ class Jp7_Collections {
 				$k = str_replace('.', '->', $k);
 				$aStr = '$a->' . $k;
             	$bStr = '$b->' . $k;
-			}			
+			}
 			
 			// Checagem de string para usar collate correto
-			$attr = explode('->', $k);
-			$valor = reset($array)->{$attr[0]};
-			if ($attr[2]) {
-				$valor = $valor->{$attr[1]}->{$attr[2]};
-			} elseif ($attr[1]) {
-				$valor = $valor->{$attr[1]};
+			if (strpos($k, '=') !== false) {
+				$valor = null;
+				$aStr = '(' . preg_replace('/([^=!])(=)([^=])/', '\1\2=\3', $aStr) . ')';
+				$bStr = '(' . preg_replace('/([^=!])(=)([^=])/', '\1\2=\3', $bStr) . ')';
+			} else {
+				$attr = explode('->', $k);
+				$valor = reset($array)->{$attr[0]};
+				if ($attr[2]) {
+					$valor = $valor->{$attr[1]}->{$attr[2]};
+				} elseif ($attr[1]) {
+					$valor = $valor->{$attr[1]};
+				}
 			}
 			if (is_string($valor) && !is_numeric($valor)) {
 				 $fnBody = '$cmp = strcoll(' . $aStr . ', ' . $bStr . ');' .
