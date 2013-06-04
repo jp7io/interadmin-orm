@@ -97,4 +97,15 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 	public function getPrefix() {
 		return Jp7_WordPress::getPrefix() . (($this->blog_id > 1) ? $this->blog_id . '_' : '');
 	}
+	
+	public function getTopic($options = array()) {
+		$options += array(
+			'from' => Jp7_WordPress::getPrefix() . 'blogs_cets_topic',
+			'fields' => '*',
+			'where' => 'id = (SELECT topic_id FROM ' . Jp7_WordPress::getPrefix() . 'blogs_cets_topic_relationship WHERE blog_id = ' . $this->blog_id . ')'
+		);
+		
+		$topics = self::retrieveObjects($this->_db, $options, get_class($this) . '_Topic');
+		return reset($topics);
+	}
 }
