@@ -105,7 +105,13 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract {
 			'where' => 'id = (SELECT topic_id FROM ' . Jp7_WordPress::getPrefix() . 'blogs_cets_topic_relationship WHERE blog_id = ' . $this->blog_id . ')'
 		);
 		
-		$topics = self::retrieveObjects($this->_db, $options, get_class($this) . '_Topic');
+		if ($options['class']) {
+			$class = $options['class'];
+		} else {
+			$class = 'Jp7_WordPress';
+		}
+				
+		$topics = self::retrieveObjects($this->_db, $options, $class . '_Topic');
 		return reset($topics);
 	}
 }
