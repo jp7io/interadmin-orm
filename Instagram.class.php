@@ -93,7 +93,7 @@ class Instagram {
         if (is_array($scope) && count(array_intersect($scope, $this->_scopes)) === count($scope)) {
             return self::API_OAUTH_URL.'?client_id='.$this->getApiKey().'&redirect_uri='.$this->getApiCallback().'&scope='.implode('+', $scope).'&response_type=code';
         } else {
-            throw new Exeption("Error: getLoginUrl() - The parameter isn't an array or invalid scope permissions used.");
+            throw new Exception("Error: getLoginUrl() - The parameter isn't an array or invalid scope permissions used.");
         }
     }
     
@@ -244,7 +244,7 @@ class Instagram {
             if (true === isset($this->_accesstoken)) {
                 $authMethod = '?access_token='.$this->getAccessToken();
             } else {
-                throw new Exeption("Error: _makeCall() | $function - This method requires an authenticated users access token.");
+                throw new Exception("Error: _makeCall() | $function - This method requires an authenticated users access token.");
             }
         }
         
