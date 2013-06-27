@@ -128,6 +128,15 @@ class PagSeguroHelper {
         
         return $isEmpty;
     }
+    
+    /**
+     * Remove all non digit character from string
+     * @param string $value
+     * @return string
+     */
+    public static function getOnlyNumbers($value){
+        return preg_replace('/\D/', '', $value);
+    }
 }
 
 ?>
