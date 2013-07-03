@@ -17,6 +17,7 @@
 abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
+	const DEFAULT_FIELDS = null;
 	
 	private static $_cache = false;
 	
@@ -201,12 +202,22 @@ abstract class InterAdminAbstract implements Serializable {
 		$this->_update($this->attributes);
 	}
 	/**
+	 * Increments a numeric attribute
+	 * 
+	 * @param string $attribute
+	 * @param integer $by
+	 */
+	public function increment($attribute, $by = 1) {
+		$this->$attribute += $by;
+		$this->_update(array($attribute => $this->$attribute));
+	}
+	/**
 	 * Updates using SQL.
 	 * 
 	 * @param array $attributes
 	 * @return void
 	 */
-	protected function _update($attributes, $where = '') {
+	protected function _update($attributes) {
 		$db = $this->getDb();
 		
 		$valuesToSave = array();

@@ -1053,7 +1053,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
 		
-		$options = $options + array(/*'fields' => '*', */'fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+		$options = $options + array('fields' => $this->staticConst('DEFAULT_FIELDS'), 'fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
