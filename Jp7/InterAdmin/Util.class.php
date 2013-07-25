@@ -21,11 +21,11 @@ class Jp7_InterAdmin_Util {
 		$optionsRegistros = $options;
 		if ($use_id_string) {
 			$optionsRegistros = self::_prepareOptionsForIdString($optionsRegistros, $tipoObj);
-		}		
+		}
 		$exports = $tipoObj->find($optionsRegistros + array(
 			'where' => "id IN(" . implode(',', $ids) . ')'
 		));
-		
+
 		$tiposChildren = $tipoObj->getInterAdminsChildren();
 		foreach ($exports as $export) {
 			$export->_children = array();
@@ -35,6 +35,8 @@ class Jp7_InterAdmin_Util {
 				if ($use_id_string) {
 					$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
 				}
+
+				$optionsChildren['fields_alias'] = true;
 				$children = $tipoChildren->find($optionsChildren);
 				foreach ($children as $child) {
 					$child->setTipo(null);
