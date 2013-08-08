@@ -1,4 +1,6 @@
-<?php if (!defined('ALLOW_PAGSEGURO_RESOURCES')) { die('No direct script access allowed'); }
+<?php if (!defined('ALLOW_PAGSEGURO_RESOURCES')) {
+	die('No direct script access allowed');
+}
 
 // Production environment
 $PagSeguroResources['environment'] = Array();
@@ -19,5 +21,4 @@ $PagSeguroResources['notificationService']['serviceTimeout'] = 20;
 $PagSeguroResources['transactionSearchService'] = Array();
 $PagSeguroResources['transactionSearchService']['servicePath'] = "/v2/transactions";
 $PagSeguroResources['transactionSearchService']['serviceTimeout'] = 20;
-
 ?>

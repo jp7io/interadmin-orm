@@ -1,4 +1,6 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) { die('No direct script access allowed'); }
+<?php if (!defined('PAGSEGURO_LIBRARY')) {
+    die('No direct script access allowed');
+}
 /*
 ************************************************************************
 Copyright [2011] [PagSeguro Internet Ltda.]
@@ -20,26 +22,46 @@ limitations under the License.
 /**
  * Represent a metadata
  */
-class PagSeguroMetaData {
-    
+class PagSeguroMetaData
+{
+
+    /**
+     * @var array
+     */
     private $items;
-    
-    public function __construct(Array $items = NULL){
-        if (!is_null($items) && count($items) > 0){
+
+    /**
+     * @param array $items
+     */
+    public function __construct(Array $items = null)
+    {
+        if (!is_null($items) && count($items) > 0) {
             $this->setItems($items);
         }
     }
-    
-    public function addItem(PagSeguroMetaDataItem $metaDataItem){
+
+    /**
+     * @param PagSeguroMetaDataItem $metaDataItem
+     */
+    public function addItem(PagSeguroMetaDataItem $metaDataItem)
+    {
         $this->items[] = $metaDataItem;
     }
-    
-    public function setItems(Array $items){
+
+    /**
+     * @param array $items
+     */
+    public function setItems(Array $items)
+    {
         $this->items = $items;
     }
-    
-    public function getItems(){
-        if($this->items == null){
+
+    /**
+     * @return array
+     */
+    public function getItems()
+    {
+        if ($this->items == null) {
             $this->items = array();
         }
         return $this->items;

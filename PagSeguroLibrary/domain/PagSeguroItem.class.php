@@ -1,27 +1,29 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) { die('No direct script access allowed'); }
+<?php if (!defined('PAGSEGURO_LIBRARY')) {
+	die('No direct script access allowed');
+}
 /*
-************************************************************************
-Copyright [2011] [PagSeguro Internet Ltda.]
+ ************************************************************************
+ Copyright [2011] [PagSeguro Internet Ltda.]
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-************************************************************************
-*/
-
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ ************************************************************************
+ */
 
 /**
-* Represents a product/item in a transaction
-*/
-class PagSeguroItem {
+ * Represents a product/item in a transaction
+ */
+class PagSeguroItem
+{
 
 	/**
 	 * Product identifier, such as SKU
@@ -54,11 +56,12 @@ class PagSeguroItem {
 	private $shippingCost;
 
 	/**
-	 * 
+	 *
 	 * Initializes a new instance of the Item class
 	 * @param array $data
 	 */
-	public function __construct(Array $data = null) {
+	public function __construct(Array $data = null)
+	{
 		if ($data) {
 			if (isset($data['id'])) {
 				$this->id = $data['id'];
@@ -84,7 +87,8 @@ class PagSeguroItem {
 	/**
 	 * @return the product identifier
 	 */
-	public function getId() {
+	public function getId()
+	{
 		return $this->id;
 	}
 
@@ -92,14 +96,16 @@ class PagSeguroItem {
 	 * Sets the product identifier
 	 * @param String $id
 	 */
-	public function setId($id) {
+	public function setId($id)
+	{
 		$this->id = $id;
 	}
 
 	/**
 	 * @return the product description
 	 */
-	public function getDescription() {
+	public function getDescription()
+	{
 		return $this->description;
 	}
 
@@ -107,14 +113,16 @@ class PagSeguroItem {
 	 * Sets the product description
 	 * @param String $description
 	 */
-	public function setDescription($description) {
+	public function setDescription($description)
+	{
 		$this->description = PagSeguroHelper::formatString($description, 255);
 	}
 
 	/**
 	 * @return the quantity
 	 */
-	public function getQuantity() {
+	public function getQuantity()
+	{
 		return $this->quantity;
 	}
 
@@ -122,14 +130,16 @@ class PagSeguroItem {
 	 * Sets the quantity
 	 * @param String $quantity
 	 */
-	public function setQuantity($quantity) {
+	public function setQuantity($quantity)
+	{
 		$this->quantity = $quantity;
 	}
 
 	/**
 	 * @return the unit amount for this item
 	 */
-	public function getAmount() {
+	public function getAmount()
+	{
 		return $this->amount;
 	}
 
@@ -137,14 +147,16 @@ class PagSeguroItem {
 	 * sets the unit amount fot this item
 	 * @param String $amount
 	 */
-	public function setAmount($amount) {
+	public function setAmount($amount)
+	{
 		$this->amount = $amount;
 	}
 
 	/**
 	 * @return the weight
 	 */
-	public function getWeight() {
+	public function getWeight()
+	{
 		return $this->weight;
 	}
 
@@ -152,14 +164,16 @@ class PagSeguroItem {
 	 * Sets the single unit weight
 	 * @param String $weight
 	 */
-	public function setWeight($weight) {
+	public function setWeight($weight)
+	{
 		$this->weight = $weight;
 	}
 
 	/**
 	 * @return the unit shipping cost for this item
 	 */
-	public function getShippingCost() {
+	public function getShippingCost()
+	{
 		return $this->shippingCost;
 	}
 
@@ -167,9 +181,10 @@ class PagSeguroItem {
 	 * Sets the unit shipping cost for this item
 	 * @param String $shippingCost
 	 */
-	public function setShippingCost($shippingCost) {
+	public function setShippingCost($shippingCost)
+	{
 		$this->shippingCost = $shippingCost;
 	}
-	
+
 }
 ?>
