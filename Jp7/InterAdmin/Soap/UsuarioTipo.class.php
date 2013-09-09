@@ -8,6 +8,9 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo {
 		 * @global Define o $id_tipo em que são gravados os usuários com acesso.
 		 */
 		global $c_tipos_permissoes_xml_csv;
+		if (!$c_tipos_permissoes_xml_csv) {
+			throw new Exception('Variável c_tipos_permissoes_xml_csv não está definida.');
+		}
 		parent::__construct($c_tipos_permissoes_xml_csv, $options);
 	}
 	
