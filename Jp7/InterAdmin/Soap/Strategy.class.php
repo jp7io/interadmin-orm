@@ -20,7 +20,11 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 			
 			$isDynamicClass = Jp7_InterAdmin_Soap::isDynamicClass($type);
 			if (substr($type, strlen($type) - 2) == '[]' || ($type != 'Options' && !$isDynamicClass && !is_subclass_of($type, 'InterAdminAbstract'))) {
-				return parent::addComplexType($type);
+				try {
+					return parent::addComplexType($type);
+				} catch (Zend_Soap_Wsdl_Exception $e) {
+					// Possibly a class was set but was not created a file for it
+				}
 			}
 						
 			// Evitar looping infinito
