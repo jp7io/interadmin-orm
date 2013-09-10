@@ -4,6 +4,7 @@ class Jp7_InterAdmin_JSTree {
 	public $tree = array();
 	public $tipos = array();
 	public $options = array();
+	protected static $_nivelPermissao = 3;
 	
 	public function __construct($options = array()) {
 		global $lang;
@@ -14,7 +15,15 @@ class Jp7_InterAdmin_JSTree {
 			$this->addTipo($this->tree, new InterAdminTipo(0));
 		}
 	}
-		
+	
+	public static function setNivelPermissao($nivel) {
+		self::$_nivelPermissao = $nivel;
+	}
+	
+	public static function getNivelPermissao() {
+		return self::$_nivelPermissao;
+	}
+	
 	public function addTipo(&$tree, $parentTipo, $nivel = 0) {
 		global $lang;
 		
@@ -27,7 +36,7 @@ class Jp7_InterAdmin_JSTree {
 		if ($nivel == 0) {
 			$options['where'][] = ($this->options['admin']) ? "admin <> ''" : "admin = ''"; 
 		}		
-		if ($nivel < 3) {
+		if ($nivel < self::$_nivelPermissao) {
 			$options = InterAdmin::mergeOptions($this->options, $options);
 		}	
 		if ($lang->prefix) {
