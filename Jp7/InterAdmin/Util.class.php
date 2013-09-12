@@ -35,8 +35,8 @@ class Jp7_InterAdmin_Util {
 				if ($use_id_string) {
 					$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
 				}
-
-				$optionsChildren['fields_alias'] = true;
+				
+				//$optionsChildren['fields_alias'] = true;
 				$children = $tipoChildren->find($optionsChildren);
 				foreach ($children as $child) {
 					$child->setTipo(null);
