@@ -28,25 +28,30 @@ class Jp7_InterAdmin_Util {
 
 		$tiposChildren = $tipoObj->getInterAdminsChildren();
 		foreach ($exports as $export) {
-			$export->_children = array();
-			foreach ($tiposChildren as $tipoChildren) {
-				$optionsChildren = $options;
-				$tipoChildren = $export->getChildrenTipo($tipoChildren['id_tipo']/*, array('class' => 'InterAdminTipo')*/);
-				if ($use_id_string) {
-					$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
-				}
-				
-				//$optionsChildren['fields_alias'] = true;
-				$children = $tipoChildren->find($optionsChildren);
-				foreach ($children as $child) {
-					$child->setTipo(null);
-					$child->setParent(null);
-				}
-				$export->_children[$tipoChildren->id_tipo] = $children;
-			}
-			$export->setTipo(null);
+			self::_exportChildren($export, $tiposChildren, $use_id_string, $options);
 		}
 		return $exports;
+	}
+	
+	protected static function _exportChildren($export, $tiposChildren, $use_id_string, $options) {
+		$export->_children = array();
+		foreach ($tiposChildren as $tipoChildren) {
+			$optionsChildren = $options;
+			$tipoChildren = $export->getChildrenTipo($tipoChildren['id_tipo']/*, array('class' => 'InterAdminTipo')*/);
+			if ($use_id_string) {
+				$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
+			}
+			
+			//$optionsChildren['fields_alias'] = true;
+			$children = $tipoChildren->find($optionsChildren);
+			$tiposGrandChildren = $tipoChildren->getInterAdminsChildren();
+			foreach ($children as $child) {
+				self::_exportChildren($child, $tiposGrandChildren, $use_id_string, $options);
+				$child->setParent(null);
+			}
+			$export->_children[$tipoChildren->id_tipo] = $children;
+		}
+		$export->setTipo(null);
 	}
 	
 	protected static function _prepareOptionsForIdString($options, $tipo) {
@@ -102,22 +107,27 @@ class Jp7_InterAdmin_Util {
 			$record->save();
 			
 			if ($import_children) {
-				foreach ($record->_children as $child_id_tipo => $tipo_children) {
-					$child_tipo = InterAdminTipo::getInstance($child_id_tipo);
-					
-					foreach ($tipo_children as $child) {
-						unset($child->id);
-												
-						$child->parent_id = $record->id;
-						$child->setTipo($child_tipo);
-						
-						if ($use_id_string || $bind_children) {
-							self::_importAttributeFromIdString($child, $bind_children);
-						}
-						
-						$child->save();
-					}
+				self::_importChildren($record, $use_id_string, $bind_children);
+			}
+		}
+	}
+	
+	public static function _importChildren($record, $use_id_string, $bind_children) {
+		foreach ($record->_children as $child_id_tipo => $tipo_children) {
+			$child_tipo = InterAdminTipo::getInstance($child_id_tipo);
+			
+			foreach ($tipo_children as $child) {
+				unset($child->id);
+				
+				$child->parent_id = $record->id;
+				$child->setTipo($child_tipo);
+				
+				if ($use_id_string || $bind_children) {
+					self::_importAttributeFromIdString($child, $bind_children);
 				}
+				
+				$child->save();
+				self::_importChildren($child, $use_id_string, $bind_children);
 			}
 		}
 	}
