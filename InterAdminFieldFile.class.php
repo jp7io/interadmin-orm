@@ -39,8 +39,13 @@ class InterAdminFieldFile {
 		return $this->url;
 	}
 	public function getAbsoluteUrl() {
-		global $config;
-		return jp7_replace_beginning('../../upload/', $config->url . 'upload/', $this->url);
+		global $config, $jp7_app;
+		
+		if ($jp7_app == 'intermail_new') {
+			return jp7_replace_beginning('../../upload/', 'http://' . $config->server->host . '/' . $config->name_id . '/' . $jp7_app . '/upload/', $this->url);
+		} else {
+			return jp7_replace_beginning('../../upload/', $config->url . 'upload/', $this->url);
+		}
 	}	
 	/**
 	 * Retorna texto para ser usado no "alt" ou "title" da imagem.
