@@ -52,7 +52,7 @@ class InlineStyle
     public function __construct($html = '')
     {
         if ($html) {
-            if (file_exists($html))
+            if (strlen($html) < 255 && file_exists($html))
                 $this->loadHTMLFile($html);
             else
                 $this->loadHTML($html);
