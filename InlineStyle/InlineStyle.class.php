@@ -134,11 +134,16 @@ class InlineStyle
             $style = $this->_styleToArray($style);
 
             foreach($nodes as $node) {
-                $current = $node->hasAttribute("style") ?
+            	$current = $node->hasAttribute("style") ?
                     $this->_styleToArray($node->getAttribute("style")) :
                     array();
-
-                $current = $this->_mergeStyles($current, $style);
+				
+                if ($node->hasAttribute('data-flag-css')) {
+                	$current = $this->_mergeStyles($current, $style);
+                } else {
+                	$current = $this->_mergeStylesInline($current, $style);
+                	$node->setAttribute('data-flag-css', 1);
+                }
                 $st = array();
 
                 foreach($current as $prop => $val) {
@@ -159,7 +164,7 @@ class InlineStyle
      */
     public function getHTML()
     {
-        return $this->_dom->saveHTML();
+        return str_replace(' data-flag-css="1"', '', $this->_dom->saveHTML());
     }
 
     /**
@@ -318,6 +323,19 @@ class InlineStyle
         }
 
         return $styleA;
+    }
+    
+    private function _mergeStylesInline(array $styleA, array $styleB)
+    {
+    	foreach($styleB as $prop => $val) {
+    		if(!isset($styleA[$prop])
+    		|| substr(str_replace(" ", "", strtolower($val)), -10) === "!important")
+    		{
+    			$styleA[$prop] = $val;
+    		}
+    	}
+    
+    	return $styleA;
     }
 
     private function _stripStylesheet($s)
