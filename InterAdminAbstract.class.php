@@ -364,17 +364,17 @@ abstract class InterAdminAbstract implements Serializable {
 			if ($use_published_filters) {
 				foreach ($options['from'] as $key => $from) {
 					list($table, $alias) = explode(' AS ', $from);
-					/*
-					if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
-						continue;
-					}*/
 					if ($alias == 'main') {
-						// @todo PHP 5.3, trocar $this por static
-						$filters = $this->getPublishedFilters($table, $alias);
+						if (!$options['skip_published_filters'] || !in_array('main', $options['skip_published_filters'])) {
+							// @todo PHP 5.3, trocar $this por static
+							$filters = $this->getPublishedFilters($table, 'main');
+						}						
 					} else {
-						$join = explode(' ON', $alias);
-						// @todo PHP 5.3, trocar $this por static
-						$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+						$joinArr = explode(' ON', $alias);
+						if (!$options['skip_published_filters'] || !in_array($joinArr[0], $options['skip_published_filters'])) {
+							// @todo PHP 5.3, trocar $this por static
+							$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . $this->getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
+						}
 					}
 				}
 			}
