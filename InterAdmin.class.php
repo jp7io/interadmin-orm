@@ -198,7 +198,23 @@ class InterAdmin extends InterAdminAbstract {
 			}
 		}
 		// Default error when method doesn´t exist
-		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $methodName . '()'));
+		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
+		$children = $this->getTipo()->getInterAdminsChildren();
+		$patterns = array(
+			'get{ChildName}',
+			'getFirst{ChildName}',
+			'get{ChildName}ById',
+			'get{ChildName}ByIdString',
+			'get{ChildName}Count',
+			'create{ChildName}',
+			'delete{ChildName}'				
+		);
+		foreach (array_keys($children) as $childName) {
+			foreach ($patterns as $pattern) {
+				$message .= "\t\t- " . str_replace('{ChildName}', $childName, $pattern) . "\n";
+			}
+		}
+		die(jp7_debug($message));
 	}
 	/**
 	 * Gets fields values by their alias.

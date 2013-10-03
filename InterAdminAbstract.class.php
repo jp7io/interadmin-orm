@@ -402,7 +402,15 @@ abstract class InterAdminAbstract implements Serializable {
 				$debugger->startTime();
 			}
 			// Run SQL
-			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+			$rs = $db->Execute($sql);
+			if (!$rs) {
+				$erro = $db->ErrorMsg();
+				if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
+					$erro .= ". Available fields: \n\t\t- " . implode("\n\t\t- ", array_keys($options['aliases']));
+				}			
+				die(jp7_debug($erro, $sql));
+			}
+		
 			if ($debugger) {
 				$debugger->getTime($options['debug']);
 			}
