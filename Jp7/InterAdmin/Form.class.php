@@ -22,7 +22,7 @@ class Jp7_InterAdmin_Form extends InterAdminField {
 		return InterAdminField::getForm($this->campos, $record);
 	}
 	
-	public function uploadFiles($record) {
+	public function uploadFiles($record, $key = 0) {
 		foreach ($this->campos as $campo) {
 			if ($campo['form'] && startsWith('file_', $campo['tipo'])) {
 				$nome_id = $campo['nome_id'];
@@ -32,7 +32,7 @@ class Jp7_InterAdmin_Form extends InterAdminField {
 				
 				$record->$nome_id = '';
 				// Irá procurar por , essa classe só funciona se o campo for array
-				if ($url_temp = $uploader->save(0, 'temp_')) {
+				if ($url_temp = $uploader->save($key, 'temp_')) {
 					// Cria um objeto InterAdminArquivo, necessário porque é essa classe que tem o método addToArquivosBanco
 					$imagem = $record->createArquivo();
 					$imagem->url = $url_temp;
