@@ -77,7 +77,7 @@
 	 	if (!self::$_enabled) {
 	 		return false;
 	 	}
-
+		
 	 	// Gera o id do cache
 	 	$id = $this->_makeId(func_get_args());
 
@@ -133,7 +133,7 @@
         if ($id === null) {
             Zend_Cache::throwException('use of end() without a start()');
         }
-        $this->save($data, $id, $tags, $specificLifetime, $priority);
+        if ($data) $this->save($data, $id, $tags, $specificLifetime, $priority); // Jp7
 		if ($echoData) {
 			echo $this->replacePlaceholders($data); // Jp7
         }
