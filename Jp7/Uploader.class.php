@@ -86,6 +86,19 @@ class Jp7_Uploader {	protected $fieldName;
 			// Copy
 			copy($tmp_name[$key], $finalDestination);
 		}
+		if (!is_file($finalDestination)) {
+			$msg = 'Impossível copiar arquivo "' . $tmp_name[$key] . '" para "' . $finalDestination . '".<br /> getcwd(): ' . getcwd();
+			if (!is_file($tmp_name[$key])) {
+				$msg .= '<br /> Arquivo ' . basename($tmp_name[$key]) . ' não existe.';
+			}
+			if (!is_dir(dirname($finalDestination))) {
+				$msg .= '<br /> Diretório ' . dirname($finalDestination) . ' não existe.';
+			} elseif (!is_writable(dirname($finalDestination))) {
+				$msg .= '<br /> Diretório ' . dirname($finalDestination) . ' não tem permissão de escrita.';
+			}
+			throw new Exception($msg);
+		}
+		
 		@chmod($finalDestination, 0777);
 		return $finalDestination;
 	}
