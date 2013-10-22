@@ -161,7 +161,17 @@ class InterAdminArquivo extends InterAdminAbstract {
 		
 		// Movendo arquivo temporário
 		if (!@rename($this->url, $newurl)) {
-			throw new Exception('Impossível renomear arquivo "' . $this->url . '" para "' . $newurl . '". getcwd(): ' . getcwd());
+			$msg = 'Impossível renomear arquivo "' . $this->url . '" para "' . $newurl . '".<br /> getcwd(): ' . getcwd();
+			if (!is_file($this->url)) {
+				$msg .= '<br /> Arquivo ' . basename($this->url) . ' não existe.';
+			}
+			if (!is_dir(dirname($this->url))) {
+				$msg .= '<br /> Diretório ' . dirname($this->url) . ' não existe.';
+			}
+			if (!is_dir(dirname($newurl))) {
+				$msg .= '<br /> Diretório ' . dirname($newurl) . ' não existe.';
+			}
+			throw new Exception($msg);
 		}
 		
 		$clientSideFolder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
