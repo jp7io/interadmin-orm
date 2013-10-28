@@ -344,7 +344,7 @@ class InlineStyle
         $s = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!','', $s);
         
         // strip keyframes rules
-        $s = preg_replace('/@[-|keyframes].*?\{.*?\}[ \r\n]*\}/s', '', $s);
+        //$s = preg_replace('/@[-|keyframes].*?\{.*?\}[ \r\n]*\}/s', '', $s);
 
         return $s;
     }
