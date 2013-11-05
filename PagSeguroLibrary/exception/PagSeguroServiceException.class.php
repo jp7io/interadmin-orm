@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -22,92 +21,129 @@
 /*
  * Represents a exception behavior
  * */
+/**
+ * Class PagSeguroServiceException
+ */
 class PagSeguroServiceException extends Exception
 {
 
-	private $httpStatus;
-	private $httpMessage;
-	private $errors = Array();
+    /**
+     * @var PagSeguroHttpStatus
+     */
+    private $httpStatus;
+    /**
+     * @var
+     */
+    private $httpMessage;
+    /**
+     * @var array
+     */
+    private $errors = array();
 
-	public function __construct(PagSeguroHttpStatus $httpStatus, Array $errors = null)
-	{
-		$this->httpStatus = $httpStatus;
-		if ($errors) {
-			$this->errors = $errors;
-		}
-		$this->message = $this->getFormatedMessage();
-	}
+    /**
+     * @param PagSeguroHttpStatus $httpStatus
+     * @param array $errors
+     */
+    public function __construct(PagSeguroHttpStatus $httpStatus, array $errors = null)
+    {
+        $this->httpStatus = $httpStatus;
+        if ($errors) {
+            $this->errors = $errors;
+        }
+        $this->httpMessage = $this->getFormattedMessage();
+    }
 
-	public function getErrors($errors)
-	{
-		return $this->errors;
-	}
-	public function setErrors(Array $errors)
-	{
-		$this->errors = errors;
-	}
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 
-	public function getHttpStatus()
-	{
-		return $this->httpStatus;
-	}
-	public function setHttpStatus(PagSeguroHttpStatus $httpStatus)
-	{
-		$this->httpStatus = $httpStatus;
-	}
+    /**
+     * @param array $errors
+     */
+    public function setErrors(array $errors)
+    {
+        $this->errors = $errors;
+    }
 
-	private function getHttpMessage()
-	{
-		switch ($this->httpStatus->getType()) {
+    /**
+     * @return PagSeguroHttpStatus
+     */
+    public function getHttpStatus()
+    {
+        return $this->httpStatus;
+    }
 
-			case 'BAD_REQUEST':
-				$message = "BAD_REQUEST";
-				break;
+    /**
+     * @param PagSeguroHttpStatus $httpStatus
+     */
+    public function setHttpStatus(PagSeguroHttpStatus $httpStatus)
+    {
+        $this->httpStatus = $httpStatus;
+    }
 
-			case 'UNAUTHORIZED':
-				$message = "UNAUTHORIZED";
-				break;
+    /**
+     * @return string
+     */
+    private function getHttpMessage()
+    {
+        switch ($this->httpStatus->getType()) {
 
-			case 'FORBIDDEN':
-				$message = "FORBIDDEN";
-				break;
+            case 'BAD_REQUEST':
+                $message = "BAD_REQUEST";
+                break;
 
-			case 'NOT_FOUND':
-				$message = "NOT_FOUND";
-				break;
+            case 'UNAUTHORIZED':
+                $message = "UNAUTHORIZED";
+                break;
 
-			case 'INTERNAL_SERVER_ERROR':
-				$message = "INTERNAL_SERVER_ERROR";
-				break;
+            case 'FORBIDDEN':
+                $message = "FORBIDDEN";
+                break;
 
-			case 'BAD_GATEWAY':
-				$message = "BAD_GATEWAY";
-				break;
+            case 'NOT_FOUND':
+                $message = "NOT_FOUND";
+                break;
 
-			default:
-				$message = "UNDEFINED";
-				break;
+            case 'INTERNAL_SERVER_ERROR':
+                $message = "INTERNAL_SERVER_ERROR";
+                break;
 
-		}
-		return $message;
-	}
+            case 'BAD_GATEWAY':
+                $message = "BAD_GATEWAY";
+                break;
 
-	public function getFormatedMessage()
-	{
-		$message = "";
-		$message .= "[HTTP " . $this->httpStatus->getStatus() . "] - " . $this->getHttpMessage() . "\n";
-		foreach ($this->errors as $key => $value) {
-			if ($value instanceof PagSeguroError) {
-				$message .= "[" . $value->getCode() . "] - " . $value->getMessage();
-			}
-		}
-		return $message;
-	}
+            default:
+                $message = "UNDEFINED";
+                break;
 
-	public function getOneLineMessage()
-	{
-		return str_replace("\n", " ", $this->getFormatedMessage());
-	}
+        }
+        return $message;
+    }
 
+    /**
+     * @return string
+     */
+    public function getFormattedMessage()
+    {
+        $message = "";
+        $message .= "[HTTP " . $this->httpStatus->getStatus() . "] - " . $this->getHttpMessage() . "\n";
+        foreach ($this->errors as $key => $value) {
+            if ($value instanceof PagSeguroError) {
+                $message .= "$key [" . $value->getCode() . "] - " . $value->getMessage();
+            }
+        }
+        return $message;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOneLineMessage()
+    {
+        return str_replace("\n", " ", $this->getFormattedMessage());
+    }
 }
-?>

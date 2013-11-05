@@ -1,6 +1,4 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,47 +25,45 @@
 class PagSeguroNotificationType
 {
 
-	private static $typeList = array(
-		'TRANSACTION'	 => 'transaction'
-	);
+    private static $typeList = array(
+        'TRANSACTION' => 'transaction'
+    );
 
-	private $value;
+    private $value;
 
-	public function __construct($value = null)
-	{
-		if ($value) {
-			$this->value = $value;
-		}
-	}
+    public function __construct($value = null)
+    {
+        if ($value) {
+            $this->value = $value;
+        }
+    }
 
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	public function setByType($type)
-	{
-		if (isset(self::$typeList[$type])) {
-			$this->value = self::$typeList[$type];
-		} else {
-			throw new Exception("undefined index $type");
-		}
-	}
+    public function setByType($type)
+    {
+        if (isset(self::$typeList[$type])) {
+            $this->value = self::$typeList[$type];
+        } else {
+            throw new Exception("undefined index $type");
+        }
+    }
 
-	public function getValue()
-	{
-		return $this->value;
-	}
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * @param value
-	 * @return the PagSeguroNotificationType corresponding to the informed value
-	 */
-	public function getTypeFromValue($value = null)
-	{
-		$value = ($value == null ? $this->value : $value);
-		return array_search($this->value, self::$typeList);
-	}
-
+    /**
+     * @param value
+     * @return the PagSeguroNotificationType corresponding to the informed value
+     */
+    public function getTypeFromValue($value = null)
+    {
+        $value = ($value == null ? $this->value : $value);
+        return array_search($this->value, self::$typeList);
+    }
 }
-?>

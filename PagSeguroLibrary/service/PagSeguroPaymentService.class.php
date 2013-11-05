@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,73 +24,102 @@
 class PagSeguroPaymentService
 {
 
-	const serviceName = 'paymentService';
+    /**
+     *
+     */
+    const SERVICE_NAME = 'paymentService';
 
-	private static function buildCheckoutRequestUrl(PagSeguroConnectionData $connectionData)
-	{
-		return $connectionData->getServiceUrl() . '/?' . $connectionData->getCredentialsUrlQuery();
-	}
+    /**
+     * @param PagSeguroConnectionData $connectionData
+     * @return string
+     */
+    private static function buildCheckoutRequestUrl(PagSeguroConnectionData $connectionData)
+    {
+        return $connectionData->getServiceUrl() . '/?' . $connectionData->getCredentialsUrlQuery();
+    }
 
-	private static function buildCheckoutUrl(PagSeguroConnectionData $connectionData, $code)
-	{
-		return $connectionData->getResource('checkoutUrl') . "?code=$code";
-	}
+    /**
+     * @param PagSeguroConnectionData $connectionData
+     * @param $code
+     * @return string
+     */
+    private static function buildCheckoutUrl(PagSeguroConnectionData $connectionData, $code)
+    {
+        return $connectionData->getResource('checkoutUrl') . "?code=$code";
+    }
 
-	// createCheckoutRequest is the actual implementation of the Register method
-	// This separation serves as test hook to validate the Uri
-	// against the code returned by the service
-	public static function createCheckoutRequest(PagSeguroCredentials $credentials, PagSeguroPaymentRequest $paymentRequest)
-	{
+    // createCheckoutRequest is the actual implementation of the Register method
+    // This separation serves as test hook to validate the Uri
+    // against the code returned by the service
+    /**
+     * @param PagSeguroCredentials $credentials
+     * @param PagSeguroPaymentRequest $paymentRequest
+     * @return bool|string
+     * @throws Exception|PagSeguroServiceException
+     * @throws Exception
+     */
+    public static function createCheckoutRequest(
+        PagSeguroCredentials $credentials,
+        PagSeguroPaymentRequest $paymentRequest
+    ) {
 
-		LogPagSeguro::info("PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - begin");
+        LogPagSeguro::info("PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - begin");
 
-		$connectionData = new PagSeguroConnectionData($credentials, self::serviceName);
+        $connectionData = new PagSeguroConnectionData($credentials, self::SERVICE_NAME);
 
-		try
-		{
+        try {
 
-			$connection = new PagSeguroHttpConnection();
-			$connection->post(self::buildCheckoutRequestUrl($connectionData), PagSeguroPaymentParser::getData($paymentRequest), $connectionData->getServiceTimeout(), $connectionData->getCharset());
+            $connection = new PagSeguroHttpConnection();
+            $connection->post(
+                self::buildCheckoutRequestUrl($connectionData),
+                PagSeguroPaymentParser::getData($paymentRequest),
+                $connectionData->getServiceTimeout(),
+                $connectionData->getCharset()
+            );
 
-			$httpStatus = new PagSeguroHttpStatus($connection->getStatus());
+            $httpStatus = new PagSeguroHttpStatus($connection->getStatus());
 
-			switch ($httpStatus->getType()) {
+            switch ($httpStatus->getType()) {
 
-				case 'OK':
-					$PaymentParserData = PagSeguroPaymentParser::readSuccessXml($connection->getResponse());
-					$paymentUrl = self::buildCheckoutUrl($connectionData, $PaymentParserData->getCode());
-					LogPagSeguro::info("PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - end {1}" . $PaymentParserData->getCode());
-					break;
+                case 'OK':
+                    $PaymentParserData = PagSeguroPaymentParser::readSuccessXml($connection->getResponse());
+                    $paymentUrl = self::buildCheckoutUrl($connectionData, $PaymentParserData->getCode());
+                    LogPagSeguro::info(
+                        "PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - end {1}" .
+                        $PaymentParserData->getCode()
+                    );
+                    break;
 
-				case 'BAD_REQUEST':
-					$errors = PagSeguroPaymentParser::readErrors($connection->getResponse());
-					$e = new PagSeguroServiceException($httpStatus, $errors);
-					LogPagSeguro::error("PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - error " . $e->getOneLineMessage());
-					throw $e;
-					break;
+                case 'BAD_REQUEST':
+                    $errors = PagSeguroPaymentParser::readErrors($connection->getResponse());
+                    $e = new PagSeguroServiceException($httpStatus, $errors);
+                    LogPagSeguro::error(
+                        "PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - error " .
+                        $e->getOneLineMessage()
+                    );
+                    throw $e;
+                    break;
 
-				default:
-					$e = new PagSeguroServiceException($httpStatus);
-					LogPagSeguro::error("PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - error " . $e->getOneLineMessage());
-					throw $e;
-					break;
+                default:
+                    $e = new PagSeguroServiceException($httpStatus);
+                    LogPagSeguro::error(
+                        "PagSeguroPaymentService.Register(" . $paymentRequest->toString() . ") - error " .
+                        $e->getOneLineMessage()
+                    );
+                    throw $e;
+                    break;
 
-			}
+            }
 
-			return (isset($paymentUrl) ? $paymentUrl : false);
+            return (isset($paymentUrl) ? $paymentUrl : false);
 
-		}
-		catch (PagSeguroServiceException $e)
-		{
-			throw $e;
-		}
-		catch (Exception $e)
-		{
-			LogPagSeguro::error("Exception: " . $e->getMessage());
-			throw $e;
-		}
+        } catch (PagSeguroServiceException $e) {
+            throw $e;
+        }
+        catch (Exception $e) {
+            LogPagSeguro::error("Exception: " . $e->getMessage());
+            throw $e;
+        }
 
-	}
-
+    }
 }
-?>

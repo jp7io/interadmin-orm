@@ -1,4 +1,5 @@
 <?php
+
 /*
  ************************************************************************
  Copyright [2013] [PagSeguro Internet Ltda.]
@@ -24,72 +25,74 @@
 class PagSeguroCurrencies
 {
 
-	/**
-	 * List of available currencies on PagSeguro Transactions
-	 * key = currency name
-	 * value = currency iso code 3
-	 * @var Array
-	 */
-	private static $currencies = array(
-		'REAL' => 'BRL');
+    /**
+     * List of available currencies on PagSeguro Transactions
+     * <code>
+     *      key = currency name
+     *      value = currency iso code 3
+     * </code>
+     * @var array
+     */
+    private static $currencies = array(
+        'REAL' => 'BRL'
+    );
 
-	/**
-	 * Check if currency is available by informed iso code for PagSeguro transactions
-	 * @param string $currency_iso_code
-	 * @return boolean
-	 */
-	public static function checkCurrencyAvailabilityByIsoCode($currency_iso_code)
-	{
-		$available = false;
-		if (array_search(strtoupper($currency_iso_code), self::$currencies)) {
-			$available = true;
-		}
-		return $available;
-	}
+    /**
+     * Check if currency is available by informed iso code for PagSeguro transactions
+     * @param string $currency_iso_code
+     * @return boolean
+     */
+    public static function checkCurrencyAvailabilityByIsoCode($currency_iso_code)
+    {
+        $available = false;
+        if (array_search(strtoupper($currency_iso_code), self::$currencies)) {
+            $available = true;
+        }
+        return $available;
+    }
 
-	/**
-	 * Check if currency is available by informed currency name for PagSeguro transactions
-	 * @param string $name
-	 * @return boolean
-	 */
-	public static function checkCurrencyAvailabilityByName($name)
-	{
-		$available = false;
-		if (array_key_exists(strtoupper($name), self::$currencies)) {
-			$available = true;
-		}
-		return $available;
-	}
+    /**
+     * Check if currency is available by informed currency name for PagSeguro transactions
+     * @param string $name
+     * @return boolean
+     */
+    public static function checkCurrencyAvailabilityByName($name)
+    {
+        $available = false;
+        if (array_key_exists(strtoupper($name), self::$currencies)) {
+            $available = true;
+        }
+        return $available;
+    }
 
-	/**
-	 * Return currencies list
-	 * @return Array
-	 */
-	public static function getCurrenciesList()
-	{
-		return self::$currencies;
-	}
+    /**
+     * Return currencies list
+     * @return array
+     */
+    public static function getCurrenciesList()
+    {
+        return self::$currencies;
+    }
 
-	/**
-	 * Return iso code by currency name
-	 * Default return BRL (Brazilian Real) iso code
-	 * @param string $name - the currency name
-	 * @return string
-	 */
-	public static function getIsoCodeByName($name)
-	{
-		$name = strtoupper($name);
-		return (isset(self::$currencies[$name])) ? self::$currencies[$name] : self::$currencies['REAL'];
-	}
+    /**
+     * Return iso code by currency name
+     * Default return BRL (Brazilian Real) iso code
+     * @param string $name - the currency name
+     * @return string
+     */
+    public static function getIsoCodeByName($name)
+    {
+        $name = strtoupper($name);
+        return (isset(self::$currencies[$name])) ? self::$currencies[$name] : self::$currencies['REAL'];
+    }
 
-	/**
-	 * Return currency name by iso code
-	 * @param type $iso_code
-	 * @return type
-	 */
-	public static function getCurrencyNameByIsoCode($iso_code)
-	{
-		return array_search(strtoupper($iso_code), self::getCurrenciesList());
-	}
+    /**
+     * Return currency name by iso code
+     * @param string $iso_code
+     * @return string
+     */
+    public static function getCurrencyNameByIsoCode($iso_code)
+    {
+        return array_search(strtoupper($iso_code), self::getCurrenciesList());
+    }
 }
-?>

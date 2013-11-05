@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,15 +24,13 @@
 abstract class PagSeguroCredentials
 {
 
-	/**
-	 * @return a map of name value pairs that compose this set of credentials
-	 */
-	abstract function getAttributesMap();
+    /**
+     * @return array a map of name value pairs that compose this set of credentials
+     */
+    abstract public function getAttributesMap();
 
-	/**
-	 * @return a string that represents the current object
-	 */
-	abstract function toString();
-
+    /**
+     * @return string a string that represents the current object
+     */
+    abstract public function toString();
 }
-?>

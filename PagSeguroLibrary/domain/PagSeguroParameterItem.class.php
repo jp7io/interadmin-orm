@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
 /*
  * ***********************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,96 +24,94 @@ if (!defined('PAGSEGURO_LIBRARY')) {
 class PagSeguroParameterItem
 {
 
-	/**
-	 * Allow add extra information to order
-	 *
-	 * @var string
-	 */
-	private $key;
+    /**
+     * Allow add extra information to order
+     *
+     * @var string
+     */
+    private $key;
 
-	/**
-	 * Value of corresponding key
-	 *
-	 * @var type
-	 */
-	private $value;
+    /**
+     * Value of corresponding key
+     *
+     * @var mixed
+     */
+    private $value;
 
-	/**
-	 * Used for grouping values of parameter items
-	 * @var type
-	 */
-	private $group;
+    /**
+     * Used for grouping values of parameter items
+     * @var mixed
+     */
+    private $group;
 
-	public function __construct($key, $value, $group = NULL)
-	{
-		if (isset($key) && !PagSeguroHelper::isEmpty($key)) {
-			$this->setKey($key);
-		}
-		if (isset($value) && !PagSeguroHelper::isEmpty($value)) {
-			$this->setValue($value);
-		}
-		if (isset($group) && !PagSeguroHelper::isEmpty($group)) {
-			$this->setGroup($group);
-		}
-	}
+    public function __construct($key, $value, $group = null)
+    {
+        if (isset($key) && !PagSeguroHelper::isEmpty($key)) {
+            $this->setKey($key);
+        }
+        if (isset($value) && !PagSeguroHelper::isEmpty($value)) {
+            $this->setValue($value);
+        }
+        if (isset($group) && !PagSeguroHelper::isEmpty($group)) {
+            $this->setGroup($group);
+        }
+    }
 
-	/**
-	 * Gets the parameter item key
-	 * @return string
-	 */
-	public function getKey()
-	{
-		return $this->key;
-	}
+    /**
+     * Gets the parameter item key
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
 
-	/**
-	 * Sets the parameter item key
-	 *
-	 * @param string $key
-	 */
-	public function setKey($key)
-	{
-		$this->key = $key;
-	}
+    /**
+     * Sets the parameter item key
+     *
+     * @param string $key
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+    }
 
-	/**
-	 * Gets parameter item value
-	 * @return string
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
+    /**
+     * Gets parameter item value
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * Sets parameter item value
-	 *
-	 * @param string $value
-	 */
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    /**
+     * Sets parameter item value
+     *
+     * @param string $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	/**
-	 * Gets parameter item group
-	 *
-	 * @return int
-	 */
-	public function getGroup()
-	{
-		return $this->group;
-	}
+    /**
+     * Gets parameter item group
+     *
+     * @return int
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
 
-	/**
-	 * Sets parameter item group
-	 *
-	 * @param int $group
-	 */
-	public function setGroup($group)
-	{
-		$this->group = (int) $group;
-	}
-
+    /**
+     * Sets parameter item group
+     *
+     * @param int $group
+     */
+    public function setGroup($group)
+    {
+        $this->group = (int) $group;
+    }
 }
-?>

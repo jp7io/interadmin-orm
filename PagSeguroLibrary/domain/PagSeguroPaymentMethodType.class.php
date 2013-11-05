@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('NOT ALLOWED');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,68 +24,65 @@
 class PagSeguroPaymentMethodType
 {
 
-	private static $typeList = array(
-		/** Credit card */
-		'CREDIT_CARD'		 => 1,
+    private static $typeList = array(
+        /** Credit card */
+        'CREDIT_CARD' => 1,
+        /** Boleto - is a form of invoicing in Brazil */
+        'BOLETO' => 2,
+        /** Online transfer */
+        'ONLINE_TRANSFER' => 3,
+        /** PagSeguro account balance */
+        'BALANCE' => 4,
+        /** OiPaggo */
+        'OI_PAGGO' => 5,
+        /** Direct deposit */
+        'DIRECT_DEPOSIT' => 7
+    );
 
-		/** Boleto - is a form of invoicing in Brazil */
-		'BOLETO'			 => 2,
+    /**
+     * Payment method type value
+     * Example: 1
+     * @var integer
+     */
+    private $value;
 
-		/** Online transfer */
-		'ONLINE_TRANSFER'	 => 3,
+    public function __construct($value = null)
+    {
+        if ($value) {
+            $this->value = $value;
+        }
+    }
 
-		/** PagSeguro account balance */
-		'BALANCE'			 => 4,
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-		/** OiPaggo */
-		'OI_PAGGO'			 => 5
-	);
+    public function setByType($type)
+    {
+        if (isset(self::$typeList[$type])) {
+            $this->value = self::$typeList[$type];
+        } else {
+            throw new Exception("undefined index $type");
+        }
+    }
 
-	/**
-	 * Payment method type value
-	 * Example: 1
-	 */
-	private $value;
+    /**
+     * @return integer payment method type value
+     * Example: 1
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	public function __construct($value = null)
-	{
-		if ($value) {
-			$this->value = $value;
-		}
-	}
-
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
-
-	public function setByType($type)
-	{
-		if (isset(self::$typeList[$type])) {
-			$this->value = self::$typeList[$type];
-		} else {
-			throw new Exception("undefined index $type");
-		}
-	}
-
-	/**
-	 * @return payment method type value
-	 * Example: 1
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
-
-	/**
-	 * @param value
-	 * @return the PagSeguroPaymentMethodType corresponding to the informed value
-	 */
-	public function getTypeFromValue($value = null)
-	{
-		$value = ($value == null ? $this->value : $value);
-		return array_search($this->value, self::$typeList);
-	}
-
+    /**
+     * @param value
+     * @return PagSeguroPaymentMethodType the corresponding to the informed value
+     */
+    public function getTypeFromValue($value = null)
+    {
+        $value = ($value == null ? $this->value : $value);
+        return array_search($this->value, self::$typeList);
+    }
 }
-?>

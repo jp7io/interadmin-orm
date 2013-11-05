@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
 /*
  * ***********************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,105 +24,109 @@ if (!defined('PAGSEGURO_LIBRARY')) {
 class PagSeguroHttpConnection
 {
 
-	private $status;
-	private $response;
+    private $status;
+    private $response;
+    
+    const LANG_DESC = 'language-engine-description: ';
 
-	public function __construct()
-	{
-		if (!function_exists('curl_init')) {
-			throw new Exception('PagSeguroLibrary: cURL library is required.');
-		}
-	}
+    public function __construct()
+    {
+        if (!function_exists('curl_init')) {
+            throw new Exception('PagSeguroLibrary: cURL library is required.');
+        }
+    }
 
-	public function getStatus()
-	{
-		return $this->status;
-	}
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
-	public function setStatus($status)
-	{
-		$this->status = $status;
-	}
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
 
-	public function getResponse()
-	{
-		return $this->response;
-	}
+    public function getResponse()
+    {
+        return $this->response;
+    }
 
-	public function setResponse($response)
-	{
-		$this->response = $response;
-	}
+    public function setResponse($response)
+    {
+        $this->response = $response;
+    }
 
-	public function post($url, Array $data, $timeout = 20, $charset = 'ISO-8859-1')
-	{
-		return $this->curlConnection('POST', $url, $data, $timeout, $charset);
-	}
+    public function post($url, array $data, $timeout = 20, $charset = 'ISO-8859-1')
+    {
+        return $this->curlConnection('POST', $url, $timeout, $charset, $data);
+    }
 
-	public function get($url, $timeout = 20, $charset = 'ISO-8859-1')
-	{
-		return $this->curlConnection('GET', $url, null, $timeout, $charset);
-	}
+    public function get($url, $timeout = 20, $charset = 'ISO-8859-1')
+    {
+        return $this->curlConnection('GET', $url, $timeout, $charset, null);
+    }
 
-	private function curlConnection($method = 'GET', $url, Array $data = null, $timeout, $charset)
-	{
+    private function curlConnection($method, $url, $timeout, $charset, array $data = null)
+    {
 
-		if (strtoupper($method) === 'POST') {
-			$postFields = ($data ? http_build_query($data, '', '&') : "");
-			$contentLength = "Content-length: " . strlen($postFields);
-			$methodOptions = Array(
-				CURLOPT_POST => true,
-				CURLOPT_POSTFIELDS => $postFields,
-			);
-		} else {
-			$contentLength = null;
-			$methodOptions = Array(
-				CURLOPT_HTTPGET => true
-			);
-		}
+        if (strtoupper($method) === 'POST') {
+            $postFields = ($data ? http_build_query($data, '', '&') : "");
+            $contentLength = "Content-length: " . strlen($postFields);
+            $methodOptions = array(
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $postFields,
+            );
+        } else {
+            $contentLength = null;
+            $methodOptions = array(
+                CURLOPT_HTTPGET => true
+            );
+        }
 
-		$options = Array(
-			CURLOPT_HTTPHEADER => Array(
-				"Content-Type: application/x-www-form-urlencoded; charset=" . $charset,
-				$contentLength,
-				'lib-description: ' . 'php' . ':' . PagSeguroLibrary::getVersion()
-			),
-			CURLOPT_URL => $url,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_HEADER => false,
-			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_CONNECTTIMEOUT => $timeout,
-			//CURLOPT_TIMEOUT => $timeout
-			);
+        $options = array(
+            CURLOPT_HTTPHEADER => array(
+                "Content-Type: application/x-www-form-urlencoded; charset=" . $charset,
+                $contentLength,
+                'lib-description: php:' . PagSeguroLibrary::getVersion()
+            ),
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CONNECTTIMEOUT => $timeout,
+            //CURLOPT_TIMEOUT => $timeout
+            );
 
-		// adding module version
-		if (!is_null(PagSeguroLibrary::getModuleVersion())) {
-			array_push($options[CURLOPT_HTTPHEADER], 'module-description: ' . PagSeguroLibrary::getModuleVersion());
-		}
+        // adding module version
+        if (!is_null(PagSeguroLibrary::getModuleVersion())) {
+            array_push($options[CURLOPT_HTTPHEADER], 'module-description: ' . PagSeguroLibrary::getModuleVersion());
+        }
 
-		// adding CMS version
-		if (!is_null(PagSeguroLibrary::getCMSVersion())) {
-			array_push($options[CURLOPT_HTTPHEADER], 'cms-description: ' . PagSeguroLibrary::getCMSVersion());
-		}
+        // adding CMS version
+        if (!is_null(PagSeguroLibrary::getCMSVersion())) {
+            array_push($options[CURLOPT_HTTPHEADER], 'cms-description: ' . PagSeguroLibrary::getCMSVersion());
+        }
+        
+        // adding PHP version
+        if (!is_null(PagSeguroLibrary::getPHPVersion())) {
+            array_push($options[CURLOPT_HTTPHEADER], self::LANG_DESC . PagSeguroLibrary::getPHPVersion());
+        }
 
-		$options = ($options + $methodOptions);
+        $options = ($options + $methodOptions);
 
-		$curl = curl_init();
-		curl_setopt_array($curl, $options);
-		$resp = curl_exec($curl);
-		$info = curl_getinfo($curl);
-		$error = curl_errno($curl);
-		$errorMessage = curl_error($curl);
-		curl_close($curl);
-		$this->setStatus((int) $info['http_code']);
-		$this->setResponse((String) $resp);
-		if ($error) {
-			throw new Exception("CURL can't connect: $errorMessage");
-			return false;
-		} else {
-			return true;
-		}
-	}
-
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
+        $resp = curl_exec($curl);
+        $info = curl_getinfo($curl);
+        $error = curl_errno($curl);
+        $errorMessage = curl_error($curl);
+        curl_close($curl);
+        $this->setStatus((int) $info['http_code']);
+        $this->setResponse((String) $resp);
+        if ($error) {
+            throw new Exception("CURL can't connect: $errorMessage");
+        } else {
+            return true;
+        }
+    }
 }
-?>

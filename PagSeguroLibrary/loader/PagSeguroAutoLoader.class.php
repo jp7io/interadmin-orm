@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,49 +24,47 @@
 class PagSeguroAutoloader
 {
 
-	public static $loader;
+    public static $loader;
 
-	private static $dirs = Array(
-		'config',
-		'resources',
-		'log',
-		'domain',
-		'exception',
-		'parser',
-		'service',
-		'utils',
-		'helper'
-	);
+    private static $dirs = array(
+        'config',
+        'resources',
+        'log',
+        'domain',
+        'exception',
+        'parser',
+        'service',
+        'utils',
+        'helper'
+    );
 
-	private function __construct()
-	{
-		if (function_exists('__autoload')) {
-			spl_autoload_register('__autoload');
-		}
-		spl_autoload_register(Array($this, 'addClass'));
-	}
+    private function __construct()
+    {
+        if (function_exists('__autoload')) {
+            spl_autoload_register('__autoload');
+        }
+        spl_autoload_register(array($this, 'addClass'));
+    }
 
-	public static function init()
-	{
-		if (!function_exists('spl_autoload_register')) {
-			throw new Exception("PagSeguroLibrary: Standard PHP Library (SPL) is required.");
-			return false;
-		}
-		if (self::$loader == null) {
-			self::$loader = new PagSeguroAutoloader();
-		}
-		return self::$loader;
-	}
+    public static function init()
+    {
+        if (!function_exists('spl_autoload_register')) {
+            throw new Exception("PagSeguroLibrary: Standard PHP Library (SPL) is required.");
+        }
+        if (self::$loader == null) {
+            self::$loader = new PagSeguroAutoloader();
+        }
+        return self::$loader;
+    }
 
-	private function addClass($class)
-	{
-		foreach (self::$dirs as $key => $dir) {
-			$file = PagSeguroLibrary::getPath() . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $class . '.class.php';
-			if (file_exists($file) && is_file($file)) {
-				require_once $file;
-			}
-		}
-	}
-
+    private function addClass($class)
+    {
+        foreach (self::$dirs as $key => $dir) {
+            $file = PagSeguroLibrary::getPath() . DIRECTORY_SEPARATOR .
+                $dir . DIRECTORY_SEPARATOR . $class . '.class.php';
+            if (file_exists($file) && is_file($file)) {
+                require_once $file;
+            }
+        }
+    }
 }
-?>

@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,56 +26,54 @@
 class PagSeguroTransactionType
 {
 
-	private static $typeList = array(
-		'PAYMENT'			 => 1,
-		'TRANSFER'			 => 2,
-		'FUND_ADDITION'		 => 3,
-		'WITHDRAW'			 => 4,
-		'CHARGE'			 => 5,
-		'DONATION'			 => 6,
-		'BONUS'				 => 7,
-		'BONUS_REPASS'		 => 8,
-		'OPERATIONAL'		 => 9,
-		'POLITICAL_DONATION' => 10
-	);
+    private static $typeList = array(
+        'PAYMENT' => 1,
+        'TRANSFER' => 2,
+        'FUND_ADDITION' => 3,
+        'WITHDRAW' => 4,
+        'CHARGE' => 5,
+        'DONATION' => 6,
+        'BONUS' => 7,
+        'BONUS_REPASS' => 8,
+        'OPERATIONAL' => 9,
+        'POLITICAL_DONATION' => 10
+    );
 
-	private $value;
+    private $value;
 
-	public function __construct($value = null)
-	{
-		if ($value) {
-			$this->value = $value;
-		}
-	}
+    public function __construct($value = null)
+    {
+        if ($value) {
+            $this->value = $value;
+        }
+    }
 
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	public function setByType($type)
-	{
-		if (isset(self::$typeList[$type])) {
-			$this->value = self::$typeList[$type];
-		} else {
-			throw new Exception("undefined index $type");
-		}
-	}
+    public function setByType($type)
+    {
+        if (isset(self::$typeList[$type])) {
+            $this->value = self::$typeList[$type];
+        } else {
+            throw new Exception("undefined index $type");
+        }
+    }
 
-	public function getValue()
-	{
-		return $this->value;
-	}
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * @param value
-	 * @return the transaction type corresponding to the informed type value value
-	 */
-	public function getTypeFromValue($value = null)
-	{
-		$value = ($value == null ? $this->value : $value);
-		return array_search($this->value, self::$typeList);
-	}
-
+    /**
+     * @param integer|string $value
+     * @return string|integer the transaction type corresponding to the informed type value value
+     */
+    public function getTypeFromValue($value = null)
+    {
+        $value = ($value == null ? $this->value : $value);
+        return array_search($value, self::$typeList);
+    }
 }
-?>

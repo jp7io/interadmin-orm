@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,283 +24,281 @@
 class PagSeguroTransactionSummary
 {
 
-	/**
-	 * Transaction date
-	 */
-	private $date;
+    /**
+     * Transaction date
+     */
+    private $date;
 
-	/**
-	 * Last event date
-	 * Date the last notification about this transaction was sent
-	 */
-	private $lastEventDate;
+    /**
+     * Last event date
+     * Date the last notification about this transaction was sent
+     */
+    private $lastEventDate;
 
-	/**
-	 * Transaction code
-	 */
-	private $code;
+    /**
+     * Transaction code
+     */
+    private $code;
 
-	/**
-	 *  Reference code
-	 *  You can use the reference code to store an identifier so you can
-	 *  associate the PagSeguro transaction to a transaction in your system.
-	 */
-	private $reference;
+    /**
+     *  Reference code
+     *  You can use the reference code to store an identifier so you can
+     *  associate the PagSeguro transaction to a transaction in your system.
+     */
+    private $reference;
 
-	/**
-	 * Groos amount of the transaction
-	 */
-	private $grossAmount;
+    /**
+     * Groos amount of the transaction
+     */
+    private $grossAmount;
 
-	/**
-	 * Transaction type
-	 * @see PagSeguroTransactionType
-	 */
-	private $type;
+    /**
+     * Transaction type
+     * @see PagSeguroTransactionType
+     */
+    private $type;
 
-	/**
-	 * Transaction status
-	 * @see PagSeguroTransactionStatus
-	 */
-	private $status;
+    /**
+     * Transaction status
+     * @see PagSeguroTransactionStatus
+     */
+    private $status;
 
-	/**
-	 * Net amount
-	 */
-	private $netAmount;
+    /**
+     * Net amount
+     */
+    private $netAmount;
 
-	/**
-	 * Discount amount
-	 */
-	private $discountAmount;
+    /**
+     * Discount amount
+     */
+    private $discountAmount;
 
-	/**
-	 * Fee amount
-	 */
-	private $feeAmount;
+    /**
+     * Fee amount
+     */
+    private $feeAmount;
 
-	/**
-	 * Extra amount
-	 */
-	private $extraAmount;
+    /**
+     * Extra amount
+     */
+    private $extraAmount;
 
-	/**
-	 * Payment method
-	 * @see PagSeguroPaymentMethod
-	 */
-	private $paymentMethod;
+    /**
+     * Payment method
+     * @see PagSeguroPaymentMethod
+     */
+    private $paymentMethod;
 
-	/**
-	 * @return the transaction date
-	 */
-	public function getDate()
-	{
-		return $this->date;
-	}
+    /**
+     * @return the transaction date
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
 
-	/**
-	 * Sets the transaction date
-	 * @param String $date
-	 */
-	public function setDate($date)
-	{
-		$this->date = $date;
-	}
+    /**
+     * Sets the transaction date
+     * @param String $date
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
 
-	/**
-	 * @return the transaction code
-	 */
-	public function getCode()
-	{
-		return $this->code;
-	}
+    /**
+     * @return the transaction code
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-	/**
-	 * Sets transaction code
-	 * @param String $code
-	 */
-	public function setCode($code)
-	{
-		$this->code = $code;
-	}
+    /**
+     * Sets transaction code
+     * @param String $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
 
-	/**
-	 * You can use the reference code to store an identifier so you can
-	 *  associate the PagSeguro transaction to a transaction in your system.
-	 *
-	 * @return the reference code
-	 */
-	public function getReference()
-	{
-		return $this->reference;
-	}
+    /**
+     * You can use the reference code to store an identifier so you can
+     *  associate the PagSeguro transaction to a transaction in your system.
+     *
+     * @return the reference code
+     */
+    public function getReference()
+    {
+        return $this->reference;
+    }
 
-	/**
-	 * Sets the reference code
-	 *
-	 * @param reference
-	 */
-	public function setReference($reference)
-	{
-		$this->reference = $reference;
-	}
+    /**
+     * Sets the reference code
+     *
+     * @param reference
+     */
+    public function setReference($reference)
+    {
+        $this->reference = $reference;
+    }
 
-	/**
-	 * @return the transaction gross amount
-	 */
-	public function getGrossAmount()
-	{
-		return $this->grossAmount;
-	}
+    /**
+     * @return the transaction gross amount
+     */
+    public function getGrossAmount()
+    {
+        return $this->grossAmount;
+    }
 
-	/**
-	 * Sets the gorss amount
-	 * @param float $grossAmount
-	 */
-	public function setGrossAmount($grossAmount)
-	{
-		$this->grossAmount = $grossAmount;
-	}
+    /**
+     * Sets the gorss amount
+     * @param float $grossAmount
+     */
+    public function setGrossAmount($grossAmount)
+    {
+        $this->grossAmount = $grossAmount;
+    }
 
-	/**
-	 * @return the transaction type
-	 * @see PagSeguroTransactionType
-	 */
-	public function getType()
-	{
-		return $this->type;
-	}
+    /**
+     * @return the transaction type
+     * @see PagSeguroTransactionType
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	/**
-	 * Sets the transaction sype
-	 * @param PagSeguroTransactionType $type
-	 */
-	public function setType(PagSeguroTransactionType $type)
-	{
-		$this->type = $type;
-	}
+    /**
+     * Sets the transaction sype
+     * @param PagSeguroTransactionType $type
+     */
+    public function setType(PagSeguroTransactionType $type)
+    {
+        $this->type = $type;
+    }
 
-	/**
-	 * Date the last notification about this transaction was sent
-	 * @return the last event date
-	 */
-	public function getLastEventDate()
-	{
-		return $this->lastEventDate;
-	}
+    /**
+     * Date the last notification about this transaction was sent
+     * @return the last event date
+     */
+    public function getLastEventDate()
+    {
+        return $this->lastEventDate;
+    }
 
-	/**
-	 * Sets the last event date
-	 * @param String $lastEventDate
-	 */
-	public function setLastEventDate($lastEventDate)
-	{
-		$this->lastEventDate = $lastEventDate;
-	}
+    /**
+     * Sets the last event date
+     * @param String $lastEventDate
+     */
+    public function setLastEventDate($lastEventDate)
+    {
+        $this->lastEventDate = $lastEventDate;
+    }
 
-	/**
-	 * @return the transaction status
-	 * @see PagSeguroTransactionStatus
-	 */
-	public function getStatus()
-	{
-		return $this->status;
-	}
+    /**
+     * @return the transaction status
+     * @see PagSeguroTransactionStatus
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
-	/**
-	 * Sets the transaction status
-	 * @param PagSeguroTransactionStatus $status
-	 */
-	public function setStatus(PagSeguroTransactionStatus $status)
-	{
-		$this->status = $status;
-	}
+    /**
+     * Sets the transaction status
+     * @param PagSeguroTransactionStatus $status
+     */
+    public function setStatus(PagSeguroTransactionStatus $status)
+    {
+        $this->status = $status;
+    }
 
-	/**
-	 * @return the net amount
-	 */
-	public function getNetAmount()
-	{
-		return $this->netAmount;
-	}
+    /**
+     * @return the net amount
+     */
+    public function getNetAmount()
+    {
+        return $this->netAmount;
+    }
 
-	/**
-	 * Sets the net amount
-	 * @param float $netAmount
-	 */
-	public function setNetAmount($netAmount)
-	{
-		$this->netAmount = $netAmount;
-	}
+    /**
+     * Sets the net amount
+     * @param float $netAmount
+     */
+    public function setNetAmount($netAmount)
+    {
+        $this->netAmount = $netAmount;
+    }
 
-	/**
-	 * @return the discount amount
-	 */
-	public function getDiscountAmount()
-	{
-		return $this->discountAmount;
-	}
+    /**
+     * @return the discount amount
+     */
+    public function getDiscountAmount()
+    {
+        return $this->discountAmount;
+    }
 
-	/**
-	 * Sets the discount amount
-	 * @param float $discountAmount
-	 */
-	public function setDiscountAmount($discountAmount)
-	{
-		$this->discountAmount = $discountAmount;
-	}
+    /**
+     * Sets the discount amount
+     * @param float $discountAmount
+     */
+    public function setDiscountAmount($discountAmount)
+    {
+        $this->discountAmount = $discountAmount;
+    }
 
-	/**
-	 * @return the fee amount
-	 */
-	public function getFeeAmount()
-	{
-		return $this->feeAmount;
-	}
+    /**
+     * @return the fee amount
+     */
+    public function getFeeAmount()
+    {
+        return $this->feeAmount;
+    }
 
-	/**
-	 * Sets the fee amount
-	 * @param float $feeAmount
-	 */
-	public function setFeeAmount($feeAmount)
-	{
-		$this->feeAmount = $feeAmount;
-	}
+    /**
+     * Sets the fee amount
+     * @param float $feeAmount
+     */
+    public function setFeeAmount($feeAmount)
+    {
+        $this->feeAmount = $feeAmount;
+    }
 
-	/**
-	 * @return the extra amount
-	 */
-	public function getExtraAmount()
-	{
-		return $this->extraAmount;
-	}
+    /**
+     * @return the extra amount
+     */
+    public function getExtraAmount()
+    {
+        return $this->extraAmount;
+    }
 
-	/**
-	 * Sets the extra amount
-	 * @param float $extraAmount
-	 */
-	public function setExtraAmount($extraAmount)
-	{
-		$this->extraAmount = $extraAmount;
-	}
+    /**
+     * Sets the extra amount
+     * @param float $extraAmount
+     */
+    public function setExtraAmount($extraAmount)
+    {
+        $this->extraAmount = $extraAmount;
+    }
 
-	/**
-	 * Sets the payment method
-	 * @param PagSeguroPaymentMethod $paymentMethod
-	 */
-	public function setPaymentMethod(PagSeguroPaymentMethod $paymentMethod)
-	{
-		$this->paymentMethod = $paymentMethod;
-	}
+    /**
+     * Sets the payment method
+     * @param PagSeguroPaymentMethod $paymentMethod
+     */
+    public function setPaymentMethod(PagSeguroPaymentMethod $paymentMethod)
+    {
+        $this->paymentMethod = $paymentMethod;
+    }
 
-	/**
-	 * @return the payment method
-	 * @see PagSeguroPaymentMethod
-	 */
-	public function getPaymentMethod()
-	{
-		return $this->paymentMethod;
-	}
-
+    /**
+     * @return the payment method
+     * @see PagSeguroPaymentMethod
+     */
+    public function getPaymentMethod()
+    {
+        return $this->paymentMethod;
+    }
 }
-?>

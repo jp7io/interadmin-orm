@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
 /*
  * ***********************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,147 +24,149 @@ if (!defined('PAGSEGURO_LIBRARY')) {
 class PagSeguroSender
 {
 
-	/** Sender name */
-	private $name;
+    /** Sender name */
+    private $name;
 
-	/** Sender email */
-	private $email;
+    /** Sender email */
+    private $email;
 
-	/** Sender phone */
-	private $phone;
+    /** Sender phone */
+    private $phone;
 
-	/** Sender documents */
-	private $documents;
+    /** Sender documents */
+    private $documents;
 
-	/**
-	 * Initializes a new instance of the Sender class
-	 *
-	 * @param array $data
-	 */
-	public function __construct(Array $data = null)
-	{
-		if ($data) {
-			if (isset($data['name'])) {
-				$this->name = $data['name'];
-			}
-			if (isset($data['email'])) {
-				$this->email = $data['email'];
-			}
-			if (isset($data['phone']) && $data['phone'] instanceof PagSeguroPhone) {
-				$this->phone = $data['phone'];
-			} else
-				if (isset($data['areaCode']) && isset($data['number'])) {
-					$phone = new PagSeguroPhone($data['areaCode'], $data['number']);
-					$this->phone = $phone;
-				}
-			if (isset($data['documents']) && is_array($data['documents'])) {
-				$this->setDocuments($data['documents']);
-			}
-		}
-	}
+    /**
+     * Initializes a new instance of the Sender class
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = null)
+    {
+        if ($data) {
+            if (isset($data['name'])) {
+                $this->name = $data['name'];
+            }
+            if (isset($data['email'])) {
+                $this->email = $data['email'];
+            }
+            if (isset($data['phone']) && $data['phone'] instanceof PagSeguroPhone) {
+                $this->phone = $data['phone'];
+            } else {
+                if (isset($data['areaCode']) && isset($data['number'])) {
+                    $phone = new PagSeguroPhone($data['areaCode'], $data['number']);
+                    $this->phone = $phone;
+                }
+            }
+            if (isset($data['documents']) && is_array($data['documents'])) {
+                $this->setDocuments($data['documents']);
+            }
+        }
+    }
 
-	/**
-	 * Sets the sender name
-	 * @param String $name
-	 */
-	public function setName($name)
-	{
-		$this->name = PagSeguroHelper::formatString($name, 50, '');
-	}
+    /**
+     * Sets the sender name
+     * @param String $name
+     */
+    public function setName($name)
+    {
+        $this->name = PagSeguroHelper::formatString($name, 50, '');
+    }
 
-	/**
-	 * @return the sender name
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
+    /**
+     * @return String the sender name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * Sets the Sender e-mail
-	 * @param email
-	 */
-	public function setEmail($email)
-	{
-		$this->email = $email;
-	}
+    /**
+     * Sets the Sender e-mail
+     * @param email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
 
-	/**
-	 * @return the sender e-mail
-	 */
-	public function getEmail()
-	{
-		return $this->email;
-	}
+    /**
+     * @return String the sender e-mail
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
 
-	/**
-	 * Sets the sender phone
-	 * @param String $areaCode
-	 * @param String $number
-	 */
-	public function setPhone($areaCode, $number = null)
-	{
-		$param = $areaCode;
-		if ($param instanceof PagSeguroPhone) {
-			$this->phone = $param;
-		} elseif ($number) {
-			$phone = new PagSeguroPhone();
-			$phone->setAreaCode($areaCode);
-			$phone->setNumber($number);
-			$this->phone = $phone;
-		}
-	}
+    /**
+     * Sets the sender phone
+     * @param String $areaCode
+     * @param String $number
+     */
+    public function setPhone($areaCode, $number = null)
+    {
+        $param = $areaCode;
+        if ($param instanceof PagSeguroPhone) {
+            $this->phone = $param;
+        } elseif ($number) {
+            $phone = new PagSeguroPhone();
+            $phone->setAreaCode($areaCode);
+            $phone->setNumber($number);
+            $this->phone = $phone;
+        }
+    }
 
-	/**
-	 * @return the sender phone
-	 * @see PagSeguroPhone
-	 */
-	public function getPhone()
-	{
-		return $this->phone;
-	}
+    /**
+     * @return PagSeguroPhone the sender phone
+     * @see PagSeguroPhone
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
 
-	/**
-	 * Get Sender documents
-	 * @return List of PagSeguroDocument
-	 * @see PagSeguroDocument
-	 */
-	public function getDocuments()
-	{
-		return $this->documents;
-	}
+    /**
+     * Get Sender documents
+     * @return array PagSeguroDocument List of PagSeguroDocument
+     * @see PagSeguroDocument
+     */
+    public function getDocuments()
+    {
+        return $this->documents;
+    }
 
-	/**
-	 * Set PagSeguro documents
-	 * @param array $documents
-	 * @see PagSeguroDocument
-	 */
-	public function setDocuments(Array $documents)
-	{
-		if (count($documents) > 0) {
-			foreach ($documents as $document) {
-				if ($document instanceof PagSeguroSenderDocument)
-					$this->documents[] = $document;
-				else
-					if (is_array($document))
-						$this->addDocument($document['type'], $document['value']);
-			}
-		}
-	}
+    /**
+     * Set PagSeguro documents
+     * @param array $documents
+     * @see PagSeguroDocument
+     */
+    public function setDocuments(array $documents)
+    {
+        if (count($documents) > 0) {
+            foreach ($documents as $document) {
+                if ($document instanceof PagSeguroSenderDocument) {
+                    $this->documents[] = $document;
+                } else {
+                    if (is_array($document)) {
+                        $this->addDocument($document['type'], $document['value']);
+                    }
+                }
+            }
+        }
+    }
 
-	/**
-	 * Add a document for Sender object
-	 * @param type $type
-	 * @param type $value
-	 */
-	public function addDocument($type, $value)
-	{
-		if ($type && $value) {
-			if (count($this->documents) == 0) {
-				$document = new PagSeguroSenderDocument($type, $value);
-				$this->documents[] = $document;
-			}
-		}
-	}
+    /**
+     * Add a document for Sender object
+     * @param String $type
+     * @param String $value
+     */
+    public function addDocument($type, $value)
+    {
+        if ($type && $value) {
+            if (count($this->documents) == 0) {
+                $document = new PagSeguroSenderDocument($type, $value);
+                $this->documents[] = $document;
+            }
+        }
+    }
 }
-?>

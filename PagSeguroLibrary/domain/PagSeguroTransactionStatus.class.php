@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,69 +26,81 @@
 class PagSeguroTransactionStatus
 {
 
-	private static $statusList = array(
-		'INITIATED'			 => 0,
-		'WAITING_PAYMENT'	 => 1,
-		'IN_ANALYSIS'		 => 2,
-		'PAID'				 => 3,
-		'AVAILABLE'			 => 4,
-		'IN_DISPUTE'		 => 5,
-		'REFUNDED'			 => 6,
-		'CANCELLED'			 => 7
-	);
+    /**
+     * @var array
+     */
+    private static $statusList = array(
+        'INITIATED' => 0,
+        'WAITING_PAYMENT' => 1,
+        'IN_ANALYSIS' => 2,
+        'PAID' => 3,
+        'AVAILABLE' => 4,
+        'IN_DISPUTE' => 5,
+        'REFUNDED' => 6,
+        'CANCELLED' => 7
+    );
 
-	/**
-	 * the value of the transaction status
-	 * Example: 3
-	 */
-	private $value;
+    /**
+     * the value of the transaction status
+     * Example: 3
+     */
+    private $value;
 
-	public function __construct($value = null)
-	{
-		if ($value) {
-			$this->value = $value;
-		}
-	}
+    /**
+     * @param null $value
+     */
+    public function __construct($value = null)
+    {
+        if ($value) {
+            $this->value = $value;
+        }
+    }
 
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    /**
+     * @param $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	public function setByType($type)
-	{
-		if (isset(self::$statusList[$type])) {
-			$this->value = self::$statusList[$type];
-		} else {
-			throw new Exception("undefined index $type");
-		}
-	}
+    /**
+     * @param $type
+     * @throws Exception
+     */
+    public function setByType($type)
+    {
+        if (isset(self::$statusList[$type])) {
+            $this->value = self::$statusList[$type];
+        } else {
+            throw new Exception("undefined index $type");
+        }
+    }
 
-	/**
-	 * @return the status value.
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
+    /**
+     * @return integer the status value.
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * @param value
-	 * @return the transaction status corresponding to the informed status value
-	 */
-	public function getTypeFromValue($value = null)
-	{
-		$value = ($value == null ? $this->value : $value);
-		return array_search($this->value, self::$statusList);
-	}
+    /**
+     * @param value
+     * @return String the transaction status corresponding to the informed status value
+     */
+    public function getTypeFromValue($value = null)
+    {
+        $value = ($value == null ? $this->value : $value);
+        return array_search($this->value, self::$statusList);
+    }
 
-	/**
-	 * Get status list
-	 * @return array
-	 */
-	public static function getStatusList()
-	{
-		return self::$statusList;
-	}
+    /**
+     * Get status list
+     * @return array
+     */
+    public static function getStatusList()
+    {
+        return self::$statusList;
+    }
 }
-?>

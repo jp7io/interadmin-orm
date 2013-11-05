@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,92 +24,93 @@
 class PagSeguroShipping
 {
 
-	/**
-	 * Shipping address
-	 * @see PagSeguroAddress
-	 */
-	private $address;
+    /**
+     * Shipping address
+     * @see PagSeguroAddress
+     */
+    private $address;
 
-	/**
-	 * Shipping type. See the PagSeguroShippingType class for a list of known shipping types.
-	 * @see PagSeguroShippingType
-	 */
-	private $type;
+    /**
+     * Shipping type. See the PagSeguroShippingType class for a list of known shipping types.
+     * @see PagSeguroShippingType
+     */
+    private $type;
 
-	/**
-	 * shipping cost.
-	 */
-	private $cost;
+    /**
+     * shipping cost.
+     */
+    private $cost;
 
-	/**
-	 * Initializes a new instance of the PagSeguroShipping class
-	 * @param array $data
-	 */
-	public function __construct(Array $data = null)
-	{
-		if ($data) {
-			if (isset($data['address']) && $data['address'] instanceof PagSeguroAddress) {
-				$this->address = $data['address'];
-			}
-			if (isset($data['type']) && $data['type'] instanceof PagSeguroShippingType) {
-				$this->type = $data['type'];
-			}
-			if (isset($data['cost'])) {
-				$this->cost = $data['cost'];
-			}
-		}
-	}
+    /**
+     * Initializes a new instance of the PagSeguroShipping class
+     * @param array $data
+     */
+    public function __construct(array $data = null)
+    {
+        if ($data) {
+            if (isset($data['address']) && $data['address'] instanceof PagSeguroAddress) {
+                $this->address = $data['address'];
+            }
+            if (isset($data['type']) && $data['type'] instanceof PagSeguroShippingType) {
+                $this->type = $data['type'];
+            }
+            if (isset($data['cost'])) {
+                $this->cost = $data['cost'];
+            }
+        }
+    }
 
-	/**
-	 * Sets the shipping address
-	 * @see PagSeguroAddress
-	 * @param PagSeguroAddress $address
-	 */
-	public function setAddress(PagSeguroAddress $address)
-	{
-		$this->address = $address;
-	}
+    /**
+     * Sets the shipping address
+     * @see PagSeguroAddress
+     * @param PagSeguroAddress $address
+     */
+    public function setAddress(PagSeguroAddress $address)
+    {
+        $this->address = $address;
+    }
 
-	/**
-	 * @return the shipping Address
-	 * @see PagSeguroAddress
-	 */
-	public function getAddress()
-	{
-		return $this->address;
-	}
+    /**
+     * @return PagSeguroAddress the shipping Address
+     * @see PagSeguroAddress
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
 
-	/**
-	 * Sets the shipping type
-	 * @param PagSeguroShippingType $type
-	 * @see PagSeguroShippingType
-	 */
-	public function setType(PagSeguroShippingType $type)
-	{
-		$this->type = $type;
-	}
+    /**
+     * Sets the shipping type
+     * @param PagSeguroShippingType $type
+     * @see PagSeguroShippingType
+     */
+    public function setType(PagSeguroShippingType $type)
+    {
+        $this->type = $type;
+    }
 
-	/**
-	 * @return the shipping type
-	 * @see PagSeguroShippingType
-	 */
-	public function getType()
-	{
-		return $this->type;
-	}
+    /**
+     * @return PagSeguroShippingType the shipping type
+     * @see PagSeguroShippingType
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	public function setCost($cost)
-	{
-		$this->cost = $cost;
-	}
+    /**
+     * @param $cost float
+     */
+    public function setCost($cost)
+    {
+        $this->cost = $cost;
+    }
 
-	/**
-	 * @return the shipping cost
-	 */
-	public function getCost()
-	{
-		return $this->cost;
-	}
-
+    /**
+     * @return float the shipping cost
+     */
+    public function getCost()
+    {
+        return $this->cost;
+    }
 }
-?>

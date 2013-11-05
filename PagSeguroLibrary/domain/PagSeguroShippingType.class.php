@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -27,80 +26,91 @@
 class PagSeguroShippingType
 {
 
-	private static $typeList = array(
-		'PAC'			 => 1,
-		'SEDEX'			 => 2,
-		'NOT_SPECIFIED'	 => 3
-	);
+    /**
+     * @var array
+     */
+    private static $typeList = array(
+        'PAC' => 1,
+        'SEDEX' => 2,
+        'NOT_SPECIFIED' => 3
+    );
 
-	/**
-	 * the shipping type value
-	 * Example: 1
-	 */
-	private $value;
+    /**
+     * the shipping type value
+     * Example: 1
+     */
+    private $value;
 
-	public function __construct($value = null)
-	{
-		if ($value) {
-			$this->value = $value;
-		}
-	}
+    /**
+     * @param null $value
+     */
+    public function __construct($value = null)
+    {
+        if ($value) {
+            $this->value = $value;
+        }
+    }
 
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    /**
+     * @param $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	public function setByType($type)
-	{
-		if (isset(self::$typeList[$type])) {
-			$this->value = self::$typeList[$type];
-		} else {
-			throw new Exception("undefined index $type");
-		}
-	}
+    /**
+     * @param $type
+     * @throws Exception
+     */
+    public function setByType($type)
+    {
+        if (isset(self::$typeList[$type])) {
+            $this->value = self::$typeList[$type];
+        } else {
+            throw new Exception("undefined index $type");
+        }
+    }
 
-	/**
-	 * @return the value of the shipping type
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
+    /**
+     * @return int the value of the shipping type
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * @param value
-	 * @return the PagSeguroShippingType corresponding to the informed value
-	 */
-	public function getTypeFromValue($value = null)
-	{
-		$value = ($value === null ? $this->value : $value);
-		return array_search($value, self::$typeList);
-	}
+    /**
+     * @param value
+     * @return PagSeguroShippingType the PagSeguroShippingType corresponding to the informed value
+     */
+    public function getTypeFromValue($value = null)
+    {
+        $value = ($value === null ? $this->value : $value);
+        return array_search($value, self::$typeList);
+    }
 
-	/**
-	 * @param type
-	 * @return the code corresponding to the informed shipping type
-	 */
-	public static function getCodeByType($type)
-	{
-		if (isset(self::$typeList[$type])) {
-			return self::$typeList[$type];
-		} else {
-			return false;
-		}
-	}
+    /**
+     * @param string
+     * @return integer the code corresponding to the informed shipping type
+     */
+    public static function getCodeByType($type)
+    {
+        if (isset(self::$typeList[$type])) {
+            return self::$typeList[$type];
+        } else {
+            return false;
+        }
+    }
 
-	/**
-	 * @param type
-	 * @return a PagSeguroShippingType object corresponding to the informed type
-	 */
-	public static function createByType($type)
-	{
-		$ShippingType = new PagSeguroShippingType();
-		$ShippingType->setByType($type);
-		return $ShippingType;
-	}
-
+    /**
+     * @param string $type
+     * @return PagSeguroShippingType a PagSeguroShippingType object corresponding to the informed type
+     */
+    public static function createByType($type)
+    {
+        $ShippingType = new PagSeguroShippingType();
+        $ShippingType->setByType($type);
+        return $ShippingType;
+    }
 }
-?>

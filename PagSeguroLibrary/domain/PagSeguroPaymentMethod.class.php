@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -26,73 +25,71 @@
 class PagSeguroPaymentMethod
 {
 
-	/**
-	 * Payment method type
-	 */
-	private $type;
+    /**
+     * Payment method type
+     */
+    private $type;
 
-	/**
-	 * Payment method code
-	 */
-	private $code;
+    /**
+     * Payment method code
+     */
+    private $code;
 
-	/**
-	 * Initializes a new instance of the PaymentMethod class
-	 *
-	 * @param PagSeguroPaymentMethodType $type
-	 * @param PagSeguroPaymentMethodCode $code
-	 */
-	public function __construct($type = null, $code = null)
-	{
-		if ($type) {
-			$this->setType($type);
-		}
-		if ($code) {
-			$this->setCode($code);
-		}
-	}
+    /**
+     * Initializes a new instance of the PaymentMethod class
+     *
+     * @param PagSeguroPaymentMethodType $type
+     * @param PagSeguroPaymentMethodCode $code
+     */
+    public function __construct($type = null, $code = null)
+    {
+        if ($type) {
+            $this->setType($type);
+        }
+        if ($code) {
+            $this->setCode($code);
+        }
+    }
 
-	/**
-	 * @return the payment method type
-	 */
-	public function getType()
-	{
-		return $this->type;
-	}
+    /**
+     * @return the payment method type
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	/**
-	 * Sets the payment method type
-	 * @param PagSeguroPaymentMethodType $type
-	 */
-	public function setType($type)
-	{
-		if ($type instanceof PagSeguroPaymentMethodType) {
-			$this->type = $type;
-		} else {
-			$this->type = new PagSeguroPaymentMethodType($type);
-		}
-	}
+    /**
+     * Sets the payment method type
+     * @param PagSeguroPaymentMethodType $type
+     */
+    public function setType($type)
+    {
+        if ($type instanceof PagSeguroPaymentMethodType) {
+            $this->type = $type;
+        } else {
+            $this->type = new PagSeguroPaymentMethodType($type);
+        }
+    }
 
-	/**
-	 * @return the code
-	 */
-	public function getCode()
-	{
-		return $this->code;
-	}
+    /**
+     * @return the code
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-	/**
-	 * Sets the payment method code
-	 * @param PagSeguroPaymentMethodCode $code
-	 */
-	public function setCode($code)
-	{
-		if ($code instanceof PagSeguroPaymentMethodCode) {
-			$this->code = $code;
-		} else {
-			$this->code = new PagSeguroPaymentMethodCode($code);
-		}
-	}
-
+    /**
+     * Sets the payment method code
+     * @param PagSeguroPaymentMethodCode $code
+     */
+    public function setCode($code)
+    {
+        if ($code instanceof PagSeguroPaymentMethodCode) {
+            $this->code = $code;
+        } else {
+            $this->code = new PagSeguroPaymentMethodCode($code);
+        }
+    }
 }
-?>

@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,75 +24,75 @@
 class PagSeguroDocument
 {
 
-	private static $availableDocumentList = array(
-		1 => 'CPF');
+    private static $availableDocumentList = array(
+        1 => 'CPF'
+    );
 
-	/**
-	 * The type of document
-	 * @var string
-	 */
-	private $type;
+    /**
+     * The type of document
+     * @var string
+     */
+    private $type;
 
-	/**
-	 * The value of document
-	 * @var string
-	 */
-	private $value;
+    /**
+     * The value of document
+     * @var string
+     */
+    private $value;
 
-	public function __construct(Array $data = NULL)
-	{
-		if ($data) {
-			if (isset($data['type']) && isset($data['value'])) {
-				$this->setType ($data['type']);
-				$this->setValue(PagSeguroHelper::getOnlyNumbers($data['value']));
-			}
-		}
-	}
+    public function __construct(array $data = null)
+    {
+        if ($data) {
+            if (isset($data['type']) && isset($data['value'])) {
+                $this->setType($data['type']);
+                $this->setValue(PagSeguroHelper::getOnlyNumbers($data['value']));
+            }
+        }
+    }
 
-	/**
-	 * Get document type
-	 * @return string
-	 */
-	public function getType()
-	{
-		return $this->type;
-	}
+    /**
+     * Get document type
+     * @return String
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	/**
-	 * Set document type
-	 * @param string $type
-	 */
-	public function setType($type)
-	{
-		$this->type = strtoupper($type);
-	}
+    /**
+     * Set document type
+     * @param String $type
+     */
+    public function setType($type)
+    {
+        $this->type = strtoupper($type);
+    }
 
-	/**
-	 * Get document value
-	 * @return string
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
+    /**
+     * Get document value
+     * @return String
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * Set document value
-	 * @param string $value
-	 */
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    /**
+     * Set document value
+     * @param String $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	/**
-	 * Check if document type is available for PagSeguro
-	 * @param type $documentType
-	 * @return type
-	 */
-	public static function isDocumentTypeAvailable($documentType)
-	{
-		return (array_search(strtoupper($documentType), self::$availableDocumentList));
-	}
+    /**
+     * Check if document type is available for PagSeguro
+     * @param string $documentType
+     * @return array|boolean
+     */
+    public static function isDocumentTypeAvailable($documentType)
+    {
+        return (array_search(strtoupper($documentType), self::$availableDocumentList));
+    }
 }
-?>

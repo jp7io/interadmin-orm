@@ -1,6 +1,5 @@
-<?php if (!defined('PAGSEGURO_LIBRARY')) {
-	die('No direct script access allowed');
-}
+<?php
+
 /*
  ************************************************************************
  Copyright [2011] [PagSeguro Internet Ltda.]
@@ -25,127 +24,133 @@
 class PagSeguroTransactionSearchResult
 {
 
-	/**
-	 * Date/time when this search was executed
-	 */
-	private $date;
+    /**
+     * Date/time when this search was executed
+     */
+    private $date;
 
-	/**
-	 * Transactions in the current page
-	 */
-	private $resultsInThisPage;
+    /**
+     * Transactions in the current page
+     */
+    private $resultsInThisPage;
 
-	/**
-	 * Total number of pages
-	 */
-	private $totalPages;
+    /**
+     * Total number of pages
+     */
+    private $totalPages;
 
-	/**
-	 * Current page.
-	 */
-	private $currentPage;
+    /**
+     * Current page.
+     */
+    private $currentPage;
 
-	/**
-	 * Transaction summaries in this page
-	 */
-	private $transactions;
+    /**
+     * Transaction summaries in this page
+     */
+    private $transactions;
 
-	/**
-	 * @return the current page number
-	 */
-	public function getCurrentPage()
-	{
-		return $this->currentPage;
-	}
+    /**
+     * @return the current page number
+     */
+    public function getCurrentPage()
+    {
+        return $this->currentPage;
+    }
 
-	/**
-	 * Sets the current page number
-	 * @param integer $currentPage
-	 */
-	public function setCurrentPage($currentPage)
-	{
-		$this->currentPage = $currentPage;
-	}
+    /**
+     * Sets the current page number
+     * @param integer $currentPage
+     */
+    public function setCurrentPage($currentPage)
+    {
+        $this->currentPage = $currentPage;
+    }
 
-	/**
-	 * @return the date/time when this search was executed
-	 */
-	public function getDate()
-	{
-		return $this->date;
-	}
+    /**
+     * @return the date/time when this search was executed
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
 
-	/**
-	 * Set the date/time when this search was executed
-	 * @param date
-	 */
-	public function setDate($date)
-	{
-		$this->date = $date;
-	}
+    /**
+     * Set the date/time when this search was executed
+     * @param date
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
 
-	/**
-	 * @return the number of transactions summaries in the current page
-	 */
-	public function getResultsInThisPage()
-	{
-		return $this->resultsInThisPage;
-	}
+    /**
+     * @return the number of transactions summaries in the current page
+     */
+    public function getResultsInThisPage()
+    {
+        return $this->resultsInThisPage;
+    }
 
-	/**
-	 * Sets the number of transaction summaries in the current page
-	 *
-	 * @param resultsInThisPage
-	 */
-	public function setResultsInThisPage($resultsInThisPage)
-	{
-		$this->resultsInThisPage = $resultsInThisPage;
-	}
+    /**
+     * Sets the number of transaction summaries in the current page
+     *
+     * @param resultsInThisPage
+     */
+    public function setResultsInThisPage($resultsInThisPage)
+    {
+        $this->resultsInThisPage = $resultsInThisPage;
+    }
 
-	/**
-	 * @return the total number of pages
-	 */
-	public function getTotalPages()
-	{
-		return $this->totalPages;
-	}
+    /**
+     * @return the total number of pages
+     */
+    public function getTotalPages()
+    {
+        return $this->totalPages;
+    }
 
-	/**
-	 * Sets the total number of pages
-	 *
-	 * @param totalPages
-	 */
-	public function setTotalPages($totalPages)
-	{
-		$this->totalPages = $totalPages;
-	}
+    /**
+     * Sets the total number of pages
+     *
+     * @param totalPages
+     */
+    public function setTotalPages($totalPages)
+    {
+        $this->totalPages = $totalPages;
+    }
 
-	/**
-	 * @return the transaction summaries in this page
-	 * @see PagSeguroTransactionSummary
-	 */
-	public function getTransactions()
-	{
-		return $this->transactions;
-	}
+    /**
+     * @return PagSeguroTransactionSummary the transaction summaries in this page
+     * @see PagSeguroTransactionSummary
+     */
+    public function getTransactions()
+    {
+        return $this->transactions;
+    }
 
-	/**
-	 * Sets the transaction summaries in this page
-	 *
-	 * @param transactions
-	 */
-	public function setTransactions(Array $transactions)
-	{
-		$this->transactions = $transactions;
-	}
+    /**
+     * Sets the transaction summaries in this page
+     *
+     * @param array $transactions
+     */
+    public function setTransactions(array $transactions)
+    {
+        $this->transactions = $transactions;
+    }
 
-	/**
-	 * @return a string that represents the current object
-	 */
-	public function toString()
-	{
-		return "PagSeguroTransactionSearchResult(" . "Date=" . $this->date . ", CurrentPage=" . $this->currentPage . ", TotalPages=" . $this->totalPages . ", Transactions in this page=" . $this->resultsInThisPage . ")";
-	}
+    /**
+     * @return String a string that represents the current object
+     */
+    public function toString()
+    {
+        $transaction = array();
 
+        $transaction['Date'] = $this->date;
+        $transaction['CurrentPage'] = $this->currentPage;
+        $transaction['TotalPages'] = $this->totalPages;
+        $transaction['Transactions in this page'] = $this->resultsInThisPage;
+
+        return "PagSeguroTransactionSearchResult: " . var_export($transaction, true);
+
+    }
 }
-?>
