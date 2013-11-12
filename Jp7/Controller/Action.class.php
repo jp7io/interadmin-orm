@@ -17,14 +17,25 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @var InterAdmin
 	 */
 	protected static $record;
-	/*
+	
 	public function init() {
+		$config = Zend_Registry::get('config');
+		if (preg_match('~\b(alt|qa)\b~', $_SERVER['HTTP_HOST'])) {
+			if (!isset($_SERVER['PHP_AUTH_USER']) || $_SERVER['PHP_AUTH_USER'] != $config->name_id || $_SERVER['PHP_AUTH_PW'] != $config->name_id) {
+				header('WWW-Authenticate: Basic realm="' . $config->name . '"');
+				header('HTTP/1.0 401 Unauthorized');
+				echo '401 Unauthorized';
+				exit;
+			}
+		}
+		/*
 		global $debugger;
 		$debugger->showFileName('# Module: <b>' . $this->_getParam('module') . '</b>');
 		$debugger->showFileName('# Controller: <b>' . $this->_getParam('controller') . '</b>');
 		$debugger->showFileName('# Action: <b>' . $this->_getParam('action') . '</b>');
+		*/
 	}
-	*/
+	
 	public function preDispatch() {
     	if (!$this->actionExists()) {
 			$this->forwardToTemplate();
