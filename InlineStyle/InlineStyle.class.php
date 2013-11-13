@@ -164,7 +164,9 @@ class InlineStyle
      */
     public function getHTML()
     {
-        return str_replace(' data-flag-css="1"', '', $this->_dom->saveHTML());
+    	$html = $this->_dom->saveHTML();
+    	$html = preg_replace('~<(img|meta|link|br|hr)([^>]+[^>/])?\>~i', '<$1$2/>', $html);
+    	return str_replace(' data-flag-css="1"', '', $html);
     }
 
     /**
