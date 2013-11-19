@@ -185,8 +185,10 @@ class InlineStyle
         $stylesheets = array();
 
         if(strtolower($node->nodeName) === "style") {
-            $stylesheets[] = $node->nodeValue;
-            $node->parentNode->removeChild($node);
+        	if (strpos($node->nodeValue, '@media') === false) {
+        		$stylesheets[] = $node->nodeValue;
+            	$node->parentNode->removeChild($node);
+        	}
         }
         else if(strtolower($node->nodeName) === "link") {
             if($node->hasAttribute("href")) {
