@@ -100,6 +100,16 @@ class Jp7_Collections {
 		// Returning values with reindexed keys
 		return array_values($subitens);
 	}
+	
+	public static function separate($array, $property) {
+		$separated = array();
+		foreach ($array as $item) {
+			$separated[$item->$property][] = $item;
+		}
+		// Returning values with reindexed keys
+		return $separated;
+	}
+	
 	/**
  	 * Acts like an order by on an SQL.
  	 * 
