@@ -28,7 +28,7 @@ class Jp7_InterAdmin_Search {
 	
 	public function checkIndexes($exclude_tables = array()) {
 		global $db;
-		$tables = array_diff($this->getTables(), $exclude_tables);
+		$tables = array_diff($this->getTables(), $exclude_tables ?: array());
 		foreach ($tables as $table) {
 			$indexes = $db->MetaIndexes($table);
 			$columns = $db->MetaColumnNames($table);
