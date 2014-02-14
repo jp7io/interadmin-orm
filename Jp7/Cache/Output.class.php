@@ -147,7 +147,7 @@
 	 */
 	public function cancel() {
 		self::$_enabled = false;
-		ob_get_clean();	
+		ob_end_flush();	
 	}
 
 	/**

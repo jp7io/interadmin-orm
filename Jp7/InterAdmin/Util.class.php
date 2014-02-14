@@ -69,11 +69,15 @@ class Jp7_InterAdmin_Util {
 	protected static function _importAttributeFromIdString($record, $bind_children = false) {
 		foreach ($record->attributes as $attributeName => $attribute) {
 			if ($attribute instanceof InterAdmin && $attribute->id_string) {
-				if ($attributeTipo = $attribute->getTipo()) {
+				$attributeTipo = InterAdminTipo::getInstance($attribute->id_tipo);
+				//$attribute->setTipo($attributeTipo);
+				if ($attributeTipo) {
 					$options = array();
 					if ($bind_children) {
-						$options['order'] = 'parent_id = ' . $record->parent_id . ' DESC';
+						$options['order'] = 'parent_id = ' . $record->parent_id . ' DESC, ';
 					}
+					$options['order'] .= 'deleted = \'\' DESC';
+					
 					$record->$attributeName = $attributeTipo->findByIdString($attribute->id_string, $options);
 				}
 			}
@@ -92,7 +96,9 @@ class Jp7_InterAdmin_Util {
 	 * @return 	void	
 	 */
 	public static function import(array $records, $id_tipo, $parent_id = 0, $import_children = true, $use_id_string = false, $bind_children = false) {
+		$returnIds = array();
 		foreach ($records as $record) {
+			$returnId = array('id' => $record->id);
 			unset($record->id);
 			
 			$tipo = InterAdminTipo::getInstance($id_tipo);
@@ -105,11 +111,14 @@ class Jp7_InterAdmin_Util {
 			}
 			
 			$record->save();
+			$returnId['new_id'] = $record->id;
 			
 			if ($import_children) {
 				self::_importChildren($record, $use_id_string, $bind_children);
 			}
+			$returnIds[] = $returnId;
 		}
+		return $returnIds;
 	}
 	
 	public static function _importChildren($record, $use_id_string, $bind_children) {

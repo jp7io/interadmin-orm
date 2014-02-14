@@ -13,15 +13,15 @@ class Jp7_Bootstrap {
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
 		Zend_Registry::set('get', new Zend_Filter_Input(null, null, $_GET));
 		
-		self::initConfig();
-		self::initAdminBar();
-		self::initDataBase();
-		self::initFrontController();
-		self::initLanguage();
-		self::initLayout();
-		self::preDispatch();
-		self::dispatch();
-		self::postDispatch();		
+		static::initConfig();
+		static::initAdminBar();
+		static::initDataBase();
+		static::initFrontController();
+		static::initLanguage();
+		static::initLayout();
+		static::preDispatch();
+		static::dispatch();
+		static::postDispatch();		
 	}
 	
 	public static function initConfig() {

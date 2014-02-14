@@ -50,7 +50,7 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
 			}
 		}
 				
-		$pk = $this->staticConst('PK');
+		$pk = static::PK;
 		if (!$pk) {
 			throw new Exception('Undefined primary key.');	
 		};
@@ -84,7 +84,7 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract {
     }
 	
 	public function __toString() {
-		$pk = $this->staticConst('PK');
+		$pk = static::PK;
 		return (string) $this->$pk;
 	}
 }

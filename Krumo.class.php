@@ -1345,7 +1345,7 @@ if (typeof($) == 'undefined') {
 			(<em class="krumo-type">String,
 				<strong class="krumo-string-length"><?php
 					echo strlen($data) ?> characters</strong> </em>)
-			<strong class="krumo-string"><?php echo htmlSpecialChars($_);?></strong>
+			<strong class="krumo-string"><?php echo htmlspecialchars($_, ENT_COMPAT, 'ISO-8859-1');?></strong>
 			
 			<?php
 			// callback ?
@@ -1367,7 +1367,7 @@ if (typeof($) == 'undefined') {
 		<ul class="krumo-node">
 			
 			<li class="krumo-child">
-				<div class="krumo-preview"><?php echo str_replace("\n", '<br />', htmlSpecialChars($data));?></div>
+				<div class="krumo-preview"><?php echo str_replace("\n", '<br />', htmlspecialchars($data, ENT_COMPAT, 'ISO-8859-1'));?></div>
 			</li>
 			
 		</ul>
@@ -1401,5 +1401,3 @@ if (!function_exists('krumo')) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
-?>

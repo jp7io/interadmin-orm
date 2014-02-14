@@ -93,12 +93,11 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * 
 	 * @param string 	$id_tipo 	[optional] This record's 'id_tipo'.
 	 * @param array		$options 	[optional] Default array of options. Available keys: db_prefix, fields.
-	 * @todo Modificar staticConst(...) por static::ID_TIPO no PHP 5.3
 	 */
 	public function __construct($id_tipo = null, $options = array()) {
 		if (is_null($id_tipo) || is_array($id_tipo)) {
 			$options = (array) $id_tipo;
-			$id_tipo = $this->staticConst('ID_TIPO');
+			$id_tipo = static::ID_TIPO;
 		}
 		// id_tipo must be a string, because in_array will not work with integers and an array of objects
 		$id_tipo = (string) $id_tipo;
@@ -180,7 +179,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			return $this->_parent;
 		}
 		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
-			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
+			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
@@ -230,7 +229,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
 				'class' => $options['class'],
-				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+				'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 			));
 			$tipo->setParent($this);
 			$this->_getAttributesFromRow($row, $tipo, $options);
@@ -451,7 +450,7 @@ class InterAdminTipo extends InterAdminAbstract {
 						$A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
-							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
 					}
 				}
@@ -872,7 +871,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			return InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
-				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+				'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 			));
 		}
 	}
@@ -884,7 +883,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function createInterAdmin(array $attributes = array()) {
-		$options = array('default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin');
+		$options = array('default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin');
 		$record = InterAdmin::getInstance(0, $options, $this);
 		$mostrar = $this->getCamposAlias('char_key');
 		$record->$mostrar = 'S';
@@ -961,7 +960,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			);
 			$rs = $this->_executeQuery($options2);
 			
-			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';		
+			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';		
 			$this->_tiposUsingThisModel = array();
 			while ($row = $rs->FetchNextObj()) {
 				$this->_tiposUsingThisModel[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);;
@@ -1048,12 +1047,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {
 		$optionsInstance = array(
 			'class' => $options['class'],
-			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
+			'default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin'
 		);
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
-		
-		$options = $options + array('fields' => $this->staticConst('DEFAULT_FIELDS'), 'fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+		$defaultFields = static::DEFAULT_FIELDS;
+		if ($defaultFields && strpos($defaultFields, ',') !== false) {
+			$defaultFields = explode(',', $defaultFields);
+		}
+		$options = $options + array('fields' => $defaultFields, 'fields_alias' => static::DEFAULT_FIELDS_ALIAS);
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {

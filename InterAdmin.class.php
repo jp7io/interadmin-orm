@@ -65,7 +65,7 @@ class InterAdmin extends InterAdminAbstract {
 		$this->_db = $options['db'];
 		
 		if ($options['fields'] && $this->id) {
-			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
 			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 	}
@@ -238,7 +238,9 @@ class InterAdmin extends InterAdminAbstract {
 	public function getTipo($options = array()) {
 		if (!$this->_tipo) {
 			if (!$id_tipo = $this->id_tipo) {
-				$id_tipo = jp7_fields_values($this->getTableName(), 'id', $this->id, 'id_tipo');
+				global $db;
+				$sql = "SELECT id_tipo FROM " . $this->getTableName() . " WHERE id = " . intval($this->id);
+				$id_tipo = $db->GetOne($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 			}
 			$this->setTipo(InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,
@@ -265,24 +267,25 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function getParent($options = array()) {
-		if (!$this->parent_id) {
-			$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
-		}
-		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
-		if ($this->parent_id) {
-			if (!$this->_parent) {
-				$parentTipo = null;
-				if ($this->parent_id_tipo) {
-					$parentTipo = InterAdminTipo::getInstance($this->parent_id_tipo);
-				}
-				$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
+		if (!$this->_parent) {
+			if (!$this->parent_id || !$this->parent_id_tipo) {
+				$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
+			}
+			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+			
+			$parentTipo = null;
+			if ($this->parent_id_tipo) {
+				$parentTipo = InterAdminTipo::getInstance($this->parent_id_tipo);
+			}
+			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdmin';
+			if ($this->parent_id) {
 				$this->_parent = InterAdmin::getInstance($this->parent_id, $options, $parentTipo);
 				if ($this->_parent->id) {
 					$this->getTipo()->setParent($this->_parent);
 				}
-			} elseif ($options['fields']) {
-				$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
 			}
+		} elseif ($options['fields']) {
+			$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 		return $this->_parent;
 	}
@@ -324,7 +327,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$options['db_prefix']) {
 			$options['db_prefix'] = $this->getTipo()->db_prefix;
 		}
-		$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
+		$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
 		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
 		$childrenTipo->setParent($this);
 		return $childrenTipo;
@@ -339,7 +342,7 @@ class InterAdmin extends InterAdminAbstract {
 	public function getChildren($id_tipo, $options = array()) {
 		$children = array();
 		if ($id_tipo) {
-			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
 			$children = $this->getChildrenTipo($id_tipo)->find($options);
 		}
 		return $children;
@@ -413,7 +416,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminArquivo
 	 */
 	public function createArquivo(array $attributes = array()) {
-		$className = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminArquivo';
+		$className = static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
 		if (!class_exists($className)) {
 			$className = 'InterAdminArquivo';
 		}
@@ -433,7 +436,7 @@ class InterAdmin extends InterAdminAbstract {
 	public function getArquivos($options = array()) {
 		$arquivos = array();
 		
-		$className = (class_exists($options['class'])) ? $options['class'] : $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminArquivo';
+		$className = (class_exists($options['class'])) ? $options['class'] : static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
 		$arquivoModel = new $className(0);
 		$arquivoModel->setTipo($this->getTipo());
 		

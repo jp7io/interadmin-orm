@@ -28,7 +28,7 @@ class Jp7_Diff_Xml {
 			if( $allowShortTag && $contents === '' ) {
 				$out .= ' />';
 			} else {
-				$out .= '>' . htmlspecialchars( $contents ) . "</$element>";
+				$out .= '>' . isospecialchars( $contents ) . "</$element>";
 			}
 		}
 		return $out;

@@ -21,11 +21,6 @@ class Jp7_Date extends DateTime {
 	const DURATION_HUMAN = 2;
 	
 	/**
-	 * @var string
-	 */
-	private $_serializedValue;
-	
-	/**
 	 * Retorna string da diferença de tempo, ex: '3 dias atrás'.
 	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
 	 * Diferenças menores de 1 minuto retornam 'agora'.
@@ -166,66 +161,6 @@ class Jp7_Date extends DateTime {
 	}
 	
 	/**
-	 * Returns the difference between two Jp7_Date objects.
-	 * 
-	 * @param Jp7_Date $datetime
-	 * @return DateInterval|object
-     */
-	public function diff(Jp7_Date $datetime) {
-		if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-			// Versão 5.3 já possui método
-			$retorno = parent::diff($datetime);
-		} else {
-			// Versões antigas precisam fazer "manualmente"
-			if ($this < $datetime){
-				$d1 = $datetime;
-				$d2 = $this;
-			} else {
-			    $d1 = $this;
-				$d2 = $datetime;
-			}
-			$temp = $d1->getTimestamp();
-			$keys = array('y', 'm', 'd', 'h', 'i', 's', '_', '_', '_', '_', '_', '_');
-			$d1 = (object) array_combine($keys, date_parse($d1->format('Y-m-d H:i:s')));
-			$d2 = (object) array_combine($keys, date_parse($d2->format('Y-m-d H:i:s')));
-			if ($d1->s >= $d2->s) {
-				$diff->s = $d1->s - $d2->s;
-			} else {
-				$d1->i--;
-				$diff->s = 60 - $d2->s + $d1->s;
-			}
-			if ($d1->i >= $d2->i) {
-				$diff->i = $d1->i - $d2->i;
-			} else {
-				$d1->h--;
-				$diff->i = 60 - $d2->i + $d1->i;
-			}
-			if ($d1->h >= $d2->h) {
-				$diff->h = $d1->h - $d2->h;
-			} else {
-				$d1->d--;
-				$diff->h = 24 - $d2->h + $d1->h;
-			}
-			if ($d1->d >= $d2->d) {
-				$diff->d = $d1->d - $d2->d;
-			} else {
-				$d1->m--;
-				$diff->d = date('t', $temp) - $d2->d + $d1->d;
-			}
-			if ($d1->m >= $d2->m) {
-				$diff->m = $d1->m - $d2->m;
-			} else {
-				$d1->y--;
-				$diff->m = 12 - $d2->m + $d1->m;
-			}
-			$diff->y = $d1->y - $d2->y;
-			$retorno = $diff;
-		}
-		//$retorno->days; // Bugado até mesmo na 'oficial' PHP 5.3
-		return $retorno;
-	}
-	
-	/**
 	 * Gets the Unix timestamp
 	 * 
 	 * @return int Returns Unix timestamp representing the date. 
@@ -300,28 +235,6 @@ class Jp7_Date extends DateTime {
 	
 	public function __toString() {
 		return $this->format('Y-m-d H:i:s');
-	}
-	
-	/**
-	 * DateTime does not support serialization by default.
-	 * 
-	 * @todo Retirar quando migrar para PHP 5.3
-	 * @return 
-	 */
-	public function __wakeUp() {
-		parent::__construct($this->_serializedValue);
-		unset($this->_serializedValue);
-	}
-	
-	/** 
-	 * DateTime does not support serialization by default.
-	 * 
-	 * @todo Retirar quando migrar para PHP 5.3
-	 * @return void
-	 */
-	public function __sleep() {
-		$this->_serializedValue = $this->__toString();
-		return array('_serializedValue');
 	}
 	
 	public function minute() {

@@ -463,7 +463,7 @@ class InterAdminField {
 			</div>
 			<?php
 		} else {
-			return htmlspecialchars($valor);
+			return isospecialchars($valor);
 		}	
 	}
 	

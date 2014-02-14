@@ -215,7 +215,7 @@ class Jp7_Debugger {
 		if (class_exists('Jp7_InterAdmin_Soap') && Jp7_InterAdmin_Soap::isSoapRequest()) {
 			$S .= $this->_getBacktraceLabel('HTTP_SOAPACTION') . print_r($_SERVER['HTTP_SOAPACTION'], true);
 			$S .= $this->_getBacktraceLabel('CONTENT_TYPE') . print_r($_SERVER['CONTENT_TYPE'], true);
-			$S .= $this->_getBacktraceLabel('PHP INPUT') . htmlspecialchars(print_r(file_get_contents('php://input'), true));
+			$S .= $this->_getBacktraceLabel('PHP INPUT') . isospecialchars(print_r(file_get_contents('php://input'), true));
 		}
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
@@ -270,16 +270,10 @@ class Jp7_Debugger {
 	 * @return bool
 	 */
 	public function errorHandler($code, $msgErro) {
-		if ($code == E_STRICT || $code == E_NOTICE || $code == E_DEPRECATED) {
-			return false; // FALSE -> the default error handler will take care of it.
+		if ($code == E_WARNING && strpos($msgErro, 'Creating default object from empty value') !== false) {
+			return true; // Ignorar esse erro do PHP 5.4
 		}
-		if (error_reporting() == 0) {
-			return false; // Programmer used @ so the error reporting value is 0.
-		}
-
-		$backtrace = debug_backtrace();
-		array_shift($backtrace);
-		die(jp7_debug($msgErro, NULL, $backtrace));
+		return false;
 	}
 	/**
 	 * Adds a log to the $_log array.
