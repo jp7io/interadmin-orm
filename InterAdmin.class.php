@@ -240,7 +240,10 @@ class InterAdmin extends InterAdminAbstract {
 			if (!$id_tipo = $this->id_tipo) {
 				global $db;
 				$sql = "SELECT id_tipo FROM " . $this->getTableName() . " WHERE id = " . intval($this->id);
-				$id_tipo = $db->GetOne($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+				$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+				if ($row = $rs->FetchNextObj()) {
+					$id_tipo = $row->id_tipo;
+				}				
 			}
 			$this->setTipo(InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,
