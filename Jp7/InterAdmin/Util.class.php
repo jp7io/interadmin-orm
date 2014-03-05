@@ -287,6 +287,7 @@ STR;
 			@mkdir(dirname($arquivo), 0777, true);
 			
 			$retorno = file_put_contents($arquivo, $conteudo);
+			@chmod($arquivo, 0777);
 			if ($retorno === false) {
 				$avisos['erro'][] = 'Não foi possível gravar arquivo: "' . $arquivo . '". Verifique permissões no diretório.';
 			} else {
