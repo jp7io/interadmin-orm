@@ -71,7 +71,7 @@ class InterAdminField {
 		if (array_key_exists('value', $campo_array)) {
 			$valor = $campo_array['value'];
 		} else {
-			$valor = stripslashes($GLOBALS[$campo]);
+			$valor = $GLOBALS[$campo];
 		}
 		if (!$valor && !$id) {
 			if (strpos($tipo_de_campo, 'select_') === 0 && $valor_default && !is_numeric($valor_default)) {
@@ -264,7 +264,7 @@ class InterAdminField {
 						break;
 				}
 			}
-			$form = '<input type="' . ((strpos($tipo_de_campo, 'password_') === 0) ? 'password' . ($is->ch ? '" autocomplete="off' : '') : 'text') . '" name="' . $campo . '[]" label="' . $campo_nome . '" value="' . toForm($valor) . '" title="' . $ajuda . '" maxlength="' . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />" . $form_xtra;
+			$form = '<input type="' . ((strpos($tipo_de_campo, 'password_') === 0) ? 'password' . ($is->ch ? '" autocomplete="off' : '') : 'text') . '" name="' . $campo . '[]" label="' . $campo_nome . '" value="' . htmlspecialchars($valor) . '" title="' . $ajuda . '" maxlength="' . (($tamanho) ? $tamanho : 255) . "\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress." xtra=\"".$xtra."\" />" . $form_xtra;
 		}
 		$form.="<input type=\"hidden\" name=\"".$campo."_xtra[]\" value=\"".$xtra."\"".$readonly." />";
 		if ($readonly && $valor_default) {
