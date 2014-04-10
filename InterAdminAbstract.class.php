@@ -458,8 +458,9 @@ abstract class InterAdminAbstract implements Serializable {
 		// not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
 		$not_function = '(?![ ]?\()';
 		$reserved = array(
-				'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
-				'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS'
+			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
+			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
+			'INTERVAL', 'DAY'
 		);
 		
 		$offset = 0;
