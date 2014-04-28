@@ -86,21 +86,30 @@ class PagSeguroConfig
     {
         if (isset(self::$data['credentials']) &&
             isset(self::$data['credentials']['email']) &&
-            isset(self::$data['credentials']['token'])
+            isset(self::$data['credentials']['token'][self::$data['environment']])
         ) {
+            
             return new PagSeguroAccountCredentials(
                 self::$data['credentials']['email'],
-                self::$data['credentials']['token']
+                self::$data['credentials']['token'][self::$data['environment']]
             );
         } else {
             throw new Exception("Credentials not set.");
         }
     }
 
+    public static function getPaymentRedirectUrl() {
+        return PagSeguroResources::getPaymentUrl(self::$data['environment']);
+    }
+
+    public static function getStaticUrl() {
+        return PagSeguroResources::getStaticUrl(self::$data['environment']);
+    }
+
     public static function getEnvironment()
     {
-        if (isset(self::$data['environment']) && isset(self::$data['environment']['environment'])) {
-            return self::$data['environment']['environment'];
+        if (isset(self::$data['environment'])) {
+            return self::$data['environment'];
         } else {
             throw new Exception("Environment not set.");
         }
@@ -161,8 +170,8 @@ class PagSeguroConfig
 
         $version = str_replace('.', '', phpversion());
 
-        if ($version < 516) {
-            $requirements['version'] = 'PagSeguroLibrary: PHP version 5.1.6 or greater is required.';
+        if ($version < 533) {
+            $requirements['version'] = 'PagSeguroLibrary: PHP version 5.3.3 or greater is required.';
         }
 
         if (!function_exists('spl_autoload_register')) {
