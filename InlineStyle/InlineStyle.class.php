@@ -98,6 +98,7 @@ class InlineStyle
         $stylesheet = (array) $stylesheet;
         foreach($stylesheet as $ss) {
             $parsed = $this->parseStylesheet($ss);
+            $parsed = array_reverse($parsed); // Regras com mesma specificidade, que vem depois, passam por cima
             $parsed = $this->sortSelectorsOnSpecificity($parsed);
             foreach($parsed as $arr) {
                 list($selector, $style) = $arr;
@@ -132,7 +133,7 @@ class InlineStyle
         if($selector) {
             $nodes = $this->_getNodesForCssSelector($selector);
             $style = $this->_styleToArray($style);
-
+			
             foreach($nodes as $node) {
             	$current = $node->hasAttribute("style") ?
                     $this->_styleToArray($node->getAttribute("style")) :
