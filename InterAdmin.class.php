@@ -821,7 +821,7 @@ class InterAdmin extends InterAdminAbstract {
 		$nomeCampo = $aliases[$fieldToSet] ? $aliases[$fieldToSet] : $fieldToSet;
 		
 		if (!startsWith('select_', $nomeCampo)) {
-			throw new Exception('Campo precisa ser um select para utilizar a função setFieldBySearch.');	
+			throw new Exception('Campo ' . $fieldToSet . ' não é um select para utilizar a função setFieldBySearch.');	
 		}
 		
 		$campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
