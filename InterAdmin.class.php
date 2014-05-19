@@ -828,6 +828,10 @@ class InterAdmin extends InterAdminAbstract {
 		$record = $campoTipo->findFirst(array(
 			'where' => array($fieldToSearch . " = '" . $value . "'")
 		));
-		$this->$fieldToSet = $record;
+		if (startsWith('select_multi_', $nomeCampo)) {
+			$this->$fieldToSet = array($record);
+		} else {
+			$this->$fieldToSet = $record;
+		}
 	}
 }
