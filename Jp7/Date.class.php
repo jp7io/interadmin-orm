@@ -21,6 +21,22 @@ class Jp7_Date extends DateTime {
 	const DURATION_HUMAN = 2;
 	
 	/**
+	 * Returns new Jp7_Date object formatted according to the specified format.
+	 * @param string $format
+	 * @param string $time
+	 * @param DateTimeZone $timezone
+	 * @return Jp7_Date
+	 */
+	public static function createFromFormat($format, $time, DateTimeZone $timezone = null) {
+		if ($timezone) { 
+			$date = parent::createFromFormat($format, $time, $timezone); 
+		} else {
+			$date = parent::createFromFormat($format, $time);
+		}
+		return new static($date->format('c'), $date->getTimezone());
+	}
+	
+	/**
 	 * Retorna string da diferença de tempo, ex: '3 dias atrás'.
 	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
 	 * Diferenças menores de 1 minuto retornam 'agora'.
@@ -75,6 +91,7 @@ class Jp7_Date extends DateTime {
 	 * @param string|int $from [only with static calls] Datetime (string) or Timestamp (int).
 	 * @param string|int $to [optional]
 	 * @return int Age in years.
+	 * TODO needs refactoring
 	 */
 	public function yearsDiff($to = false) {
 		if (isset($this) && $this instanceof self) {
@@ -158,19 +175,6 @@ class Jp7_Date extends DateTime {
 			$datetime = strtotime($datetime);
 		}
 		return $datetime;
-	}
-	
-	/**
-	 * Gets the Unix timestamp
-	 * 
-	 * @return int Returns Unix timestamp representing the date. 
-	 */
-	public function getTimestamp() {
-		if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
-			return parent::getTimestamp();
-		} else {
-			return $this->format('U');
-		}
 	}
 	
 	/**
