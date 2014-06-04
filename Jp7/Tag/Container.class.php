@@ -28,4 +28,8 @@ abstract class Jp7_Tag_Container extends Jp7_Tag {
 	public function getItems() {
 		return $this->items;
 	}
+	
+	public function setItems($items) {
+		$this->items = $items;
+	}
 }
