@@ -870,12 +870,10 @@ abstract class InterAdminAbstract implements Serializable {
 	 * FIXME temporário para wheres que eram com string 
 	 */
 	protected function _whereArrayFix(&$where) {
-		if (!is_array($where)) {
-			if ($where) {
-				$where = jp7_explode(' AND ', $where);
-			} else {
-				$where = array();
-			}
+		if (is_string($where)) {
+			$where = jp7_explode(' AND ', $where);
+		} elseif (!$where) {
+			$where = array();
 		}
 	}
 	

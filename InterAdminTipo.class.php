@@ -286,14 +286,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
 	public function find($options = array()) {
-		$this->_whereArrayFix($options['where']); // FIXME
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}
-		
-		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$rs = $this->_executeQuery($options, $select_multi_fields);
 		$options['select_multi_fields'] = $select_multi_fields;
@@ -310,6 +308,24 @@ class InterAdminTipo extends InterAdminAbstract {
 		$rs->Close();
 		return $records;
 	}
+	
+	public function distinct($column, $options) {
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
+		
+		$options['fields'] = 'DISTINCT(' . $column . ') AS values';
+		$options['where'][] = "id_tipo = " . $this->id_tipo;
+		if ($this->_parent instanceof InterAdmin) {
+			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
+		}
+		
+		$rs = $this->_executeQuery($options);
+		$array = array();
+		while ($row = $rs->FetchNextObj()) {
+			$array[] = $row->{'main.values'};
+		}
+		return $array;
+	}
+	
 	/**
 	 * @deprecated Use find() instead.
 	 * @param array $options
@@ -1045,6 +1061,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {
+		$this->_whereArrayFix($options['where']); // FIXME
+		
 		$optionsInstance = array(
 			'class' => $options['class'],
 			'default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin'
@@ -1075,10 +1093,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin[]
 	 */
 	public function getInterAdminsUsingThisModel($options = array()) {
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
+		
 		$tipos = $this->getTiposUsingThisModel();
 		$options['where'][] = "id_tipo IN (" . implode(',', $tipos) . ')';
-		
-		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$rs = $this->_executeQuery($options);
 		$records = array();
