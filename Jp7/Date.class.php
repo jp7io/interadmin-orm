@@ -33,7 +33,19 @@ class Jp7_Date extends DateTime {
 		} else {
 			$date = parent::createFromFormat($format, $time);
 		}
-		return new static($date->format('c'), $date->getTimezone());
+		if ($date) {
+			return new static($date->format('c'), $date->getTimezone());
+		} else {
+			return $date;
+		}
+	}
+	
+	public static function createFromString($time, $formats = array('d/m/Y', 'Y-m-d'), DateTimeZone $timezone = null) {
+		foreach ($formats as $format) {
+			if ($date = static::createFromFormat($format, $time, $timezone)) {
+				return $date;
+			}
+		}
 	}
 	
 	/**
