@@ -1177,7 +1177,7 @@ if (typeof($) == 'undefined') {
 	// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 	private static function getStringValue($data) {
 		if (self::$useToString && (method_exists($data, '__toString') || $data instanceof SimpleXMLElement) && !$data instanceof Zend_Form_Element) {
-			return '</strong> (' . jp7_string_left($data, 100) . ')<strong>';
+			return '</strong> (' . isospecialchars(jp7_string_left($data, 100)) . ')<strong>';
 		}
 	}
 
