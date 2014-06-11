@@ -28,7 +28,8 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
     	 $config = Zend_Registry::get('config');
 		 $lang = Zend_Registry::get('lang');
 		 
-		 $current = Zend_Controller_Front::getInstance()->getRequest()->getParams();
+		 $frontController = Zend_Controller_Front::getInstance();
+		 $current = $frontController->getRequest()->getParams();
 		 
 		 $extraParams = array_diff_key($userParams, $current);
 		 $userParams = $userParams + $current;
@@ -44,7 +45,7 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
 		 if ($userParams['controller'] != 'index' || $url) {
 		 	$url[] = $userParams['controller'];
 		 }
-		 if ($userParams['module'] != 'default') {
+		 if ($userParams['module'] != $frontController->getDefaultModule()) {
 			 $url[] = $userParams['module'];
 		 }
 		 if ($userParams['lang'] != $config->lang_default) {
