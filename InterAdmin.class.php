@@ -811,27 +811,37 @@ class InterAdmin extends InterAdminAbstract {
 		return array('id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
     }
 	
-	/**
-	 * 
-	 * @return 
-	 */
-	public function setFieldBySearch($fieldToSet, $value, $fieldToSearch = 'varchar_key') {
+    /**
+     * Searches $value on the relationship and sets the $attribute  
+     * @param string $attribute
+     * @param string $searchValue
+     * @param string $searchColumn
+     * @throws Exception
+     */
+    public function setAttributeBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
 		$campos = $this->getTipo()->getCampos();
 		$aliases = array_flip($this->getTipo()->getCamposAlias());
-		$nomeCampo = $aliases[$fieldToSet] ? $aliases[$fieldToSet] : $fieldToSet;
+		$nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 		
 		if (!startsWith('select_', $nomeCampo)) {
-			throw new Exception('Campo ' . $fieldToSet . ' não é um select para utilizar a função setFieldBySearch.');	
+			throw new Exception('The field ' . $attribute . ' is not a select. It was expected a select field on setAttributeBySearch.');
 		}
 		
 		$campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
 		$record = $campoTipo->findFirst(array(
-			'where' => array($fieldToSearch . " = '" . $value . "'")
+			'where' => array($searchColumn . " = '" . $searchValue . "'")
 		));
 		if (startsWith('select_multi_', $nomeCampo)) {
-			$this->$fieldToSet = array($record);
+			$this->$attribute = array($record);
 		} else {
-			$this->$fieldToSet = $record;
+			$this->$attribute = $record;
 		}
+    }
+    
+	/**
+	 * @deprecated use setAttributeBySearch
+	 */
+	public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
+		return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
 	}
 }
