@@ -83,8 +83,10 @@ class Jp7_Date extends DateTime {
 		$seconds = $currentTime - $timeStamp;
 		if ($seconds <= 60) {
 			return $now;
-		} elseif ($seconds >= 86400 && $seconds < 86400 * 2) {
-			return $yesterday;
+		} elseif ($seconds < 86400 * 2 && date('d', $currentTime) - 1 == date('d', $timeStamp)) {
+			return $yesterday; // ontem
+		} elseif ($seconds < 604800) {
+			$seconds = ceil($seconds / 86400) * 86400; // dias
 		}
 		foreach ($units as $unit => $seconds_in_period) {
 			if ($seconds >= $seconds_in_period) {
