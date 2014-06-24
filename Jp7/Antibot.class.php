@@ -10,9 +10,9 @@ class Jp7_Antibot {
 	
 	protected function __construct($options = array()) {
 		$this->redirect = $options['redirect'] ?: $_SERVER['REQUEST_URI'];
-		if ($options['captcha_url']) {
-			$this->captcha_url = $options['captcha_url'];
-		}
+		$this->captcha_url = $options['captcha_url'] ?: $this->captcha_url;
+		$this->attempts_before_captcha = $options['attempts_before_captcha'] ?: $this->attempts_before_captcha;
+		
 		$this->path = jp7_path(sys_get_temp_dir()) . 'antibot/';
 		if (!is_dir($this->path)) {
 			mkdir($this->path, 0777, true);
@@ -47,7 +47,8 @@ class Jp7_Antibot {
 		
 	public function allow() {
 		$data = $this->getData();
-		header('Location: ' . $data->redirect);
+		$redirect = $data->redirect ?: $this->redirect;
+		header('Location: ' . $redirect);
 		$this->saveData('');
 		exit;
 	}
