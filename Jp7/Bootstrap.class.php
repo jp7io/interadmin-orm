@@ -9,9 +9,9 @@ class Jp7_Bootstrap {
 		$debugger->setExceptionsEnabled(true);
 		$debugger->setSafePoint(true);
 		
-		if ($_COOKIE['PHPSESSID'] === '') {
+		if (preg_match('/[^a-zA-Z0-9-,]/', $_COOKIE['PHPSESSID'])) {
 			unset($_COOKIE['PHPSESSID']); // Bug Zend_Session + Usuário com cookie errado
-		}		
+		}	
 		
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
