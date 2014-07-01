@@ -26,28 +26,42 @@ class Jp7_Antibot {
 	}
 	
 	public static function getInstance($options = array()) {
-		return new self($options);
+		return new static($options);
 	}
-	
+	/**
+	 * Checks if too many attempts were made and redirects to captcha URL.
+	 */
 	public function check() {
-		$data = $this->getData();
-		if ($data->count > $this->attempts_before_captcha) {
-			$data->redirect = $this->redirect;
-			$this->saveData($data);
+		if ($this->isSuspicious()) {
+			$_SESSION['_antibot_redirect'] = $this->redirect;
 			header('Location: ' . $this->captcha_url);
 			exit;
 		}
 	}
-	
+	/**
+	 * If attempts counter >= attempts_before_captcha, returns TRUE 
+	 * 
+	 * @return boolean
+	 */
+	public function isSuspicious() {
+		$data = $this->getData();
+		if ($data->count >= $this->attempts_before_captcha) {
+			return true;
+		}
+	}
+	/**
+	 * Increments attempts counter.
+	 */
 	public function increment() {
 		$data = $this->getData();
 		$data->count++;
 		$this->saveData($data);
 	}
-		
+	/**
+	 * Removes captcha lock.
+	 */
 	public function allow() {
-		$data = $this->getData();
-		$redirect = $data->redirect ?: $this->redirect;
+		$redirect = $_SESSION['_antibot_redirect'] ?: $this->redirect;
 		header('Location: ' . $redirect);
 		$this->saveData('');
 		exit;
@@ -68,7 +82,11 @@ class Jp7_Antibot {
 	public function saveData($data) {
 		file_put_contents($this->path . $this->filename, serialize($data));
 	}
-	
+	/**
+	 * Returns AntiSpoof secret.
+	 * 
+	 * @return string
+	 */
 	public function secret() {
 		if (!is_array($_SESSION['_antispoof'])) {
 			$_SESSION['_antispoof'] = array();
@@ -77,7 +95,12 @@ class Jp7_Antibot {
 		$_SESSION['_antispoof'][] = $secret;
 		return $secret;
 	}
-	
+	/**
+	 * Checks if AntiSpoof secret is in Session.
+	 * 
+	 * @param string $secret
+	 * @return boolean
+	 */
 	public function checkSecret($secret) {
 		if ($_SESSION['_antispoof'] && in_array($secret, $_SESSION['_antispoof'])) {
 			array_delete($_SESSION['_antispoof'], $secret);
