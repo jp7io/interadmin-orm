@@ -37,6 +37,7 @@ class Jp7_Antibot {
 			header('Location: ' . $this->captcha_url);
 			exit;
 		}
+		return $this;
 	}
 	/**
 	 * If attempts counter >= attempts_before_captcha, returns TRUE 
@@ -56,6 +57,7 @@ class Jp7_Antibot {
 		$data = $this->getData();
 		$data->count++;
 		$this->saveData($data);
+		return $this;
 	}
 	/**
 	 * Removes captcha lock.
