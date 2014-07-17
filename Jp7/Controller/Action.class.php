@@ -88,10 +88,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		 * @var array $metas Metatags no formato $nome => $valor
 		 */
 		$metas = Zend_Registry::get('metas');
-		// TODO Late Static Binding static::getTipo()
-		$tipo = $this->getTipo();
 		
-		$record = self::getRecord();
+		$tipo = static::getTipo();
+		
+		$record = static::getRecord();
 		
 		// View
 		$this->view->config = $config;
@@ -127,7 +127,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @return string
 	 */
 	protected function _prepareTitle() {
-		$record = self::getRecord();
+		$record = static::getRecord();
 		
 		$this->view->headTitle()->setSeparator(' | ');
 		
@@ -138,7 +138,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			}
 		}
 		// Adiciona breadcrumb to tipo
-		if ($secao = $this->getTipo()) { // TODO Late static Binding
+		if ($secao = static::getTipo()) {
 			if ($secao->getNome() == 'Home' && !$secao->getParent()->id_tipo) {
 				return; // Home
 			}
@@ -150,10 +150,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	}
 	
 	protected function _prepareMetas() {
-		if ($settings = $this->getSettings()) { // TODO Late Static Binding static::getSettings()
+		if ($settings = static::getSettings()) {
 			$metas = Zend_Registry::get('metas');
-			$tipo = self::getTipo();
-			$record = self::getRecord();
+			$tipo = static::getTipo();
+			$record = static::getRecord();
 			if (!$settings->title) {
 				$tipo->getFieldsValues('nome');
 				if ($tipo->nome != 'Home') {
@@ -215,6 +215,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				}
 				if ($action == '$action') {
 					$action = $this->_getParam('action');
+				} elseif ($this->_getParam('action') != 'index') {
+					$tipos = static::getTiposArray();
+					if (!$tipos['action']) {
+						return false; // won't forward unexistent actions
+					}
 				}
 				static $loop_count = 0;
 				$loop_count++;
@@ -234,47 +239,57 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * 
 	 * @return InterAdminTipo
 	 */
-	public function getTipo() {
-		if (!isset(self::$tipo)) {
-			if (isset($this) && $this instanceof self) { // TODO Corrigir no 5.3 com Late Static Binding
-				$parentTipo = $this->getRootTipo();
-			} else {
-				$parentTipo = self::getRootTipo();
-			}
-			$request = Zend_Controller_Front::getInstance()->getRequest();
-			
-			$tipos = array();
-			if ($request->getModuleName() != 'default') {
-				$tipos[] = toId($request->getModuleName());
-			}
-			if ($request->getControllerName() != 'index') {
-				$tipos[] = toId($request->getControllerName());
-			}
-			if ($request->getActionName() != 'index') {
-				$tipos[] = toId($request->getActionName());
-			}
-			if (!$tipos) {
-				$tipos[] = 'home';
-			}
-			
-			foreach ($tipos as $id_tipo_string) {
-				$tipo = $parentTipo->getFirstChild(array(
-					'fields' => array('template'),
-					'where' => array("id_tipo_string = '" . $id_tipo_string . "'")
-				));
-				// Caso action não exista no interadmin, mas o controller sim
-				if (!$tipo) { 
-					if ($parentTipo->id_tipo) {
-						$tipo = $parentTipo;
-					}
-					break;
-				}
-				$parentTipo = $tipo;
-			}
-			self::$tipo = $tipo;
+	public static function getTipo() {
+		if (!isset(static::$tipo)) {
+			$tipos = static::getTiposArray();
+			static::$tipo = end($tipos);
 		}
-		return self::$tipo;
+		return static::$tipo;
 	}
+	
+	public static function getTiposArray() {
+		$tipo = static::getRootTipo();
+		$path = static::getTiposPath();
+		
+		$array = array(
+			'root' => $tipo
+		);
+		foreach ($path as $key => $directory) {
+			$tipo = $tipo->getFirstChild(array(
+				'fields' => array('template', 'nome'),
+				'where' => array("id_tipo_string = '" . toId($directory) . "'")
+			));
+			if (toSeo($tipo->nome) != $directory) {
+				$tipo = null;
+			}
+			if (!$tipo) {
+				break;
+			}
+			$array[$key] = $tipo;
+		}
+		return $array;
+	}
+	
+	public static function getTiposPath() {
+		$front = Zend_Controller_Front::getInstance();
+		$request = $front->getRequest();
+		
+		$path = array();
+		if ($request->getModuleName() != $front->getDefaultModule()) {
+			$path['module'] = $request->getModuleName();
+		}
+		if ($request->getControllerName() != 'index') {
+			$path['controller'] = $request->getControllerName();
+		}
+		if ($request->getActionName() != 'index') {
+			$path['action'] = $request->getActionName();
+		}
+		if (!$path) {
+			$path['controller'] = 'home';
+		}
+		return $path;
+	}
+	
 	/**
 	 * Sets the InterAdminTipo for this controller.
 	 * 
@@ -282,15 +297,15 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @return void
 	 */
 	public static function setTipo(InterAdminTipo $tipo = null) {
-		self::$tipo = $tipo;
+		static::$tipo = $tipo;
 	}
 	
 	public static function getRecord() {
-		return self::$record;
+		return static::$record;
 	}
 	
 	public static function setRecord(InterAdmin $record = null) {
-		self::$record = $record;
+		static::$record = $record;
 	}
 	
 	/**
@@ -327,7 +342,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		}
 		
 		//Retrieves all the menus
-		$rootTipo = self::getRootTipo();
+		$rootTipo = static::getRootTipo();
 		$menu = $rootTipo->getChildren($options);
 		
 		foreach ($menu as $item) {
@@ -344,7 +359,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	}
 	
 	public static function getSettings() {
-		if ($tipo = self::getTipo()) {
+		if ($tipo = static::getTipo()) {
 			$settingsTipo = $tipo->getFirstChildByModel('Settings');
 			if ($settingsTipo instanceof InterAdminTipo) {
 				return $settingsTipo->findFirst(array(
