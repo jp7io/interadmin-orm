@@ -136,4 +136,21 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 
         return $finalClass;
     }
+    
+    // Custom: Won't remove special characters from the URL
+    // controller/index~ will trigger page not found, because "index~Action" does not exist
+    public function formatActionName($unformatted)
+    {
+    	$segments = (array) $unformatted;
+    	foreach ($segments as $key => $segment) {
+    		$segment        = str_replace($this->getWordDelimiter(), ' ', strtolower($segment));
+    		//$segment        = preg_replace('/[^a-z0-9 ]/', '', $segment);
+    		$segments[$key] = str_replace(' ', '', ucwords($segment));
+    	}
+    	
+    	$formatted = implode('_', $segments);
+    	
+        return strtolower(substr($formatted, 0, 1)) . substr($formatted, 1) . 'Action';
+    }
+    
 }
