@@ -8,6 +8,17 @@ class Jp7_Tag_Table extends Jp7_Tag_Container {
 		return $tr;
 	}
 	
+	public static function fromArray($array) {
+		$object = new self;
+		foreach ($array as $row) {
+			$tr = $object->tr();
+			foreach ($row as $cell) {
+				$tr->td($cell);
+			}
+		}
+		return $object;
+	}
+	
 	public function rotate() {
 		$trs = $this->getItems();
 		

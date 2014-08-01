@@ -17,11 +17,6 @@
 class Jp7_Debugger {
 	const EMAIL = 'debug@jp7.com.br';
 	/**
-	 * Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
-	 * @var bool
-	 */
-	public $active;
-	/**
 	 * Flag indicating if filenames will be showed or not. Use $_GET['debug_filename'] to set it.
 	 * @var bool 
 	 */
@@ -80,10 +75,6 @@ class Jp7_Debugger {
 			setcookie('debug_toolbar', $_GET['debug_toolbar'], 0, '/');
 			$_COOKIE['debug_toolbar'] = $_GET['debug_toolbar'];
 		}
-		// Setting it as active
-		if ($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) {
-			$this->active = true;
-		}
 	}
 	/**
 	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
@@ -141,15 +132,9 @@ class Jp7_Debugger {
 	 * @param string Stylesheet on the box displayed. The default value is ''.
 	 * @return void
 	 */	
-	public function showSql($sql, $forceDebug = false, $style = '') {
-		if ($forceDebug) {
-			ob_flush();
-			flush();
-		}
-		if (!$this->isSafePoint()) {
-			return;
-		}
-		if ($this->debugSql || $forceDebug) {
+	public function showSql($sql, $time, $forceOutput = false, $style = '') {
+		$this->addLog($sql, 'sql', $time);
+		if ($this->isSafePoint() || $forceOutput) {
 			echo $this->syntaxHighlightSql($sql, $style) ;
 		}
 	}
@@ -228,7 +213,7 @@ class Jp7_Debugger {
 		
 		$html = '<hr />';
 		$html .= $this->_getBacktraceLabel('CALL STACK') . '<br />';
-		$html .= '<table id="jp7_debugger_table"><tr><th>#</th><th>Function</th><th>Location</th></tr>';
+		$html .= '<table class="jp7_debugger_table"><tr><th>#</th><th>Function</th><th>Location</th></tr>';
 		foreach ($backtrace as $key => $row) {
 			$html .= '<tr><td>' . (count($backtrace) - $key) . '</td>';
 			$html .= '<td>' . $row['class'] . $row['type'] . $row['function'] . '()</td>';
@@ -320,19 +305,22 @@ class Jp7_Debugger {
  	 * @return void
 	 */
 	public function showToolbar() {
-		if (!$this->active || !$this->isSafePoint()) {
-			return;
+		if (($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) && $this->isSafePoint()) {
+			if ($this->_templateFilename) {
+				echo ('Template: ' . $this->_templateFilename);
+			} else {
+				echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
+			}
+			echo $this->getLogTable();
+			$this->getTime(true);
 		}
-		
-		if ($this->_templateFilename) {
-			echo ('Template: ' . $this->_templateFilename);
-		} else {
-			echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
-		}
-		
-		krumo($this->_log);
-		$this->getTime(true);
 	}
+	
+	public function getLogTable() {
+		$table = Jp7_Tag_Table::fromArray($this->_log);
+		return $table->attr('border', 1)->attr('class', 'jp7_debugger_table debug-toolbar');		
+	}
+	
 	public function isSafePoint() {
 		return $this->_safePoint || headers_sent();
 	}

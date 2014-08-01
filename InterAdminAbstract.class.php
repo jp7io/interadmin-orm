@@ -395,8 +395,7 @@ abstract class InterAdminAbstract implements Serializable {
 				" WHERE " . $filters . $clauses .
 				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 			// Debug
-			if ($debugger) {
-				$debugger->showSql($sql, $options['debug']);
+			if ($debugger->debugSql || $options['debug']) {
 				$debugger->startTime();
 			}
 			// Run SQL
@@ -408,9 +407,10 @@ abstract class InterAdminAbstract implements Serializable {
 				}			
 				die(jp7_debug($erro, $sql));
 			}
-		
-			if ($debugger) {
-				$debugger->getTime($options['debug']);
+			
+			if ($debugger->debugSql || $options['debug']) {
+				$time = $debugger->getTime($options['debug']);
+				$debugger->showSql($sql, $time, $options['debug']);
 			}
 			$select_multi_fields = $options['select_multi_fields'];			
 			/*
