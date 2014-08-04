@@ -2,6 +2,7 @@
 class Jp7_Session_File { 
 	static $save_path;
 	static $maxlifetime = 43200; // 12 Horas
+	static $save_handler;
 	
 	protected function __construct() {
 		// Private
@@ -50,7 +51,8 @@ class Jp7_Session_File {
 	}
 	
 	public static function register() {
-		$static_class = get_called_class();	
+		$static_class = get_called_class();
+		static::$save_handler = $static_class;
 		return session_set_save_handler(
 			array($static_class, 'open'),
 			array($static_class, 'close'),
@@ -59,5 +61,9 @@ class Jp7_Session_File {
 			array($static_class, 'destroy'),
 			array($static_class, 'gc')
 		);
+	}
+	
+	public static function getSaveHandler() {
+		return static::$save_handler;
 	}
 }
