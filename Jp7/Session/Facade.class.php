@@ -1,8 +1,8 @@
 <?php
-
 class Jp7_Session_Facade implements ArrayAccess {
 	private $_data = array();
 	public function __construct($session) {
+		trigger_error('Experimental - do not use', E_USER_WARNING);
 		$this->_data = $session;
 		session_write_close();
 	}
