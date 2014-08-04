@@ -104,6 +104,14 @@ class Jp7_Debugger {
 		}
 		return $debug_totaltime;
 	}
+	public function step($name, $tag = 'step') {
+		$this->addLog($name, $tag, $this->getTime());
+		$this->startTime();
+	}
+	
+	public function finish($name, $tag = 'step') {
+		$this->addLog($name, $tag, $this->getTime());
+	}
 	/**
 	 * Shows the filename if $safePoint and $debugFilename are <tt>TRUE</tt>. Adds the filename to $_log.
 	 *
@@ -133,7 +141,9 @@ class Jp7_Debugger {
 	 * @return void
 	 */	
 	public function showSql($sql, $time, $forceOutput = false, $style = '') {
-		$this->addLog($sql, 'sql', $time);
+		if ($time > 5) {
+			$this->addLog($sql, 'sql', $time);
+		}
 		if ($this->isSafePoint() || $forceOutput) {
 			echo $this->syntaxHighlightSql($sql, $style) ;
 		}
@@ -311,8 +321,8 @@ class Jp7_Debugger {
 			} else {
 				echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
 			}
-			echo $this->getLogTable();
 			$this->getTime(true);
+			echo $this->getLogTable();
 		}
 	}
 	
