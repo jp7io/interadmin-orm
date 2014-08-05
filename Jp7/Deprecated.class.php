@@ -70,8 +70,9 @@ class Jp7_Deprecated {
 		$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 	
 		// Debug - Before SQL injection
-		$debugger->showSql($sql, null, $sql_debug, 'color:#FFFFFF;background:#444444;');
-	
+		if ($debugger->debugSql) {
+			$debugger->showSql($sql, null, $sql_debug, 'color:#FFFFFF;background:#444444;');
+		}
 		// Split
 		$sql_slipt = preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
 		$sql_slipt = explode("{;}", $sql_slipt);
@@ -132,8 +133,9 @@ class Jp7_Deprecated {
 		// Join
 		$sql = $sql_select . $sql_from . $sql_where . $sql_final;
 		// Debug - After SQL injection
-		$debugger->showSql($sql, null, $sql_debug);
-	
+		if ($debugger->debugSql) {
+			$debugger->showSql($sql, null, $sql_debug);
+		}
 		// Return
 		if ($debugger->active) $debugger->startTime();
 		if($sql_db){
