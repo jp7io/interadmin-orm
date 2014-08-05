@@ -83,5 +83,16 @@ class Jp7_Utf8 {
 	 */
 	public static function decode($str) {
 		return utf8_decode(str_replace(self::$utf8, self::$cp1252, $str));
-	}	
+	}
+	
+	public static function decodeRecursive($array) {
+		foreach ($array as &$item) {
+			if (is_string($item)) {
+				$item = self::decode($item);
+			} elseif (is_object($item) || is_array($item)) {
+				$item = self::decodeRecursive($item);
+			}
+		}
+		return $array;
+	}
 }
