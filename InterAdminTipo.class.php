@@ -310,9 +310,29 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function distinct($column, $options) {
+		return $this->_aggregate('DISTINCT', $column, $options);
+	}
+	
+	public function max($column, $options) {
+		return reset($this->_aggregate('MAX', $column, $options));
+	}
+	
+	public function min($column, $options) {
+		return reset($this->_aggregate('MIN', $column, $options));
+	}
+	
+	public function sum($column, $options) {
+		return reset($this->_aggregate('SUM', $column, $options));
+	}
+	
+	public function avg($column, $options) {
+		return reset($this->_aggregate('AVG', $column, $options));
+	}
+	
+	protected function _aggregate($function, $column, $options) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
-		$options['fields'] = 'DISTINCT(' . $column . ') AS values';
+		$options['fields'] = $function . '(' . $column . ') AS values';
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
@@ -323,7 +343,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		while ($row = $rs->FetchNextObj()) {
 			$array[] = $row->{'main.values'};
 		}
-		return $array;
+		return $array;	
 	}
 	
 	/**
@@ -345,9 +365,11 @@ class InterAdminTipo extends InterAdminAbstract {
 			// O COUNT() precisa trazer a contagem total em 1 linha
 			// Caso exista GROUP BY id, ele traria em várias linhas
 			// Esse é um tratamento especial apenas para o ID
-			// FIXME Se houver GROUP BY com outro campo, retornará a contagem errada
 			$options['fields'] = array('COUNT(DISTINCT id) AS count_id');
 			unset($options['group']);
+		} elseif ($options['group']) {
+			// Se houver GROUP BY com outro campo, retornará a contagem errada
+			throw new Exception("GROUP BY is not supported when using count().");
 		} else {
 			$options['fields'] = array('COUNT(id) AS count_id');
 		}

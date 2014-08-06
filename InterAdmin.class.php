@@ -132,6 +132,14 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $children[$nome_id];
 	}
+	
+	public function getChildrenTipoByNome($nome_id) {
+		$child = $this->_findChild($nome_id);
+		if ($child) {
+			return $this->getChildrenTipo($child['id_tipo']);
+		}
+	}
+	
 	/**
 	 * Magic method calls
 	 * 
