@@ -137,7 +137,7 @@ class Jp7_Deprecated {
 			$debugger->showSql($sql, null, $sql_debug);
 		}
 		// Return
-		if ($debugger->active) $debugger->startTime();
+		if ($debugger->debugSql) $debugger->startTime();
 		if($sql_db){
 			if(isset($numrows) && isset($offset))
 				$rs_pre = $sql_db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
@@ -149,7 +149,7 @@ class Jp7_Deprecated {
 			else
 				$rs_pre = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		}
-		if ($debugger->active) $debugger->addLog($sql, 'sql', $debugger->getTime($_GET['debug_sql']));
+		if ($debugger->debugSql) $debugger->addLog($sql, 'sql', $debugger->getTime($_GET['debug_sql']));
 	
 		if ($rs && $sql) eval("global \$" . $rs . ";\$" . $rs . "=\$rs_pre;");
 		else return $rs_pre;
