@@ -138,7 +138,10 @@ class InterAdminField {
 					'nome' => $campo_nome,
 					'label' => $campo_array['label']
 				));
-				
+				if ($xtra == 'X' && $readonly) {
+					$xtra = ''; // Com busca não tem readonly
+					$campo_array['where'] .= ' AND id IN(' . ($valor ?: '0') . ')';
+				}
 				if ($xtra == 'X') {
 					include 'site/aplicacao/select_multi.php';
 					$campo_nome = trim($campo_nome);
