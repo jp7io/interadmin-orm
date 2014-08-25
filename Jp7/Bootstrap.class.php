@@ -13,6 +13,8 @@ class Jp7_Bootstrap {
 			unset($_COOKIE['PHPSESSID']); // Bug Zend_Session + Usuário com cookie errado
 		}	
 		
+		Zend_Session::setOptions(array('throw_startup_exceptions' => error_reporting()));
+
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
 		Zend_Registry::set('get', new Zend_Filter_Input(null, null, $_GET));
