@@ -334,6 +334,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$options['fields'] = $function . '(' . $column . ') AS values';
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
+		
+		$options['whiny_children_group'] = true;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}

@@ -431,11 +431,18 @@ abstract class InterAdminAbstract implements Serializable {
 		// Group by para wheres com children
 		if (!$options['group'] && strpos($options['fields'][0], 'DISTINCT') === false) {
 			// strpos por Performance
-			if (strpos($options['where'] . ' ' . $options['order'], 'children_') !== false || strpos($options['where'] . ' ' . $options['order'], 'tags.') !== false) { 
+			if (
+				(strpos($options['where'] . ' ' . $options['order'], 'children_') !== false || strpos($options['where'] . ' ' . $options['order'], 'tags.') !== false) &&
+				strpos($options['where'], 'EXISTS ') === false
+			) {
+				$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
 				preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 				foreach ($matches[1] as $match) {
 					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
 					if ($match[0] != "'") {
+						if (isset($options['whiny_children_group'])) {
+							throw new Exception('This method cannot be used with children or tags. Use EXISTS if needed.');	
+						}
 						$options['group'] = 'main.id';
 						break;
 					}
@@ -464,6 +471,8 @@ abstract class InterAdminAbstract implements Serializable {
 		);
 		
 		$offset = 0;
+		$ignoreJoinsUntil = -1;
+			
 		while(preg_match('/(' . $quoted . '|' . $keyword . $not_function . '|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
 			// Resolvendo true e false para char
@@ -524,6 +533,8 @@ abstract class InterAdminAbstract implements Serializable {
 					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
 					$clause = $inicioRep . substr($clause, strlen($inicio . $existsMatches[0]));
 					$offset = strlen($inicioRep);
+					
+					$ignoreJoinsUntil = $offset + strlen($clause);
 					continue;
 				}
 			}
@@ -537,7 +548,7 @@ abstract class InterAdminAbstract implements Serializable {
 				if ($table != 'main') {
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					if ($table == 'tags') {
-						if (!in_array($table, (array) $options['from_alias'])) {
+						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
 							" ON " . $table . ".parent_id = main.id";
@@ -555,7 +566,7 @@ abstract class InterAdminAbstract implements Serializable {
 							'db' => $this->_db,
 							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
-						if (!in_array($table, (array) $options['from_alias'])) {
+						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $joinTipo->getInterAdminsTableName() .
 							' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
@@ -568,7 +579,7 @@ abstract class InterAdminAbstract implements Serializable {
 						if ($options['joins'] && $options['joins'][$table]) {
 							$joinTipo = $options['joins'][$table][1];
 						} else {
-							if (!in_array($table, (array) $options['from_alias'])) {
+							if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
 								$this->_addJoinAlias($options, $table, $campos[$joinNome]);
 							}
 							$joinTipo = $this->getCampoTipo($campos[$joinNome]);
