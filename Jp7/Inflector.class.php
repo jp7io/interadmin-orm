@@ -107,8 +107,12 @@ class Jp7_Inflector {
      * @param 	string 	$lower_case_and_underscored_word  Phrase to convert
      * @return 	string  Camel case form of the phrase: LowerCaseAndUnderscoredWord
      */
-   	public static function camelize($lower_case_and_underscored_word) {
+   	public static function camelize($lower_case_and_underscored_word, $uppercase_first_letter = true) {
 		$lower_case_and_underscored_word = toId($lower_case_and_underscored_word, false, '_'); 
-        return str_replace(' ', '', ucwords(str_replace('_', ' ', $lower_case_and_underscored_word)));
+        $result = str_replace(' ', '', ucwords(str_replace('_', ' ', $lower_case_and_underscored_word)));
+        if (!$uppercase_first_letter) {
+        	$result = lcfirst($result);
+        }
+        return $result;
     }
 } 
