@@ -37,9 +37,9 @@ class SoapResponseHandler extends Handler
         $xml .= '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">';
         $xml .= '  <SOAP-ENV:Body>';
         $xml .= '    <SOAP-ENV:Fault>';
-        $xml .= '      <faultcode>'. htmlspecialchars($exception->getCode()) .'</faultcode>';
-        $xml .= '      <faultstring>'. htmlspecialchars($exception->getMessage()) .'</faultstring>';
-        $xml .= '      <detail><trace>'. htmlspecialchars($exception->getTraceAsString()) .'</trace></detail>';
+        $xml .= '      <faultcode>'. htmlspecialchars($exception->getCode(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') .'</faultcode>';
+        $xml .= '      <faultstring>'. htmlspecialchars($exception->getMessage(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') .'</faultstring>';
+        $xml .= '      <detail><trace>'. htmlspecialchars($exception->getTraceAsString(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') .'</trace></detail>';
         $xml .= '    </SOAP-ENV:Fault>';
         $xml .= '  </SOAP-ENV:Body>';
         $xml .= '</SOAP-ENV:Envelope>';

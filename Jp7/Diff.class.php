@@ -157,12 +157,12 @@ class _HWLDF_WordAccumulator {
 		if ($this->_group !== '') {
 			if ($this->_tag == 'ins')
 			$this->_line .= '<ins class="diffchange diffchange-inline">' .
-			htmlspecialchars ( $this->_group ) . '</ins>';
+			htmlspecialchars ( $this->_group , ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '</ins>';
 			elseif ($this->_tag == 'del')
 			$this->_line .= '<del class="diffchange diffchange-inline">' .
-			htmlspecialchars ( $this->_group ) . '</del>';
+			htmlspecialchars ( $this->_group, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1' ) . '</del>';
 			else
-			$this->_line .= htmlspecialchars ( $this->_group );
+			$this->_line .= htmlspecialchars ( $this->_group, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1' );
 		}
 		$this->_group = '';
 		$this->_tag = $new_tag;

@@ -67,14 +67,14 @@ class Jp7_Diff_TableFormatter extends Jp7_Diff_Formatter {
 		foreach ($lines as $line) {
 			echo '<tr>' . $this->emptyLine() .
 			$this->addedLine( '<ins class="diffchange">' .
-			htmlspecialchars ( $line ) . '</ins>' ) . "</tr>\n";
+			htmlspecialchars ( $line, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1' ) . '</ins>' ) . "</tr>\n";
 		}
 	}
 
 	function _deleted($lines) {
 		foreach ($lines as $line) {
 			echo '<tr>' . $this->deletedLine( '<del class="diffchange">' .
-			htmlspecialchars ( $line ) . '</del>' ) .
+			htmlspecialchars ( $line, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1' ) . '</del>' ) .
 			$this->emptyLine() . "</tr>\n";
 		}
 	}
@@ -82,8 +82,8 @@ class Jp7_Diff_TableFormatter extends Jp7_Diff_Formatter {
 	function _context( $lines ) {
 		foreach ($lines as $line) {
 			echo '<tr>' .
-			$this->contextLine( htmlspecialchars ( $line ) ) .
-			$this->contextLine( htmlspecialchars ( $line ) ) . "</tr>\n";
+			$this->contextLine( htmlspecialchars ( $line, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1' ) ) .
+			$this->contextLine( htmlspecialchars ( $line, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1' ) ) . "</tr>\n";
 		}
 	}
 

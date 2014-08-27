@@ -119,7 +119,7 @@ class PHPExcel_Shared_XMLWriter extends XMLWriter {
 		}
 
 		if (method_exists($this, 'writeRaw')) {
-			return $this->writeRaw(htmlspecialchars($text));
+			return $this->writeRaw(htmlspecialchars($text, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1'));
 		}
 
 		return $this->text($text);
