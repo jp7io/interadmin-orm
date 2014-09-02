@@ -48,6 +48,11 @@ class Jp7_Date extends DateTime {
 		}
 	}
 	
+	public function cloneAndModify($string) {
+		$copy = clone $this;
+		return $copy->modify($string);
+	}
+	
 	/**
 	 * Retorna string da diferença de tempo, ex: '3 dias atrás'.
 	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
