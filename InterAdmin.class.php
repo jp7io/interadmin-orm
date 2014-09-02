@@ -53,6 +53,11 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected static $publish_filters_enabled = true;
 	/**
+	 * Timestamp for testing filters with a different date.
+	 * @var int
+	 */
+	protected static $timestamp;
+	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param string $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
@@ -617,8 +622,8 @@ class InterAdmin extends InterAdminAbstract {
 		global $config, $s_session;
 		$this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
 		return (
-			strtotime($this->date_publish) <= time() &&
-			(strtotime($this->date_expire) >= time() || $this->date_expire == '0000-00-00 00:00:00') &&
+			strtotime($this->date_publish) <= InterAdmin::getTimestamp() &&
+			(strtotime($this->date_expire) >= InterAdmin::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
 			$this->char_key &&
 			($this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
 			!$this->deleted
@@ -781,6 +786,12 @@ class InterAdmin extends InterAdminAbstract {
 	public static function isPublishedFiltersEnabled() {
 		return self::$publish_filters_enabled;
 	}
+	public static function getTimestamp() {
+		return isset(self::$timestamp) ? self::$timestamp : time();
+	}
+	public static function setTimestamp($time) {
+		self::$timestamp = $time;
+	}	
 	/**
 	 * Merges two option arrays.
 	 * 

@@ -903,7 +903,6 @@ abstract class InterAdminAbstract implements Serializable {
 	
 	public static function getPublishedFilters($table, $alias) {
 		global $db, $config, $s_session;
-		//$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 		// Tipos
 		if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
 			return $alias . ".mostrar <> '' AND " . $alias . ".deleted_tipo = '' AND ";
@@ -915,8 +914,8 @@ abstract class InterAdminAbstract implements Serializable {
 			return $alias . ".mostrar <> '' AND " . $alias . ".deleted = '' AND ";
 		// Registros
 		} else {
-			$return = $alias . ".date_publish <= '" . date("Y-m-d H:i:59") . "'" .
-				" AND (" . $alias . ".date_expire > '" . date("Y-m-d H:i:00") . "' OR " . $alias . ".date_expire = '0000-00-00 00:00:00')" .
+			$return = $alias . ".date_publish <= '" . date("Y-m-d H:i:59", InterAdmin::getTimestamp()) . "'" .
+				" AND (" . $alias . ".date_expire > '" . date("Y-m-d H:i:00", InterAdmin::getTimestamp()) . "' OR " . $alias . ".date_expire = '0000-00-00 00:00:00')" .
 				" AND " . $alias . ".char_key <> ''" .
 				" AND " . $alias . ".deleted = ''".
 				" AND ";
