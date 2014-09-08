@@ -61,6 +61,19 @@ class Jp7_Collections {
 	 * @return array
 	 */
 	public static function filter($array, $clause, $debug = false) {
+		return array_filter($array, self::_clauseToFunction($clause, $debug));
+	}
+	
+	public static function detect($array, $clause, $debug = false) {
+		$function = self::_clauseToFunction($clause);
+		foreach ($array as $item) {
+			if ($function($item)) {
+				return $item;
+			}
+		}
+	}
+	
+	private static function _clauseToFunction($clause, $debug = false) {
 		if (is_array($clause)) {
 			$clause = implode(' AND ', $clause);
 		}
@@ -73,8 +86,9 @@ class Jp7_Collections {
 		if ($debug) {
 			krumo($fnBody);
 		}
-		return array_filter($array, create_function('$a', $fnBody));
+		return create_function('$a', $fnBody);
 	}
+	
 	/**
 	 * Flips an array of $itens->subitem into an array of $subitem->itens; 
 	 * 
@@ -106,7 +120,6 @@ class Jp7_Collections {
 		foreach ($array as $item) {
 			$separated[$item->$property][] = $item;
 		}
-		// Returning values with reindexed keys
 		return $separated;
 	}
 	
