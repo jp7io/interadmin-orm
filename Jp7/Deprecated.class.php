@@ -278,6 +278,9 @@ class Jp7_Deprecated {
 				$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 				if ($row = $rs->FetchNextObj()) {
 					if (count($fields_arr) > 1 || $OOP) {
+						if (!$O) {
+							$O = new stdClass;
+						}
 						foreach ($fields_arr as $field) {
 							$O->$field = $row->$field;
 						}

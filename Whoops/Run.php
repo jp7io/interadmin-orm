@@ -297,9 +297,9 @@ class Run
     public function handleError($level, $message, $file = null, $line = null)
     {
         if ($level & error_reporting()) {
-        	if ($level == E_WARNING && strpos($message, 'Creating default object from empty value') !== false) {
+        	if (strstr($_SERVER['HTTP_HOST'], '.') && $level == E_WARNING && strpos($message, 'Creating default object from empty value') !== false) {
         		return true; // Ignorar esse erro do PHP 5.4, por enquanto
-        	}        	
+        	}
             foreach ($this->silencedPatterns as $entry) {
                 $pathMatches = (bool) preg_match($entry["pattern"], $file);
                 $levelMatches = $level & $entry["levels"];
