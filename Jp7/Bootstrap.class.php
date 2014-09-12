@@ -107,6 +107,8 @@ class Jp7_Bootstrap {
 	}
 	
 	public static function initFrontController() {
+		global $config;
+		
 		$frontController = Zend_Controller_Front::getInstance();
 		// Alterando o dispatcher para abrir o template caso o Controller não exista
 		$frontController->setDispatcher(new Jp7_Controller_Dispatcher());
@@ -119,7 +121,7 @@ class Jp7_Bootstrap {
 		if (is_dir(APPLICATION_PATH . '/modules')) {
 			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
 		}
-		$frontController->throwExceptions(false);
+		$frontController->throwExceptions($config->isDesenvolvimento());
 		// @todo Usar config para determinar ambiente
 		$frontController->setParam('env', 'development');
 	}
