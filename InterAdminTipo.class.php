@@ -245,7 +245,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChild($options = array()) {
-		return reset($this->getChildren(array('limit' => 1) + $options));
+		$retorno = $this->getChildren(array('limit' => 1) + $options);
+		return $retorno[0];
 	}
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
@@ -255,7 +256,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChildByModel($model_id_tipo, $options = array()) {
-		return reset($this->getChildrenByModel($model_id_tipo, array('limit' => 1) + $options));
+		$retorno = $this->getChildrenByModel($model_id_tipo, array('limit' => 1) + $options);
+		return $retorno[0];
 	}
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "nome"
@@ -314,19 +316,23 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function max($column, $options) {
-		return reset($this->_aggregate('MAX', $column, $options));
+		$retorno = $this->_aggregate('MAX', $column, $options);
+		return $retorno[0];
 	}
 	
 	public function min($column, $options) {
-		return reset($this->_aggregate('MIN', $column, $options));
+		$retorno = $this->_aggregate('MIN', $column, $options);
+		return $retorno[0];
 	}
 	
 	public function sum($column, $options) {
-		return reset($this->_aggregate('SUM', $column, $options));
+		$retorno = $this->_aggregate('SUM', $column, $options);
+		return $retorno[0];
 	}
 	
 	public function avg($column, $options) {
-		return reset($this->_aggregate('AVG', $column, $options));
+		$retorno = $this->_aggregate('AVG', $column, $options);
+		return $retorno[0];
 	}
 	
 	protected function _aggregate($function, $column, $options) {

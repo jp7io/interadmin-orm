@@ -383,7 +383,8 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function getFirstChild($id_tipo, $options = array()) {
-		return reset($this->getChildren($id_tipo, array('limit' => 1) + $options));	
+		$retorno = $this->getChildren($id_tipo, array('limit' => 1) + $options);
+		return $retorno[0];	
 	}
 	/**
 	 * Returns the first Child by ID.
@@ -396,7 +397,8 @@ class InterAdmin extends InterAdminAbstract {
 	public function getChildById($id_tipo, $id, $options = array()) {
 		$options['limit'] = 1;
 		$options['where'][] = "id = " . intval($id);
-		return reset($this->getChildren($id_tipo, $options));	
+		$retorno = $this->getChildren($id_tipo, $options);
+		return $retorno[0];	
 	}
 	/**
 	 * Deletes all the children of a given $id_tipo.
@@ -484,7 +486,8 @@ class InterAdmin extends InterAdminAbstract {
 		return $arquivos;
 	}
 	public function getFirstArquivo($options = array()) {
-		return reset($this->getArquivos($options + array('limit' => 1)));
+		$retorno = $this->getArquivos($options + array('limit' => 1));
+		return $retorno[0];
 	}
 	/**
 	 * Deletes all the InterAdminArquivo records related with this record.
