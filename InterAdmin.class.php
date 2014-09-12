@@ -591,20 +591,22 @@ class InterAdmin extends InterAdminAbstract {
 			
 			$this->_tags = array();
 			while ($row = $rs->FetchNextObj()) {
-				$tag_tipo = InterAdminTipo::getInstance($row->id_tipo);
-				$tag_text = $tag_tipo->getFieldsValues('nome');
-				if ($row->id) {
-					$options = array(
-						'fields' => array('varchar_key'),
-						'where' => array('id = ' . $row->id)
-					);
-					$tag_registro = $tag_tipo->findFirst($options);
-					$tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';
-					$tag_registro->interadmin = $this;
-					$retorno[] = $tag_registro;
-				} else {
-					$tag_tipo->interadmin = $this;
-					$retorno[] = $tag_tipo;
+				if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
+					$tag_text = $tag_tipo->getFieldsValues('nome');
+					if ($row->id) {
+						$options = array(
+							'fields' => array('varchar_key'),
+							'where' => array('id = ' . $row->id)
+						);
+						if ($tag_registro = $tag_tipo->findFirst($options)) {
+							$tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';
+							$tag_registro->interadmin = $this;
+							$retorno[] = $tag_registro;
+						}
+					} else {
+						$tag_tipo->interadmin = $this;
+						$retorno[] = $tag_tipo;
+					}
 				}
 			}
 			$rs->Close();
