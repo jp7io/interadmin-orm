@@ -534,7 +534,7 @@ abstract class InterAdminAbstract implements Serializable {
 					$clause = $inicioRep . substr($clause, strlen($inicio . $existsMatches[0]));
 					$offset = strlen($inicioRep);
 					
-					$ignoreJoinsUntil = $offset + strlen($clause);
+					$ignoreJoinsUntil = $offset;
 					continue;
 				}
 			}
@@ -545,7 +545,9 @@ abstract class InterAdminAbstract implements Serializable {
 				if (strpos($termo, '.') !== false) {
 					list($table, $termo, $subtermo) = explode('.', $termo);
 				}
-				if ($table != 'main') {
+				if ($table === 'main') {
+					$campo = ($aliases[$termo]) ? $aliases[$termo] : $termo;
+				} else {
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					if ($table == 'tags') {
 						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
@@ -603,8 +605,6 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinAliases = array_flip($subJoinTipo->getCamposAlias());
 					}
 					$campo = ($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
-				} else {
-					$campo = ($aliases[$termo]) ? $aliases[$termo] : $termo;
 				}
 				$termo = $table . '.' . $campo;
 				$clause = substr_replace($clause, $termo, $pos, $len);
