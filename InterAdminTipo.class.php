@@ -311,26 +311,26 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $records;
 	}
 	
-	public function distinct($column, $options) {
+	public function distinct($column, $options = array()) {
 		return $this->_aggregate('DISTINCT', $column, $options);
 	}
 	
-	public function max($column, $options) {
+	public function max($column, $options = array()) {
 		$retorno = $this->_aggregate('MAX', $column, $options);
 		return $retorno[0];
 	}
 	
-	public function min($column, $options) {
+	public function min($column, $options = array()) {
 		$retorno = $this->_aggregate('MIN', $column, $options);
 		return $retorno[0];
 	}
 	
-	public function sum($column, $options) {
+	public function sum($column, $options = array()) {
 		$retorno = $this->_aggregate('SUM', $column, $options);
 		return $retorno[0];
 	}
 	
-	public function avg($column, $options) {
+	public function avg($column, $options = array()) {
 		$retorno = $this->_aggregate('AVG', $column, $options);
 		return $retorno[0];
 	}
@@ -341,7 +341,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['fields'] = $function . '(' . $column . ') AS values';
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		
-		$options['whiny_children_group'] = true;
+		if (isset($options['group'])) {
+			throw new Exception('This method cannot be used with GROUP BY.');	
+		}
+		
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}

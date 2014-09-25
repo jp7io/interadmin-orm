@@ -440,9 +440,6 @@ abstract class InterAdminAbstract implements Serializable {
 				foreach ($matches[1] as $match) {
 					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
 					if ($match[0] != "'") {
-						if (isset($options['whiny_children_group'])) {
-							throw new Exception('This method cannot be used with children or tags. Use EXISTS if needed.');	
-						}
 						$options['group'] = 'main.id';
 						break;
 					}
