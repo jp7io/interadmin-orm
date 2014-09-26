@@ -885,6 +885,31 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 	}
 	
+	public function where($where) {
+		$options = new InterAdminOptions($this);
+		return $options->where($where);
+	}
+	
+	public function fields($_) {
+		$options = new InterAdminOptions($this);
+		return call_user_method_array('fields', $options, func_get_args());
+	}
+	
+	public function limit($limit) {
+		$options = new InterAdminOptions($this);
+		return $options->limit($limit);
+	}
+	
+	public function group($group) {
+		$options = new InterAdminOptions($this);
+		return $options->group($group);
+	}
+	
+	public function order($order) {
+		$options = new InterAdminOptions($this);
+		return $options->order($order);
+	}
+	
 	/**
 	 * Returns the InterAdminTipo for a field.
 	 * 
