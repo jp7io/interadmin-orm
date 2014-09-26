@@ -41,11 +41,15 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function all($options = array()) {
-		return $this->provider->find(InterAdmin::mergeOptions($options, $this->options));
+	public function __call($method_name, $params) {
+		$last = count($params) - 1;
+		if (is_array($params[$last])) {
+			$params[$last] = InterAdmin::mergeOptions($this->options, $params[$last]);
+		} else {
+			$params[] = $this->options;
+		}
+		
+		return call_user_method_array($method_name, $this->provider, $params);
 	}
 	
-	public function first($options = array()) {
-		return $this->provider->findFirst(InterAdmin::mergeOptions($options, $this->options));
-	}
 }
