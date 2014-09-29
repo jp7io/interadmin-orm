@@ -26,6 +26,21 @@ class InterAdminOptions {
 		return $this;
 	}
 	
+	public function innerJoin($alias, $tipo, $on) {
+		$this->options['joins'][$alias] = array('INNER', $tipo, $on);
+		return $this;
+	}
+	
+	public function leftJoin($alias, $tipo, $on) {
+		$this->options['joins'][$alias] = array('LEFT', $tipo, $on);
+		return $this;
+	}
+	
+	public function rightJoin($alias, $tipo, $on) {
+		$this->options['joins'][$alias] = array('RIGHT', $tipo, $on);
+		return $this;
+	}
+	
 	public function limit($limit) {
 		$this->options['limit'] = $limit;
 		return $this;
