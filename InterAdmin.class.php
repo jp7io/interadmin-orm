@@ -312,11 +312,13 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function setParent(InterAdmin $parent = null) {
-		if (!isset($parent->id)) {
-			$parent->id = 0; // Necessário para que a referência funcione
-		}
-		if (!isset($parent->id_tipo)) {
-			$parent->id_tipo = 0; // Necessário para que a referência funcione
+		if (isset($parent)) {
+			if (!isset($parent->id)) {
+				$parent->id = 0; // Necessário para que a referência funcione
+			}
+			if (!isset($parent->id_tipo)) {
+				$parent->id_tipo = 0; // Necessário para que a referência funcione
+			}
 		}
 		$this->attributes['parent_id'] = &$parent->id;
 		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
