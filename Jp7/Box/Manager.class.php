@@ -176,7 +176,13 @@ class Jp7_Box_Manager {
 		$layout = self::getRecordMode() ? $parentTipo->layout_registros : $parentTipo->layout;
 		if ($layout) {
 			$position = self::$positions[$layout];
+			if (!$columns[$position]) {
+				$columns[$position] = new stdClass();
+			}
 			if (!$columns[$position]->boxes) {
+				if (!$columns[$position]->width) {
+					$columns[$position]->width = new stdClass();
+				}
 				$columns[$position]->width = self::$widths[$layout];
 				$columns[$position]->boxes = array(self::createBoxFromId('_content'));
 			}
