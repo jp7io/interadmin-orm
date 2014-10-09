@@ -201,7 +201,7 @@ class InterAdminMfa extends InterAdmin {
     	$message .= 'Obrigado por solicitar o seu token de acesso.';
     	$message .= '</div>';
     	
-    	//jp7_mail($this->email, $issuer . ' Token', $message, "From: " . $issuer . " <no-reply@jp7.com.br>\r\n");   	
+    	jp7_mail($this->email, $issuer . ' Token', $message, "From: " . $issuer . " <no-reply@jp7.com.br>\r\n");   	
     }
     
     public function maskEmail() {
