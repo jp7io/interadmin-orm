@@ -148,11 +148,11 @@ class InterAdminMfa extends InterAdmin {
     }
     
     private function getCliente() {
-    	global $s_interadmin_cliente;
-    	if (in_array($s_interadmin_cliente, array('extra', 'casasbahia', 'pontofrio'))) {
+    	global $config;
+    	if (in_array($config->name_id, array('extra', 'casasbahia', 'pontofrio'))) {
     		return 'novapontocom';
     	} else {
-    		return $s_interadmin_cliente;
+    		return $config->name_id;
     	}
     }
 
