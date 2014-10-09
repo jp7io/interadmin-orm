@@ -181,7 +181,7 @@ class InterAdmin extends InterAdminAbstract {
 				$nome_id = substr($methodName, strlen('get'), -strlen('ByStringId'));
 				if ($child = $this->_findChild($nome_id)) {
 					$options = (array) $args[1];
-					$options['where'][] = "id_string = " . intval($args[0]);
+					$options['where'][] = "id_string = '" . $args[0] . "'";
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
 			// get{ChildName}Count
@@ -314,11 +314,11 @@ class InterAdmin extends InterAdminAbstract {
 	public function setParent(InterAdmin $parent = null) {
 		if (isset($parent)) {
 			if (!isset($parent->id)) {
-				$parent->id = 0; // Necessário para que a referência funcione
-			}
+			$parent->id = 0; // Necessário para que a referência funcione
+		}
 			if (!isset($parent->id_tipo)) {
-				$parent->id_tipo = 0; // Necessário para que a referência funcione
-			}
+			$parent->id_tipo = 0; // Necessário para que a referência funcione
+		}
 		}
 		$this->attributes['parent_id'] = &$parent->id;
 		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
