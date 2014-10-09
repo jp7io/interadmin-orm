@@ -895,9 +895,9 @@ abstract class InterAdminAbstract implements Serializable {
 		return call_user_method_array('fields', $options, func_get_args());
 	}
 	
-	public function innerJoin($alias, $tipo, $on) {
+	public function join($alias, $tipo, $on) {
 		$options = new InterAdminOptions($this);
-		return $options->innerJoin($alias, $tipo, $on);
+		return $options->join($alias, $tipo, $on);
 	}
 	
 	public function leftJoin($alias, $tipo, $on) {

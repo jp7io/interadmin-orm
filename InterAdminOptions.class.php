@@ -26,7 +26,7 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function innerJoin($alias, $tipo, $on) {
+	public function join($alias, $tipo, $on) {
 		$this->options['joins'][$alias] = array('INNER', $tipo, $on);
 		return $this;
 	}
