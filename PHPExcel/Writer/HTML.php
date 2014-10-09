@@ -2,7 +2,7 @@
 /**
  * PHPExcel
  *
- * Copyright (c) 2006 - 2013 PHPExcel
+ * Copyright (c) 2006 - 2014 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,9 @@
  *
  * @category   PHPExcel
  * @package	PHPExcel_Writer_HTML
- * @copyright  Copyright (c) 2006 - 2013 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  * @license	http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version	1.7.9, 2013-06-02
+ * @version	##VERSION##, ##DATE##
  */
 
 
@@ -31,7 +31,7 @@
  *
  * @category   PHPExcel
  * @package	PHPExcel_Writer_HTML
- * @copyright  Copyright (c) 2006 - 2013 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
  */
 class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter {
 	/**
@@ -316,24 +316,24 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 		$html .= '  <head>' . PHP_EOL;
 		$html .= '	  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">' . PHP_EOL;
 		if ($properties->getTitle() > '')
-			$html .= '	  <title>' . htmlspecialchars($properties->getTitle(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '</title>' . PHP_EOL;
+			$html .= '	  <title>' . htmlspecialchars($properties->getTitle()) . '</title>' . PHP_EOL;
 
 		if ($properties->getCreator() > '')
-			$html .= '	  <meta name="author" content="' . htmlspecialchars($properties->getCreator(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="author" content="' . htmlspecialchars($properties->getCreator()) . '" />' . PHP_EOL;
 		if ($properties->getTitle() > '')
-			$html .= '	  <meta name="title" content="' . htmlspecialchars($properties->getTitle(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="title" content="' . htmlspecialchars($properties->getTitle()) . '" />' . PHP_EOL;
 		if ($properties->getDescription() > '')
-			$html .= '	  <meta name="description" content="' . htmlspecialchars($properties->getDescription(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="description" content="' . htmlspecialchars($properties->getDescription()) . '" />' . PHP_EOL;
 		if ($properties->getSubject() > '')
-			$html .= '	  <meta name="subject" content="' . htmlspecialchars($properties->getSubject(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="subject" content="' . htmlspecialchars($properties->getSubject()) . '" />' . PHP_EOL;
 		if ($properties->getKeywords() > '')
-			$html .= '	  <meta name="keywords" content="' . htmlspecialchars($properties->getKeywords(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="keywords" content="' . htmlspecialchars($properties->getKeywords()) . '" />' . PHP_EOL;
 		if ($properties->getCategory() > '')
-			$html .= '	  <meta name="category" content="' . htmlspecialchars($properties->getCategory(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="category" content="' . htmlspecialchars($properties->getCategory()) . '" />' . PHP_EOL;
 		if ($properties->getCompany() > '')
-			$html .= '	  <meta name="company" content="' . htmlspecialchars($properties->getCompany(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="company" content="' . htmlspecialchars($properties->getCompany()) . '" />' . PHP_EOL;
 		if ($properties->getManager() > '')
-			$html .= '	  <meta name="manager" content="' . htmlspecialchars($properties->getManager(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" />' . PHP_EOL;
+			$html .= '	  <meta name="manager" content="' . htmlspecialchars($properties->getManager()) . '" />' . PHP_EOL;
 
 		if ($pIncludeStyles) {
 			$html .= $this->generateStyles(true);
@@ -428,7 +428,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 					while($column++ < $dimension[1][0]) {
 						// Cell exists?
 						if ($sheet->cellExistsByColumnAndRow($column, $row)) {
-							$rowData[$column] = $sheet->getCellByColumnAndRow($column, $row);
+							$rowData[$column] = PHPExcel_Cell::stringFromColumnIndex($column) . $row;
 						} else {
 							$rowData[$column] = '';
 						}
@@ -588,7 +588,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 					}
 
 					// Convert UTF8 data to PCDATA
-					$filename = htmlspecialchars($filename, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+					$filename = htmlspecialchars($filename);
 
 					$html .= PHP_EOL;
 					if ((!$this->_embedImages) || ($this->_isPdf)) {
@@ -608,7 +608,10 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 					}
 
 					$html .= '<div style="position: relative;">';
-					$html .= '<img style="position: absolute; z-index: 1; left: ' . $drawing->getOffsetX() . 'px; top: ' . $drawing->getOffsetY() . 'px; width: ' . $drawing->getWidth() . 'px; height: ' . $drawing->getHeight() . 'px;" src="' . $imageData . '" border="0" />' . PHP_EOL;
+					$html .= '<img style="position: absolute; z-index: 1; left: ' . 
+                        $drawing->getOffsetX() . 'px; top: ' . $drawing->getOffsetY() . 'px; width: ' . 
+                        $drawing->getWidth() . 'px; height: ' . $drawing->getHeight() . 'px;" src="' . 
+                        $imageData . '" border="0" />';
 					$html .= '</div>';
 				}
 			}
@@ -1019,13 +1022,13 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 		$html .= $this->_setMargins($pSheet);
 			
 		if (!$this->_useInlineCss) {
-			$gridlines = $pSheet->getShowGridLines() ? ' gridlines' : '';
+			$gridlines = $pSheet->getShowGridlines() ? ' gridlines' : '';
 			$html .= '	<table border="0" cellpadding="0" cellspacing="0" id="sheet' . $sheetIndex . '" class="sheet' . $sheetIndex . $gridlines . '">' . PHP_EOL;
 		} else {
 			$style = isset($this->_cssStyles['table']) ?
 				$this->_assembleCSS($this->_cssStyles['table']) : '';
 
-			if ($this->_isPdf && $pSheet->getShowGridLines()) {
+			if ($this->_isPdf && $pSheet->getShowGridlines()) {
 				$html .= '	<table border="1" cellpadding="1" id="sheet' . $sheetIndex . '" cellspacing="1" style="' . $style . '">' . PHP_EOL;
 			} else {
 				$html .= '	<table border="0" cellpadding="1" id="sheet' . $sheetIndex . '" cellspacing="0" style="' . $style . '">' . PHP_EOL;
@@ -1111,9 +1114,9 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 
 			// Write cells
 			$colNum = 0;
-			foreach ($pValues as $cell) {
+			foreach ($pValues as $cellAddress) {
+                $cell = ($cellAddress > '') ? $pSheet->getCell($cellAddress) : '';
 				$coordinate = PHPExcel_Cell::stringFromColumnIndex($colNum) . ($pRow + 1);
-
 				if (!$this->_useInlineCss) {
 					$cssClass = '';
 					$cssClass = 'column' . $colNum;
@@ -1153,7 +1156,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 
 							// Convert UTF8 data to PCDATA
 							$cellText = $element->getText();
-							$cellData .= htmlspecialchars($cellText, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+							$cellData .= htmlspecialchars($cellText);
 
 							if ($element instanceof PHPExcel_RichText_Run) {
 								if ($element->getFont()->getSuperScript()) {
@@ -1179,7 +1182,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 								array($this, 'formatColor')
 							);
 						}
-						$cellData = htmlspecialchars($cellData, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+						$cellData = htmlspecialchars($cellData);
 						if ($pSheet->getParent()->getCellXfByIndex( $cell->getXfIndex() )->getFont()->getSuperScript()) {
 							$cellData = '<sup>'.$cellData.'</sup>';
 						} elseif ($pSheet->getParent()->getCellXfByIndex( $cell->getXfIndex() )->getFont()->getSubScript()) {
@@ -1215,7 +1218,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 
 				// Hyperlink?
 				if ($pSheet->hyperlinkExists($coordinate) && !$pSheet->getHyperlink($coordinate)->isInternal()) {
-					$cellData = '<a href="' . htmlspecialchars($pSheet->getHyperlink($coordinate)->getUrl(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '" title="' . htmlspecialchars($pSheet->getHyperlink($coordinate)->getTooltip(), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '">' . $cellData . '</a>';
+					$cellData = '<a href="' . htmlspecialchars($pSheet->getHyperlink($coordinate)->getUrl()) . '" title="' . htmlspecialchars($pSheet->getHyperlink($coordinate)->getTooltip()) . '">' . $cellData . '</a>';
 				}
 
 				// Should the cell be written or is it swallowed by a rowspan or colspan?
@@ -1233,7 +1236,9 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 					//	Also apply style from last cell in merge to fix borders -
 					//		relies on !important for non-none border declarations in _createCSSStyleBorder
 					$endCellCoord = PHPExcel_Cell::stringFromColumnIndex($colNum + $colSpan - 1) . ($pRow + $rowSpan);
-					$cssClass .= ' style' . $pSheet->getCell($endCellCoord)->getXfIndex();
+					if (!$this->_useInlineCss) {
+						$cssClass .= ' style' . $pSheet->getCell($endCellCoord)->getXfIndex();
+					}
 				}
 
 				// Write
@@ -1401,7 +1406,7 @@ class PHPExcel_Writer_HTML extends PHPExcel_Writer_Abstract implements PHPExcel_
 		}
 
 		// convert to PCDATA
-		$value = htmlspecialchars($pValue, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+		$value = htmlspecialchars($pValue);
 
 		// color span tag
 		if ($color !== null) {
