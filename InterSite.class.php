@@ -74,7 +74,8 @@ class InterSite {
 	 */
 	public static function isAtLocalhost()
 	{
-		if ($_SERVER['HTTP_HOST'] == 'localhost') {
+		$host = explode(':', $_SERVER['HTTP_HOST'])[0];
+		if ($host == 'localhost') {
 			return true;
 		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
 			return true;
@@ -135,6 +136,8 @@ class InterSite {
 	public function init($host) {
 		global $jp7_app;
 		
+		$host = explode(':', $host)[0];
+
 		// Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
 		$host = strtolower($host);
 		
@@ -193,10 +196,13 @@ class InterSite {
 			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
 				$this->db->host = $this->db->host_internal;
 			}
+
+			$this->db->prefix = 'interadmin_' . $this->name_id;
+
 			foreach((array) $this->server->vars as $var => $value) {
 				$this->$var = $value;
 			}
-			$this->url = ($_SERVER['HTTPS'] ? 'https' : 'http') . '://' . $this->server->host . '/' . jp7_path($this->server->path);
+			$this->url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $this->server->host . '/' . jp7_path($this->server->path);
 			
 			foreach($this->langs as $sigla => $lang) {
 				if ($lang->default) {
@@ -249,7 +255,9 @@ class InterSite {
 			}
 		}
 		
+
 		/* @todo TEMP - Creating old globals */
+		/*
 		$oldtypes = array(
 			self::PRODUCAO => 'Principal',
 			self::QA => 'QA',
@@ -290,6 +298,7 @@ class InterSite {
 			$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
 		}
 		$GLOBALS['c_lang_default'] = $this->lang_default;
+		*/
 		/* TEMP - Creating old globals */
 	}
 		

@@ -741,11 +741,13 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->getTipo()->getCamposAlias();
 	}
 	public function getTableName() {
+		global $config;
+		
 		if ($this->id_tipo) {
 			return $this->getTipo()->getInterAdminsTableName();
 		} else {
 			// Compatibilidade, tenta encontrar na tabela global
-			return $this->db_prefix . $this->table;
+			return $config->db->prefix . $this->table;
 		}
 	}
     /**

@@ -95,6 +95,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array		$options 	[optional] Default array of options. Available keys: db_prefix, fields.
 	 */
 	public function __construct($id_tipo = null, $options = array()) {
+		global $config;
+
 		if (is_null($id_tipo) || is_array($id_tipo)) {
 			$options = (array) $id_tipo;
 			$id_tipo = static::ID_TIPO;
@@ -102,7 +104,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// id_tipo must be a string, because in_array will not work with integers and an array of objects
 		$id_tipo = (string) $id_tipo;
 		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
 		$this->_db = $options['db'];
 		
 		if ($options['fields']) {
@@ -155,7 +157,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// Classe foi encontrada, instanciar o objeto
 		return new $class_name($id_tipo, $options);
 	}
-	public function getFieldsValues($fields) {
+	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
 		if (!isset($this->attributes['model_id_tipo'])) {
 			$eagerload = array('nome', 'language', 'parent_id_tipo', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
 			$neededFields = array_unique(array_merge((array) $fields, $eagerload));
@@ -816,7 +818,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		return array();
 	}
 	public function getTableName() {
-		return $this->db_prefix . '_tipos';
+		global $config;
+		return $config->db->prefix . '_tipos';
 	}
 	public function getInterAdminsOrder($order = '') {
 		if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
@@ -1112,6 +1115,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
 			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
 		}
+
 		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['order'] = $this->getInterAdminsOrder($options['order']);
 		// Internal use
@@ -1169,5 +1173,9 @@ class InterAdminTipo extends InterAdminAbstract {
      */
     public function getAdminAttributes() {
         return array();
+    }
+
+    public static function __callStatic($name, $arguments) {
+    	kd($method);
     }
 }

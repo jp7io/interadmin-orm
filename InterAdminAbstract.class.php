@@ -405,7 +405,8 @@ abstract class InterAdminAbstract implements Serializable {
 				if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
 					$erro .= ". Available fields: \n\t\t- " . implode("\n\t\t- ", array_keys($options['aliases']));
 				}			
-				die(jp7_debug($erro, $sql));
+				
+				throw new Exception($erro . ' - SQL: ' . $sql);
 			}
 			
 			if ($debugger->debugSql || $options['debug']) {
@@ -895,9 +896,9 @@ abstract class InterAdminAbstract implements Serializable {
 		return call_user_method_array('fields', $options, func_get_args());
 	}
 	
-	public function join($alias, $tipo, $on) {
+	public function innerJoin($alias, $tipo, $on) {
 		$options = new InterAdminOptions($this);
-		return $options->join($alias, $tipo, $on);
+		return $options->innerJoin($alias, $tipo, $on);
 	}
 	
 	public function leftJoin($alias, $tipo, $on) {
