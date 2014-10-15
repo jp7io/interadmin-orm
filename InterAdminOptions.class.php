@@ -41,7 +41,8 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function limit($limit) {
+	public function limit($offset, $rows = null) {
+		$limit = $offset . (is_null($rows) ? '' : ',' . $rows);
 		$this->options['limit'] = $limit;
 		return $this;
 	}
@@ -51,8 +52,9 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function order($order) {
-		$this->options['order'] = $order;
+	public function order($_) {
+		$order = func_get_args();
+		$this->options['order'] = implode(',', $order);
 		return $this;
 	}
 	
