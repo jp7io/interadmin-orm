@@ -464,7 +464,7 @@ abstract class InterAdminAbstract implements Serializable {
 		$reserved = array(
 			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
 			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
-			'INTERVAL', 'DAY', 'WEEK'
+			'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR'
 		);
 		
 		$offset = 0;
