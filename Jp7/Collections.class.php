@@ -115,10 +115,16 @@ class Jp7_Collections {
 		return array_values($subitens);
 	}
 	
-	public static function separate($array, $property) {
+	public static function separate($array, $clause) {
 		$separated = array();
+
+		$properties = explode('.', $clause);
 		foreach ($array as $item) {
-			$separated[$item->$property][] = $item;
+			$key = $item;
+			foreach ($properties as $property) {
+				$key = $key->$property;
+			}
+			$separated[$key][] = $item;
 		}
 		return $separated;
 	}
