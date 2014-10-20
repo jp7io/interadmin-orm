@@ -293,4 +293,21 @@ class Jp7_Collections {
 			}
 		}
 	}
+
+	public static function lists($interadminsArray, $column, $first = 'Selecione', $id_column = 'id') {
+		$list = [
+			"" => utf8_encode($first),
+			0  => '--------------------'
+		];
+
+		foreach ($interadminsArray as $interadmin) {
+			if (!$interadmin->$column || !$interadmin->$id_column) {
+				continue;
+			}
+
+			$list[toId($interadmin->$id_column)] = utf8_encode($interadmin->$column);
+		}
+		return $list;
+
+	}
 }
