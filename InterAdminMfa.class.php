@@ -3,6 +3,8 @@
 class InterAdminMfa extends InterAdmin {
 	const DEFAULT_FIELDS_ALIAS = true;
 	
+	private static $issuer;
+	
 	/**
 	 * @return InterAdmin_Mfa
 	 */
@@ -195,7 +197,7 @@ class InterAdminMfa extends InterAdmin {
     	$issuer = $this->getIssuer();
     	
     	$message = '<div style="font-family: Verdana;font-size: 13px;">';
-    	$message .= 'Token de acesso ao ' . $issuer . ':<br><br>';
+    	$message .= 'Token de acesso para ' . $issuer . ':<br><br>';
     	$message .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">' . $secret . '</div>';
     	$message .= '<br><br>';
     	$message .= 'Obrigado por solicitar o seu token de acesso.';
@@ -222,13 +224,20 @@ class InterAdminMfa extends InterAdmin {
     }
     
  	public function getIssuer() {
-    	global $config, $c_interadmin_app_title;
-    	$issuer = $c_interadmin_app_title . ' - ' . $config->name;
-    	
-    	if ($config->server->type != InterSite::PRODUCAO) {
-    		$issuer .= " (" . strtoupper($config->server->type == 'Desenvolvimento' ? 'Dev' : '') . ")";
-    	}
-    	return $issuer;
+ 		if (!self::$issuer) {
+	    	global $config, $c_interadmin_app_title;
+	    	self::$issuer = $c_interadmin_app_title . ' - ' . $config->name;
+	    	
+	    	if ($config->server->type != InterSite::PRODUCAO) {
+	    		self::$issuer .= " (" . strtoupper($config->server->type == 'Desenvolvimento' ? 'Dev' : '') . ")";
+	    	}
+ 		}
+ 		
+    	return self::$issuer;
+    }
+    
+    public function setIssuer($name) {
+    	self::$issuer = $name;
     }
     
     public function getGoogleQRCodeUrl($code) {
