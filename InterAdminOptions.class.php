@@ -55,7 +55,17 @@ class InterAdminOptions {
 		$this->options['order'] = $order;
 		return $this;
 	}
+
+	public function debug($debug = true) {
+		$this->options['debug'] = (bool)$debug;
+		return $this;
+	}
 	
+	public function usePublishedFilters($filters = true) {
+		$this->options['use_published_filters'] = (bool)$debug;	
+		return $this;
+	}
+
 	public function __call($method_name, $params) {
 		$last = count($params) - 1;
 		if (is_array($params[$last])) {

@@ -394,10 +394,10 @@ abstract class InterAdminAbstract implements Serializable {
 			    $joins .
 				" WHERE " . $filters . $clauses .
 				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-			// Debug
-			if ($debugger->debugSql || $options['debug']) {
-				$debugger->startTime();
-			}
+			// // Debug
+			// if ($debugger->debugSql || $options['debug']) {
+			// 	$debugger->startTime();
+			// }
 			// Run SQL
 			$rs = $db->Execute($sql);
 			if (!$rs) {
@@ -409,9 +409,9 @@ abstract class InterAdminAbstract implements Serializable {
 				throw new Exception($erro . ' - SQL: ' . $sql);
 			}
 			
-			if ($debugger->debugSql || $options['debug']) {
-				$time = $debugger->getTime($options['debug']);
-				$debugger->showSql($sql, $time, $options['debug']);
+			if ($options['debug']) {
+				// $time = $debugger->getTime($options['debug']);
+				krumo($sql);
 			}
 			$select_multi_fields = $options['select_multi_fields'];			
 			/*

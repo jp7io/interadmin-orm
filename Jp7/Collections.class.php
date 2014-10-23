@@ -44,7 +44,13 @@ class Jp7_Collections {
 		foreach ($array as $item) {
 			$hash = ':';
 			foreach ($keys as $key) {
-				$hash .= strtolower(jp7_normalize($item->$key));
+				$properties = explode('.', $key);
+				$value = $item;
+				foreach ($properties as $property) {
+					$value = $value->$property;
+				}
+
+				$hash .= strtolower(jp7_normalize($value));
 			}			
 			if (!$hashExistente[$hash]) {
 				$novaArray[] = $item;
@@ -300,14 +306,54 @@ class Jp7_Collections {
 			0  => '--------------------'
 		];
 
+		$properties = explode('.', $column);
+		$idProperties = explode('.', $id_column);
+
 		foreach ($interadminsArray as $interadmin) {
-			if (!$interadmin->$column || !$interadmin->$id_column) {
+			if (!is_object($interadmin)) continue;
+			
+			$value = $id = $interadmin;
+			foreach ($properties as $property) {
+				$value = $value->$property;
+			}
+			foreach ($idProperties as $property) {
+				$id = $id->$property;
+			}
+
+			if (!$value || !$id) {
 				continue;
 			}
 
-			$list[toId($interadmin->$id_column)] = utf8_encode($interadmin->$column);
+			$list[toId($id)] = utf8_encode($value);
 		}
-		return $list;
 
+		ksort($list, SORT_STRING);
+
+		return $list;
+	}
+
+	public static function extractFields($interadmins, $column, $order = true, $distinct = true) {
+		$novoArray = [];
+
+		$properties = explode('.', $column);
+
+		if ($interadmins) {
+			foreach ($interadmins as $interadmin) {
+				$value = $interadmin;
+				foreach ($properties as $property) {
+					$value = $value->$property;
+				}
+
+				if (!$value || ($distinct && in_array($value, $novoArray))) { continue; }
+
+				$novoArray[] = $value;
+			}
+		}
+
+		if ($order) {
+			sort($novoArray);
+		}
+
+		return $novoArray;
 	}
 }
