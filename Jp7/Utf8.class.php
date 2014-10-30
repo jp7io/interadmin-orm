@@ -95,4 +95,22 @@ class Jp7_Utf8 {
 		}
 		return $array;
 	}
+
+	/**
+	 * Encode recursive
+	 * @param string $str
+	 * @return string
+	 */
+	
+	public static function encodeRecursive($array) {
+		$novoArray = [];
+		foreach ($array as $key => $item) {
+			if (is_string($item)) {
+				$novoArray[self::encode($key)] = self::encode($item);
+			} elseif (is_object($item) || is_array($item)) {
+				$novoArray[self::encode($key)] = self::encodeRecursive($item);
+			}
+		}
+		return $novoArray;
+	}
 }

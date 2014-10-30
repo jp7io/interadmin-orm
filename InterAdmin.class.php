@@ -475,7 +475,7 @@ class InterAdmin extends InterAdminAbstract {
 		$rs = $this->_executeQuery($options);
 		
 		$records = array();
-		while ($row = $rs->FetchNextObj()) {
+		foreach ($rs as $row) {
 			$arquivo = new $className($row->id_arquivo, array(
 				'db_prefix' => $this->getTipo()->db_prefix,
 				'db' => $this->_db

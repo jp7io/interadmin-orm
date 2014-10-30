@@ -78,7 +78,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				return ($match[1]) ? reset($retorno) : $retorno;
 			}
 		}
-		// Default error when method doesn´t exist
+		// Default error when method doesnÂ´t exist
 		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $method . '()'));
 	}
 
@@ -138,15 +138,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['default_class'] = self::$_defaultClass;
 		}
 		if ($options['class']) {
-			// Classe foi forçada
+			// Classe foi forÃ§ada
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
-			// Classe não foi forçada, cria uma instância temporária para acessar o DB e verificar a classe correta
+			// Classe nÃ£o foi forÃ§ada, cria uma instÃ¢ncia temporÃ¡ria para acessar o DB e verificar a classe correta
 			$instance = new $options['default_class']($id_tipo, array_merge($options, array(
 				'fields' => array('model_id_tipo', 'class_tipo')
 			)));
 			$class_name = $instance->class_tipo;
-			// Classe não é customizada, retornar a própria classe temporária
+			// Classe nÃ£o Ã© customizada, retornar a prÃ³pria classe temporÃ¡ria
 			if (!class_exists($class_name)) {
 				if ($options['fields']) {
 					$instance->getFieldsValues($options['fields']);
@@ -226,7 +226,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$rs = $this->_executeQuery($options);
 		
 		$tipos = array();
-		while ($row = $rs->FetchNextObj()) {
+		foreach ($rs as $row) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
@@ -237,7 +237,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $tipo, $options);
 			$tipos[] = $tipo;
 		}
-		$rs->Close();
+		// $rs->Close();
 		return $tipos;
 	}
 	/**
@@ -279,7 +279,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		// Necessário enquanto algumas tabelas ainda tem esse campo numérico
+		// NecessÃ¡rio enquanto algumas tabelas ainda tem esse campo numÃ©rico
 		$options['where'][] = "model_id_tipo != '0'"; 
 		return $this->getChildren($options);
 	}
@@ -301,7 +301,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['select_multi_fields'] = $select_multi_fields;
 		
 		$records = array();
-		while ($row = $rs->FetchNextObj()) {
+		foreach ($rs as $row) {
 			$record = InterAdmin::getInstance($row->id, $optionsInstance, $this);
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
@@ -309,7 +309,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
-		$rs->Close();
+		// // $rs->Close();
 		return $records;
 	}
 	
@@ -353,7 +353,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$rs = $this->_executeQuery($options);
 		$array = array();
-		while ($row = $rs->FetchNextObj()) {
+		foreach ($rs as $row) {
 			$array[] = $row->{'main.values'};
 		}
 		return $array;	
@@ -376,12 +376,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function count($options = array()) {
 		if ($options['group'] == 'id') {
 			// O COUNT() precisa trazer a contagem total em 1 linha
-			// Caso exista GROUP BY id, ele traria em várias linhas
-			// Esse é um tratamento especial apenas para o ID
+			// Caso exista GROUP BY id, ele traria em vÃ¡rias linhas
+			// Esse Ã© um tratamento especial apenas para o ID
 			$options['fields'] = array('COUNT(DISTINCT id) AS count_id');
 			unset($options['group']);
 		} elseif ($options['group']) {
-			// Se houver GROUP BY com outro campo, retornará a contagem errada
+			// Se houver GROUP BY com outro campo, retornarÃ¡ a contagem errada
 			throw new Exception("GROUP BY is not supported when using count().");
 		} else {
 			$options['fields'] = array('COUNT(id) AS count_id');
@@ -579,7 +579,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 	}	
 	/**
-	 * Returns this object´s nome and all the fields marked as 'combo', if the field 
+	 * Returns this objectÂ´s nome and all the fields marked as 'combo', if the field 
 	 * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
 	 *
 	 * @return string For the tipo 'City' with the field 'state' marked as 'combo' it would return: 'City - State'.
@@ -1014,7 +1014,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			
 			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';		
 			$this->_tiposUsingThisModel = array();
-			while ($row = $rs->FetchNextObj()) {
+			foreach ($rs as $row) {
 				$this->_tiposUsingThisModel[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);;
 			}
 			$this->_tiposUsingThisModel[$this->id_tipo] = $this;
@@ -1049,7 +1049,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	public static function findTiposByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
 		if ($model_id_tipo != '0') {
-			// Devido à mudança de int para string do campo model_id_tipo, essa linha é necessária
+			// Devido Ã  mudanÃ§a de int para string do campo model_id_tipo, essa linha Ã© necessÃ¡ria
 			$options['where'][] = "model_id_tipo != '0'";
 		}
 		return self::findTipos($options); 
@@ -1084,7 +1084,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$rs = $instance->_executeQuery($options);
 		$tipos = array();
 		
-		while ($row = $rs->FetchNextObj()) {
+		foreach ($rs as $row) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $instance->db_prefix,
 				'db' => $instance->getDb(),
@@ -1137,7 +1137,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$rs = $this->_executeQuery($options);
 		$records = array();
-		while ($row = $rs->FetchNextObj()) {
+		foreach ($rs as $row) {
 			$record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->id_tipo]);
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;

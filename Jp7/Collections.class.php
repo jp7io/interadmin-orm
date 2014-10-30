@@ -232,7 +232,7 @@ class Jp7_Collections {
 	 * @param 	string	$separator		
 	 * @param 	array	$array					Array of objects.
 	 * @param 	string 	$propertyName 			[optional] Defaults to 'nome'.
-	 * @param 	bool 	$discardEmptyValues		If TRUE empty values won´t be imploded.
+	 * @param 	bool 	$discardEmptyValues		If TRUE empty values wonÂ´t be imploded.
 	 * @return 	string 	Values of $propertyName imploded using $separator.
 	 */
 	public static function implode($separator, $array, $propertyName = 'nome', $discardEmptyValues = true) {
@@ -301,9 +301,10 @@ class Jp7_Collections {
 	}
 
 	public static function lists($interadminsArray, $column, $first = 'Selecione', $id_column = 'id') {
+		
 		$list = [
-			"" => utf8_encode($first),
-			0  => '--------------------'
+			0 => $first,
+			1 => '--------------------'
 		];
 
 		$properties = explode('.', $column);
@@ -324,9 +325,9 @@ class Jp7_Collections {
 				continue;
 			}
 
-			$list[toId($id)] = utf8_encode($value);
+			$list[toId($id)] = $value;
 		}
-
+		
 		ksort($list, SORT_STRING);
 
 		return $list;
@@ -355,5 +356,15 @@ class Jp7_Collections {
 		}
 
 		return $novoArray;
+	}
+
+	public static function makeArray($fromArrays, $closure) {
+		$newArray = [];
+
+		foreach ($fromArrays AS $key => $value) {
+			$newArray += $closure($value, $key);
+		}
+
+		return $newArray;
 	}
 }
