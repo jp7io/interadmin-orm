@@ -34,8 +34,8 @@ class Jp7_View_Helper_HeadLink extends Zend_View_Helper_HeadLink {
 	public function toString($indent = null) {
 		$config = Zend_Registry::get('config');
 		foreach ($this as $item) {
-			if ($item->rel == 'stylesheet') {
-				$item->href .= (strpos($item->href, '?') ? '&' : '?') . 'build=' . $config->build;
+			if ($item->rel == 'stylesheet' && $config->build) {
+				$item->href .= (strpos($item->href, '?') !== false  ? '&' : '?') . 'build=' . $config->build;
 			}
         }
 		return parent::toString($indent);
