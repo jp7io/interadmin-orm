@@ -31,6 +31,10 @@ class Jp7_YouTube {
 		}
 	}
 	
+	public static function matchUrl($url) {
+		return preg_match('/^http(s)?:\/\/www.youtube.com/', $url);
+	}
+	
 	/**
 	 * Gets the HTML for embedding a Youtube Video.
 	 * 
@@ -64,7 +68,7 @@ class Jp7_YouTube {
 	 * @return string
 	 */
 	public static function getId($youTubeVideoUrl) {
-		if (strpos($youTubeVideoUrl, 'http://www.youtube.com/user/') === 0) {
+		if (preg_match('/^http(s)?:\/\/www.youtube.com\/user\//', $youTubeVideoUrl)) {
 			// Channels
 			return preg_replace('~(.*)/u/([0-9]*)/(.*)~', '\3', $youTubeVideoUrl);
 		} else {
