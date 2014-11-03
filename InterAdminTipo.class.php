@@ -292,6 +292,22 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function find($options = array()) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
+		if ((!isset($options['where']) || !in_array('id_slug', $options['where']))) {
+			$options['fields'][] = 'id_slug';
+
+			if ($options['fields']) {
+				foreach ($options['fields'] as $key => $field) {
+					if (!is_string($field)) { continue; }
+					
+					$explodedField = explode('.', $field);
+
+					if (count($explodedField) == 2) {
+						$options['fields'][] = $explodedField[0] . '.id_slug';
+					}
+				}
+			}
+		}
+
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
@@ -442,6 +458,17 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function findByIdString($id_string, $options = array()) {
 		$options['where'][] = "id_string = '" . $id_string . "'";
+		return $this->findFirst($options);
+	}
+
+	/**
+	 * Retrieves the first record which have this id_slug
+	 * 
+	 * @param string $id_slug Search value.
+	 * @return InterAdmin First InterAdmin object found.
+	 */
+	public function findByIdSlug($id_slug, $options = array()) {
+		$options['where'][] = "id_slug = '" . $id_slug . "'";
 		return $this->findFirst($options);
 	}
 	/**

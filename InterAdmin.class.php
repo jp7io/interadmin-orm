@@ -184,6 +184,13 @@ class InterAdmin extends InterAdminAbstract {
 					$options['where'][] = "id_string = '" . $args[0] . "'";
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
+			} elseif (substr($methodName, -8) == 'ByIdSlug') {
+				$nome_id = substr($methodName, strlen('get'), -strlen('ByIdSlug'));
+				if ($child = $this->_findChild($nome_id)) {
+					$options = (array) $args[1];
+					$options['where'][] = "id_slug = '" . $args[0] . "'";
+					return $this->getFirstChild($child['id_tipo'], $options);
+				}
 			// get{ChildName}Count
 			} elseif (substr($methodName, -5) == 'Count') {
 				$nome_id = substr($methodName, strlen('get'), -strlen('Count'));

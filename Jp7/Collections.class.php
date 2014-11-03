@@ -325,7 +325,7 @@ class Jp7_Collections {
 				continue;
 			}
 
-			$list[toId($id)] = $value;
+			$list[toSeo($id)] = $value;
 		}
 		
 		ksort($list, SORT_STRING);
