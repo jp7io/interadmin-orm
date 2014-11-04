@@ -36,6 +36,18 @@ class Jp7_YouTube {
 		return preg_match('/^http(s)?:\/\/www.youtube.com/', $url);
 	}
 	
+	public static function getTitle($youTubeVideoUrl) {
+		if ($id = self::getId($youTubeVideoUrl)) {
+			$restUrl = 'https://www.googleapis.com/youtube/v3/videos?id=' . $id . '&part=snippet&key=' . self::API_KEY;
+			
+			if ($data = json_decode(file_get_contents($restUrl))) {
+				if ($title = $data->items[0]->snippet->title) {
+					return $title;
+				}
+			}
+		}
+	}
+	
 	public static function getDuration($youTubeVideoUrl) {
 		if ($id = self::getId($youTubeVideoUrl)) {
 			$restUrl = 'https://www.googleapis.com/youtube/v3/videos?id=' . $id . '&part=contentDetails&key=' . self::API_KEY;
