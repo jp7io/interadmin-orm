@@ -473,7 +473,7 @@ abstract class InterAdminAbstract implements Serializable {
 		$reserved = array(
 			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
 			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
-			'INTERVAL', 'DAY', 'WEEK'
+			'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR'
 		);
 		
 		$offset = 0;
@@ -904,9 +904,9 @@ abstract class InterAdminAbstract implements Serializable {
 		return call_user_method_array('fields', $options, func_get_args());
 	}
 	
-	public function innerJoin($alias, $tipo, $on) {
+	public function join($alias, $tipo, $on) {
 		$options = new InterAdminOptions($this);
-		return $options->innerJoin($alias, $tipo, $on);
+		return $options->join($alias, $tipo, $on);
 	}
 	
 	public function leftJoin($alias, $tipo, $on) {
@@ -919,9 +919,9 @@ abstract class InterAdminAbstract implements Serializable {
 		return $options->rightJoin($alias, $tipo, $on);
 	}
 		
-	public function limit($limit) {
+	public function limit($offset, $rows = null) {
 		$options = new InterAdminOptions($this);
-		return $options->limit($limit);
+		return $options->limit($offset, $rows);
 	}
 	
 	public function group($group) {
@@ -929,9 +929,9 @@ abstract class InterAdminAbstract implements Serializable {
 		return $options->group($group);
 	}
 	
-	public function order($order) {
+	public function order($_) {
 		$options = new InterAdminOptions($this);
-		return $options->order($order);
+		return call_user_method_array('order', $options, func_get_args());
 	}
 	
 	/**

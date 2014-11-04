@@ -26,7 +26,7 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function innerJoin($alias, $tipo, $on) {
+	public function join($alias, $tipo, $on) {
 		$this->options['joins'][$alias] = array('INNER', $tipo, $on);
 		return $this;
 	}
@@ -41,7 +41,8 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function limit($limit) {
+	public function limit($offset, $rows = null) {
+		$limit = $offset . (is_null($rows) ? '' : ',' . $rows);
 		$this->options['limit'] = $limit;
 		return $this;
 	}
@@ -51,8 +52,9 @@ class InterAdminOptions {
 		return $this;
 	}
 	
-	public function order($order) {
-		$this->options['order'] = $order;
+	public function order($_) {
+		$order = func_get_args();
+		$this->options['order'] = implode(',', $order);
 		return $this;
 	}
 
@@ -65,7 +67,11 @@ class InterAdminOptions {
 		$this->options['use_published_filters'] = (bool)$debug;	
 		return $this;
 	}
-
+	
+	public function getOptionsArray() {
+		return $this->options;
+	}
+	
 	public function __call($method_name, $params) {
 		$last = count($params) - 1;
 		if (is_array($params[$last])) {
@@ -74,7 +80,12 @@ class InterAdminOptions {
 			$params[] = $this->options;
 		}
 		
-		return call_user_method_array($method_name, $this->provider, $params);
+		$retorno = call_user_method_array($method_name, $this->provider, $params);
+		if ($retorno instanceof InterAdminOptions) {
+			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
+			return $this;
+		}
+		return $retorno;
 	}
 	
 }

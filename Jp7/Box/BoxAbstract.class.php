@@ -23,6 +23,8 @@ abstract class Jp7_Box_BoxAbstract {
 	
 	protected function _prepareDataImages() {
 		// Tamanho das imagens
+		$this->params = (object) $this->params;
+		
 		$this->params->imgHeight = $this->params->imgHeight ? $this->params->imgHeight : 60;
 		$this->params->imgWidth = $this->params->imgWidth ? $this->params->imgWidth : 80;
 		
@@ -120,6 +122,8 @@ abstract class Jp7_Box_BoxAbstract {
 	 * @return string
 	 */
 	public function checkbox($name, $default_value = false) {
+		$this->params = (object) $this->params;
+		
 		if (is_null($this->params->$name)) {
 			$this->params->$name = $default_value;
 		}

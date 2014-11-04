@@ -34,7 +34,7 @@ class Jp7_View_Helper_HeadScript extends Zend_View_Helper_HeadScript {
 	public function toString($indent = null) {
 		$config = Zend_Registry::get('config');
 		foreach ($this as $item) {
-			if ($item->attributes['src']) {
+			if ($item->attributes['src'] && $config->build) {
 				$item->attributes['src'] .= (strpos($item->attributes['src'], '?') ? '&' : '?') . 'build=' . $config->build;
         	}
 		}

@@ -157,9 +157,9 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	}
 	
 	protected function _prepareImageData($box, $default_width = '80', $default_height = '60') {
-		$params = $box->params; // facilita
+		$params = (object) $box->params; // facilita
 		$view = $box->view;
-		
+				
 		$params->imgWidth = $params->imgWidth ? $params->imgWidth : $default_width;
 		$params->imgHeight = $params->imgHeight ? $params->imgHeight : $default_height;
 		$params->imgSize = $params->imgWidth . 'x' . $params->imgHeight; 

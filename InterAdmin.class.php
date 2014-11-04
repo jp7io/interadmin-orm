@@ -65,7 +65,7 @@ class InterAdmin extends InterAdminAbstract {
 	public function __construct($id = '0', $options = array()) {
 		$id = (string) $id;
 		$this->id = is_numeric($id) ? $id : '0';
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['config']->db->prefix;
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
 		$this->_db = $options['db'];
 		
@@ -321,11 +321,11 @@ class InterAdmin extends InterAdminAbstract {
 	public function setParent(InterAdmin $parent = null) {
 		if (isset($parent)) {
 			if (!isset($parent->id)) {
-			$parent->id = 0; // Necessário para que a referência funcione
-		}
+				$parent->id = 0; // Necessário para que a referência funcione
+			}
 			if (!isset($parent->id_tipo)) {
-			$parent->id_tipo = 0; // Necessário para que a referência funcione
-		}
+				$parent->id_tipo = 0; // Necessário para que a referência funcione
+			}
 		}
 		$this->attributes['parent_id'] = &$parent->id;
 		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
@@ -771,13 +771,11 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->getTipo()->getCamposAlias();
 	}
 	public function getTableName() {
-		global $config;
-		
 		if ($this->id_tipo) {
 			return $this->getTipo()->getInterAdminsTableName();
 		} else {
 			// Compatibilidade, tenta encontrar na tabela global
-			return $config->db->prefix . $this->table;
+			return $this->db_prefix . $this->table;
 		}
 	}
     /**

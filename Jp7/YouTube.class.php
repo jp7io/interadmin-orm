@@ -3,6 +3,7 @@
 class Jp7_YouTube {
 	const URL_PREFIX = 'http://www.youtube.com/v/';
 	const SHORT_URL_PREFIX = 'http://youtu.be/';
+	const API_KEY = 'AIzaSyACr-Ib2wc9mxT1AbGQHhzJ71GAeJoDrj4';	
 	
 	/**
 	 * Gets the link for embedding from the YouTube URL.
@@ -28,6 +29,36 @@ class Jp7_YouTube {
 	public static function getThumbnail($youTubeVideoUrl, $size = 0) {
 		if ($id = self::getId($youTubeVideoUrl)) {
 			return 'http://img.youtube.com/vi/' . $id . '/' . $size . '.jpg';
+		}
+	}
+	
+	public static function matchUrl($url) {
+		return preg_match('/^http(s)?:\/\/www.youtube.com/', $url);
+	}
+	
+	public static function getTitle($youTubeVideoUrl) {
+		if ($id = self::getId($youTubeVideoUrl)) {
+			$restUrl = 'https://www.googleapis.com/youtube/v3/videos?id=' . $id . '&part=snippet&key=' . self::API_KEY;
+			
+			if ($data = json_decode(file_get_contents($restUrl))) {
+				if ($title = $data->items[0]->snippet->title) {
+					return $title;
+				}
+			}
+		}
+	}
+	
+	public static function getDuration($youTubeVideoUrl) {
+		if ($id = self::getId($youTubeVideoUrl)) {
+			$restUrl = 'https://www.googleapis.com/youtube/v3/videos?id=' . $id . '&part=contentDetails&key=' . self::API_KEY;
+			
+			if ($data = json_decode(file_get_contents($restUrl))) {
+				if ($duration = $data->items[0]->contentDetails->duration) {
+					$date = new DateTime('00:00');
+					$date->add(new DateInterval($duration));
+					return preg_replace('/^00:/', '', $date->format('H:i:s'));
+				}	
+			}
 		}
 	}
 	
@@ -64,7 +95,7 @@ class Jp7_YouTube {
 	 * @return string
 	 */
 	public static function getId($youTubeVideoUrl) {
-		if (strpos($youTubeVideoUrl, 'http://www.youtube.com/user/') === 0) {
+		if (preg_match('/^http(s)?:\/\/www.youtube.com\/user\//', $youTubeVideoUrl)) {
 			// Channels
 			return preg_replace('~(.*)/u/([0-9]*)/(.*)~', '\3', $youTubeVideoUrl);
 		} else {
