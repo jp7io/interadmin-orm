@@ -885,9 +885,9 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 	}
 	
-	public function where($where) {
+	public function where($_) {
 		$options = new InterAdminOptions($this);
-		return $options->where($where);
+		return call_user_method_array('where', $options, func_get_args());
 	}
 	
 	public function fields($_) {
