@@ -399,12 +399,12 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->getTipo()
 			->fields(
 				// Real fields that is loaded in the record
-				array_filter(array_keys($this->attributes), function($value) use ($aliases){
-					return in_array($value, $aliases);
+				array_filter(array_keys($this->attributes), function($key) use ($aliases){
+					return in_array($key, $aliases);
 				})
 			)
 			->where("id <> {$this->id}")
-			->find();
+			->find($options);
 	}
 
 	/**
