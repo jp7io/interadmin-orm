@@ -7,7 +7,7 @@ class Jp7_ContactController extends __Controller_Action {
 	public function indexAction() {
 		include_once ROOT_PATH . '/inc/7.form.lib.php';
 		
-		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.maskedinput-1.2.2.min.js');
+		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.maskedinput-1.3.1.min.js');
 		
 		$contactTipo = self::getTipo();
 		// Introdução
