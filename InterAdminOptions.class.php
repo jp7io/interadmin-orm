@@ -21,7 +21,7 @@ class InterAdminOptions {
 	}
 		
 	public function fields($_) {
-		$fields = func_get_args();
+		$fields = is_array($_) ? $_ : func_get_args();
 		$this->options['fields'] = array_merge($this->options['fields'], $fields);
 		return $this;
 	}
@@ -58,6 +58,10 @@ class InterAdminOptions {
 		return $this;
 	}
 	
+	public function getOptionsArray() {
+		return $this->options;
+	}
+	
 	public function __call($method_name, $params) {
 		$last = count($params) - 1;
 		if (is_array($params[$last])) {
@@ -66,7 +70,12 @@ class InterAdminOptions {
 			$params[] = $this->options;
 		}
 		
-		return call_user_method_array($method_name, $this->provider, $params);
+		$retorno = call_user_method_array($method_name, $this->provider, $params);
+		if ($retorno instanceof InterAdminOptions) {
+			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
+			return $this;
+		}
+		return $retorno;
 	}
 	
 }
