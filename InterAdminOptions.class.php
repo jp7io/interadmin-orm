@@ -12,14 +12,48 @@ class InterAdminOptions {
 		);
 	}
 	
-	public function where($where) {
-		if (!is_array($where)) {
-			$where = array($where);
+	public function where($_) {
+		$where = func_get_args();
+		if (count($where) > 1) {
+			// Prepared statement: email LIKE ?
+			$format = array_shift($where);
+			$format = str_replace('?','%s', $format);
+			
+			$where = array_map([$this, '_escapeParam'], $where);
+			array_unshift($where, $format);
+			
+			$where = array(call_user_func_array('sprintf', $where));
+		} else {
+			$where = $where[0];
+			if (is_array($where)) {
+				if (!is_numeric(key($where))) {
+					// Hash = [a => 1, b => 2]
+					$original = $where;
+					$where = array();
+					foreach ($original as $key => $value) {
+						if (is_array($value)) {
+							$escaped = array_map([$this, '_escapeParam'], $value);
+							$where[] = "$key IN (" . implode(',', $escaped) . ")";
+						} else {
+							$where[] = "$key = " . $this->_escapeParam($value);
+						}					
+					}
+				}
+			} else {
+				$where = array($where);
+			}
 		}
 		$this->options['where'] = array_merge($this->options['where'], $where);
 		return $this;  
 	}
-		
+	
+	protected function _escapeParam($value) {
+		if (is_string($value)) {
+			$value = "'" . addslashes($value) . "'";
+		}
+		return $value;
+	}
+	
 	public function fields($_) {
 		$fields = is_array($_) ? $_ : func_get_args();
 		$this->options['fields'] = array_merge($this->options['fields'], $fields);
