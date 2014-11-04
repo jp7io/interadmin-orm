@@ -3,6 +3,7 @@
 class Jp7_YouTube {
 	const URL_PREFIX = 'http://www.youtube.com/v/';
 	const SHORT_URL_PREFIX = 'http://youtu.be/';
+	const API_KEY = 'AIzaSyACr-Ib2wc9mxT1AbGQHhzJ71GAeJoDrj4';	
 	
 	/**
 	 * Gets the link for embedding from the YouTube URL.
@@ -33,6 +34,20 @@ class Jp7_YouTube {
 	
 	public static function matchUrl($url) {
 		return preg_match('/^http(s)?:\/\/www.youtube.com/', $url);
+	}
+	
+	public static function getDuration($youTubeVideoUrl) {
+		if ($id = self::getId($youTubeVideoUrl)) {
+			$restUrl = 'https://www.googleapis.com/youtube/v3/videos?id=' . $id . '&part=contentDetails&key=' . self::API_KEY;
+			
+			if ($data = json_decode(file_get_contents($restUrl))) {
+				if ($duration = $data->items[0]->contentDetails->duration) {
+					$date = new DateTime('00:00');
+					$date->add(new DateInterval($duration));
+					return preg_replace('/^00:/', '', $date->format('H:i:s'));
+				}	
+			}
+		}
 	}
 	
 	/**

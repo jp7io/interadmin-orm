@@ -71,18 +71,36 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 				'fields' => array('video', 'thumb')
 			));
 			
-			if ($registro->video && ($registro->video != $interadminObj->varchar_1 || !$registro->thumb)) {
-				// Salvando thumb caso esteja vazio e seja um vídeo do YouTube ou Vimeo
-				if (Jp7_YouTube::matchUrl($registro->video)) {
-					$registro->updateAttributes(array(
-						'thumb' => Jp7_YouTube::getThumbnail($registro->video)
-					));
-				} elseif (startsWith('http://vimeo.com', $registro->video)) {
-					$registro->updateAttributes(array(
-						'thumb' => Jp7_Vimeo::getThumbnailLarge($registro->video)
-					));
+			if ($registro->video) {
+				if ($registro->video != $interadminObj->varchar_1 || !$registro->thumb) {
+					self::_updateThumb($registro);
 				}
-			}		
+				if ($registro->video != $interadminObj->varchar_1 || !$registro->duration) {
+					self::_updateDuration($registro);
+				}
+			}
+		}
+	}
+	
+	protected static function _updateThumb($registro) {
+		// Salvando thumb caso esteja vazio e seja um vídeo do YouTube ou Vimeo
+		if (Jp7_YouTube::matchUrl($registro->video)) {
+			$registro->updateAttributes(array(
+				'thumb' => Jp7_YouTube::getThumbnail($registro->video)
+			));
+		} elseif (startsWith('http://vimeo.com', $registro->video)) {
+			$registro->updateAttributes(array(
+				'thumb' => Jp7_Vimeo::getThumbnailLarge($registro->video)
+			));
+		}
+	}
+	
+	protected static function _updateDuration($registro) {
+		// Salvando thumb caso esteja vazio e seja um vídeo do YouTube ou Vimeo
+		if (Jp7_YouTube::matchUrl($registro->video)) {
+			$registro->updateAttributes(array(
+				'duration' => Jp7_YouTube::getDuration($registro->video)
+			));
 		}
 	}
 }
