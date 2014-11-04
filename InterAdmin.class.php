@@ -384,6 +384,29 @@ class InterAdmin extends InterAdminAbstract {
 		$retorno = $this->getFirstChild($id_tipo, $options);
 		return intval($retorno->count_distinct_id);
 	}
+
+	/**
+	 * Returns siblings records
+	 * 
+	 * @param array $options Default array of options. Available keys: where.
+	 * @return Array of InterAdmins
+	 */
+	public function getSiblings($options = []) {
+		if (!$this->id) { return null; }
+
+		$aliases = array_values($this->getTipo()->getCamposAlias());
+
+		return $this->getTipo()
+			->fields(
+				// Real fields that is loaded in the record
+				array_filter(array_keys($this->attributes), function($value) use ($aliases){
+					return in_array($value, $aliases);
+				})
+			)
+			->where("id <> {$this->id}")
+			->find();
+	}
+
 	/**
 	 * Returns the first Child.
 	 * 

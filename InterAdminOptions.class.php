@@ -21,7 +21,7 @@ class InterAdminOptions {
 	}
 		
 	public function fields($_) {
-		$fields = func_get_args();
+		$fields = is_array($_) ? $_ : func_get_args();
 		$this->options['fields'] = array_merge($this->options['fields'], $fields);
 		return $this;
 	}
