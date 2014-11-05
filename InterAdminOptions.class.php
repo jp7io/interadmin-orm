@@ -92,6 +92,11 @@ class InterAdminOptions {
 		return $this;
 	}
 	
+	public function debug($debug = true) {
+		$this->options['debug'] = (bool) $debug;
+		return $this;
+	}	
+	
 	public function getOptionsArray() {
 		return $this->options;
 	}

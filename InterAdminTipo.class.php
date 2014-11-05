@@ -1170,4 +1170,45 @@ class InterAdminTipo extends InterAdminAbstract {
     public function getAdminAttributes() {
         return array();
     }
+    
+
+    public function where($_) {
+    	$options = new InterAdminOptions($this);
+    	return call_user_method_array('where', $options, func_get_args());
+    }
+    
+    public function fields($_) {
+    	$options = new InterAdminOptions($this);
+    	return call_user_method_array('fields', $options, func_get_args());
+    }
+    
+    public function join($alias, $tipo, $on) {
+    	$options = new InterAdminOptions($this);
+    	return $options->join($alias, $tipo, $on);
+    }
+    
+    public function leftJoin($alias, $tipo, $on) {
+    	$options = new InterAdminOptions($this);
+    	return $options->leftJoin($alias, $tipo, $on);
+    }
+    
+    public function rightJoin($alias, $tipo, $on) {
+    	$options = new InterAdminOptions($this);
+    	return $options->rightJoin($alias, $tipo, $on);
+    }
+    
+    public function limit($offset, $rows = null) {
+    	$options = new InterAdminOptions($this);
+    	return $options->limit($offset, $rows);
+    }
+    
+    public function group($group) {
+    	$options = new InterAdminOptions($this);
+    	return $options->group($group);
+    }
+    
+    public function order($_) {
+    	$options = new InterAdminOptions($this);
+    	return call_user_method_array('order', $options, func_get_args());
+    }
 }
