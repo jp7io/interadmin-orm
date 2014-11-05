@@ -34,6 +34,8 @@ class InterAdminOptions {
 						if (is_array($value)) {
 							$escaped = array_map([$this, '_escapeParam'], $value);
 							$where[] = "$key IN (" . implode(',', $escaped) . ")";
+						} elseif (is_bool($value)) {
+							$where[] = "$key " . ($value ? "<> ''" : "= ''");
 						} else {
 							$where[] = "$key = " . $this->_escapeParam($value);
 						}					
