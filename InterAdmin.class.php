@@ -216,6 +216,8 @@ class InterAdmin extends InterAdminAbstract {
 			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
+		} elseif ($child = $this->_findChild(ucfirst($methodName))) {
+			return $this->getChildrenTipo($child['id_tipo']);
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
