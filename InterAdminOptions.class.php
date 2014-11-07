@@ -1,11 +1,11 @@
 <?php
 
 class InterAdminOptions {
-	private $provider;
+	private $tipo;
 	private $options;
 	
-	public function __construct($provider) {
-		$this->provider = $provider;
+	public function __construct(InterAdminTipo $tipo) {
+		$this->tipo = $tipo;
 		$this->options = array(
 			'fields' => array(),
 			'where' => array()
@@ -108,6 +108,14 @@ class InterAdminOptions {
 		return $this->options;
 	}
 	
+	public function all() {
+		return $this->tipo->find($this->options);
+	}
+	
+	public function first() {
+		return $this->tipo->findFirst($this->options);
+	}
+	
 	public function __call($method_name, $params) {
 		$last = count($params) - 1;
 		if (is_array($params[$last])) {
@@ -116,7 +124,7 @@ class InterAdminOptions {
 			$params[] = $this->options;
 		}
 		
-		$retorno = call_user_method_array($method_name, $this->provider, $params);
+		$retorno = call_user_method_array($method_name, $this->tipo, $params);
 		if ($retorno instanceof InterAdminOptions) {
 			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
 			return $this;
