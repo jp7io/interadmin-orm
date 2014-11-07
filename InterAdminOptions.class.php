@@ -34,6 +34,8 @@ class InterAdminOptions {
 						if (is_array($value)) {
 							$escaped = array_map([$this, '_escapeParam'], $value);
 							$where[] = "$key IN (" . implode(',', $escaped) . ")";
+						} elseif (is_bool($value)) {
+							$where[] = "$key " . ($value ? "<> ''" : "= ''");
 						} else {
 							$where[] = "$key = " . $this->_escapeParam($value);
 						}					
@@ -93,9 +95,14 @@ class InterAdminOptions {
 	}
 	
 	public function debug($debug = true) {
-		$this->options['debug'] = (bool) $debug;
+		$this->options['debug'] = (bool)$debug;
 		return $this;
-	}	
+	}
+	
+	public function usePublishedFilters($filters = true) {
+		$this->options['use_published_filters'] = (bool) $debug;	
+		return $this;
+	}
 	
 	public function getOptionsArray() {
 		return $this->options;
