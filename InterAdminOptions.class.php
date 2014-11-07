@@ -95,12 +95,12 @@ class InterAdminOptions {
 	}
 
 	public function debug($debug = true) {
-		$this->options['debug'] = (bool)$debug;
+		$this->options['debug'] = (bool) $debug;
 		return $this;
 	}
 	
 	public function usePublishedFilters($filters = true) {
-		$this->options['use_published_filters'] = (bool)$debug;	
+		$this->options['use_published_filters'] = (bool) $filters;	
 		return $this;
 	}
 	
