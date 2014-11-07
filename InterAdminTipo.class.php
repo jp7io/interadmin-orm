@@ -155,7 +155,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// Classe foi encontrada, instanciar o objeto
 		return new $class_name($id_tipo, $options);
 	}
-	public function getFieldsValues($fields) {
+	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
 		if (!isset($this->attributes['model_id_tipo'])) {
 			$eagerload = array('nome', 'language', 'parent_id_tipo', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
 			$neededFields = array_unique(array_merge((array) $fields, $eagerload));
@@ -281,9 +281,15 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['where'][] = "model_id_tipo != '0'"; 
 		return $this->getChildren($options);
 	}
+
 	/**
-	 * Retrieves the records which have this InterAdminTipo's id_tipo.
-	 * 
+	 * @return InterAdmin[] Array of InterAdmin objects.
+	 */
+	public function all() {
+		return $this->find();
+	}
+	
+	/**
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
@@ -388,7 +394,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		return intval($retorno->count_id);
 	}
 	/**
-	 * @deprecated Use count instead()
+	 * @deprecated Use count() instead
 	 * @param unknown $options
 	 */
 	public function getInterAdminsCount($options = array()) {
@@ -396,14 +402,22 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	/**
-	 * Retrieves the first records which have this InterAdminTipo's id_tipo.
-	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, class.
 	 * @return InterAdmin 	First InterAdmin object found.
 	 */
 	public function findFirst($options = array()) {
 		return reset($this->find(array('limit' => 1) + $options));
 	}
+
+	/**
+	 * Retrieves the first records which have this InterAdminTipo's id_tipo.
+	 * 
+	 * @return InterAdmin 	First InterAdmin object found.
+	 */
+	public function first() {
+		return reset($this->limit(1)->all());
+	}
+
 	/**
 	 * @deprecated use findFirst() instead.
 	 * @param array $options
