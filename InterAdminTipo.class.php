@@ -288,6 +288,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
 	public function all() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->find();
 	}
 	
@@ -433,6 +434,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin 	First InterAdmin object found.
 	 */
 	public function first() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return reset($this->limit(1)->all());
 	}
 

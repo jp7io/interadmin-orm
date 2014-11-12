@@ -17,6 +17,9 @@ class InterAdminOptions {
 		if (count($where) > 1) {
 			// Prepared statement: email LIKE ?
 			$format = array_shift($where);
+			if (strpos($format, '?') === false) {
+				throw new BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
+			}
 			$format = str_replace('?','%s', $format);
 			
 			$where = array_map([$this, '_escapeParam'], $where);
@@ -109,11 +112,26 @@ class InterAdminOptions {
 	}
 	
 	public function all() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->tipo->find($this->options);
 	}
 	
 	public function first() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->tipo->findFirst($this->options);
+	}
+	
+	public function count() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
+		return $this->tipo->count($this->options);
+	}
+	
+	public function find() {
+		throw new BadMethodCallException('Use all() instead of find().');
+	}
+	
+	public function findFirst() {
+		throw new BadMethodCallException('Use first() instead of findFirst().');
 	}
 	
 	public function __call($method_name, $params) {
