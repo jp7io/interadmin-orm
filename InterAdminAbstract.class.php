@@ -473,7 +473,7 @@ abstract class InterAdminAbstract implements Serializable {
 		$reserved = array(
 			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
 			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
-			'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR'
+			'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END'
 		);
 		
 		$offset = 0;
@@ -685,7 +685,7 @@ abstract class InterAdminAbstract implements Serializable {
 					unset($fields[$join]);
 				}
 			// Com função
-			} elseif (strpos($campo, '(') !== false) {
+			} elseif (strpos($campo, '(') !== false || strpos($campo, 'CASE') !== false) {
 				if (strpos($campo, ' AS ') === false) {
 					$aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
 				} else {
