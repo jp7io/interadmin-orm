@@ -13,43 +13,69 @@ class InterAdminOptions {
 	}
 	
 	public function where($_) {
-		$where = func_get_args();
-		if (count($where) > 1) {
+		$args = func_get_args();
+		if (count($args) > 1) {
 			// Prepared statement: email LIKE ?
-			$format = array_shift($where);
-			if (strpos($format, '?') === false) {
-				throw new BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
-			}
-			$format = str_replace('?','%s', $format);
-			
-			$where = array_map([$this, '_escapeParam'], $where);
-			array_unshift($where, $format);
-			
-			$where = array(call_user_func_array('sprintf', $where));
+			$where = $this->_wherePreparedStatement($args);
 		} else {
-			$where = $where[0];
-			if (is_array($where)) {
-				if (!is_numeric(key($where))) {
-					// Hash = [a => 1, b => 2]
-					$original = $where;
-					$where = array();
-					foreach ($original as $key => $value) {
-						if (is_array($value)) {
-							$escaped = array_map([$this, '_escapeParam'], $value);
-							$where[] = "$key IN (" . implode(',', $escaped) . ")";
-						} elseif (is_bool($value)) {
-							$where[] = "$key " . ($value ? "<> ''" : "= ''");
-						} else {
-							$where[] = "$key = " . $this->_escapeParam($value);
-						}					
-					}
-				}
-			} else {
+			$where = $args[0];
+			if (!is_array($where)) {
 				$where = array($where);
+			} elseif (!is_numeric(key($where))) {
+				// Hash = [a => 1, b => 2]
+				$where = $this->_whereHash($where);
 			}
 		}
 		$this->options['where'] = array_merge($this->options['where'], $where);
 		return $this;  
+	}
+	
+	public function whereNot(array $hash) {
+		$where = $this->_whereHash($hash, true);
+		
+		$this->options['where'] = array_merge($this->options['where'], $where);
+		return $this;
+	}
+	
+	protected function _wherePreparedStatement($args) {
+		$format = array_shift($args);
+		if (strpos($format, '?') === false) {
+			throw new BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
+		}
+		$format = str_replace('?', '%s', $format);
+		
+		$where = array_map([$this, '_escapeParam'], $args);
+		
+		array_unshift($where, $format);
+			
+		return array(call_user_func_array('sprintf', $where));
+	}
+	
+	protected function _whereHash($hash, $reverse = false) {
+		$where = array();
+		foreach ($hash as $key => $value) {
+			if (is_array($value)) {
+				$escaped = array_map([$this, '_escapeParam'], $value);
+				$operator = ($reverse ? 'NOT IN' : 'IN');
+				$where[] = "$key $operator (" . implode(',', $escaped) . ")";
+			} elseif (is_bool($value) && $this->_isChar($key)) {
+				$operator = ($value && !$reverse ? "<>" : "=");
+				$where[] = "$key $operator ''";
+			} else {
+				$operator = ($reverse ? '<>' : '=');
+				$where[] = "$key $operator " . $this->_escapeParam($value);
+			}
+		}
+		return $where;
+	}
+	
+	protected function _isChar($field) {
+		$aliases = array_flip($this->tipo->getCamposAlias());
+		if (isset($aliases[$field])) {
+			return strpos($aliases[$field], 'char_') === 0;
+		} else {
+			return strpos($field, 'char_') === 0;
+		}
 	}
 	
 	protected function _escapeParam($value) {
