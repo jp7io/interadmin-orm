@@ -82,7 +82,7 @@ abstract class InterAdminAbstract implements Serializable {
 		return isset($this->attributes[$attributeName]);
 	}
 	/**
-	 * String value of this recordÂ´s primary_key.
+	 * String value of this record´s primary_key.
 	 * 
 	 * @return string String value of the primary_key property.
 	 */
@@ -165,6 +165,35 @@ abstract class InterAdminAbstract implements Serializable {
 			return $this->attributes[$fields];
 		}
 	}
+
+	/**
+	 * Loads attributes if they are not set yet.
+	 * 
+	 * @param array $attributes
+	 * @return null
+	 */
+	public function loadAttributes($attributes, $fieldsAlias = true) {
+		$fieldsToLoad = array_diff($attributes, array_keys($this->attributes));
+		// Retrieving data
+		if ($fieldsToLoad) {
+			$options = array(
+				'fields' => (array) $fieldsToLoad,
+				'fields_alias' => $fieldsAlias,
+				'from' => $this->getTableName() . ' AS main',
+				'where' => array($this->_primary_key . ' = ' . intval($this->{$this->_primary_key})),
+				// Internal use
+				'aliases' => $this->getAttributesAliases(),
+				'campos' => $this->getAttributesCampos()
+				//'skip_published_filters' => array('main')
+			);
+			$rs = $this->_executeQuery($options);
+			if ($row = $rs[0]) {
+				$this->_getAttributesFromRow($row, $this, $options);
+			}
+			//$rs->Close();
+		}
+	}
+
 	/**
 	 * DEPRECATED: Updates the values into the database table. If this object has no 'id', the data is inserted.
 	 * 
@@ -790,13 +819,14 @@ abstract class InterAdminAbstract implements Serializable {
 				}
 				
 				if (is_object($attributes[$table])) {
+					$subobject = $attributes[$table];
 					$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-					$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $attributes[$table]);
+					$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $subobject);
 					
-					if (is_object($attributes[$table]->$alias)) {
+					if (isset($subobject->$alias) && is_object($subobject->$alias)) {
 						continue;
 					}
-					$attributes[$table]->$alias = $value;
+					$subobject->$alias = $value;
 				}
 			}
 		}
@@ -816,7 +846,7 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 	}
 	/**
-	 * Sets this objectÂ´s attributes with the given array keys and values.
+	 * Sets this object´s attributes with the given array keys and values.
 	 * 
 	 * @param array $attributes
 	 * @return void

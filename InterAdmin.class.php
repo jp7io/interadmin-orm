@@ -74,6 +74,27 @@ class InterAdmin extends InterAdminAbstract {
 			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 	}
+
+	/**
+	 * Magic get acessor.
+	 * 
+	 * @param string $attributeName
+	 * @return mixed
+	 */
+	public function &__get($attributeName) {
+		if (isset($this->attributes[$attributeName])) {
+			return $this->attributes[$attributeName];
+		} else {
+			if (
+				in_array($attributeName, $this->getTipo()->getCamposAlias()) || 
+				in_array($attributeName, $this->getAdminAttributes())
+			) {
+				throw new Jp7_InterAdmin_Exception('Attribute was not loaded: ' . $attributeName);
+			}
+			return null;
+		}
+	}
+
 	/**
 	 * Returns an InterAdmin instance. If $options['class'] is passed, 
 	 * it will be returned an object of the given class, otherwise it will search 
@@ -293,10 +314,11 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getParent($options = array()) {
 		if (!$this->_parent) {
-			if (!$this->parent_id || !$this->parent_id_tipo) {
-				$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
-			}
-			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+			$this->loadAttributes(array('parent_id', 'parent_id_tipo'), false);
+			
+			$options = $options + array(
+				'fields_alias' => static::DEFAULT_FIELDS_ALIAS
+			);
 			
 			$parentTipo = null;
 			if ($this->parent_id_tipo) {
@@ -310,7 +332,7 @@ class InterAdmin extends InterAdminAbstract {
 				}
 			}
 		} elseif ($options['fields']) {
-			$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
+			$this->_parent->loadAttributes($options['fields'], $options['fields_alias']);
 		}
 		return $this->_parent;
 	}
@@ -390,23 +412,12 @@ class InterAdmin extends InterAdminAbstract {
 	/**
 	 * Returns siblings records
 	 * 
-	 * @param array $options Default array of options. Available keys: where.
-	 * @return Array of InterAdmins
+	 * @return InterAdminOptions
 	 */
-	public function getSiblings($options = []) {
-		if (!$this->id) { return null; }
-
-		$aliases = array_values($this->getTipo()->getCamposAlias());
-
-		return $this->getTipo()
-			->fields(
-				// Real fields that is loaded in the record
-				array_filter(array_keys($this->attributes), function($key) use ($aliases){
-					return in_array($key, $aliases);
-				})
-			)
-			->where("id <> {$this->id}")
-			->find($options);
+	public function siblings() {
+		return $this
+			->getTipo()
+			->whereNot(['id' => $this->id]);
 	}
 
 	/**
