@@ -114,6 +114,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param bool $fieldsAlias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
 	 * @todo Multiple languages - When there is no id_tipo yet, the function is unable to decide which language table it should use.
+	 * @deprecated Use loadAttributes() or just set fields() with all().
 	 */
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
 		if ($this->_deleted) {
@@ -210,7 +211,7 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $fields_values, true, $force_magic_quotes_gpc);
 		}
-		$this->_updated = true; // FIXME Hack tempor√°rio
+		$this->_updated = true; // FIXME Hack tempor·rio
 	}
 	/**
 	 * Updates all the attributes from the passed-in array and saves the record.
@@ -476,7 +477,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
 				preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 				foreach ($matches[1] as $match) {
-					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos n√£o deve agrupar pelo pai
+					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos n„o deve agrupar pelo pai
 					if ($match[0] != "'") {
 						$options['group'] = 'main.id';
 						break;
@@ -533,7 +534,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
 					$table = $existsMatches[2];
-					// TODO unificar l√≥gica
+					// TODO unificar lÛgica
 					if ($table == 'tags') {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
@@ -665,7 +666,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		foreach ($fields as $key => $campo) {
 			// Traduzindo 'join.campo' para 'join' => array('campo')
-			if (is_string($campo) && strpos($campo, '.') && strpos($campo, '(') === false) {
+			if (is_string($campo) && strpos($campo, '.') !== false && strpos($campo, '(') === false) {
 				list($join, $nome) = explode('.', $campo);
 				$fields[$join][] = $nome;
 				unset($fields[$key]);
@@ -682,7 +683,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinTipo = $options['joins'][$join][1];
 					} elseif (strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
 						$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
-						// Processamento dos campos do select_multi √© feito depois
+						// Processamento dos campos do select_multi È feito depois
 						$joinTipo = null;
 						$options['select_multi_fields'][$join] = array(
 							'fields' => $fields[$join],
@@ -692,13 +693,18 @@ abstract class InterAdminAbstract implements Serializable {
 					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					    // Join e Recursividade
 					    if (!in_array($join, (array) $options['from_alias'])) {
-							$this->_addJoinAlias($options, $join, $campos[$nome]);
+							$joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
+							if ($joinClasse !== 'tipo') {
+								$fields[$join][] = 'id_slug';
+							}
 					    }
 					    $joinTipo = $this->getCampoTipo($campos[$nome]);
 					}
 					if ($joinTipo) {
-						if ($fields[$join] == array('*')) {
-							$fields[$join] = $joinTipo->getCamposNames();
+						$wildcardPos = array_search('*', $fields[$join]);
+						if ($wildcardPos !== false) {
+							unset($fields[$join][$wildcardPos]);
+							$fields[$join] = array_merge($fields[$join], $joinTipo->getCamposNames());
 						}
 						$joinOptions = array(
 							'fields' => $fields[$join],
@@ -713,7 +719,7 @@ abstract class InterAdminAbstract implements Serializable {
 					}
 					unset($fields[$join]);
 				}
-			// Com fun√ß√£o
+			// Com funÁ„o
 			} elseif (strpos($campo, '(') !== false || strpos($campo, 'CASE') !== false) {
 				if (strpos($campo, ' AS ') === false) {
 					$aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
@@ -728,7 +734,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
 				if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
 					if (strpos($campo, 'file_') === 0) {
-						// necess√°rio para quando o parametro fields est√° sem alias, mas o retorno est√° com alias
+						// necess·rio para quando o parametro fields est· sem alias, mas o retorno est· com alias
 						$file_campo = array_search($campo, $aliases);
 					} else {
 						$file_campo = $campo;
@@ -752,13 +758,16 @@ abstract class InterAdminAbstract implements Serializable {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join (' . get_class($this) . ' - PK: ' . $this->__toString() . ').'));
 		}
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
-		// @todo testar
+		
 		if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {
             $options['from'][] = $joinTipo->getTableName() . 
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id_tipo';
+            
+            return 'tipo';
         } else {
             $options['from'][] = $joinTipo->getInterAdminsTableName() .
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id';
+            return 'interadmin';
         }
 	}
 	/**
@@ -868,7 +877,7 @@ abstract class InterAdminAbstract implements Serializable {
 			$existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
 			$fields = array_intersect($fields, $existingFields);
 		}
-		// Esvaziando valores para for√ßar atualiza√ß√£o
+		// Esvaziando valores para forÁar atualizaÁ„o
 		foreach ($fields as $key) {
 			unset($this->attributes[$key]);
 		}
@@ -914,7 +923,7 @@ abstract class InterAdminAbstract implements Serializable {
 	
 	/**
 	 * @param array $where
-	 * FIXME tempor√°rio para wheres que eram com string 
+	 * FIXME tempor·rio para wheres que eram com string 
 	 */
 	protected function _whereArrayFix(&$where) {
 		if (is_string($where)) {

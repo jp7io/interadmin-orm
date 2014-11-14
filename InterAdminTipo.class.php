@@ -299,22 +299,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function find($options = array()) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
-		if ((!isset($options['where']) || !in_array('id_slug', $options['where']))) {
-			$options['fields'][] = 'id_slug';
-
-			if ($options['fields']) {
-				foreach ($options['fields'] as $key => $field) {
-					if (!is_string($field)) { continue; }
-					
-					$explodedField = explode('.', $field);
-
-					if (count($explodedField) == 2) {
-						$options['fields'][] = $explodedField[0] . '.id_slug';
-					}
-				}
-			}
-		}
-
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
@@ -1161,7 +1145,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
+			$options['fields'] = array_merge(array('id', 'id_tipo', 'id_slug'), (array) $options['fields']);
 		}
 
 		$options['from'] = $recordModel->getTableName() . " AS main";
