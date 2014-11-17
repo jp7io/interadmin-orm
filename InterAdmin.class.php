@@ -42,6 +42,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @var array
 	 */
 	protected $_tags;
+	
+	protected $_eagerLoad;
+	
 	/**
 	 * Username to be inserted in the log when saving this record.
 	 * @var string
@@ -239,8 +242,13 @@ class InterAdmin extends InterAdminAbstract {
 			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
+		// childName() - relacionamento
 		} elseif ($child = $this->_findChild(ucfirst($methodName))) {
-			return $this->getChildrenTipo($child['id_tipo']);
+			$childrenTipo = $this->getChildrenTipo($child['id_tipo']);
+			if (isset($this->_eagerLoad[ucfirst($methodName)])) {
+				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[ucfirst($methodName)]);	
+			}
+			return $childrenTipo;
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
@@ -879,7 +887,7 @@ class InterAdmin extends InterAdminAbstract {
      * @see InterAdminAbstract::getAdminAttributes()
      */
     public function getAdminAttributes() {
-		return array('id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+		return $this->getTipo()->getInterAdminsAdminAttributes();
     }
 	
     /**
@@ -914,5 +922,9 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
 		return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
+	}
+	
+	public function setEagerLoad($key, $data) {
+		$this->_eagerLoad[$key] = $data;
 	}
 }

@@ -137,6 +137,11 @@ class InterAdminOptions {
 		return $this->options;
 	}
 	
+	public function with($_) {
+		$this->options['with'] = func_get_args();
+		return $this;
+	}
+	
 	public function all() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->tipo->find($this->options);

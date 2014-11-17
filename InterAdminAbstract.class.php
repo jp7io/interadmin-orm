@@ -17,7 +17,7 @@
 abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
-	const DEFAULT_FIELDS = null;
+	const DEFAULT_FIELDS = '*';
 	
 	private static $_cache = false;
 	
@@ -704,7 +704,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$wildcardPos = array_search('*', $fields[$join]);
 						if ($wildcardPos !== false) {
 							unset($fields[$join][$wildcardPos]);
-							$fields[$join] = array_merge($fields[$join], $joinTipo->getCamposNames());
+							$fields[$join] = array_merge($fields[$join], $joinTipo->getCamposNames(), $joinTipo->getInterAdminsAdminAttributes());
 						}
 						$joinOptions = array(
 							'fields' => $fields[$join],
@@ -851,7 +851,7 @@ abstract class InterAdminAbstract implements Serializable {
 		if ($fields == '*' || (is_array($fields) && in_array('*', $fields))) {
 			$fields = (array) $fields;
 			unset($fields[array_search('*', $fields)]);
-			$fields = array_merge($object->getAttributesNames(), $fields);
+			$fields = array_merge($object->getAttributesNames(), $object->getAdminAttributes(), $fields);
 		}
 	}
 	/**

@@ -316,6 +316,17 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
+		if ($options['eager_load']) {
+			foreach ($options['eager_load'] as $child_nome_id) {
+				$childrenTipo = $this->getInterAdminsChildrenTipo($child_nome_id);
+				$children = $childrenTipo->where(['parent_id' => $records])->all();
+				$children = Jp7_Collections::separate($children, 'parent_id');
+				
+				foreach ($records as $record) {
+					$record->setEagerLoad($child_nome_id, $children[$record->id] ?: array());
+				}
+			}
+		}
 		// // $rs->Close();
 		return $records;
 	}
@@ -1137,22 +1148,53 @@ class InterAdminTipo extends InterAdminAbstract {
 		);
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
-		$defaultFields = static::DEFAULT_FIELDS;
-		if ($defaultFields && strpos($defaultFields, ',') !== false) {
-			$defaultFields = explode(',', $defaultFields);
+		
+		if (!$options['fields']) {
+			$defaultFields = static::DEFAULT_FIELDS;
+			if (strpos($defaultFields, ',') !== false) {
+				$defaultFields = explode(',', $defaultFields);
+			}
+			$options['fields'] = $defaultFields;
 		}
-		$options = $options + array('fields' => $defaultFields, 'fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+		if (!array_key_exists('fields_alias', $options)) {
+			$options['fields_alias'] = static::DEFAULT_FIELDS_ALIAS;
+		}
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
 			$options['fields'] = array_merge(array('id', 'id_tipo', 'id_slug'), (array) $options['fields']);
 		}
-
+		
 		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['order'] = $this->getInterAdminsOrder($options['order']);
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();
+		$options['eager_load'] = array();
+		
+		if ($options['with']) {
+			foreach ($options['with'] as $withRelationship) {
+				if ($options['fields_alias']) {
+					$campoNome = array_search($withRelationship, $options['aliases']);
+				} elseif ($options['campos'][$withRelationship]) {
+					$campoNome = $withRelationship;
+				}
+				if ($campoNome !== false) {
+					$options['fields'][$withRelationship] = array('*');
+				} else {
+					$childrenData = $this->getInterAdminsChildren();
+					if ($childData = $childrenData[ucfirst($withRelationship)]) {
+						$options['eager_load'][] = ucfirst($withRelationship);
+					} else {
+						throw new Exception('Unknown relationship: ' . $withRelationship);
+					}
+				}
+			}
+		}
+	}
+		
+	public function getInterAdminsAdminAttributes() {
+		return array('id_slug', 'id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
 	}
 	
 	/**
@@ -1217,6 +1259,11 @@ class InterAdminTipo extends InterAdminAbstract {
     	return call_user_method_array('fields', $options, func_get_args());
     }
     
+    public function with($_) {
+    	$options = new InterAdminOptions($this);
+    	return call_user_method_array('with', $options, func_get_args());
+    }
+    
     public function join($alias, $tipo, $on) {
     	$options = new InterAdminOptions($this);
     	return $options->join($alias, $tipo, $on);
@@ -1251,4 +1298,9 @@ class InterAdminTipo extends InterAdminAbstract {
     	$options = new InterAdminOptions($this);
     	return $options->whereNot($hash);
     }
+    
+	public function debug($debug = true) {
+		$options = new InterAdminOptions($this);
+    	return $options->debug($debug);
+	}
 }
