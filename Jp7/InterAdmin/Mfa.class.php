@@ -1,12 +1,12 @@
 <?php
 
-class InterAdminMfa extends InterAdmin {
+class Jp7_InterAdmin_Mfa extends InterAdmin {
 	const DEFAULT_FIELDS_ALIAS = true;
 	
 	private static $issuer;
 	
 	/**
-	 * @return InterAdmin_Mfa
+	 * @return Jp7_InterAdmin_Mfa
 	 */
     public static function getLoggedUser($s_user = null) {
     	global $s_session;
