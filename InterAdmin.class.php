@@ -732,12 +732,12 @@ class InterAdmin extends InterAdminAbstract {
 		// id_string
 		if (isset($this->varchar_key)) {
 			$this->id_string = toId($this->varchar_key);
-			//$this->id_slug = $this->generateSlug($this->varchar_key);
+			$this->id_slug = $this->generateSlug($this->varchar_key);
 		} else {
 			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
 			if (isset($this->$alias_varchar_key)) {
 				$this->id_string = toId($this->$alias_varchar_key);
-				//$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
+				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
 			}			
 		}	
 		// log
@@ -754,13 +754,25 @@ class InterAdmin extends InterAdminAbstract {
 		return parent::save();
 	}
 
-	protected function generateSlug($string) {
+	public function generateSlug($string) {
 		$this->getByAlias('id_slug');
 		$newSlug = toSlug($string);
-		//if ($this->id_slug === $newSlug) {
-		//	return $newSlug; // Igual, evitar query
-		//}
-		kd($this->siblings()->all());
+		if (is_numeric($newSlug)) {
+			$newSlug = '--' . $newSlug;
+		}
+		if ($this->id_slug === $newSlug) {
+			// Está igual, evitar query
+			return $newSlug; 
+		}
+		$siblingSlugs = $this->siblings()->where('id_slug LIKE ?', "$newSlug%")->distinct('id_slug');
+		
+		$i = 2;
+		$newSlugCopy = $newSlug;
+		while (in_array($newSlug, $siblingSlugs)) {
+			$newSlug = $newSlugCopy . $i;
+			$i++;
+		}
+		return $newSlug;
 	}
 		
 	public function getAttributesNames() {
