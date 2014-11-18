@@ -191,10 +191,10 @@ abstract class InterAdminAbstract implements Serializable {
 				'skip_published_filters' => array('main')
 			);
 			$rs = $this->_executeQuery($options);
-			if ($row = $rs[0]) {
+			if ($row = $rs->FetchNextObj()) {
 				$this->_getAttributesFromRow($row, $this, $options);
 			}
-			//$rs->Close();
+			$rs->Close();
 		}
 	}
 
