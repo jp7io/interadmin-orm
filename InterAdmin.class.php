@@ -211,13 +211,6 @@ class InterAdmin extends InterAdminAbstract {
 					$options['where'][] = "id_string = '" . $args[0] . "'";
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
-			} elseif (substr($methodName, -8) == 'ByIdSlug') {
-				$nome_id = substr($methodName, strlen('get'), -strlen('ByIdSlug'));
-				if ($child = $this->_findChild($nome_id)) {
-					$options = (array) $args[1];
-					$options['where'][] = "id_slug = '" . $args[0] . "'";
-					return $this->getFirstChild($child['id_tipo'], $options);
-				}
 			// get{ChildName}Count
 			} elseif (substr($methodName, -5) == 'Count') {
 				$nome_id = substr($methodName, strlen('get'), -strlen('Count'));
@@ -425,9 +418,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminOptions
 	 */
 	public function siblings() {
-		return $this
-			->getTipo()
-			->whereNot(['id' => $this->id]);
+		return $this->getTipo()->whereNot(['id' => $this->id]);
 	}
 
 	/**
@@ -769,12 +760,6 @@ class InterAdmin extends InterAdminAbstract {
 			}
 		}
 		// log
-		if ($this->id && !isset($this->log)) {
-			// Evita bug em que um registro despublicado tem seu log zerado
-			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
-			$this->getFieldsValues('log');
-			InterAdmin::setPublishedFiltersEnabled($old_value);
-		}
 		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		// date_modify
 		$this->date_modify = date('c');

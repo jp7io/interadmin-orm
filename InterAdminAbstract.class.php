@@ -189,8 +189,8 @@ abstract class InterAdminAbstract implements Serializable {
 				'where' => array($this->_primary_key . ' = ' . intval($this->{$this->_primary_key})),
 				// Internal use
 				'aliases' => $this->getAttributesAliases(),
-				'campos' => $this->getAttributesCampos()
-				//'skip_published_filters' => array('main')
+				'campos' => $this->getAttributesCampos(),
+				'skip_published_filters' => array('main')
 			);
 			$rs = $this->_executeQuery($options);
 			if ($row = $rs[0]) {

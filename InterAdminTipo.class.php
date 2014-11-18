@@ -494,17 +494,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['where'][] = "id_string = '" . addslashes($id_string) . "'";
 		return $this->findFirst($options);
 	}
-
-	/**
-	 * Retrieves the first record which have this id_slug
-	 * 
-	 * @param string $id_slug Search value.
-	 * @return InterAdmin First InterAdmin object found.
-	 */
-	public function findByIdSlug($id_slug, $options = array()) {
-		$options['where'][] = "id_slug = '" . addslashes($id_slug) . "'";
-		return $this->findFirst($options);
-	}
 	/**
 	 * @deprecated use findByIdString() instead.
 	 * @param string $id_string
@@ -1259,7 +1248,7 @@ class InterAdminTipo extends InterAdminAbstract {
     public function getAdminAttributes() {
         return array();
     }
-
+	
     public function where($_) {
     	$options = new InterAdminOptions($this);
     	return call_user_method_array('where', $options, func_get_args());
@@ -1310,8 +1299,8 @@ class InterAdminTipo extends InterAdminAbstract {
     	return $options->whereNot($hash);
     }
     
-	public function debug($debug = true) {
+    public function debug($debug = true) {
 		$options = new InterAdminOptions($this);
-    	return $options->debug($debug);
-	}
+        return $options->debug($debug);
+    }
 }
