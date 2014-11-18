@@ -141,7 +141,8 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// Fields		
 		if ($options['fields']) {
-			$finalInstance->getFieldsValues($options['fields'], false, $options['fields_alias']);
+			$finalInstance->_resolveWildcard($options['fields'], $finalInstance);
+			$finalInstance->loadAttributes($options['fields'], $options['fields_alias']);
 		}
 		return $finalInstance;
 	}
@@ -274,13 +275,11 @@ class InterAdmin extends InterAdminAbstract {
 	 *  
 	 * @param array|string $fields
 	 * @see InterAdmin::getFieldsValues()
-	 * @return 
+	 * @deprecated
+	 * @return
 	 */
 	public function getByAlias($fields) {
-		if (func_num_args() > 1) {
-			throw new Exception('Only 1 argument is expected and it should be an array.');
-		}
-		return $this->getFieldsValues($fields, false, true);
+		throw new Exception('getByAlias() was removed, load fields previously.');
 	}
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
@@ -327,7 +326,8 @@ class InterAdmin extends InterAdminAbstract {
 			$this->loadAttributes(array('parent_id', 'parent_id_tipo'), false);
 			
 			$options = $options + array(
-				'fields_alias' => static::DEFAULT_FIELDS_ALIAS
+				'fields_alias' => static::DEFAULT_FIELDS_ALIAS,
+				'fields' => static::DEFAULT_FIELDS
 			);
 			
 			$parentTipo = null;

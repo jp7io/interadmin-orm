@@ -117,6 +117,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @deprecated Use loadAttributes() or just set fields() with all().
 	 */
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
+		throw new Exception('getFieldsValues() has been removed.');
 		if ($this->_deleted) {
 			throw new Exception('This record has been deleted.');
 		}
@@ -174,6 +175,10 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return null
 	 */
 	public function loadAttributes($attributes, $fieldsAlias = true) {
+		if ($this->_deleted) {
+			throw new Exception('This record has been deleted.');
+		}
+		
 		$fieldsToLoad = array_diff($attributes, array_keys($this->attributes));
 		// Retrieving data
 		if ($fieldsToLoad) {

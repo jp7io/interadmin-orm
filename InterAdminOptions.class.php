@@ -157,8 +157,12 @@ class InterAdminOptions {
 		return $this->tipo->count($this->options);
 	}
 	
-	public function find() {
-		throw new BadMethodCallException('Use all() instead of find().');
+	public function find($id) {
+		if (func_num_args() != 1) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1.');
+		if (!is_string($id) && !is_int($id)) {
+			throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
+		}
+		return $this->tipo->find($id, $this->options);
 	}
 	
 	public function findFirst() {
