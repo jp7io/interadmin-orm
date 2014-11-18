@@ -367,4 +367,55 @@ class Jp7_Collections {
 
 		return $newArray;
 	}
+	
+	public static function eagerLoad($records, $relationships) {
+		if (!is_array($relationships)) {
+			$relationships = array($relationships);
+		}
+		$relationship = array_shift($relationships);
+		
+		if (!$records) {
+			return false;
+		}
+		$model = reset($records);
+		
+		if ($data = $model->getRelationshipData($relationship)) {
+			if ($data['type'] == 'select') {
+				// select.id = record.select_id
+				$indexed = self::separate($records, $relationship . '.id');
+				
+				$rows = $data['tipo']->find(array(
+					'fields' => '*',
+					'fields_alias' => $data['alias'],
+					'where' => array('id IN (' . implode(',', array_keys($indexed)) . ')')
+				));
+				
+				if ($relationships) {
+					self::eagerLoad($rows, $relationships);
+				}
+				foreach ($rows as $row) {
+					foreach ($indexed[$row->id] as $record) {
+						$record->$relationship = $row;
+					}
+					unset($row);
+				}
+			} elseif ($data['type'] == 'children') {
+				// child.parent_id = parent.id
+				$data['tipo']->setParent(null);
+				$children = $data['tipo']->where(['parent_id' => $records])->all();
+				if ($relationships) {
+					self::eagerLoad($children, $relationships);
+				}
+				$children = self::separate($children, 'parent_id');
+				
+				foreach ($records as $record) {
+					$record->setEagerLoad($relationship, $children[$record->id] ?: array());
+				}
+			} else {
+				throw new Jp7_InterAdmin_Exception('Unsupported relationship type: "' . $data['type'] . '" for class ' . get_class($model) . ' - ID: ' . $model->id);
+			}
+		} else {
+			throw new Jp7_InterAdmin_Exception('Unknown relationship: "' . $relationship . '" for class ' . get_class($model) . ' - ID: ' . $model->id);
+		}		
+	}
 }

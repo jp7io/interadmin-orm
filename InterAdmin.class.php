@@ -246,8 +246,8 @@ class InterAdmin extends InterAdminAbstract {
 		// childName() - relacionamento
 		} elseif ($child = $this->_findChild(ucfirst($methodName))) {
 			$childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-			if (isset($this->_eagerLoad[ucfirst($methodName)])) {
-				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[ucfirst($methodName)]);	
+			if (isset($this->_eagerLoad[$methodName])) {
+				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);	
 			}
 			return $childrenTipo;
 		}
@@ -922,6 +922,36 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
 		return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
+	}
+	
+	public function getRelationshipData($relationship) {
+		$aliases = $this->getAttributesAliases();
+		
+		$campoNome = array_search($relationship, $aliases);
+		$alias = true;
+		if ($campoNome === false) {
+			$campoNome = $relationship;
+			$alias = false;
+		}
+		$campos = $this->getAttributesCampos();
+		$campoTipo = $this->getCampoTipo($campos[$campoNome]);
+		if ($campoTipo instanceof InterAdminTipo) {
+			return array(
+				'type' => 'select',
+				'tipo' => $campoTipo,
+				'name' => $relationship,
+				'alias' => $alias
+			);
+		}
+		if ($childrenTipo = $this->getChildrenTipoByNome($relationship)) {
+			return array(
+				'type' => 'children',
+				'tipo' => $childrenTipo,
+				'name' => $relationship,
+				'alias' => true
+			);
+		}
+		throw new Exception('Unknown relationship: ' . $relationship);
 	}
 	
 	public function setEagerLoad($key, $data) {

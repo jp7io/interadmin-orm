@@ -332,16 +332,22 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
-		if ($options['eager_load_select']) {
-			kd($options['eager_load_select']);
-			foreach ($options['eager_load_select'] as $selectEagerData) {
-				Jp7_Collections::eagerLoad($records, $select, $level2);
-			}
-		}
-		if ($options['eager_load_children']) {
-			foreach ($options['eager_load_children'] as $eagerData) {
-				kd($eagerData);
-				Jp7_Collections::eagerLoad($records, null, $eagerData);
+		if ($options['eager_load']) {
+			foreach ($options['eager_load'] as $relationshipData) {
+				if ($relationshipData['type'] == 'select') {
+					if ($relationshipData['levels']) {
+						$selects = array();
+						$property = $relationshipData['name'];
+						foreach ($records as $item) {
+							if ($item->$property) {
+								$selects[] = $item->$property;
+							}
+						}
+						Jp7_Collections::eagerLoad($selects, $relationshipData['levels']);
+					}
+				} else {
+					Jp7_Collections::eagerLoad($records, $relationshipData['levels']);
+				}
 			}
 		}
 		// // $rs->Close();
@@ -1173,33 +1179,22 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		if ($options['with']) {
 			foreach ($options['with'] as $withRelationship) {
-				// Precisa ser recursivo, isso aqui é mais uma validação
+				// Isso aqui é mais uma validação
 				// O código mesmo é rodado depois
-				list($level1, $level2) = explode('.', $withRelationship);
+				$levels = explode('.', $withRelationship);
 				
-				if ($options['fields_alias']) {
-					$campoNome = array_search($level1, $options['aliases']);
-				} elseif ($options['campos'][$level1]) {
-					$campoNome = $level1;
-				}
-				if ($campoNome !== false) {
-					// select.*
-					$options['fields'][$level1] = array('*');
-					$options['eager_load_select'][] = array(
-						'select' => $level1,
-						'level2' => $level2
-					);
-				} else {
-					// children()->all()
-					$childrenData = $this->getInterAdminsChildren();
-					if ($childData = $childrenData[ucfirst($level1)]) {
-						$options['eager_load_children'][] = array(
-							'childName' => ucfirst($level1),
-							'level2' => $level2
-						);
-					} else {
-						throw new Exception('Unknown relationship: ' . $level1);
+				if ($relationshipData = $recordModel->getRelationshipData($levels[0])) {
+					if ($relationshipData['type'] === 'select') {
+						// select.* - Esse carregamento é feito com join para aproveitar código existente
+						// E também porque join é mais rápido para hasOne() do que um novo select
+						$options['fields'][$levels[0]] = array('*');
+						array_shift($levels);
 					}
+					$options['eager_load'][] = $relationshipData + array(
+						'levels' => $levels
+					);
+				} else{
+					throw new Exception('Unknown relationship: ' . $levels[0]);
 				}
 			}
 		}
