@@ -472,30 +472,23 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return 
 	 */
 	protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters) {
-		// Group by para wheres com children
+		$resolvedWhere = $this->_resolveSql($options['where'], $options, $use_published_filters); 
+		
+		// Group by para wheres com children, DISTINCT é usado para corrigir COUNT() com children
 		if (!$options['group'] && strpos($options['fields'][0], 'DISTINCT') === false) {
-			// strpos por Performance
-			if (
-				(strpos($options['where'] . ' ' . $options['order'], 'children_') !== false || strpos($options['where'] . ' ' . $options['order'], 'tags.') !== false) &&
-				strpos($options['where'], 'EXISTS ') === false
-			) {
-				$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
-				preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
-				foreach ($matches[1] as $match) {
-					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
-					if ($match[0] != "'") {
-						$options['group'] = 'main.id';
-						break;
-					}
+			foreach ($options['from'] as $join) {
+				// Isso pode ser feito por flag depois
+				if (strpos($join, '.parent_id = main.id') !== false || strpos($join, 'AS tags ON') !== false) {
+					$options['group'] = 'main.id';
 				}
 			}
 		}
-		$clause = $options['where'] .
-			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
+		
+		$clause = (($options['group']) ? " GROUP BY " . $options['group'] : '') .
 			(($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
-		return $this->_resolveSql($clause, $options, $use_published_filters);
+		return $resolvedWhere . $this->_resolveSql($clause, $options, $use_published_filters);
 	}
 	protected function _resolveSql($clause, &$options = array(), $use_published_filters) {
 		$campos = &$options['campos'];
@@ -589,21 +582,15 @@ abstract class InterAdminAbstract implements Serializable {
 				if ($table === 'main') {
 					$campo = ($aliases[$termo]) ? $aliases[$termo] : $termo;
 				} else {
-					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
-					if ($table == 'tags') {
-						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
-							$options['from_alias'][] = $table;
-							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
-							" ON " . $table . ".parent_id = main.id";
-						}
-						$joinAliases = array();
-						// Joins com children
-					} elseif (strpos($table, 'children_') === 0) {
+					$childrenArr = $childrenArr ?: $this->getInterAdminsChildren();
+					
+					// Joins com children
+					if (strpos($table, 'children_') === 0) {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
-						$childrenArr = $this->getInterAdminsChildren();
-						if (!$childrenArr[$joinNome]) {
-							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
-						}
+					} else {
+						$joinNome = Jp7_Inflector::camelize($table);
+					}
+					if ($childrenArr[$joinNome]) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
@@ -615,7 +602,15 @@ abstract class InterAdminAbstract implements Serializable {
 							' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
 						}
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
-						// Joins normais
+					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
+					} elseif ($table == 'tags') {
+						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
+							$options['from_alias'][] = $table;
+							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
+							" ON " . $table . ".parent_id = main.id";
+						}
+						$joinAliases = array();
+					// Joins normais
 					} else {
 						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields

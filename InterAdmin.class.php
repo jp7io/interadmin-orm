@@ -94,7 +94,7 @@ class InterAdmin extends InterAdminAbstract {
 				in_array($attributeName, $this->getTipo()->getCamposAlias()) || 
 				in_array($attributeName, $this->getAdminAttributes())
 			) {
-				throw new Jp7_InterAdmin_Exception('Attribute was not loaded: ' . $attributeName);
+				throw new Jp7_InterAdmin_Exception('Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
 			}
 			return null;
 		}
@@ -187,8 +187,15 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function __call($methodName, $args) {
+		// childName() - relacionamento
+		if ($child = $this->_findChild(ucfirst($methodName))) {
+			$childrenTipo = $this->getChildrenTipo($child['id_tipo']);
+			if (isset($this->_eagerLoad[$methodName])) {
+				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
+			}
+			return $childrenTipo;
 		// get{ChildName}, getFirst{ChildName} and get{ChildName}ById
-		if (strpos($methodName, 'get') === 0) {
+		} elseif (strpos($methodName, 'get') === 0) {
 			// getFirst{ChildName}
 			if (strpos($methodName, 'getFirst') === 0) {
 				$nome_id = substr($methodName, strlen('getFirst'));
@@ -236,13 +243,6 @@ class InterAdmin extends InterAdminAbstract {
 			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
-		// childName() - relacionamento
-		} elseif ($child = $this->_findChild(ucfirst($methodName))) {
-			$childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-			if (isset($this->_eagerLoad[$methodName])) {
-				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);	
-			}
-			return $childrenTipo;
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
