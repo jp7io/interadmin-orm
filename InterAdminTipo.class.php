@@ -106,21 +106,17 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->_db = $options['db'];
 		
 		if ($options['fields']) {
-			$this->getFieldsValues($options['fields']);
+			$this->loadAttributes($options['fields'], false);
 		}
 	}
 	public function &__get($attributeName) {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
-		} else {
-			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'language', 'layout', 'layout_registros');
-			if (in_array($attributeName, $inheritArr)) {
-				$this->getFieldsValues($attributeName);
-				return $this->attributes[$attributeName];
-			} else {
-				return null;
-			}
+		} elseif (in_array($attributeName, $this->getAttributesNames())) {
+			$this->loadAttributes($this->getAttributesNames(), false);
+			return $this->attributes[$attributeName];
 		}
+		return null;
 	}
 	/**
 	 * Returns an InterAdminTipo instance. If $options['class'] is passed, 
@@ -147,7 +143,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			// Classe não é customizada, retornar a própria classe temporária
 			if (!class_exists($class_name)) {
 				if ($options['fields']) {
-					$instance->getFieldsValues($options['fields']);
+					$instance->loadAttributes($options['fields'], false);
 				}
 				return $instance;
 			}
@@ -155,6 +151,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// Classe foi encontrada, instanciar o objeto
 		return new $class_name($id_tipo, $options);
 	}
+	/*
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
 		if (!isset($this->attributes['model_id_tipo'])) {
 			$eagerload = array('nome', 'language', 'parent_id_tipo', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
@@ -168,6 +165,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return parent::getFieldsValues($fields);
 	}
+	*/
 	/**
 	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
 	 * 
@@ -178,7 +176,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->_parent) {
 			return $this->_parent;
 		}
-		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
+		if ($this->parent_id_tipo) {
 			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
@@ -286,6 +284,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
 	public function all() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->find();
 	}
 	
@@ -293,7 +292,25 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
-	public function find($options = array()) {
+	public function find() {
+		if (func_num_args() > 2) {
+			throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0, 1 or 2 ($id, $options).');
+		}
+		$args = func_get_args();
+		if (is_array(end($args))) {
+			$options = array_pop($args);
+		} else {
+			$options = array();
+		}
+		if (!empty($args)) {
+			$id = array_pop($args);
+			if (is_numeric($id)) {
+				return $this->findById($id, $options);
+			} else {
+				return $this->findByIdSlug($id, $options);
+			}
+		}
+		
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
@@ -312,6 +329,24 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
+		}
+		if ($options['eager_load']) {
+			foreach ($options['eager_load'] as $relationshipData) {
+				if ($relationshipData['type'] == 'select') {
+					if ($relationshipData['levels']) {
+						$selects = array();
+						$property = $relationshipData['name'];
+						foreach ($records as $item) {
+							if ($item->$property) {
+								$selects[] = $item->$property;
+							}
+						}
+						Jp7_Collections::eagerLoad($selects, $relationshipData['levels']);
+					}
+				} else {
+					Jp7_Collections::eagerLoad($records, $relationshipData['levels']);
+				}
+			}
 		}
 		$rs->Close();
 		return $records;
@@ -415,6 +450,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin 	First InterAdmin object found.
 	 */
 	public function first() {
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return reset($this->limit(1)->all());
 	}
 
@@ -453,7 +489,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin First InterAdmin object found.
 	 */
 	public function findByIdString($id_string, $options = array()) {
-		$options['where'][] = "id_string = '" . $id_string . "'";
+		$options['where'][] = "id_string = '" . addslashes($id_string) . "'";
 		return $this->findFirst($options);
 	}
 	/**
@@ -472,7 +508,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo Model used by this InterAdminTipo.
 	 */
 	public function getModel($options = array()) {
-		if ($this->model_id_tipo || $this->getFieldsValues('model_id_tipo')) {
+		if ($this->model_id_tipo) {
 			if (is_numeric($this->model_id_tipo)) {
 				$model = new InterAdminTipo($this->model_id_tipo, $options);
 			} else {
@@ -491,14 +527,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getCampos() {
 		if (!$A = $this->_getMetadata('campos')) {
-			$campos = $this->getFieldsValues('campos');
 			//unset($model->campos);
 			$campos_parameters = array(
 				'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
 				'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
 				'default', 'nome_id'
 			);
-			$campos	= explode('{;}', $campos);
+			$campos	= explode('{;}', $this->campos);
 			$A = array();
 			for ($i = 0; $i < count($campos); $i++) {
 				$parameters = explode("{,}", $campos[$i]);
@@ -543,10 +578,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array|string Resulting alias(es).
 	 */
 	public function getCamposAlias($fields = null) {
-		$campos = $this->getCampos();
 		if (is_null($fields)) {
-			$fields = array_keys($campos);
+			if (!$aliases = $this->_getMetadata('camposAlias')) {
+				$allFields = array_keys($this->getCampos());
+				$aliases = $this->getCamposAlias($allFields);
+				$this->_setMetadata('camposAlias', $aliases);
+			}
+			return $aliases;
 		}
+		$campos = $this->getCampos();
 		$aliases = array();
 		$update = false;
 		foreach ((array) $fields as $field) {
@@ -557,8 +597,8 @@ class InterAdminTipo extends InterAdminAbstract {
 				if (is_object($alias)) {
 					if ($campos[$field]['label']) {
 					 	$alias = $campos[$field]['label'];
-					} else { 
-						$alias = $alias->getFieldsValues('nome');	
+					} else {
+						$alias = $alias->nome;	
 					}
 				}
 				$alias = ($alias) ? toId($alias) : $field;
@@ -598,7 +638,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getStringValue(/*$simple = FALSE*/) {
 		$campos = $this->getCampos();
-		$return[] = $this->getFieldsValues('nome');
+		$return[] = $this->nome;
 		//if (!$simple) {
 			foreach ($campos as $key => $row) {
 				if (($row['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
@@ -617,10 +657,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getNome() {
 		global $lang;
 		if ($lang->prefix) {
-			$this->getFieldsValues(array('nome', 'nome' . $lang->prefix));
 			return $this->{'nome' . $lang->prefix} ? $this->{'nome' . $lang->prefix} : $this->nome;
 		} else {
-			return $this->getFieldsValues('nome');
+			return $this->nome;
 		}
 	}
 	/**
@@ -637,9 +676,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		$url_arr = '';
 		$parent = $this;
 		while ($parent) {
-			if (!isset($parent->nome)) {
-				$parent->getFieldsValues('nome');
-			}
 			if ($seo) {
 				if (!in_array($parent->nome, (array) $implicit_parents_names)) {
 					$url_arr[] = toSeo($parent->nome);
@@ -680,11 +716,11 @@ class InterAdminTipo extends InterAdminAbstract {
 		$parent = $this;
 		while ($parent) {
 			if ($seo) {
-				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) {
-					$url_arr[] = toSeo($parent->getFieldsValues('nome'));
+				if (!in_array($parent->nome, (array)$implicit_parents_names)) {
+					$url_arr[] = toSeo($parent->nome);
 				}
 			} else {
-				$url_arr[] = $parent->getFieldsValues('nome');
+				$url_arr[] = $parent->nome;
 			}
 			$parent = $parent->getParent();
 		}
@@ -703,12 +739,6 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->id_tipo_string = toId($this->nome);
 		}
 		// log
-		if ($this->id_tipo && !isset($this->log)) {
-			// Evita bug em que um tipo despublicado tem seu log zerado
-			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
-			$this->getFieldsValues('log');
-			InterAdmin::setPublishedFiltersEnabled($old_value);
-		}
 		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		
 		// Inheritance
@@ -729,9 +759,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function syncInheritance() {
-		// cache dos atributos herdados
-		$this->getFieldsValues(array_merge(array('model_id_tipo', 'inherited'), self::$inheritedFields));
-		
 		// Retornando ao valor real
 		foreach (jp7_explode(',', $this->inherited) as $inherited_var) {
 			$this->attributes[$inherited_var] = '';
@@ -741,7 +768,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->model_id_tipo) {
 			if (is_numeric($this->model_id_tipo)) {
 				$modelo = new InterAdminTipo($this->model_id_tipo);
-				$modelo->getFieldsValues(self::$inheritedFields);
+				$modelo->loadAttributes(self::$inheritedFields, false);
 			} else {
 				$className = 'Jp7_Model_' . $this->model_id_tipo . 'Tipo';
 				if (class_exists($className)) {
@@ -817,9 +844,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	
 	public function getAttributesNames() {
 		$db = $this->getDb();
-		if (!$attributes  = $this->_getMetadata('attributes')) {
+		if (!$attributes = self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix]['attributes']) {
 			$attributes = $db->MetaColumnNames($this->getTableName()) or die(jp7_debug($db->ErrorMsg()));
-			$this->_setMetadata('attributes', $attributes);
+			self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix]['attributes'] = $attributes;
 		}
 		return $attributes;
 	}
@@ -881,9 +908,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _getTableLang() {
 		global $lang;
 		$table = $this->db_prefix;
-		if (!isset($this->language)) {
-			$this->getFieldsValues('language');
-		}
 		if ($this->language) {
 			$table .= $lang->prefix;
 		}
@@ -905,7 +929,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			//$model = $this->getModel();
 			
 			$children = array();
-			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
+			$childrenArr = explode("{;}", $this->children);
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
 				$childrenArrParts = explode('{,}', $childrenArr[$i]);
 				if (count($childrenArrParts) < 4) { // 4 = 'id_tipo', 'nome', 'ajuda', 'netos'
@@ -1116,21 +1140,59 @@ class InterAdminTipo extends InterAdminAbstract {
 		);
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
-		$defaultFields = static::DEFAULT_FIELDS;
-		if ($defaultFields && strpos($defaultFields, ',') !== false) {
-			$defaultFields = explode(',', $defaultFields);
+		
+		if (!$options['fields']) {
+			$defaultFields = static::DEFAULT_FIELDS;
+			if (strpos($defaultFields, ',') !== false) {
+				$defaultFields = explode(',', $defaultFields);
+			}
+			$options['fields'] = $defaultFields;
 		}
-		$options = $options + array('fields' => $defaultFields, 'fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+		if (!array_key_exists('fields_alias', $options)) {
+			$options['fields_alias'] = static::DEFAULT_FIELDS_ALIAS;
+		}
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
+			$options['fields'] = array_merge(array('id', 'id_tipo', 'id_slug'), (array) $options['fields']);
 		}
+		
 		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['order'] = $this->getInterAdminsOrder($options['order']);
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();
+		$options['eager_load'] = array();
+		
+		if ($options['with']) {
+			foreach ($options['with'] as $withRelationship) {
+				// Isso aqui é mais uma validação
+				// O código mesmo é rodado depois
+				$levels = explode('.', $withRelationship);
+				
+				if ($relationshipData = $recordModel->getRelationshipData($levels[0])) {
+					if ($relationshipData['type'] === 'select') {
+						// select.* - Esse carregamento é feito com join para aproveitar código existente
+						// E também porque join é mais rápido para hasOne() do que um novo select
+						$options['fields'][$levels[0]] = array('*');
+						array_shift($levels);
+					}
+					$options['eager_load'][] = $relationshipData + array(
+						'levels' => $levels
+					);
+				} else{
+					throw new Exception('Unknown relationship: ' . $levels[0]);
+				}
+			}
+		}
+	}
+		
+	public function getInterAdminsAdminAttributes() {
+		return array('id_slug', 'id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+	}
+	
+	public function getInterAdminsUsingThisModel($options = array()) {
+		return $this->allUsingThisModel($options);
 	}
 	
 	/**
@@ -1139,7 +1201,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
-	public function getInterAdminsUsingThisModel($options = array()) {
+	public function allUsingThisModel($options = array()) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$tipos = $this->getTiposUsingThisModel();
@@ -1184,8 +1246,7 @@ class InterAdminTipo extends InterAdminAbstract {
     public function getAdminAttributes() {
         return array();
     }
-    
-
+	
     public function where($_) {
     	$options = new InterAdminOptions($this);
     	return call_user_method_array('where', $options, func_get_args());
@@ -1194,6 +1255,11 @@ class InterAdminTipo extends InterAdminAbstract {
     public function fields($_) {
     	$options = new InterAdminOptions($this);
     	return call_user_method_array('fields', $options, func_get_args());
+    }
+    
+    public function with($_) {
+    	$options = new InterAdminOptions($this);
+    	return call_user_method_array('with', $options, func_get_args());
     }
     
     public function join($alias, $tipo, $on) {
@@ -1224,5 +1290,15 @@ class InterAdminTipo extends InterAdminAbstract {
     public function order($_) {
     	$options = new InterAdminOptions($this);
     	return call_user_method_array('order', $options, func_get_args());
+    }
+    
+    public function whereNot(array $hash) {
+    	$options = new InterAdminOptions($this);
+    	return $options->whereNot($hash);
+    }
+    
+    public function debug($debug = true) {
+	$options = new InterAdminOptions($this);
+        return $options->debug($debug);
     }
 }

@@ -42,6 +42,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @var array
 	 */
 	protected $_tags;
+	
+	protected $_eagerLoad;
+	
 	/**
 	 * Username to be inserted in the log when saving this record.
 	 * @var string
@@ -115,7 +118,8 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// Fields		
 		if ($options['fields']) {
-			$finalInstance->getFieldsValues($options['fields'], false, $options['fields_alias']);
+			$finalInstance->_resolveWildcard($options['fields'], $finalInstance);
+			$finalInstance->loadAttributes($options['fields'], $options['fields_alias']);
 		}
 		return $finalInstance;
 	}
@@ -209,8 +213,13 @@ class InterAdmin extends InterAdminAbstract {
 			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
+		// childName() - relacionamento
 		} elseif ($child = $this->_findChild(ucfirst($methodName))) {
-			return $this->getChildrenTipo($child['id_tipo']);
+			$childrenTipo = $this->getChildrenTipo($child['id_tipo']);
+			if (isset($this->_eagerLoad[$methodName])) {
+				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);	
+			}
+			return $childrenTipo;
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
@@ -286,10 +295,12 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getParent($options = array()) {
 		if (!$this->_parent) {
-			if (!$this->parent_id || !$this->parent_id_tipo) {
-				$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
-			}
-			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+			$this->loadAttributes(array('parent_id', 'parent_id_tipo'), false);
+			
+			$options = $options + array(
+				'fields_alias' => static::DEFAULT_FIELDS_ALIAS,
+				'fields' => static::DEFAULT_FIELDS
+			);
 			
 			$parentTipo = null;
 			if ($this->parent_id_tipo) {
@@ -303,7 +314,7 @@ class InterAdmin extends InterAdminAbstract {
 				}
 			}
 		} elseif ($options['fields']) {
-			$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
+			$this->_parent->loadAttributes($options['fields'], $options['fields_alias']);
 		}
 		return $this->_parent;
 	}
@@ -316,11 +327,11 @@ class InterAdmin extends InterAdminAbstract {
 	public function setParent(InterAdmin $parent = null) {
 		if (isset($parent)) {
 			if (!isset($parent->id)) {
-			$parent->id = 0; // Necessário para que a referência funcione
-		}
+				$parent->id = 0; // Necessário para que a referência funcione
+			}
 			if (!isset($parent->id_tipo)) {
-			$parent->id_tipo = 0; // Necessário para que a referência funcione
-		}
+				$parent->id_tipo = 0; // Necessário para que a referência funcione
+			}
 		}
 		$this->attributes['parent_id'] = &$parent->id;
 		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
@@ -379,6 +390,16 @@ class InterAdmin extends InterAdminAbstract {
 		$retorno = $this->getFirstChild($id_tipo, $options);
 		return intval($retorno->count_distinct_id);
 	}
+
+	/**
+	 * Returns siblings records
+	 * 
+	 * @return InterAdminOptions
+	 */
+	public function siblings() {
+		return $this->getTipo()->whereNot(['id' => $this->id]);
+	}
+
 	/**
 	 * Returns the first Child.
 	 * 
@@ -711,12 +732,14 @@ class InterAdmin extends InterAdminAbstract {
 		// id_string
 		if (isset($this->varchar_key)) {
 			$this->id_string = toId($this->varchar_key);
+			//$this->id_slug = $this->generateSlug($this->varchar_key);
 		} else {
 			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
 			if (isset($this->$alias_varchar_key)) {
 				$this->id_string = toId($this->$alias_varchar_key);
-			}
-		}
+				//$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
+			}			
+		}	
 		// log
 		if ($this->id && !isset($this->log)) {
 			// Evita bug em que um registro despublicado tem seu log zerado
@@ -730,6 +753,16 @@ class InterAdmin extends InterAdminAbstract {
 		
 		return parent::save();
 	}
+
+	protected function generateSlug($string) {
+		$this->getByAlias('id_slug');
+		$newSlug = toSlug($string);
+		//if ($this->id_slug === $newSlug) {
+		//	return $newSlug; // Igual, evitar query
+		//}
+		kd($this->siblings()->all());
+	}
+		
 	public function getAttributesNames() {
 		return $this->getTipo()->getCamposNames();
 	}
@@ -836,7 +869,7 @@ class InterAdmin extends InterAdminAbstract {
      * @see InterAdminAbstract::getAdminAttributes()
      */
     public function getAdminAttributes() {
-		return array('id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+		return $this->getTipo()->getInterAdminsAdminAttributes();
     }
 	
     /**
@@ -871,5 +904,39 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
 		return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
+	}
+	
+	public function getRelationshipData($relationship) {
+		$aliases = $this->getAttributesAliases();
+		
+		$campoNome = array_search($relationship, $aliases);
+		$alias = true;
+		if ($campoNome === false) {
+			$campoNome = $relationship;
+			$alias = false;
+		}
+		$campos = $this->getAttributesCampos();
+		$campoTipo = $this->getCampoTipo($campos[$campoNome]);
+		if ($campoTipo instanceof InterAdminTipo) {
+			return array(
+				'type' => 'select',
+				'tipo' => $campoTipo,
+				'name' => $relationship,
+				'alias' => $alias
+			);
+		}
+		if ($childrenTipo = $this->getChildrenTipoByNome($relationship)) {
+			return array(
+				'type' => 'children',
+				'tipo' => $childrenTipo,
+				'name' => $relationship,
+				'alias' => true
+			);
+		}
+		throw new Exception('Unknown relationship: ' . $relationship);
+	}
+	
+	public function setEagerLoad($key, $data) {
+		$this->_eagerLoad[$key] = $data;
 	}
 }
