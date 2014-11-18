@@ -495,6 +495,16 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $this->findFirst($options);
 	}
 	/**
+	 * Retrieves the first record which have this id_slug
+	 *
+	 * @param string $id_slug Search value.
+	 * @return InterAdmin First InterAdmin object found.
+	 */
+	public function findByIdSlug($id_slug, $options = array()) {
+		$options['where'][] = "id_slug = '" . addslashes($id_slug) . "'";
+		return $this->findFirst($options);
+	}	
+	/**
 	 * @deprecated use findByIdString() instead.
 	 * @param string $id_string
 	 * @param array $options
