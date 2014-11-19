@@ -86,22 +86,35 @@ class Controller extends \Controller {
 		$action = snake_case(str_replace(['get', 'any', 'post'], '', $action));
 		$action = str_replace('_', '-', $action);
 		
-		$explodedClassName = explode('\\', get_class($this));
-		$className 		   = array_map(function($string) {
-			return str_replace(['_', '-controller'], ['-', ''], snake_case($string));
-		}, $explodedClassName);
-		$className 		   = implode('.', $className);
-		
-		$url = str_replace('.', '/', "{$className}.{$action}");
-
-		if (file_exists(\Config::get('view.paths')[0] . '/' . $url . '.blade.php')) {
-			return "{$className}.{$action}";
-		} elseif(file_exists(\Config::get('view.paths')[0] . '/' . self::$tipo->template . '/' . $action . '.blade.php')) {
-			return trim(str_replace('/', '.', self::$tipo->template) . '.' . $action, '.');
+		if ($viewFile = $this->_getViewFile(get_class($this), $action)) {
+			return $viewFile;
+		} elseif ($viewFile = $this->_getViewFile(get_parent_class($this), $action)) {
+			return $viewFile;
 		} else {
 			return "templates.{$action}";
 		}
+	}
+
+	protected function _getViewFile($controllerClass, $action) {
+		$routeName = $this->_routeName($controllerClass);
 		
+		$url = str_replace('.', '/', "{$routeName}.{$action}");
+
+		$viewPath = \Config::get('view.paths')[0];
+
+		if (file_exists($viewPath . '/' . $url . '.blade.php')) {
+			return "{$routeName}.{$action}";
+		}
+	}
+
+	protected function _routeName($controllerClass) {
+		$explodedClassName = explode('\\', $controllerClass);
+		$snakeArray = array_map(function($string) {
+			$string = snake_case($string);
+			$string = str_replace('_', '-', $string);
+			return str_replace('-controller', '', $string);
+		}, $explodedClassName);
+		return implode('.', $snakeArray);
 	}
 
 }
