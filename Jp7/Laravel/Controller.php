@@ -20,15 +20,62 @@ class Controller extends \Controller {
 		{
 			$this->view = new \StdClass;
 		}
-		// $this->beforeFilter('@setTipo');
-		// $this->beforeFilter('@setRecord', [
-		// 	'only' => ['show']
-		// ]);
+		$this->beforeFilter('@setTipo');
+		$this->beforeFilter('@setRecord', [
+			'only' => ['show']
+		]);
 		$klass = \InterAdminTipo::getDefaultClass();
 		$rootTipo = new $klass(0);
 
 		$this->view->menuItens = $rootTipo->getChildrenMenu();
 
+	}
+
+
+	public function setTipo() {
+		if (!static::$tipo && defined('static::TIPO_CLASS_NAME')) {
+			$className = '\\' . static::TIPO_CLASS_NAME;
+			
+			if (class_exists($className)) {
+				static::$tipo = new $className;
+			}
+		}
+
+		$this->tipo = $this->view->tipo = static::$tipo;
+	}
+
+	public function setRecord() {
+		if ($this->tipo) {
+			$route = Route::getCurrentRoute();
+			$resources = $route->parameterNames();
+
+			$record = $this->tipo
+				->fields('*');
+
+			$resourceName 		= end($resources);
+			$value    	  		= $route->getParameter($resourceName);
+			$resourceName 		= str_singular($resourceName);
+			
+			if (count($resources) > 1) {
+				$parentResource = $resources[count($resources) - 2];
+				$parentValue 	= $route->getParameter($parentResource);
+				$parentResource = str_singular($parentResource);
+
+				$record->where($parentResource . ".id_slug = '{$parentValue}'");
+			}
+			
+			$record = $record->findByIdSlug($value);
+			
+			$this->record 
+				= static::$record 
+				= $this->view->record
+				= $this->view->{camel_case($resourceName)}
+				= $record;
+
+			if (count($resources) > 1) {
+				$this->view->$parentResource = static::$record->$parentResource;
+			}
+		}
 	}
 
 
