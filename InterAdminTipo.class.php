@@ -95,7 +95,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array		$options 	[optional] Default array of options. Available keys: db_prefix, fields.
 	 */
 	public function __construct($id_tipo = null, $options = array()) {
-		global $config;
+		$config = InterSite::config();
 
 		if (is_null($id_tipo) || is_array($id_tipo)) {
 			$options = (array) $id_tipo;
@@ -683,7 +683,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->_url) {
 			return $this->_url;
 		}
-		global $config, $implicit_parents_names, $seo, $lang;
+		global $implicit_parents_names, $seo, $lang;
+		$config = InterSite::config();
+		
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
@@ -722,7 +724,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getTreePath() {
-		global $config, $implicit_parents_names, $seo, $lang;
+		global $implicit_parents_names, $seo, $lang;
+		$config = InterSite::config();
+		
 		$url = '';
 		$url_arr = '';
 		$parent = $this;

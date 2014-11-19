@@ -35,7 +35,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
      * @see Jp7_Box_BoxAbstract::_getEditorFields()
      */
 	protected function _getEditorFields() {
-		global $config;
+		$config = InterSite::config();
 		
     	ob_start();
 		?>

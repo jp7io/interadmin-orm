@@ -108,7 +108,8 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getUrl() {
-		global $config;
+		$config = InterSite::config();
+		
 		$url = ($this->url) ? $this->url : $this->getFieldsValues('url');
 		$url = str_replace('../../', $config->url, $url);
 		return $url; 

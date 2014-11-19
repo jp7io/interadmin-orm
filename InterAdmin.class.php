@@ -66,7 +66,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
 	 */
 	public function __construct($id = '0', $options = array()) {
-		global $config;
+		$config = InterSite::config();
 		
 		$id = (string) $id;
 		$this->id = is_numeric($id) ? $id : '0';
@@ -678,7 +678,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return bool
 	 */
 	public function isPublished() {
-		global $config, $s_session;
+		global $s_session;
+		$config = InterSite::config();
+		
 		$this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
 		return (
 			strtotime($this->date_publish) <= InterAdmin::getTimestamp() &&

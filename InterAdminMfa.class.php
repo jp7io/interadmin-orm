@@ -150,7 +150,8 @@ class InterAdminMfa extends InterAdmin {
     }
     
     private function getCliente() {
-    	global $config;
+    	$config = InterSite::config();
+    	
     	if (in_array($config->name_id, array('extra', 'casasbahia', 'pontofrio'))) {
     		return 'novapontocom';
     	} else {
@@ -225,7 +226,8 @@ class InterAdminMfa extends InterAdmin {
     
  	public function getIssuer() {
  		if (!self::$issuer) {
-	    	global $config, $c_interadmin_app_title;
+	    	$config = InterSite::config();
+	    	global $c_interadmin_app_title;
 	    	self::$issuer = $c_interadmin_app_title . ' - ' . $config->name;
 	    	
 	    	if ($config->server->type != InterSite::PRODUCAO) {

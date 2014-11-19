@@ -34,7 +34,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
     }
 	
 	protected function _getEditorFields() {
-		global $config;
+		$config = InterSite::config();
     	ob_start();
 		?>
 		<div class="fields">
