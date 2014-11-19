@@ -504,6 +504,14 @@ class InterAdmin extends InterAdminAbstract {
 		$arquivoModel = new $className(0);
 		$arquivoModel->setTipo($this->getTipo());
 		
+		if (!$options['fields']) {
+			$defaultFields = static::DEFAULT_FIELDS;
+			if (strpos($defaultFields, ',') !== false) {
+				$defaultFields = explode(',', $defaultFields);
+			}
+			$options['fields'] = $defaultFields;
+		}
+		
 		$this->_resolveWildcard($options['fields'], $arquivoModel);
 		$this->_whereArrayFix($options['where']); // FIXME
 		
