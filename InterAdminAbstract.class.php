@@ -947,7 +947,9 @@ abstract class InterAdminAbstract implements Serializable {
 	abstract function getTableName();
 	
 	public static function getPublishedFilters($table, $alias) {
-		global $db, $config, $s_session;
+		global $db, $s_session;
+		$config = InterSite::config();
+		
 		// Tipos
 		if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
 			return $alias . ".mostrar <> '' AND " . $alias . ".deleted_tipo = '' AND ";

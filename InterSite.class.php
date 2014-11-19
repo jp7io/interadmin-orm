@@ -162,7 +162,9 @@ class InterSite {
 		$host = strtolower($host);
 		
 		// This server is a main host
-		$this->server = $this->servers[$host];
+		if (isset($this->servers[$host])) {
+			$this->server = $this->servers[$host];
+		}
 		$this->hostType = self::HOST_MAIN;
 		
 		// Not Found, searching aliases
@@ -234,7 +236,9 @@ class InterSite {
 	}
 	
 	function start() {
-		$this->init($_SERVER['HTTP_HOST']);
+		$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+		
+		$this->init($host);
 		
 		switch ($this->hostType) {
 			case self::HOST_ALIAS:
