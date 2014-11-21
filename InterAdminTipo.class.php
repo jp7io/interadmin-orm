@@ -139,11 +139,11 @@ class InterAdminTipo extends InterAdminAbstract {
 		} else {
 			// Classe não foi forçada, cria uma instância temporária para acessar o DB e verificar a classe correta
 			$instance = new $options['default_class']($id_tipo, array_merge($options, array(
-				'fields' => array('model_id_tipo', 'class_tipo')
+				'fields' => array('class_tipo')
 			)));
 			$class_name = $instance->class_tipo;
 			// Classe não é customizada, retornar a própria classe temporária
-			if (!class_exists($class_name)) {
+			if (!$class_name || !class_exists($class_name)) {
 				if ($options['fields']) {
 					$instance->loadAttributes($options['fields'], false);
 				}

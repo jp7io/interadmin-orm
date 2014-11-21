@@ -5,53 +5,52 @@ namespace Jp7\Laravel;
 class Controller extends \Controller {
 
 	static $tipo = null;
-	static $record = null;
 
-	protected $layout = 'templates.layout';
+	protected $layout = 'layouts.master';
 
 	/**
 	 * @var Variables to send to view
 	 */
 	protected $view = null;
+	protected $tipoClassName = null;
 	
-	public function __construct()
-	{
-		if (is_null($this->view))
-		{
+	public function __construct() {
+		if (is_null($this->view)) {
 			$this->view = new \StdClass;
 		}
 		$this->beforeFilter('@setTipo');
-		$this->beforeFilter('@setRecord', [
-			'only' => ['show']
-		]);
-		$klass = \InterAdminTipo::getDefaultClass();
-		$rootTipo = new $klass(0);
-
-		$this->view->menuItens = $rootTipo->getChildrenMenu();
-
+		$this->beforeFilter('@setRecord', ['only' => ['show']]);
+		$this->beforeFilter('@setMenuItens');
 	}
 
-
+	public function getRootTipo() {
+		//$klass = \getDefaultClass();
+		return \InterAdminTipo::getInstance(0);
+	}
+        
+	public function setMenuItens() {
+		$this->view->menuItens = $this->getRootTipo()->getChildrenMenu();
+	}
+        
 	public function setTipo() {
-		if (!static::$tipo && defined('static::TIPO_CLASS_NAME')) {
-			$className = '\\' . static::TIPO_CLASS_NAME;
+		if (!static::$tipo && $this->tipoClassName) {
+			$className = '\\' . $this->tipoClassName;
 			
 			if (class_exists($className)) {
 				static::$tipo = new $className;
 			}
 		}
-
+		
 		$this->tipo = $this->view->tipo = static::$tipo;
 	}
 
 	public function setRecord() {
 		if ($this->tipo) {
-			$route = Route::getCurrentRoute();
+			$route = \Route::getCurrentRoute();
 			$resources = $route->parameterNames();
-
-			$record = $this->tipo
-				->fields('*');
-
+			
+			$query = $this->tipo;
+			
 			$resourceName 		= end($resources);
 			$value    	  		= $route->getParameter($resourceName);
 			$resourceName 		= str_singular($resourceName);
@@ -61,37 +60,22 @@ class Controller extends \Controller {
 				$parentValue 	= $route->getParameter($parentResource);
 				$parentResource = str_singular($parentResource);
 
-				$record->where($parentResource . ".id_slug = '{$parentValue}'");
+				$query->where($parentResource . ".id_slug = '{$parentValue}'");
 			}
 			
-			$record = $record->findByIdSlug($value);
+			$record = $query->find($value);
 			
 			$this->record 
-				= static::$record 
-				= $this->view->record
-				= $this->view->{camel_case($resourceName)}
+ 				= $this->view->record
 				= $record;
+			//= static::$record
+			//= $this->view->{camel_case($resourceName)}
 
 			if (count($resources) > 1) {
-				$this->view->$parentResource = static::$record->$parentResource;
+				$this->view->$parentResource = $record->$parentResource;
 			}
 		}
 	}
-
-
-	/**
-	 * Setup the layout used by the controller.
-	 *
-	 * @return void
-	 */
-	protected function setupLayout()
-	{
-		if ( ! is_null($this->layout))
-		{
-			$this->layout = View::make($this->layout);
-		}
-	}
-
 
 	/**
 	 * Execute an action on the controller.
@@ -100,10 +84,9 @@ class Controller extends \Controller {
 	 * @param  array   $parameters
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function callAction($method, $parameters)
-	{
+	public function callAction($method, $parameters) {
 		$response = call_user_func_array(array($this, $method), $parameters);
-
+	
 		if (is_null($response))
 		{
 			$viewName		= $this->_getViewName($method);
@@ -128,8 +111,7 @@ class Controller extends \Controller {
 	 * 
 	 * @return string
 	 */
-	private function _getViewName($action)
-	{
+	private function _getViewName($action) {
 		$action = \Jp7_Inflector::underscore(str_replace(['get', 'any', 'post'], '', $action));
 		$action = str_replace('_', '-', $action);
 		
@@ -157,7 +139,7 @@ class Controller extends \Controller {
 	protected function _routeName($controllerClass) {
 		$explodedClassName = explode('\\', $controllerClass);
 		$snakeArray = array_map(function($string) {
-			$string =  \Jp7_Inflector::underscore($string);
+			$string = \Jp7_Inflector::underscore($string);
 			$string = str_replace('_', '-', $string);
 			return str_replace('-controller', '', $string);
 		}, $explodedClassName);
