@@ -16,11 +16,11 @@
  * @package InterSite
  */
 class InterSite {
-	const PRODUCAO = 'Produção';
+	const PRODUCAO = 'ProduÃ§Ã£o';
 	const QA = 'QA';
 	const DESENVOLVIMENTO = 'Desenvolvimento';
 	
-	const PRODUCTION = 'Produção';
+	const PRODUCTION = 'ProduÃ§Ã£o';
 	const DEVELOPMENT = 'Desenvolvimento';
 	
 	const HOST_MAIN = 'main';
@@ -66,7 +66,7 @@ class InterSite {
 	protected static $instance = null;
 	
 	/**
-	 * Checks if it´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
+	 * Checks if itÂ´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
 	 * If the HTTP_HOST has a . (dot) like something.com, it will return false.
 	 *
 	 * @return bool
@@ -155,10 +155,10 @@ class InterSite {
 	public function init($host) {
 		global $jp7_app;
 		
-		// No caso do artisan, o $host estará vazio, mas entra em self::isAtLocalhost()
+		// No caso do artisan, o $host estarÃ¡ vazio, mas entra em self::isAtLocalhost()
 		$host = explode(':', $host)[0];		
 
-		// Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
+		// Browsers nÃ£o fazem isso, mas alguns User Agents estranhos podem vir em maiÃºscula
 		$host = strtolower($host);
 		
 		// This server is a main host
@@ -183,7 +183,7 @@ class InterSite {
 						break 2;  // Exit foreach and while.
 					}
 				}
-				// Domínios Alternativos - Não redirecionam
+				// DomÃ­nios Alternativos - NÃ£o redirecionam
 				if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
 					$this->server = $this->servers[$host] = $server;
 					$this->server->host = $host;
@@ -209,7 +209,7 @@ class InterSite {
 		
 		if ($this->server) {
 			$this->db = clone $this->server->db;
-			// Exceção para funcionamento do InterAdmin Remote nos sites Express
+			// ExceÃ§Ã£o para funcionamento do InterAdmin Remote nos sites Express
 			/*
 			if ($this->db->host == 'mysql.jp7.com.br' && $this->hostType == self::HOST_REMOTE) {
 				$this->db->host = 'localhost';
@@ -248,9 +248,9 @@ class InterSite {
 			case !$this->server: {
 				global $debugger;
 				
-				$message = 'Host não está presente nas configurações: ' . $_SERVER['HTTP_HOST'];
+				$message = 'Host nÃ£o estÃ¡ presente nas configuraÃ§Ãµes: ' . $_SERVER['HTTP_HOST'];
 				jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
-				$message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
+				$message .= '.<br /><br />VocÃª pode ter digitado um endereÃ§o invÃ¡lido.<br /><br />';
 				if ($this->servers) {
 					if ($siteProducao = $this->getFirstServerByType(self::PRODUCTION)) {
 						$urlProducao = 'http://' . jp7_implode('/', array($siteProducao->host, $siteProducao->path));
@@ -310,7 +310,7 @@ class InterSite {
 	}
 		
 	/**
-	 * Cacheando verificação, porque chega a demorar 1 segundo
+	 * Cacheando verificaÃ§Ã£o, porque chega a demorar 1 segundo
 	 */
 	public static function hasDnsRecord($domain) {
 		$cacheFile = sys_get_temp_dir() . '__dns_' . $domain;
