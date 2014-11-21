@@ -5,11 +5,11 @@ use Route;
 
 class Router {
 	
-	public function createRoutes($section, $namespace = '') {
+	public function createRoutes($section) {
 		if ($subsections = $section->getChildrenMenu()) {
-			Route::group(['namespace' => $section->getNamespace(), 'prefix' => $section->getControllerUrl()], function() use ($section, $subsections) {
+			Route::group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], function() use ($section, $subsections) {
 				foreach ($subsections as $subsection) {
-					$this->createRoutes($subsection, $section->getNamespace());
+					$this->createRoutes($subsection);
 				}
 			});
 		}
@@ -18,34 +18,42 @@ class Router {
 			$dynamic = $this->_checkTemplate($section) ? 'dynamic' : 'static';
 			
 			Route::group(['before' => 'setTipo:' . $section->id_tipo . '|' . $dynamic], function() use ($section) {
-				Route::resource($section->getControllerUrl(), $section->getControllerName(), ['only' => ['index', 'show']]);
+				Route::resource($section->getSlug(), $section->getControllerBasename(), ['only' => ['index', 'show']]);
 			});
 		}
 	}
 	
 	protected function _checkTemplate($section) {
 		$dynamic = false;
-		if (!class_exists($section->getControllerNameWithNamespace())) {
+		if (!class_exists($section->getControllerName())) {
 			$dynamic = true;
 			
-			if (starts_with($section->template, '/')) {
-				$section->template = substr($section->template, 1); //  Corrigir lasa assim que possivel
-			}
+			$templateController = '';
 			if ($section->template) {
-				$templateParts = explode('/', $section->template);
-				$templateParts = array_map('studly_case', $templateParts);
-					
-				$templateController = implode('\\', $templateParts) . 'Controller';
-			} else {
-				$templateController = '';
+				$templateController = $this->_pathToNamespace($section->template) . 'Controller';
 			}
-		
+			
+			$namespace = $section->getNamespace();
+			$namespaceCode = $namespace ? 'namespace ' . $namespace . ';' : '';
+			
 			if ($templateController && class_exists($templateController)) {
-				eval($section->getFullNamespace() . "class {$section->getControllerName()} extends \\$templateController { }");
+				eval($namespaceCode . "class {$section->getControllerBasename()} extends \\$templateController { }");
 			} else {
-				eval($section->getFullNamespace() . "class {$section->getControllerName()} extends \\BaseController { public function index() { }}");
+				eval($namespaceCode . "class {$section->getControllerBasename()} extends \\BaseController { public function index() { }}");
 			}
 		}
 		return $dynamic;
 	}
+	
+	protected function _pathToNamespace($string) {
+		if (starts_with($string, '/')) {
+			// lasa está começando com /templates - Corrigir assim que possivel 
+			$string = substr($string, 1);
+		}
+		
+		$parts = explode('/', $string);
+		$parts = array_map('studly_case', $parts);
+		return implode('\\', $parts) . 'Controller';
+	}
+	
 }
