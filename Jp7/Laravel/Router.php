@@ -1,31 +1,56 @@
 <?php
 
 namespace Jp7\Laravel;
-use Route;
 
-class Router {
+class Router extends \Illuminate\Routing\Router {
 	
-	public function createRoutes($section) {
+	protected $mapIdTipos = [];
+	
+	public function createDynamicRoutes($section, $currentPath = []) {
 		if ($subsections = $section->getChildrenMenu()) {
-			$closure = function() use ($section, $subsections) {
-				foreach ($subsections as $subsection) {
-					$this->createRoutes($subsection);
-				}
-			};
 			if ($section->isRoot()) {
-				$closure();
+				foreach ($subsections as $subsection) {
+					$this->createDynamicRoutes($subsection, $currentPath);
+				}
 			} else {
-				Route::group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], $closure);
+				$this->group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], function() use ($section, $subsections, $currentPath) {
+					//$currentPath[] = $section->getSlug();
+					foreach ($subsections as $subsection) {
+						$this->createDynamicRoutes($subsection, $currentPath);
+					}
+				});
 			}
 		}
 		if (!$section->isRoot()) {
 			// Somente para debug na barra do laravel
-			$dynamic = $this->_checkTemplate($section) ? 'dynamic' : 'static';
-			
-			Route::group(['before' => 'setTipo:' . $section->id_tipo . '|' . $dynamic], function() use ($section) {
-				Route::resource($section->getSlug(), $section->getControllerBasename(), ['only' => ['index', 'show']]);
-			});
+			$this->resource($section->getSlug(), $section->getControllerBasename(), [
+				'only' => ['index', 'show'],
+				'id_tipo' => $section->id_tipo,
+				'dynamic' => $this->_checkTemplate($section) ? '|dynamic' : ''						
+			]);
 		}
+	}
+	
+	public function resource($name, $controller, array $options = array()) {
+		if ($options['id_tipo']) {
+			$groupRoute = str_replace('/', '.', $this->getLastGroupPrefix()); 
+			$this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute . '.' : '') . $name;
+			
+			$this->group(['before' => 'setTipo:' . $options['id_tipo'] . $options['dynamic']], function() use ($name, $controller, $options) {
+				parent::resource($name, $controller, $options);
+			});
+		} else {
+			parent::resource($name, $controller, $options);
+		}
+	}	
+	
+	public function getRouteByIdTipo($id_tipo, $action = 'index') {
+		$mappedRoute = $this->mapIdTipos[$id_tipo];
+		return $this->routes->getByName($mappedRoute . '.' . $action);
+	}
+	
+	public function getMapIdTipos() {
+		return $this->mapIdTipos;
 	}
 	
 	protected function _checkTemplate($section) {
