@@ -38,6 +38,10 @@ trait Routable {
 		return studly_case($this->getSlug());
 	}
 	
+	public function isRoot() {
+		return $this->id_tipo == '0';
+	}
+	
 	public function getChildrenMenu() {
 		return $this->where(["menu <> ''"])->getChildren();
 	}

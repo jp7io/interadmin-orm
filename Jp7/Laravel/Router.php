@@ -7,13 +7,18 @@ class Router {
 	
 	public function createRoutes($section) {
 		if ($subsections = $section->getChildrenMenu()) {
-			Route::group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], function() use ($section, $subsections) {
+			$closure = function() use ($section, $subsections) {
 				foreach ($subsections as $subsection) {
 					$this->createRoutes($subsection);
 				}
-			});
+			};
+			if ($section->isRoot()) {
+				$closure();
+			} else {
+				Route::group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], $closure);
+			}
 		}
-		if ($section->id_tipo > 0) {
+		if (!$section->isRoot()) {
 			// Somente para debug na barra do laravel
 			$dynamic = $this->_checkTemplate($section) ? 'dynamic' : 'static';
 			
