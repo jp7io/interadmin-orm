@@ -78,7 +78,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				return ($match[1]) ? reset($retorno) : $retorno;
 			}
 		}
-		// Default error when method doesn¥t exist
+		// Default error when method doesn¬¥t exist
 		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $method . '()'));
 	}
 
@@ -134,15 +134,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['default_class'] = self::$_defaultClass;
 		}
 		if ($options['class']) {
-			// Classe foi forÁada
+			// Classe foi for√ßada
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
-			// Classe n„o foi forÁada, cria uma inst‚ncia tempor·ria para acessar o DB e verificar a classe correta
+			// Classe n√£o foi for√ßada, cria uma inst√¢ncia tempor√°ria para acessar o DB e verificar a classe correta
 			$instance = new $options['default_class']($id_tipo, array_merge($options, array(
 				'fields' => array('class_tipo')
 			)));
 			$class_name = $instance->class_tipo;
-			// Classe n„o È customizada, retornar a prÛpria classe tempor·ria
+			// Classe n√£o √© customizada, retornar a pr√≥pria classe tempor√°ria
 			if (!$class_name || !class_exists($class_name)) {
 				if ($options['fields']) {
 					$instance->loadAttributes($options['fields'], false);
@@ -277,7 +277,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		// Necess·rio enquanto algumas tabelas ainda tem esse campo numÈrico
+		// Necess√°rio enquanto algumas tabelas ainda tem esse campo num√©rico
 		$options['where'][] = "model_id_tipo != '0'"; 
 		return $this->getChildren($options);
 	}
@@ -417,12 +417,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function count($options = array()) {
 		if ($options['group'] == 'id') {
 			// O COUNT() precisa trazer a contagem total em 1 linha
-			// Caso exista GROUP BY id, ele traria em v·rias linhas
-			// Esse È um tratamento especial apenas para o ID
+			// Caso exista GROUP BY id, ele traria em v√°rias linhas
+			// Esse √© um tratamento especial apenas para o ID
 			$options['fields'] = array('COUNT(DISTINCT id) AS count_id');
 			unset($options['group']);
 		} elseif ($options['group']) {
-			// Se houver GROUP BY com outro campo, retornar· a contagem errada
+			// Se houver GROUP BY com outro campo, retornar√° a contagem errada
 			throw new Exception("GROUP BY is not supported when using count().");
 		} else {
 			$options['fields'] = array('COUNT(id) AS count_id');
@@ -643,7 +643,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 	}	
 	/**
-	 * Returns this object¥s nome and all the fields marked as 'combo', if the field 
+	 * Returns this object¬¥s nome and all the fields marked as 'combo', if the field 
 	 * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
 	 *
 	 * @return string For the tipo 'City' with the field 'state' marked as 'combo' it would return: 'City - State'.
@@ -677,47 +677,44 @@ class InterAdminTipo extends InterAdminAbstract {
 	/**
 	 * Returns the full url for this InterAdminTipo.
 	 * 
+	 * @param string $action
+	 * @param array $parameters
+	 * @throws BadMethodCallException
 	 * @return string
 	 */
-	public function getUrl() {
-		if ($this->_url) {
-			return $this->_url;
-		}
-		global $implicit_parents_names, $seo, $lang;
-		$config = InterSite::config();
-		
-		$url = '';
-		$url_arr = '';
-		$parent = $this;
-		while ($parent) {
-			if ($seo) {
-				if (!in_array($parent->nome, (array) $implicit_parents_names)) {
-					$url_arr[] = toSeo($parent->nome);
-				}
-			} else {
-				if (toId($parent->nome)) {
-					$url_arr[] = toId($parent->nome);
-				}
-			}
-			$parent = $parent->getParent();
-			if ($parent instanceof InterAdmin) {
-				$parent = $parent->getTipo();
-			}
-		}
-		$url_arr = array_reverse((array) $url_arr);
-		
-		if ($seo) {
-			$url = $config->url . $lang->path . jp7_implode("/", $url_arr);
-		} else {
-			$url = $config->url . $lang->path_url . implode("_", $url_arr);
-			$pos = strpos($url, '_');
-			if ($pos) {
-				$url = substr_replace($url, '/', $pos, 1);
-			}
-			$url .= (count($url_arr) > 1) ? '.php' : '/';
-		}
-		return $this->_url = $url;
-	}
+	public function getUrl($action = 'index', array $parameters = array()) {
+    	if (func_num_args() === 1 && is_array($action)) {
+    		list($action, $parameters) = ['index', $action];
+    	}
+    	
+    	$route = $this->getRoute($action);
+    	if (!$route) {
+    		throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo . ', action: ' . $action .  '. Called on ' . get_class($this));
+    	}
+    	
+    	$variables = Route::getVariablesFromRoute($route);
+    	
+    	if (count($parameters) != count($variables)) {
+	    	throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) . ' parameters, but received ' . count($parameters));
+	    }
+	    
+	    $parameters = array_map(function($p) {
+	    	return is_object($p) ? $p->id_slug : $p;
+	    }, $parameters);
+    	
+    	return URL::route(null, $parameters, true, $route);
+    }
+	
+    
+    public function getRoute($action = 'index') {
+    	$validActions = array('index', 'show', 'create', 'store', 'update', 'destroy', 'edit');
+    	if (!in_array($action, $validActions)) {
+    		throw new BadMethodCallException('Invalid action "' . $action . '", valid actions: ' . implode(', ', $validActions));
+    	}
+    	 
+    	return Route::getRouteByIdTipo($this->id_tipo, $action);
+    }
+    
 	/**
 	 * Returns the names of the parents separated by '/', e.g. 'countries/south-america/brazil'.
 	 * 
@@ -1100,7 +1097,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	public static function findTiposByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
 		if ($model_id_tipo != '0') {
-			// Devido ‡ mudanÁa de int para string do campo model_id_tipo, essa linha È necess·ria
+			// Devido √† mudan√ßa de int para string do campo model_id_tipo, essa linha √© necess√°ria
 			$options['where'][] = "model_id_tipo != '0'";
 		}
 		return self::findTipos($options); 
@@ -1182,14 +1179,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		if ($options['with']) {
 			foreach ($options['with'] as $withRelationship) {
-				// Isso aqui È mais uma validaÁ„o
-				// O cÛdigo mesmo È rodado depois
+				// Isso aqui √© mais uma valida√ß√£o
+				// O c√≥digo mesmo √© rodado depois
 				$levels = explode('.', $withRelationship);
 				
 				if ($relationshipData = $recordModel->getRelationshipData($levels[0])) {
 					if ($relationshipData['type'] === 'select') {
-						// select.* - Esse carregamento È feito com join para aproveitar cÛdigo existente
-						// E tambÈm porque join È mais r·pido para hasOne() do que um novo select
+						// select.* - Esse carregamento √© feito com join para aproveitar c√≥digo existente
+						// E tamb√©m porque join √© mais r√°pido para hasOne() do que um novo select
 						$options['fields'][$levels[0]] = array('*');
 						array_shift($levels);
 					}

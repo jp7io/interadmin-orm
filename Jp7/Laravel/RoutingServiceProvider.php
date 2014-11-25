@@ -2,6 +2,7 @@
 
 namespace Jp7\Laravel;
 
+// CODE COPIED FROM LARAVEL TO CHANGE THE NAMESPACE TO JP7
 class RoutingServiceProvider extends \Illuminate\Routing\RoutingServiceProvider {
 	
 	protected function registerRouter()

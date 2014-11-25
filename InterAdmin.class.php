@@ -28,7 +28,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public $table;
 	/**
-	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this recordÂ´s 'id_tipo'.
 	 * @var InterAdminTipo
 	 */
 	protected $_tipo;
@@ -99,6 +99,19 @@ class InterAdmin extends InterAdminAbstract {
 			return null;
 		}
 	}
+	
+	public static function __callStatic($name, array $arguments) {
+		$tipo = \InterAdminTipo::findFirstTipo(array(
+			'where' => array(
+				"class = '" . get_called_class() . "'"
+			)
+		));
+		if ($tipo) {
+			$options = new InterAdminOptions($tipo);
+			return call_user_func_array([$options, $name], $arguments);
+		}
+		throw new BadMethodCallException('Call to undefined method ' . get_called_class() . '::' . $name);
+	}
 
 	/**
 	 * Returns an InterAdmin instance. If $options['class'] is passed, 
@@ -107,7 +120,7 @@ class InterAdmin extends InterAdminAbstract {
 	 *
 	 * @param int $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class, default_class.
-	 * @param InterAdminTipo Set the record´s Tipo.
+	 * @param InterAdminTipo Set the recordÂ´s Tipo.
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
 	public static function getInstance($id, $options = array(), InterAdminTipo $tipo = null) {
@@ -117,7 +130,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$options['default_class']) {
 			$options['default_class'] = 'InterAdmin';
 		}
-		// Classe não foi forçada, descobrir a classe do Tipo
+		// Classe nÃ£o foi forÃ§ada, descobrir a classe do Tipo
 		if (!$options['class']) {
 			if (!$tipo) {
 				$instance = new $options['default_class']($id, $optionsWithoutFields);
@@ -127,10 +140,10 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// Classe foi descoberta
 		if ($instance && $options['class'] == get_class($instance)) {
-			// Classe do objeto temporário já está correta
+			// Classe do objeto temporÃ¡rio jÃ¡ estÃ¡ correta
 			$finalInstance = $instance;
 		} else {
-			// Classe é outra
+			// Classe Ã© outra
 			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
 			$finalInstance = new $class_name($id, $optionsWithoutFields);
 		}
@@ -139,7 +152,7 @@ class InterAdmin extends InterAdminAbstract {
 			$finalInstance->db_prefix = $tipo->db_prefix;
 			$finalInstance->setDb($tipo->getDb());
 		}
-		// Fields		
+		// Fields
 		if ($options['fields']) {
 			$finalInstance->_resolveWildcard($options['fields'], $finalInstance);
 			$finalInstance->loadAttributes($options['fields'], $options['fields_alias']);
@@ -193,7 +206,7 @@ class InterAdmin extends InterAdminAbstract {
 			if (isset($this->_eagerLoad[$methodName])) {
 				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
 			}
-			return $childrenTipo;
+			return new InterAdminOptions($childrenTipo);
 		// get{ChildName}, getFirst{ChildName} and get{ChildName}ById
 		} elseif (strpos($methodName, 'get') === 0) {
 			// getFirst{ChildName}
@@ -244,7 +257,7 @@ class InterAdmin extends InterAdminAbstract {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
 		}
-		// Default error when method doesn´t exist
+		// Default error when method doesnÂ´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
 		$children = $this->getTipo()->getInterAdminsChildren();
 		$patterns = array(
@@ -348,10 +361,10 @@ class InterAdmin extends InterAdminAbstract {
 	public function setParent(InterAdmin $parent = null) {
 		if (isset($parent)) {
 			if (!isset($parent->id)) {
-				$parent->id = 0; // Necessário para que a referência funcione
+				$parent->id = 0; // NecessÃ¡rio para que a referÃªncia funcione
 			}
 			if (!isset($parent->id_tipo)) {
-				$parent->id_tipo = 0; // Necessário para que a referência funcione
+				$parent->id_tipo = 0; // NecessÃ¡rio para que a referÃªncia funcione
 			}
 		}
 		$this->attributes['parent_id'] = &$parent->id;
@@ -385,7 +398,7 @@ class InterAdmin extends InterAdminAbstract {
 		return $childrenTipo;
 	}
 	/**
-	 * Retrieves this record´s children for the given $id_tipo.
+	 * Retrieves this recordÂ´s children for the given $id_tipo.
 	 * 
 	 * @param int $id_tipo
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
@@ -564,38 +577,59 @@ class InterAdmin extends InterAdminAbstract {
 		return $log;
 	}
 	
+	
 	/**
-	 * Returns the full url for this record.
+	 * Return URL from the route associated with this record.
 	 * 
+	 * @param string $action	Defaults to 'show'
 	 * @return string
+	 * @throws BadMethodCallException
 	 */
-	public function getUrl($sep = null){
-		global $seo, $seo_sep;
-				
-		if ($seo && $this->getParent()->id) {
-			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->getFieldsValues('nome'));
-		} else {
-			$link = $this->getTipo()->getUrl();
+	public function getUrl($action = 'show') {
+		$route = $this->getTipo()->getRoute($action);
+		if (!$route) {
+			throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo . ', action: ' . $action . '. Called on ' . get_class($this));
 		}
-		if ($seo) {
-			$aliases = $this->getTipo()->getCamposAlias();
-			if (array_key_exists('varchar_key', $aliases)) {
-				$alias = $aliases['varchar_key'];
-				if (isset($this->$alias)) {
-					$nome = $this->$alias;
-				} else {
-					$nome = $this->getFieldsValues('varchar_key');
-				}
-			}
-			if (is_null($sep)) {
-				$sep = $seo_sep;
-			}
-			$link .= $sep . toSeo($nome);
-		} else {
-			$link .= '?id=' . $this->id;
+		
+		$variables = Route::getVariablesFromRoute($route);
+		$hasSlug = in_array($action, array('show', 'edit', 'update', 'destroy'));
+		
+		if ($hasSlug) {
+			$removedVar = array_pop($variables);
 		}
-		return $link;
+		
+		$parameters = $this->getUrlParameters($variables);
+		
+		if ($hasSlug) {
+			$parameters[] = $this->id_slug;
+			array_push($variables, $removedVar);
+		}		
+		
+		if (count($parameters) != count($variables)) {
+			throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) . ' parameters, but received ' . count($parameters));
+		}
+		
+		return URL::route(null, $parameters, true, $route);		
 	}
+	
+	/**
+	 * Parameters to be used with URL::route().
+	 * 
+	 * @param array $variables
+	 * @return array
+	 */
+	public function getUrlParameters(array $variables) {
+		$parameters = [];
+		$parent = $this;
+		foreach ($variables as $variable) {
+			if (!$parent = $parent->getParent()) {
+				break;
+			}
+			$parameters[] = $parent->id_slug;
+		}
+		return $parameters;
+	}
+	
 	/**
 	 * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
 	 * 
@@ -722,10 +756,10 @@ class InterAdmin extends InterAdminAbstract {
 		}
 	}
 	/**
-	 * Returns this object´s varchar_key and all the fields marked as 'combo', if the field 
+	 * Returns this objectÂ´s varchar_key and all the fields marked as 'combo', if the field 
 	 * is an InterAdmin such as a select_key, its getStringValue() method is used.
 	 *
-	 * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
+	 * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - ParanÃ¡'.
 	 */
 	public function getStringValue() {
 		$campos = $this->getTipo()->getCampos();
@@ -786,7 +820,7 @@ class InterAdmin extends InterAdminAbstract {
 			$newSlug = '--' . $newSlug;
 		}
 		if ($this->id_slug === $newSlug) {
-			// Está igual, evitar query
+			// EstÃ¡ igual, evitar query
 			return $newSlug; 
 		}
 		$siblingSlugs = $this->siblings()->where('id_slug LIKE ?', "$newSlug%")->distinct('id_slug');

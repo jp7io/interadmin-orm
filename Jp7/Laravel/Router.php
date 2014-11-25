@@ -53,6 +53,12 @@ class Router extends \Illuminate\Routing\Router {
 		return $this->mapIdTipos;
 	}
 	
+	public function getVariablesFromRoute($route) {
+		$matches = array();
+		preg_match_all('/{(\w+)}/', $route->getUri(), $matches);
+		return $matches[1] ?: array();
+	}
+	
 	protected function _checkTemplate($section) {
 		$dynamic = false;
 		if (!class_exists($section->getControllerName())) {
