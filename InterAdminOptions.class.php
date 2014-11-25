@@ -160,7 +160,7 @@ class InterAdminOptions {
 	public function find($id) {
 		if (func_num_args() != 1) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1.');
 		if (!is_string($id) && !is_int($id)) {
-			throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
+			throw new BadMethodCallException('Wrong argument on find(). If youÂ´re trying to get records, use all() instead of find().');
 		}
 		return $this->tipo->find($id, $this->options);
 	}
@@ -182,6 +182,7 @@ class InterAdminOptions {
 			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
 			return $this;
 		}
+		//throw new Exception('Unsupported method ' . $method_name);
 		return $retorno;
 	}
 	

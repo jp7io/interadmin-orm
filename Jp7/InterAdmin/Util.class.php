@@ -160,7 +160,7 @@ class Jp7_InterAdmin_Util {
 	}
 	
 	/**
-	 * Helper da função _getCampoType
+	 * Helper da funï¿½ï¿½o _getCampoType
 	 *
 	 * @param InterAdminTipo $campoTipo
 	 * @param bool $isTipo
@@ -208,8 +208,7 @@ class Jp7_InterAdmin_Util {
 	}
 	
 	public static function gerarClasseInterAdmin(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '') {
-		global $config;
-		$prefixoClasse = ucfirst($config->name_id);
+		$prefixoClasse = constant(InterAdminTipo::getDefaultClass() . '::DEFAULT_NAMESPACE');
 		
 		if (!$nomeClasse) {
 			$nomeClasse = $tipo->class;
@@ -226,7 +225,7 @@ class Jp7_InterAdmin_Util {
 <?php
 
 $phpdoc
-class {$nomeClasse} extends {$prefixoClasse}_InterAdmin {
+class {$nomeClasse} extends {$prefixoClasse}InterAdmin {
 	
 }
 STR;
@@ -238,8 +237,7 @@ STR;
 	}
 	
 	public static function gerarClasseInterAdminTipo(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '', $nomeClasseInterAdmin = '') {
-		global $config;
-		$prefixoClasse = ucfirst($config->name_id);
+		$prefixoClasse = constant(InterAdminTipo::getDefaultClass() . '::DEFAULT_NAMESPACE');
 		
 		if (!$nomeClasse) {
 			$nomeClasse = $tipo->class_tipo;
@@ -265,7 +263,7 @@ STR;
 <?php
 
 $phpdoc
-class {$nomeClasse} extends {$prefixoClasse}_InterAdminTipo {
+class {$nomeClasse} extends {$prefixoClasse}InterAdminTipo {
 	const ID_TIPO = {$tipo->id_tipo};
 }
 STR;
@@ -289,12 +287,12 @@ STR;
 			$retorno = file_put_contents($arquivo, $conteudo);
 			@chmod($arquivo, 0777);
 			if ($retorno === false) {
-				$avisos['erro'][] = 'Não foi possível gravar arquivo: "' . $arquivo . '". Verifique permissões no diretório.';
+				$avisos['erro'][] = 'Nï¿½o foi possï¿½vel gravar arquivo: "' . $arquivo . '". Verifique permissï¿½es no diretï¿½rio.';
 			} else {
 				$avisos['sucesso'][] = 'Arquivo "' . $arquivo . '" gerado.';
 			}
 		} else {
-			$avisos['erro'][] = 'Arquivo "' . $arquivo . '" já existe.';
+			$avisos['erro'][] = 'Arquivo "' . $arquivo . '" jï¿½ existe.';
 		}
 		return $avisos;
 	}
