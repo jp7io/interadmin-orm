@@ -667,12 +667,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string 
 	 */
 	public function getNome() {
-		global $lang;
-		if ($lang->prefix) {
-			return $this->{'nome' . $lang->prefix} ? $this->{'nome' . $lang->prefix} : $this->nome;
-		} else {
-			return $this->nome;
-		}
+		$affix = Lang::get('interadmin.affix');
+		return $this->{'nome' . $affix} ?: $this->nome;
 	}
 	/**
 	 * Returns the full url for this InterAdminTipo.
@@ -919,10 +915,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */	
 	protected function _getTableLang() {
-		global $lang;
 		$table = $this->db_prefix;
 		if ($this->language) {
-			$table .= $lang->prefix;
+			$table .= Lang::get('interadmin.affix');
 		}
 		return $table;
 	}	
