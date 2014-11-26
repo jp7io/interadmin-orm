@@ -16,7 +16,7 @@ class Controller extends \Controller {
 	
 	public function __construct() {
 		if (is_null($this->view)) {
-			$this->view = new \StdClass;
+			$this->view = new View;
 		}
 		$this->beforeFilter('@setTipo');
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
