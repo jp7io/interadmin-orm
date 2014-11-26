@@ -112,7 +112,7 @@ class Controller extends \Controller {
 	 * @return string
 	 */
 	private function _getViewName($action) {
-		$action = \Jp7_Inflector::underscore(str_replace(['get', 'any', 'post'], '', $action));
+		$action = snake_case(str_replace(['get', 'any', 'post'], '', $action));
 		$action = str_replace('_', '-', $action);
 		
 		if ($viewFile = $this->_getViewFile(get_class($this), $action)) {
@@ -139,7 +139,7 @@ class Controller extends \Controller {
 	protected function _routeName($controllerClass) {
 		$explodedClassName = explode('\\', $controllerClass);
 		$snakeArray = array_map(function($string) {
-			$string = \Jp7_Inflector::underscore($string);
+			$string = snake_case($string);
 			$string = str_replace('_', '-', $string);
 			return str_replace('-controller', '', $string);
 		}, $explodedClassName);
