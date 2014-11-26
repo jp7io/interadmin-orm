@@ -917,6 +917,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _getTableLang() {
 		$table = $this->db_prefix;
 		if ($this->language) {
+			if (!Lang::has('interadmin.affix')) {
+				throw new Exception('You need to add interadmin.affix to app/lang/pt-br/interadmin.php');
+			}
 			$table .= Lang::get('interadmin.affix');
 		}
 		return $table;
