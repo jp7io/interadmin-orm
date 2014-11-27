@@ -27,4 +27,13 @@ class Temp {
 		}
 		/* /DB Connection */
 	}
+
+	public static function extendBlade() {
+		\Blade::extend(function($view, $compiler)
+		{
+		    $pattern = '/(?<!\w)(\s*)@include(\s*\((.*)\.(.*)\))/';
+		    
+		    return preg_replace($pattern, '$1<?php echo \$__env->make($3._$4, array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $view);
+		});
+	}
 }
