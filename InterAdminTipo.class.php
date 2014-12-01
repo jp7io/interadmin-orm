@@ -238,6 +238,11 @@ class InterAdminTipo extends InterAdminAbstract {
 		// $rs->Close();
 		return $tipos;
 	}
+
+	public function children() {
+		return new \Jp7\Interadmin\TipoOptions($this);
+	}
+
 	/**
 	 * Gets the first child.
 	 * 
@@ -1259,57 +1264,57 @@ class InterAdminTipo extends InterAdminAbstract {
     }
 	
     public function where($_) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return call_user_method_array('where', $options, func_get_args());
     }
     
     public function fields($_) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return call_user_method_array('fields', $options, func_get_args());
     }
     
     public function with($_) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return call_user_method_array('with', $options, func_get_args());
     }
     
     public function join($alias, $tipo, $on) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return $options->join($alias, $tipo, $on);
     }
     
     public function leftJoin($alias, $tipo, $on) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return $options->leftJoin($alias, $tipo, $on);
     }
     
     public function rightJoin($alias, $tipo, $on) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return $options->rightJoin($alias, $tipo, $on);
     }
     
     public function limit($offset, $rows = null) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return $options->limit($offset, $rows);
     }
     
     public function group($group) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return $options->group($group);
     }
     
     public function order($_) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return call_user_method_array('order', $options, func_get_args());
     }
     
     public function whereNot(array $hash) {
-    	$options = new InterAdminOptions($this);
+    	$options = new \Jp7\Interadmin\Options($this);
     	return $options->whereNot($hash);
     }
     
     public function debug($debug = true) {
-		$options = new InterAdminOptions($this);
+		$options = new \Jp7\Interadmin\Options($this);
         return $options->debug($debug);
     }
 }

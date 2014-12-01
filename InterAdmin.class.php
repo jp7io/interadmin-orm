@@ -101,13 +101,8 @@ class InterAdmin extends InterAdminAbstract {
 	}
 	
 	public static function __callStatic($name, array $arguments) {
-		$tipo = \InterAdminTipo::findFirstTipo(array(
-			'where' => array(
-				"class = '" . get_called_class() . "'"
-			)
-		));
-		if ($tipo) {
-			$options = new InterAdminOptions($tipo);
+		if ($tipo = self::tipo()) {
+			$options = new \Jp7\Interadmin\Options($tipo);
 			return call_user_func_array([$options, $name], $arguments);
 		}
 		throw new BadMethodCallException('Call to undefined method ' . get_called_class() . '::' . $name);
@@ -204,9 +199,9 @@ class InterAdmin extends InterAdminAbstract {
 		if ($child = $this->_findChild(ucfirst($methodName))) {
 			$childrenTipo = $this->getChildrenTipo($child['id_tipo']);
 			if (isset($this->_eagerLoad[$methodName])) {
-				return new InterAdminEagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
+				return new \Jp7\Interadmin\EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
 			}
-			return new InterAdminOptions($childrenTipo);
+			return new \Jp7\Interadmin\Options($childrenTipo);
 		// get{ChildName}, getFirst{ChildName} and get{ChildName}ById
 		} elseif (strpos($methodName, 'get') === 0) {
 			// getFirst{ChildName}
@@ -311,6 +306,15 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $this->_tipo;
 	}
+
+	public static function tipo() {
+		return \InterAdminTipo::findFirstTipo(array(
+			'where' => array(
+				"class = '" . get_called_class() . "'"
+			)
+		));
+	}
+
 	/**
 	 * Sets the InterAdminTipo object for this record, changing the $_tipo property.
 	 *

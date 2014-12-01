@@ -43,7 +43,7 @@ trait Routable {
 	}
 	
 	public function getChildrenMenu() {
-		return $this->where(["menu <> ''"])->getChildren();
+		return $this->children()->where(['menu' => true ])->all();
 	}
 	
 }
