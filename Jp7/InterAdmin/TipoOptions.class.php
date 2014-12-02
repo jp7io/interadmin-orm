@@ -29,12 +29,12 @@ class TipoOptions extends BaseOptions {
 	}
 		
 	public function all() {
-		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
+		if (func_num_args() > 0) throw new \BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->tipo->getChildren($this->options);
 	}
 	
 	public function first() {
-		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
+		if (func_num_args() > 0) throw new \BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->tipo->getFistChild($this->options);
 	}
 		

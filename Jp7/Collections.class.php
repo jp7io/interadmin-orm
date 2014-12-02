@@ -300,32 +300,32 @@ class Jp7_Collections {
 		}
 	}
 
-	public static function lists($interadminsArray, $column, $first = 'Selecione', $id_column = 'id') {
-		
+	public static function lists($records, $column, $blankText = 'Selecione', $idColumn = 'id') {
 		$list = [
-			0 => $first,
-			1 => '--------------------'
+			'' => $blankText,
 		];
-
+		
 		$properties = explode('.', $column);
-		$idProperties = explode('.', $id_column);
-
-		foreach ($interadminsArray as $interadmin) {
-			if (!is_object($interadmin)) continue;
+		$idProperties = explode('.', $idColumn);
+		
+		foreach ($records as $record) {
+			if (!is_object($record)) {
+				continue;
+			}
 			
-			$value = $id = $interadmin;
+			$value = $id = $record;
 			foreach ($properties as $property) {
 				$value = $value->$property;
 			}
 			foreach ($idProperties as $property) {
 				$id = $id->$property;
 			}
-
+			
 			if (!$value || !$id) {
 				continue;
 			}
-
-			$list[toSeo($id)] = $value;
+			
+			$list[$id] = $value;
 		}
 		
 		ksort($list, SORT_STRING);

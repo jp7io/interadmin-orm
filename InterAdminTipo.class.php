@@ -690,13 +690,15 @@ class InterAdminTipo extends InterAdminAbstract {
     	
     	$route = $this->getRoute($action);
     	if (!$route) {
-    		throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo . ', action: ' . $action .  '. Called on ' . get_class($this));
+    		throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo .
+				', action: ' . $action .  '. Called on ' . get_class($this));
     	}
     	
     	$variables = Route::getVariablesFromRoute($route);
     	
     	if (count($parameters) != count($variables)) {
-	    	throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) . ' parameters, but received ' . count($parameters));
+	    	throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) .
+	    		' parameters, but received ' . count($parameters) . '. Called on ' . get_class($this));
 	    }
 	    
 	    $parameters = array_map(function($p) {
@@ -1316,5 +1318,9 @@ class InterAdminTipo extends InterAdminAbstract {
     public function debug($debug = true) {
 		$options = new \Jp7\Interadmin\Options($this);
         return $options->debug($debug);
+    }
+    
+    public function options() {
+    	return new \Jp7\Interadmin\Options($this);
     }
 }

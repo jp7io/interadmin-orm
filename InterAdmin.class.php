@@ -592,7 +592,8 @@ class InterAdmin extends InterAdminAbstract {
 	public function getUrl($action = 'show') {
 		$route = $this->getTipo()->getRoute($action);
 		if (!$route) {
-			throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo . ', action: ' . $action . '. Called on ' . get_class($this));
+			throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo .
+				 ', action: ' . $action . '. Called on ' . get_class($this));
 		}
 		
 		$variables = Route::getVariablesFromRoute($route);
@@ -610,7 +611,8 @@ class InterAdmin extends InterAdminAbstract {
 		}		
 		
 		if (count($parameters) != count($variables)) {
-			throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) . ' parameters, but received ' . count($parameters));
+			throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) . 
+					' parameters, but received ' . count($parameters) . '. Called on ' . get_class($this));
 		}
 		
 		return URL::route(null, $parameters, true, $route);		

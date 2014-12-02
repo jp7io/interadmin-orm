@@ -43,7 +43,7 @@ abstract class BaseOptions {
 	protected function _wherePreparedStatement($args) {
 		$format = array_shift($args);
 		if (strpos($format, '?') === false) {
-			throw new BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
+			throw new \BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
 		}
 		$format = str_replace('?', '%s', $format);
 		
