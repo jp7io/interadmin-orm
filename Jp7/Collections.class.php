@@ -96,31 +96,46 @@ class Jp7_Collections {
 	}
 	
 	/**
-	 * Flips an array of $itens->subitem into an array of $subitem->itens; 
+	 * Flips an array of $items->subitem into an array of $subitem->items; 
 	 * 
-	 * @param object $compactedArray Such as array('newPropertyName' => $array).
-	 * @param object $property Name of the property to be flipped.
+	 * @param array $array Array of objects
+	 * @param string $subitemsProperty Name of the property to be flipped.
+	 * @param string $itemsProperty Name of the property to be created with items. 
 	 * @return array
 	 */
-	public static function flip($compactedArray, $property) {
-		$newPropertyName = key($compactedArray);
-		$subitens = array();
-		foreach ($compactedArray[$newPropertyName] as $item) {
-			$subitem = $item->$property;
-			unset($item->$property);
+	public static function flip($array, $subitemsProperty, $itemsProperty = null) {
+		if (func_num_args() == 2) {
+			// BC support: flip(compact('array'), 'subitemsProperty')
+			$itemsProperty = key($array);
+			$array = current($array);
+		}
+			
+		$flipped = array();
+		foreach ($array as $item) {
+			$subitem = $item->$subitemsProperty;
+			
 			if (is_object($subitem)) {
-				$key = $subitem->__toString();
-				if (!array_key_exists($key, $subitens)) {
-					$subitem->$newPropertyName = array();
-					$subitens[$key] = $subitem;
+				$key = (string) $subitem;
+				
+				if (!array_key_exists($key, $flipped)) {
+					$subitem->$itemsProperty = array();
+					$flipped[$key] = $subitem;
 				}
-				$subitens[$key]->{$newPropertyName}[] = $item;
+				
+				$flipped[$key]->{$itemsProperty}[] = $item;
 			}
 		}
 		// Returning values with reindexed keys
-		return array_values($subitens);
+		return array_values($flipped);
 	}
 	
+	/**
+	 * Keys are strings.
+	 * 
+	 * @param array $array
+	 * @param string $clause
+	 * @return array 
+	 */
 	public static function separate($array, $clause) {
 		$separated = array();
 
@@ -345,12 +360,14 @@ class Jp7_Collections {
 					$value = $value->$property;
 				}
 
-				if (!$value || ($distinct && in_array($value, $novoArray))) { continue; }
+				if (!$value || ($distinct && in_array($value, $novoArray))) { 
+					continue;
+				}
 
 				$novoArray[] = $value;
 			}
 		}
-
+		
 		if ($order) {
 			sort($novoArray);
 		}
