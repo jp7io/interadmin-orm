@@ -33,9 +33,10 @@ class Router extends \Illuminate\Routing\Router {
 	
 	public function resource($name, $controller, array $options = array()) {
 		if ($options['id_tipo']) {
-			$groupRoute = str_replace('/', '.', $this->getLastGroupPrefix()); 
-			$this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute . '.' : '') . $name;
-			
+			$groupRoute = str_replace('/', '.', $this->getLastGroupPrefix());
+			if (!array_key_exists($options['id_tipo'], $this->mapIdTipos)) {
+				$this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute . '.' : '') . $name;
+			}
 			$this->group(['before' => 'setTipo:' . $options['id_tipo'] . $options['dynamic']], function() use ($name, $controller, $options) {
 				parent::resource($name, $controller, $options);
 			});
