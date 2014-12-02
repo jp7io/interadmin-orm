@@ -22,6 +22,14 @@ class Controller extends \Controller {
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
 		$this->beforeFilter('@setMenuItens');
 	}
+	
+	public function __get($key) {
+		return $this->view->$key;
+	}
+	
+	public function __set($key, $value) {
+		$this->view->$key = $value;
+	}
 
 	public function getRootTipo() {
 		//$klass = \getDefaultClass();
@@ -29,7 +37,7 @@ class Controller extends \Controller {
 	}
         
 	public function setMenuItens() {
-		$this->view->menuItens = $this->getRootTipo()->getChildrenMenu();
+		$this->menuItens = $this->getRootTipo()->getChildrenMenu();
 	}
         
 	public function setTipo() {
@@ -70,8 +78,6 @@ class Controller extends \Controller {
 			if ($method == 'show' && !$this->record) {
 				throw new \Exception('Show action without record. You need to set $this->record inside your controller.');	
 			}
-			$this->view->tipo = $this->tipo;
-			$this->view->record = $this->record;
 				
 			$viewName = $this->_getViewName($method);
 			$viewContent = \View::make($viewName, (array) $this->view);
