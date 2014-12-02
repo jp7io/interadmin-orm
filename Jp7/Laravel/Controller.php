@@ -41,39 +41,18 @@ class Controller extends \Controller {
 			}
 		}
 		
-		$this->tipo = $this->view->tipo = static::$tipo;
+		$this->tipo = static::$tipo;
 	}
 
 	public function setRecord() {
-		if ($this->tipo) {
-			$route = \Route::getCurrentRoute();
-			$resources = $route->parameterNames();
+		$route = \Route::getCurrentRoute();
+		$resources = $route->parameterNames();
+		
+		if ($this->tipo && count($resources) == 1) {
+			$resourceName = end($resources);
+			$value = $route->getParameter($resourceName);
 			
-			$query = $this->tipo;
-			
-			$resourceName 		= end($resources);
-			$value    	  		= $route->getParameter($resourceName);
-			$resourceName 		= str_singular($resourceName);
-			
-			if (count($resources) > 1) {
-				$parentResource = $resources[count($resources) - 2];
-				$parentValue 	= $route->getParameter($parentResource);
-				$parentResource = str_singular($parentResource);
-
-				$query->where($parentResource . ".id_slug = '{$parentValue}'");
-			}
-			
-			$record = $query->find($value);
-			
-			$this->record 
- 				= $this->view->record
-				= $record;
-			//= static::$record
-			//= $this->view->{camel_case($resourceName)}
-
-			if (count($resources) > 1) {
-				$this->view->$parentResource = $record->$parentResource;
-			}
+			$this->record = $this->tipo->find($value);
 		}
 	}
 
@@ -86,22 +65,24 @@ class Controller extends \Controller {
 	 */
 	public function callAction($method, $parameters) {
 		$response = call_user_func_array(array($this, $method), $parameters);
-	
-		if (is_null($response))
-		{
-			$viewName		= $this->_getViewName($method);
-			$viewContent    = \View::make($viewName, (array)$this->view);
+		
+		if (is_null($response)) {
+			if ($method == 'show' && !$this->record) {
+				throw new \Exception('Show action without record. You need to set $this->record inside your controller.');	
+			}
+			$this->view->tipo = $this->tipo;
+			$this->view->record = $this->record;
+				
+			$viewName = $this->_getViewName($method);
+			$viewContent = \View::make($viewName, (array) $this->view);
 			
-			if (is_null($this->layout))
-			{
+			if (is_null($this->layout)) {
 				$response = $viewContent;
-			}
-			else
-			{
+			} else {
 				$this->view->content = $viewContent;
-				$response = \View::make($this->layout, (array)$this->view);
+				$response = \View::make($this->layout, (array) $this->view);
 			}
-		}		
+		}
 	
 		return $response;
 	}
@@ -112,31 +93,39 @@ class Controller extends \Controller {
 	 * @return string
 	 */
 	private function _getViewName($action) {
-		$action = snake_case(str_replace(['get', 'any', 'post'], '', $action));
-		$action = str_replace('_', '-', $action);
+		$action = str_replace('_', '-', snake_case($action));
 		
-		if ($viewFile = $this->_getViewFile(get_class($this), $action)) {
-			return $viewFile;
-		} elseif ($viewFile = $this->_getViewFile(get_parent_class($this), $action)) {
-			return $viewFile;
-		} else {
-			return "templates.{$action}";
+		$viewRoute = $this->_viewRoute(get_class($this), $action);
+		if ($this->_viewExists($viewRoute)) {
+			return $viewRoute;
 		}
+		
+		$viewRoute = $this->_viewRoute(get_parent_class($this), $action);
+		if ($this->_viewExists($viewRoute)) {
+			return $viewRoute;
+		}
+		
+		return "templates.{$action}";
 	}
 
-	protected function _getViewFile($controllerClass, $action) {
-		$routeName = $this->_routeName($controllerClass);
+	protected function _viewRoute($controllerClass, $action) {
+		$controllerRoute = $this->_controllerRoute($controllerClass);
+		return "{$controllerRoute}.{$action}";
 		
-		$url = str_replace('.', '/', "{$routeName}.{$action}");
-
-		$viewPath = \Config::get('view.paths')[0];
-
-		if (file_exists($viewPath . '/' . $url . '.blade.php')) {
-			return "{$routeName}.{$action}";
-		}
 	}
-
-	protected function _routeName($controllerClass) {
+	
+	protected function _viewExists($route) {
+		$filename = str_replace('.', '/', $route);
+		
+		foreach (\Config::get('view.paths') as $viewPath) {
+			if (file_exists($viewPath . '/' . $filename . '.blade.php')) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected function _controllerRoute($controllerClass) {
 		$explodedClassName = explode('\\', $controllerClass);
 		$snakeArray = array_map(function($string) {
 			$string = snake_case($string);
