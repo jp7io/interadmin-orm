@@ -145,19 +145,20 @@ class Jp7_Debugger {
 			$this->addLog($sql, 'sql', $time);
 		}
 		if ($this->isSafePoint() || $forceOutput) {
-			echo $this->syntaxHighlightSql($sql, $style) ;
+			echo self::syntaxHighlightSql($sql, $style) ;
 		}
 	}
 	
-	public function syntaxHighlightSql($sql, $style = '') {
+	public static function syntaxHighlightSql($sql, $style = 'background:#efefef;padding: 2px;margin-top:2px;border-top: 2px solid purple;height:20px;overflow:hidden;') {
 		if (!defined('PARSER_LIB_ROOT')) {
-			define('PARSER_LIB_ROOT', ROOT_PATH . '/inc/3thparty/sqlparserlib/');
+			// TODO usar composer
+			define('PARSER_LIB_ROOT', base_path() . '/../inc/3thparty/sqlparserlib/');
 			echo '<style>';
 			readfile(PARSER_LIB_ROOT . 'sqlsyntax.css');
 			echo '</style>';
 		}
 		require_once PARSER_LIB_ROOT . 'sqlparser.lib.php';
-		return '<div class="debug_sql" style="' . $style . '">' . PMA_SQP_formatHtml(PMA_SQP_parse($sql)) . '</div>';
+		return '<div class="debug_sql" onclick="this.style.height = \'auto\'" style="' . $style . '">' . PMA_SQP_formatHtml(PMA_SQP_parse($sql)) . '</div>';
 	}
 	
 	/**
@@ -185,7 +186,7 @@ class Jp7_Debugger {
 		
 		$S .= '<hr />';
 		if ($sql) {
-			$S .= $this->_getBacktraceLabel('SQL') . $this->syntaxHighlightSql($sql) . "\n";
+			$S .= $this->_getBacktraceLabel('SQL') . self::syntaxHighlightSql($sql) . "\n";
 		}
 		$S .= $this->_getBacktraceLabel('URL') . (($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . "\n";
 		if ($_SERVER['HTTP_REFERER']) {
@@ -243,7 +244,7 @@ class Jp7_Debugger {
 		return '<strong style="color:red">'. str_pad($caption, 12, ' ', STR_PAD_LEFT) . ':</strong> ';
 	}
 	/**
-	 * Lança exceções em caso de erro de SQL, ao invés de utilizar a função jp7_debug(). 
+	 * Lanï¿½a exceï¿½ï¿½es em caso de erro de SQL, ao invï¿½s de utilizar a funï¿½ï¿½o jp7_debug(). 
 	 * 
 	 * @param 	bool 	$bool
 	 * @return 	void
