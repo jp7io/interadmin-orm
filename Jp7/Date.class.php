@@ -27,7 +27,7 @@ class Jp7_Date extends DateTime {
 	 * @param DateTimeZone $timezone
 	 * @return Jp7_Date
 	 */
-	public static function createFromFormat($format, $time, DateTimeZone $timezone = null) {
+	public static function createFromFormat($format, $time, $timezone = null) {
 		if ($timezone) { 
 			$date = parent::createFromFormat($format, $time, $timezone); 
 		} else {
@@ -54,9 +54,9 @@ class Jp7_Date extends DateTime {
 	}
 	
 	/**
-	 * Retorna string da diferença de tempo, ex: '3 dias atrás'.
-	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
-	 * Diferenças menores de 1 minuto retornam 'agora'.
+	 * Retorna string da diferenï¿½a de tempo, ex: '3 dias atrï¿½s'.
+	 * O valor ï¿½ arredondado: 2 anos e 4 meses retorna '2 anos atrï¿½s'.
+	 * Diferenï¿½as menores de 1 minuto retornam 'agora'.
 	 * 
 	 * Static: 		humanDiff($timeStamp = false)
 	 * Instance: 	humanDiff()
@@ -74,10 +74,10 @@ class Jp7_Date extends DateTime {
 				$ago = 'ago';
 				break;
 			default:
-				$units_names = array('anos' => 'ano', 'meses' => 'mês', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto');
+				$units_names = array('anos' => 'ano', 'meses' => 'mï¿½s', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto');
 				$now = 'agora';
 				$yesterday = 'ontem';
-				$ago = 'atrás';
+				$ago = 'atrï¿½s';
 		}
 		if (isset($this) && $this instanceof self) {
 			$timeStamp = $this;
@@ -205,7 +205,7 @@ class Jp7_Date extends DateTime {
 	public function format($format) {
 		// Bug PHP para datas zeradas
 		if (parent::format('Y') === '-0001') {
-			// Switch usado para performance, default: é o tratamento completo do erro
+			// Switch usado para performance, default: ï¿½ o tratamento completo do erro
 			switch ($format) {
 				case 'd':
 					return '00';
@@ -221,7 +221,7 @@ class Jp7_Date extends DateTime {
 					$format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
 			}
 		}
-		// Tratamento de nomes para múltiplas línguas
+		// Tratamento de nomes para mï¿½ltiplas lï¿½nguas
 		if (strpos($format, 'D') !== false) {
 			$format = preg_replace('/(?<!\\\\)D/', addcslashes(jp7_date_week(intval($this->format('w')), true), 'A..z'), $format);
 		}
@@ -234,7 +234,7 @@ class Jp7_Date extends DateTime {
 		if (strpos($format, 'F') !== false) {
 			$format = preg_replace('/(?<!\\\\)F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
 		}
-		// Format padrão
+		// Format padrï¿½o
 		return parent::format($format);		
 	}
 	
@@ -313,7 +313,7 @@ class Jp7_Date extends DateTime {
 		}
 		if ($diff->m) {
 			if ($iso == Jp7_Date::DURATION_HUMAN) {
-				$duration .= $diff->m . (($diff->m == 1) ? ' mês ' : ' meses ');
+				$duration .= $diff->m . (($diff->m == 1) ? ' mï¿½s ' : ' meses ');
 			} else {
 				$duration .= $diff->m . 'M';
 			}

@@ -160,7 +160,7 @@ class Jp7_InterAdmin_Util {
 	}
 	
 	/**
-	 * Helper da fun��o _getCampoType
+	 * Helper da função _getCampoType
 	 *
 	 * @param InterAdminTipo $campoTipo
 	 * @param bool $isTipo
@@ -168,7 +168,7 @@ class Jp7_InterAdmin_Util {
 	 *
 	 * @return string Type para o PHPDoc
 	 */
-	protected function _getCampoTypeClass($campoTipo, $isTipo, $isMulti) {
+	protected static function _getCampoTypeClass($campoTipo, $isTipo, $isMulti) {
 		if ($isTipo) {
 			$retorno = 'InterAdminTipo';
 		} else {
