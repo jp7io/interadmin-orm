@@ -4,11 +4,12 @@ namespace Jp7\Laravel;
 
 class Temp {
 	
+	/*
 	public static function initDataBase() {
 		global $db;
 		$config = \InterSite::config();
 	
-		/* DB Connection */
+		/* DB Connection *-/
 		if (!$config->db) {
 			throw new Exception('No database. Make sure you call $config->start() on config.php.');
 		}
@@ -25,15 +26,15 @@ class Temp {
 			$config->db->pass = '{pass}';
 			throw new Exception('Unable to connect to the database ' . jp7_formatDsn($config->db));
 		}
-		/* /DB Connection */
+		/* /DB Connection *-/
 	}
+	*/
 
 	public static function extendBlade() {
-		\Blade::extend(function($view, $compiler)
-		{
-		    $pattern = '/(?<!\w)(\s*)@include(\s*\((.*)\.(.*)\))/';
-		    
-		    return preg_replace($pattern, '$1<?php echo \$__env->make($3._$4, array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>', $view);
+		\Blade::extend(function($view, $compiler) {
+			// @include with partials/_partial instead of partials/partial			
+		    $pattern = '/(?<!\w)(\s*)@include(\s*\((.*)\.)/';
+		    return preg_replace($pattern, '$1@include$2_', $view);
 		});
 	}
 }
