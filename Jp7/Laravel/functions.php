@@ -188,10 +188,11 @@ function snake_case($value, $delimiter = '_') {
 	return strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 }
 
-
+/*
 function link_to($url, $title = null, $attributes = array(), $secure = null, $entities = false)
 {
 	if (is_null($title) || $title === false) $title = $url;
 
 	return '<a href="'.$url.'"'.HTML::attributes($attributes).'>'. ($entities ? HTML::entities($title) : $title) .'</a>';
 }
+*/
