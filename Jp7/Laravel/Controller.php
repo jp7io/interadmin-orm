@@ -11,12 +11,12 @@ class Controller extends \Controller {
 	/**
 	 * @var Variables to send to view
 	 */
-	protected $view = null;
+	protected $_viewData = null;
 	protected $tipoClassName = null;
 	
 	public function __construct() {
-		if (is_null($this->view)) {
-			$this->view = new View;
+		if (is_null($this->_viewData)) {
+			$this->_viewData = new \stdClass();
 		}
 		$this->beforeFilter('@setTipo');
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
@@ -24,11 +24,11 @@ class Controller extends \Controller {
 	}
 	
 	public function __get($key) {
-		return $this->view->$key;
+		return $this->_viewData->$key;
 	}
 	
 	public function __set($key, $value) {
-		$this->view->$key = $value;
+		$this->_viewData->$key = $value;
 	}
 
 	public function getRootTipo() {
@@ -80,13 +80,13 @@ class Controller extends \Controller {
 			}
 				
 			$viewName = $this->_getViewName($method);
-			$viewContent = \View::make($viewName, (array) $this->view);
+			$viewContent = \View::make($viewName, (array) $this->_viewData);
 			
 			if (is_null($this->layout)) {
 				$response = $viewContent;
 			} else {
-				$this->view->content = $viewContent;
-				$response = \View::make($this->layout, (array) $this->view);
+				$this->_viewData->content = $viewContent;
+				$response = \View::make($this->layout, (array) $this->_viewData);
 			}
 		}
 	
