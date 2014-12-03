@@ -1383,7 +1383,7 @@ class InterAdminTipo extends InterAdminAbstract {
         return $options->debug($debug);
     }
     
-    public function options() {
+    public function query() {
     	return new \Jp7\Interadmin\Options($this);
     }
     
