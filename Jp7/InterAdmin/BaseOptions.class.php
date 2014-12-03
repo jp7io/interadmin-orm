@@ -1,7 +1,7 @@
 <?php
 
 namespace Jp7\Interadmin;
-use InterAdminTipo;
+use InterAdminTipo, BadMethodCallException;
 
 abstract class BaseOptions {
 	protected $tipo;
@@ -43,7 +43,7 @@ abstract class BaseOptions {
 	protected function _wherePreparedStatement($args) {
 		$format = array_shift($args);
 		if (strpos($format, '?') === false) {
-			throw new \BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
+			throw new BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
 		}
 		$format = str_replace('?', '%s', $format);
 		
@@ -85,17 +85,17 @@ abstract class BaseOptions {
 		return $this;
 	}
 	
-	public function join($alias, $tipo, $on) {
+	public function join($alias, InterAdminTipo $tipo, $on) {
 		$this->options['joins'][$alias] = array('INNER', $tipo, $on);
 		return $this;
 	}
 	
-	public function leftJoin($alias, $tipo, $on) {
+	public function leftJoin($alias, InterAdminTipo $tipo, $on) {
 		$this->options['joins'][$alias] = array('LEFT', $tipo, $on);
 		return $this;
 	}
 	
-	public function rightJoin($alias, $tipo, $on) {
+	public function rightJoin($alias, InterAdminTipo $tipo, $on) {
 		$this->options['joins'][$alias] = array('RIGHT', $tipo, $on);
 		return $this;
 	}

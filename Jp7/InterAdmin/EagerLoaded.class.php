@@ -2,6 +2,8 @@
 
 namespace Jp7\Interadmin;
 
+use InterAdminTipo, BadMethodCallException;
+
 class EagerLoaded {
 	
 	protected $data;
