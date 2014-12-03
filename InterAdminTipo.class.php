@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Support\Collection;
+
 /**
  * JP7's PHP Functions 
  * 
@@ -75,7 +77,7 @@ class InterAdminTipo extends InterAdminAbstract {
 					$options['limit'] = 1;
 				}
 				$retorno = $this->find($options);
-				return ($match[1]) ? reset($retorno) : $retorno;
+				return ($match[1]) ? $retorno[0] : $retorno;
 			}
 		}
 		// Default error when method doesn´t exist
@@ -356,7 +358,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 		}
 		// // $rs->Close();
-		return $records;
+		return new Collection($records);
 	}
 	
 	public function distinct($column, $options = array()) {
@@ -448,7 +450,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin 	First InterAdmin object found.
 	 */
 	public function findFirst($options = array()) {
-		return reset($this->find(array('limit' => 1) + $options));
+		return $this->find(array('limit' => 1) + $options)[0];
 	}
 
 	/**
@@ -458,7 +460,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function first() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return reset($this->limit(1)->all());
+		return $this->limit(1)->all()[0];
 	}
 
 	/**
@@ -647,6 +649,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			return new InterAdminTipo();
 		}
 	}	
+	
+	public function getCampoTipoByAlias($alias) {
+		$campos = $this->getCampos();
+		$aliases = array_flip($this->getCamposAlias());
+		
+		$nomeCampo = $aliases[$alias] ? $aliases[$alias] : $alias;
+		return $this->getCampoTipo($campos[$nomeCampo]);
+		
+	}
 	/**
 	 * Returns this object´s nome and all the fields marked as 'combo', if the field 
 	 * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
@@ -860,12 +871,26 @@ class InterAdminTipo extends InterAdminAbstract {
 	
 	public function getAttributesNames() {
 		$db = $this->getDb();
-		if (!$attributes = self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix]['attributes']) {
-			$attributes = $db->MetaColumnNames($this->getTableName()) or die(jp7_debug($db->ErrorMsg()));
-			self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix]['attributes'] = $attributes;
+		$db_identifier = 'todo';
+		
+		if (!$attributes = self::$_metadata[$db_identifier . '/' . $this->db_prefix]['attributes']) {
+			$attributes = $this->_pdoColumnNames($this->getTableName());
+			self::$_metadata[$db_identifier . '/' . $this->db_prefix]['attributes'] = $attributes;
 		}
 		return $attributes;
 	}
+	
+	private function _pdoColumnNames($table) {
+		$db = $this->getDb()->getPdo();
+		
+		$rs = $db->query('SELECT * FROM `' . $table . '` LIMIT 0');
+		for ($i = 0; $i < $rs->columnCount(); $i++) {
+			$col = $rs->getColumnMeta($i);
+			$columns[] = $col['name'];
+		}
+		return $columns;
+	}	
+	
 	public function getAttributesCampos() {
 		return array();
 	}
@@ -932,10 +957,12 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $table;
 	}	
 	protected function _setMetadata($varname, $value) {
-		self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
+		$db_identifier = 'todo';
+		self::$_metadata[$db_identifier . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
 	}
 	protected function _getMetadata($varname) {
-		return self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname];
+		$db_identifier = 'todo';
+		return self::$_metadata[$db_identifier . '/' . $this->db_prefix][$this->id_tipo][$varname];
 	}
 	/**
 	 * Returns metadata about the children tipos that the InterAdmins have.
@@ -979,6 +1006,37 @@ class InterAdminTipo extends InterAdminAbstract {
 				'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 			));
 		}
+	}
+	
+	public function getRelationshipData($relationship) {
+		$aliases = $this->getCamposAlias();
+		
+		$campoNome = array_search($relationship, $aliases);
+		$alias = true;
+		if ($campoNome === false) {
+			$campoNome = $relationship;
+			$alias = false;
+		}
+		$campos = $this->getCampos();
+		$campoTipo = $this->getCampoTipo($campos[$campoNome]);
+		if ($campoTipo instanceof InterAdminTipo) {
+			return array(
+				'type' => 'select',
+				'tipo' => $campoTipo,
+				'name' => $relationship,
+				'alias' => $alias
+			);
+		}
+		$studlyCased = ucfirst($relationship);
+		if ($childrenTipo = $this->getInterAdminsChildrenTipo($studlyCased)) {
+			return array(
+				'type' => 'children',
+				'tipo' => $childrenTipo,
+				'name' => $relationship,
+				'alias' => true
+			);
+		}
+		throw new Exception('Unknown relationship: ' . $relationship);
 	}
 	
 	/**
@@ -1081,7 +1139,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return 	InterAdminTipo
 	 */
 	public static function findFirstTipo($options = array()) {
-		return reset(self::findTipos(array('limit' => 1) + $options)); 
+		return self::findTipos(array('limit' => 1) + $options)[0]; 
 	}
 	/**
 	 * Retrieves the first InterAdminTipo with the given "model_id_tipo".
@@ -1091,7 +1149,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return	InterAdminTipo
 	 */
 	public static function findFirstTipoByModel($model_id_tipo, $options = array()) {
-		return reset(self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options));
+		return self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options)[0];
 	}
 	/**
 	 * Retrieves all the InterAdminTipo with the given "model_id_tipo".
@@ -1188,7 +1246,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				// O código mesmo é rodado depois
 				$levels = explode('.', $withRelationship);
 				
-				if ($relationshipData = $recordModel->getRelationshipData($levels[0])) {
+				if ($relationshipData = $this->getRelationshipData($levels[0])) {
 					if ($relationshipData['type'] === 'select') {
 						// select.* - Esse carregamento é feito com join para aproveitar código existente
 						// E também porque join é mais rápido para hasOne() do que um novo select
@@ -1280,17 +1338,22 @@ class InterAdminTipo extends InterAdminAbstract {
     	return call_user_method_array('with', $options, func_get_args());
     }
     
-    public function join($alias, $tipo, $on) {
+    public function join($alias, InterAdminTipo $tipo, $on) {
     	$options = new \Jp7\Interadmin\Options($this);
     	return $options->join($alias, $tipo, $on);
     }
     
-    public function leftJoin($alias, $tipo, $on) {
+    public function joinThrough(InterAdminTipo $tipo, $relationshipPath) {
+    	$options = new \Jp7\Interadmin\Options($this);
+    	return $options->joinThrough($tipo, $relationshipPath);
+    }    
+    
+    public function leftJoin($alias, InterAdminTipo $tipo, $on) {
     	$options = new \Jp7\Interadmin\Options($this);
     	return $options->leftJoin($alias, $tipo, $on);
     }
     
-    public function rightJoin($alias, $tipo, $on) {
+    public function rightJoin($alias, InterAdminTipo $tipo, $on) {
     	$options = new \Jp7\Interadmin\Options($this);
     	return $options->rightJoin($alias, $tipo, $on);
     }
@@ -1323,4 +1386,5 @@ class InterAdminTipo extends InterAdminAbstract {
     public function options() {
     	return new \Jp7\Interadmin\Options($this);
     }
+    
 }

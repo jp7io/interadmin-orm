@@ -983,36 +983,6 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
 	}
 	
-	public function getRelationshipData($relationship) {
-		$aliases = $this->getAttributesAliases();
-		
-		$campoNome = array_search($relationship, $aliases);
-		$alias = true;
-		if ($campoNome === false) {
-			$campoNome = $relationship;
-			$alias = false;
-		}
-		$campos = $this->getAttributesCampos();
-		$campoTipo = $this->getCampoTipo($campos[$campoNome]);
-		if ($campoTipo instanceof InterAdminTipo) {
-			return array(
-				'type' => 'select',
-				'tipo' => $campoTipo,
-				'name' => $relationship,
-				'alias' => $alias
-			);
-		}
-		if ($childrenTipo = $this->getChildrenTipoByNome($relationship)) {
-			return array(
-				'type' => 'children',
-				'tipo' => $childrenTipo,
-				'name' => $relationship,
-				'alias' => true
-			);
-		}
-		throw new Exception('Unknown relationship: ' . $relationship);
-	}
-	
 	public function setEagerLoad($key, $data) {
 		$this->_eagerLoad[$key] = $data;
 	}

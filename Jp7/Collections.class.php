@@ -103,7 +103,7 @@ class Jp7_Collections {
 	 * @param string $itemsProperty Name of the property to be created with items. 
 	 * @return array
 	 */
-	public static function flip($array, $subitemsProperty, $itemsProperty = null) {
+	public static function flip($array, $subitemsProperty, $itemsProperty = '') {
 		if (func_num_args() == 2) {
 			// BC support: flip(compact('array'), 'subitemsProperty')
 			$itemsProperty = key($array);
@@ -396,7 +396,7 @@ class Jp7_Collections {
 		}
 		$model = reset($records);
 		
-		if ($data = $model->getRelationshipData($relationship)) {
+		if ($data = $model->getTipo()->getRelationshipData($relationship)) {
 			if ($data['type'] == 'select') {
 				// select.id = record.select_id
 				$indexed = self::separate($records, $relationship . '.id');
