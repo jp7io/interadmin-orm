@@ -96,37 +96,29 @@ class Jp7_Collections {
 	}
 	
 	/**
-	 * Flips an array of $items->subitem into an array of $subitem->items; 
+	 * Flips an array of $itens->subitem into an array of $subitem->itens; 
 	 * 
-	 * @param array $array Array of objects
-	 * @param string $subitemsProperty Name of the property to be flipped.
-	 * @param string $itemsProperty Name of the property to be created with items. 
+	 * @param array $compactedArray Such as array('newPropertyName' => $array).
+	 * @param string $property Name of the property to be flipped.
 	 * @return array
 	 */
-	public static function flip($array, $subitemsProperty, $itemsProperty = '') {
-		if (func_num_args() == 2) {
-			// BC support: flip(compact('array'), 'subitemsProperty')
-			$itemsProperty = key($array);
-			$array = current($array);
-		}
-			
-		$flipped = array();
-		foreach ($array as $item) {
-			$subitem = $item->$subitemsProperty;
-			
+	public static function flip($compactedArray, $property) {
+		$newPropertyName = key($compactedArray);
+		$subitens = array();
+		foreach ($compactedArray[$newPropertyName] as $item) {
+			$subitem = $item->$property;
+			unset($item->$property);
 			if (is_object($subitem)) {
-				$key = (string) $subitem;
-				
-				if (!array_key_exists($key, $flipped)) {
-					$subitem->$itemsProperty = array();
-					$flipped[$key] = $subitem;
+				$key = $subitem->__toString();
+				if (!array_key_exists($key, $subitens)) {
+					$subitem->$newPropertyName = array();
+					$subitens[$key] = $subitem;
 				}
-				
-				$flipped[$key]->{$itemsProperty}[] = $item;
+				$subitens[$key]->{$newPropertyName}[] = $item;
 			}
 		}
 		// Returning values with reindexed keys
-		return array_values($flipped);
+		return array_values($subitens);
 	}
 	
 	/**
