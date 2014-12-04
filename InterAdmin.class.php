@@ -590,7 +590,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @throws BadMethodCallException
 	 */
 	public function getUrl($action = 'show') {
-		$route = $this->getTipo()->getRoute($action);
+		$route = $this->getRoute($action);
 		if (!$route) {
 			throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo .
 				 ', action: ' . $action . '. Called on ' . get_class($this));
@@ -616,6 +616,10 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		
 		return URL::route(null, $parameters, true, $route);		
+	}
+	
+	public function getRoute($action = 'index') {
+		return $this->getTipo()->getRoute($action);
 	}
 	
 	/**
