@@ -85,7 +85,7 @@ class Options extends BaseOptions {
 			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
 			return $this;
 		}
-		throw new Exception('Unsupported method ' . $method_name);
+		throw new BadMethodCallException('Unsupported method ' . $method_name);
 		return $retorno;
 	}
 	
