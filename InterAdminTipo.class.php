@@ -1,5 +1,6 @@
 <?php
-use Illuminate\Support\Collection;
+use Jp7\Interadmin\Collection;
+use Jp7\Interadmin\TipoCache;
 
 /**
  * JP7's PHP Functions 
@@ -27,13 +28,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo', 'xtra_disabledfields', 'xtra_disabledchildren'
 	);
 	private static $privateFields = array('children', 'campos');
-	
-	/**
-	 * Stores metadata to be shared by instances with the same $id_tipo.
-	 * @var array 
-	 */
-	protected static $_metadata;
-	
+		
 	protected static $_defaultClass = 'InterAdminTipo';
 	
 	protected $_primary_key = 'id_tipo';
@@ -106,10 +101,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		// id_tipo must be a string, because in_array will not work with integers and an array of objects
 		$id_tipo = (string) $id_tipo;
 		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
-		$this->_db = $options['db'];
+		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
+		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
-		if ($options['fields']) {
+		if (!empty($options['fields'])) {
 			$this->loadAttributes($options['fields'], false);
 		}
 	}
@@ -873,9 +868,12 @@ class InterAdminTipo extends InterAdminAbstract {
 		$db = $this->getDb();
 		$db_identifier = 'todo';
 		
-		if (!$attributes = self::$_metadata[$db_identifier . '/' . $this->db_prefix]['attributes']) {
+		// Todos os tipos tem os mesmo campos na tabela
+		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix);
+		
+		if (!$attributes = $cache->get('attributes')) {
 			$attributes = $this->_pdoColumnNames($this->getTableName());
-			self::$_metadata[$db_identifier . '/' . $this->db_prefix]['attributes'] = $attributes;
+			$cache->set('attributes', $attributes);
 		}
 		return $attributes;
 	}
@@ -958,11 +956,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	}	
 	protected function _setMetadata($varname, $value) {
 		$db_identifier = 'todo';
-		self::$_metadata[$db_identifier . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
+		
+		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix, $this->id_tipo);
+		$cache->set($varname, $value);
 	}
 	protected function _getMetadata($varname) {
 		$db_identifier = 'todo';
-		return self::$_metadata[$db_identifier . '/' . $this->db_prefix][$this->id_tipo][$varname];
+		
+		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix, $this->id_tipo);
+		return $cache->get($varname);
 	}
 	/**
 	 * Returns metadata about the children tipos that the InterAdmins have.
@@ -1211,7 +1213,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->_whereArrayFix($options['where']); // FIXME
 		
 		$optionsInstance = array(
-			'class' => $options['class'],
+			'class' => isset($options['class']) ? $options['class'] : null,
 			'default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin'
 		);
 		
