@@ -1327,17 +1327,17 @@ class InterAdminTipo extends InterAdminAbstract {
 	
     public function where($_) {
     	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_method_array('where', $options, func_get_args());
+    	return call_user_func_array([$options, 'where'], func_get_args());
     }
     
     public function fields($_) {
     	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_method_array('fields', $options, func_get_args());
+    	return call_user_func_array([$options, 'fields'], func_get_args());
     }
     
     public function with($_) {
     	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_method_array('with', $options, func_get_args());
+    	return call_user_func_array([$options, 'with'], func_get_args());
     }
     
     public function join($alias, InterAdminTipo $tipo, $on) {
@@ -1372,7 +1372,7 @@ class InterAdminTipo extends InterAdminAbstract {
     
     public function order($_) {
     	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_method_array('order', $options, func_get_args());
+    	return call_user_func_array([$options, 'order'], func_get_args());
     }
     
     public function whereNot(array $hash) {

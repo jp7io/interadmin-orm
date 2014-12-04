@@ -49,7 +49,7 @@ class EagerLoaded {
 		if ($this->debug) {
 			$target = $this->tipo->debug();
 		}
-		return call_user_method_array($method_name, $target, $params);
+		return call_user_func_array([$target, $method_name], $params);
 	}
 	
 }
