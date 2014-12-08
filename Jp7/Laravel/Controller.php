@@ -23,7 +23,7 @@ class Controller extends \Controller {
 		$this->beforeFilter('@setMenuItens');
 	}
 	
-	public function __get($key) {
+	public function &__get($key) {
 		return $this->_viewData->$key;
 	}
 	
