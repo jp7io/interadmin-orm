@@ -193,7 +193,7 @@ abstract class InterAdminAbstract implements Serializable {
 				'skip_published_filters' => array('main')
 			);
 			$rs = $this->_executeQuery($options);
-			if ($row = $rs[0]) {
+			if ($row = array_shift($rs)) {
 				$this->_getAttributesFromRow($row, $this, $options);
 			}
 			//$rs->Close();
@@ -384,10 +384,10 @@ abstract class InterAdminAbstract implements Serializable {
 		if (!is_array($options['fields'])) {
 			$options['fields'] = (array) $options['fields'];
 		}
-		if ($options['fields_alias']) {
-			$options['aliases'] = array_flip($options['aliases']);	
-		} else {
+		if (empty($options['fields_alias'])) {
 			$options['aliases'] = array();
+		} else {
+			$options['aliases'] = array_flip($options['aliases']);
 		}
 		if (array_key_exists('use_published_filters', $options)) {
 			$use_published_filters = $options['use_published_filters'];
@@ -411,12 +411,12 @@ abstract class InterAdminAbstract implements Serializable {
 				foreach ($options['from'] as $key => $from) {
 					list($table, $alias) = explode(' AS ', $from);
 					if ($alias == 'main') {
-						if (!$options['skip_published_filters'] || !in_array('main', $options['skip_published_filters'])) {
+						if (empty($options['skip_published_filters']) || !in_array('main', $options['skip_published_filters'])) {
 							$filters = static::getPublishedFilters($table, 'main');
-						}						
+						}			
 					} else {
 						$joinArr = explode(' ON', $alias);
-						if (!$options['skip_published_filters'] || !in_array($joinArr[0], $options['skip_published_filters'])) {
+						if (empty($options['skip_published_filters']) || !in_array($joinArr[0], $options['skip_published_filters'])) {
 							$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
 						}
 					}
@@ -682,7 +682,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$nome = ($aliases[$join]) ? $aliases[$join] : $join;
 				if ($nome) {
 					// Join e Recursividade
-					if ($options['joins'] && $options['joins'][$join]) {
+					if (isset($options['joins']) && $options['joins'][$join]) {
 						$joinTipo = $options['joins'][$join][1];
 					} elseif (strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
 						$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
@@ -695,7 +695,7 @@ abstract class InterAdminAbstract implements Serializable {
 					} else {
 					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					    // Join e Recursividade
-					    if (!in_array($join, (array) $options['from_alias'])) {
+					    if (empty($options['from_alias']) || !in_array($join, (array) $options['from_alias'])) {
 							$joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
 							if ($joinClasse !== 'tipo') {
 								$fields[$join][] = 'id_slug';
@@ -784,7 +784,7 @@ abstract class InterAdminAbstract implements Serializable {
 	protected function _getAttributesFromRow($row, $object, $options) {
 		$campos = &$options['campos'];
 		$aliases = &$options['aliases'];
-		if (!$options['fields_alias']) {
+		if (empty($options['fields_alias'])) {
 			$aliases = array();
 		}
 		if ($aliases) {
@@ -801,11 +801,11 @@ abstract class InterAdminAbstract implements Serializable {
 			} 
 			if ($table == 'main') {
 				$alias = isset($aliases[$field]) ? $aliases[$field] : $field;
-				$value = $this->_getByForeignKey($value, $field, $campos[$field], $object);
+				$value = $this->_getByForeignKey($value, $field, @$campos[$field], $object);
 				if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
 					continue;
 				}
-				if ($options['select_multi_fields']) {
+				if (!empty($options['select_multi_fields'])) {
 					if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
 						$multi_options = $options['select_multi_fields'][$alias];
 						if ($multi_options) {
@@ -826,15 +826,20 @@ abstract class InterAdminAbstract implements Serializable {
 						$attributes[$table] =  InterAdmin::getInstance(0, array(), $joinTipo);
 					}
 				}
+				
 				if ($joinTipo) {
 					$joinCampos = $joinTipo->getCampos();
-					$joinAlias = $joinTipo->getCamposAlias($field);
+					if ($joinTipo->id_tipo == '0') {
+						$joinAlias = '';
+					} else {
+						$joinAlias = $joinTipo->getCamposAlias($field);
+					}
 				}
 				
 				if (is_object($attributes[$table])) {
 					$subobject = $attributes[$table];
 					$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-					$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $subobject);
+					$value = $this->_getByForeignKey($value, $field, @$joinCampos[$field], $subobject);
 					
 					if (isset($subobject->$alias) && is_object($subobject->$alias)) {
 						continue;

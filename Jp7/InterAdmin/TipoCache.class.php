@@ -18,7 +18,10 @@ class TipoCache {
 	}
 	
 	public function get($var) {
-		return self::$cache[$this->key][$var];
+		$cache = self::$cache;
+		if (isset($cache[$this->key][$var])) {
+			return $cache[$this->key][$var];
+		}
 	}
 		
 	public function set($var, $value) {

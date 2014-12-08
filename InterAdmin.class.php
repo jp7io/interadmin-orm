@@ -70,9 +70,9 @@ class InterAdmin extends InterAdminAbstract {
 		
 		$id = (string) $id;
 		$this->id = is_numeric($id) ? $id : '0';
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
-		$this->table = ($options['table']) ? '_' . $options['table'] : '';
-		$this->_db = $options['db'];
+		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
+		$this->table = isset($options['table']) ? '_' . $options['table'] : '';
+		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
 		if ($options['fields'] && $this->id) {
 			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
@@ -122,11 +122,11 @@ class InterAdmin extends InterAdminAbstract {
 		$optionsWithoutFields = array_merge($options, array('fields' => array()));
 		
 		// Default Class
-		if (!$options['default_class']) {
+		if (empty($options['default_class'])) {
 			$options['default_class'] = 'InterAdmin';
 		}
 		// Classe não foi forçada, descobrir a classe do Tipo
-		if (!$options['class']) {
+		if (empty($options['class'])) {
 			if (!$tipo) {
 				$instance = new $options['default_class']($id, $optionsWithoutFields);
 				$tipo = $instance->getTipo();
@@ -134,7 +134,7 @@ class InterAdmin extends InterAdminAbstract {
 			$options['class'] = $tipo->class;
 		}
 		// Classe foi descoberta
-		if ($instance && $options['class'] == get_class($instance)) {
+		if (!empty($instance) && $options['class'] == get_class($instance)) {
 			// Classe do objeto temporário já está correta
 			$finalInstance = $instance;
 		} else {
@@ -148,7 +148,7 @@ class InterAdmin extends InterAdminAbstract {
 			$finalInstance->setDb($tipo->getDb());
 		}
 		// Fields
-		if ($options['fields']) {
+		if (!empty($options['fields'])) {
 			$finalInstance->_resolveWildcard($options['fields'], $finalInstance);
 			$finalInstance->loadAttributes($options['fields'], $options['fields_alias']);
 		}

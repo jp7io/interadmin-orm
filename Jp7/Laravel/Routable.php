@@ -17,7 +17,7 @@ trait Routable {
 	public function getNamespace() {
 		$parent = $this->getParent();
 		$namespace = array();
-		while ($parent->id_tipo > 0) {
+		while ($parent && $parent->id_tipo > 0) {
 			$namespace[] = $parent->getStudly();
 			$parent = $parent->getParent();
 		}

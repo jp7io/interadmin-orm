@@ -127,10 +127,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
 	public static function getInstance($id_tipo, $options = array()) {
-		if (!$options['default_class']) {
+		if (empty($options['default_class'])) {
 			$options['default_class'] = self::$_defaultClass;
 		}
-		if ($options['class']) {
+		if (isset($options['class'])) {
 			// Classe foi forçada
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
@@ -141,7 +141,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$class_name = $instance->class_tipo;
 			// Classe não é customizada, retornar a própria classe temporária
 			if (!$class_name || !class_exists($class_name)) {
-				if ($options['fields']) {
+				if (isset($options['fields'])) {
 					$instance->loadAttributes($options['fields'], false);
 				}
 				return $instance;
@@ -211,7 +211,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
 		$options['from'] = $this->getTableName() . " AS main";
 		$options['where'][] = "parent_id_tipo = " . $this->id_tipo;
-	 	if (!$options['order']) {
+	 	if (empty($options['order'])) {
 	 		$options['order'] = 'ordem, nome';
 		}
 		// Internal use
@@ -225,7 +225,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
-				'class' => $options['class'],
+				'class' => isset($options['class']) ? $options['class'] : null,
 				'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 			));
 			$tipo->setParent($this);
@@ -1141,7 +1141,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return 	InterAdminTipo
 	 */
 	public static function findFirstTipo($options = array()) {
-		return self::findTipos(array('limit' => 1) + $options)[0]; 
+		$tipos = self::findTipos(array('limit' => 1) + $options);
+		return empty($tipos) ? null : $tipos[0]; 
 	}
 	/**
 	 * Retrieves the first InterAdminTipo with the given "model_id_tipo".
@@ -1175,19 +1176,22 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public static function findTipos($options = array()) {
 		$instance = new self();
-		if ($options['db']) {
+		if (isset($options['db'])) {
 			$instance->setDb($options['db']);
 		}
-		if ($options['db_prefix']) {
+		if (isset($options['db_prefix'])) {
 			$instance->db_prefix = $options['db_prefix'];
 		}
-		
+		if (!isset($options['fields'])) {
+			$options['fields'] = [];
+		}		
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+		
 		$options['from'] = $instance->getTableName() . ' AS main';
-		if (!$options['where']) {
+		if (empty($options['where'])) {
 			$options['where'][] = '1 = 1';
 		}
-	 	if (!$options['order']) {
+	 	if (empty($options['order'])) {
 	 		$options['order'] = 'ordem, nome';
 		}
 		// Internal use
@@ -1201,7 +1205,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $instance->db_prefix,
 				'db' => $instance->getDb(),
-				'class' => $options['class']
+				'class' => isset($options['class']) ? $options['class'] : null
 			));
 			$instance->_getAttributesFromRow($row, $tipo, $options);
 			$tipos[] = $tipo;
@@ -1219,7 +1223,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
 		
-		if (!$options['fields']) {
+		if (empty($options['fields'])) {
 			$defaultFields = static::DEFAULT_FIELDS;
 			if (strpos($defaultFields, ',') !== false) {
 				$defaultFields = explode(',', $defaultFields);
@@ -1236,13 +1240,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		
 		$options['from'] = $recordModel->getTableName() . " AS main";
-		$options['order'] = $this->getInterAdminsOrder($options['order']);
+		$options['order'] = $this->getInterAdminsOrder(isset($options['order']) ? $options['order'] : '');
+		
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();
 		$options['eager_load'] = array();
 		
-		if ($options['with']) {
+		if (isset($options['with'])) {
 			foreach ($options['with'] as $withRelationship) {
 				// Isso aqui é mais uma validação
 				// O código mesmo é rodado depois
