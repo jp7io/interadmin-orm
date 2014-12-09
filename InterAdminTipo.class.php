@@ -233,7 +233,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$tipos[] = $tipo;
 		}
 		// $rs->Close();
-		return $tipos;
+		return new Collection($tipos);
 	}
 
 	public function children() {
