@@ -49,6 +49,14 @@ class Router extends \Illuminate\Routing\Router {
 			parent::resource($name, $controller, $options);
 		}
 	}	
+
+	public function tipo($name, $id_tipo) {
+		$controller = studly_case(str_replace('.', '\\ ', $name )) . 'Controller';
+		$this->resource($name,  $controller, [
+			'id_tipo' => $id_tipo,
+			'only' => ['index', 'show']
+		]);
+	}
 	
 	public function getRouteByIdTipo($id_tipo, $action = 'index') {
 		$mappedRoute = $this->mapIdTipos[$id_tipo];
