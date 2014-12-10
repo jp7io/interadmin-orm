@@ -8,11 +8,15 @@ class DynamicLoader {
 	public static function load($class) {
 		$tipo = \InterAdminTipo::findFirstTipo(array(
 			'where' => array(
-				"class = '" . addslashes($class) . "'"
+				"(class = '" . addslashes($class) . "' OR class_tipo = '" . addslashes($class) . "')"
 			)
 		));
 		if ($tipo) {
-			$code = \Jp7_InterAdmin_Util::gerarClasseInterAdmin($tipo, false);
+			if ($tipo->class === $class) {
+				$code = \Jp7_InterAdmin_Util::gerarClasseInterAdmin($tipo, false);
+			} else {
+				$code = \Jp7_InterAdmin_Util::gerarClasseInterAdminTipo($tipo, false);
+			}
 			eval('?>' . $code);
 			return true;
 		}

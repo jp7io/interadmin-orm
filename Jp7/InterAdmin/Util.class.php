@@ -215,10 +215,12 @@ class Jp7_InterAdmin_Util {
 		}
 		
 		$phpdoc = '/**' . "\r\n";
+		/*
 		foreach ($tipo->getCampos() as $campo) {
 			$phpdoc .= ' * @property ' . self::_getTipoPhpDocCampo($tipo, $campo) . ' $'. $campo['nome_id'] . "\r\n";
 		}
-		$phpdoc .= ' * @property Jp7_Date date_publish' . "\r\n"; 
+		$phpdoc .= ' * @property Jp7_Date date_publish' . "\r\n";
+		*/ 
 		$phpdoc.= ' */';
 		
 		$conteudo = <<<STR
@@ -242,6 +244,7 @@ STR;
 		if (!$nomeClasse) {
 			$nomeClasse = $tipo->class_tipo;
 		}
+		/*
 		if (!$nomeClasseInterAdmin) {
 			$nomeClasseInterAdmin = $tipo->class;
 		}
@@ -253,10 +256,11 @@ STR;
 				$nomeClasseInterAdmin = 'InterAdmin';
 			}
 		}
+		*/
 		$phpdoc = '/**' . "\r\n";
-		$phpdoc.= ' * @method ' . $nomeClasseInterAdmin . '[] find' . "\r\n";
-		$phpdoc.= ' * @method ' . $nomeClasseInterAdmin . ' findFirst' . "\r\n";
-		$phpdoc.= ' * @method ' . $nomeClasseInterAdmin . ' findById' . "\r\n";
+		//$phpdoc.= ' * @method ' . $nomeClasseInterAdmin . '[] find' . "\r\n";
+		//$phpdoc.= ' * @method ' . $nomeClasseInterAdmin . ' findFirst' . "\r\n";
+		//$phpdoc.= ' * @method ' . $nomeClasseInterAdmin . ' findById' . "\r\n";
 		$phpdoc.= ' */';
 		
 		$conteudo = <<<STR
