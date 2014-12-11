@@ -4,7 +4,9 @@ namespace Jp7\Laravel;
 
 class Controller extends \Controller {
 
+	/* Internal use only */
 	static $tipo = null;
+	protected static $current = null;
 
 	protected $layout = 'layouts.master';
 
@@ -15,6 +17,8 @@ class Controller extends \Controller {
 	protected $tipoClassName = null;
 	
 	public function __construct() {
+		static::$current = $this;
+
 		if (is_null($this->_viewData)) {
 			$this->_viewData = new \stdClass();
 		}
@@ -31,6 +35,11 @@ class Controller extends \Controller {
 		$this->_viewData->$key = $value;
 	}
 
+	/* Temporary solution - Avoid using this as much as possible */
+	public static function getCurrentController() {
+		return static::$current;
+	}
+	
 	public function getRootTipo() {
 		//$klass = \getDefaultClass();
 		return \InterAdminTipo::getInstance(0);
