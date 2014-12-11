@@ -48,8 +48,8 @@ class Router extends \Illuminate\Routing\Router {
 		} else {
 			parent::resource($name, $controller, $options);
 		}
-	}	
-
+	}
+	
 	public function tipo($name, $id_tipo) {
 		$controller = studly_case(str_replace('.', '\\ ', $name )) . 'Controller';
 		$this->resource($name,  $controller, [
@@ -63,6 +63,10 @@ class Router extends \Illuminate\Routing\Router {
 		return $this->routes->getByName($mappedRoute . '.' . $action);
 	}
 	
+	public function getIdTipoByRoute($route) {
+		return array_search($route, $this->mapIdTipos);
+	}
+
 	public function getMapIdTipos() {
 		return $this->mapIdTipos;
 	}
