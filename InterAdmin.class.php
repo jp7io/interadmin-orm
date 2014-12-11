@@ -606,9 +606,13 @@ class InterAdmin extends InterAdminAbstract {
 		$parameters = $this->getUrlParameters($variables);
 		
 		if ($hasSlug) {
-			$parameters[] = $this->id_slug;
+			$parameters[] = $this;
 			array_push($variables, $removedVar);
-		}		
+		}
+		
+		$parameters = array_map(function($p) {
+			return $p->id_slug;
+		}, $parameters);
 		
 		if (count($parameters) != count($variables)) {
 			throw new BadMethodCallException('Route "' . $route->getUri() . '" has ' . count($variables) . 
@@ -635,7 +639,7 @@ class InterAdmin extends InterAdminAbstract {
 			if (!$parent = $parent->getParent()) {
 				break;
 			}
-			$parameters[] = $parent->id_slug;
+			$parameters[] = $parent;
 		}
 		return $parameters;
 	}
