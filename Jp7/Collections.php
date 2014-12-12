@@ -1,6 +1,7 @@
 <?php
 /**
  * Class for handling collections of objects.
+ *
  */
 class Jp7_Collections {
  	/**
