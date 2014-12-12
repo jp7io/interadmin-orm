@@ -71,11 +71,11 @@ class InterSite {
 	 *
 	 * @return bool
 	 */
-	public static function isAtLocalhost()
-	{	
+	public static function isAtLocalhost() {	
 		global $app;
-		if ($app->runningInConsole()) {
-			// php artisan, verificar como fica em producao
+		// PHPUNIT has no $app
+		if (!$app || $app->runningInConsole()) {
+			// php artisan, @todo check what it returns in production
 			return true;
 		}
 		$host = explode(':', $_SERVER['HTTP_HOST'])[0];
