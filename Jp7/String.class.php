@@ -1,9 +1,17 @@
 <?php
 namespace Jp7;
 
+/**
+ * 
+ * @deprecated
+ */
 class String {
 	private $str;
 	
+	/**
+	 *
+	 * @deprecated
+	 */
 	public static function create($str) {
 		return new self($str);
 	}
