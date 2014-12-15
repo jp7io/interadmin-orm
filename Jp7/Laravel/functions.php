@@ -160,9 +160,9 @@ function jp7_normalize($string) {
  * @author Carlos Rodrigues
  * @version (2008/06/12) 
  */
-function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*'){
+function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*') {
 	$sql_where = $regexp;
-	for ($i = 0; $i < strlen($str); $i++){
+	for ($i = 0; $i < strlen($str); $i++) {
 		$char = $str[$i];
 		$char = str_replace('a', '[aáàãâäª]', $char);
 		$char =	str_replace('e', '[eéèêë&]', $char);
@@ -173,8 +173,8 @@ function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*'){
 		$char =	str_replace('n', '[nñ]', $char);
 		$sql_where .= $char . $regexp;
 	}
-	return "REPLACE(".$field.",' ','') REGEXP '^" . $sql_where . "$'";
-}
+	return "REPLACE(" . $field . ",' ','') REGEXP '^" . $sql_where . "$'";
+} 
 
 function jp7_debug($msg) {
 	throw new Exception($msg);
@@ -186,6 +186,20 @@ function snake_case($value, $delimiter = '_') {
 	if (ctype_lower($value)) return $value;
 	
 	return strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
+}
+
+function img_tag($img, $template = null, $options = array()) {
+	if (is_object($img)) {
+		$url = $img->getUrl();
+	} else {
+		$url = $img;
+	}
+	if ($url) {
+		if ($template) {
+			$url = preg_replace('~^assets/~', 'imagecache/' . $template . '/', $url);
+		}
+		return HTML::image($url, $img->text, $options);
+	}
 }
 
 /*

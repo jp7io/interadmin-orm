@@ -1,14 +1,5 @@
 <?php
-/**
- * JP7's PHP Functions 
- * 
- * Contains the main custom functions and classes.
- * @author JP7
- * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package InterAdmin
- */
- 
+
 /**
  * Class which represents records on the table interadmin_{client name}_arquivos.
  *
@@ -16,6 +7,8 @@
  */
 class InterAdminArquivo extends InterAdminAbstract {
 	
+	use \Jp7\Interadmin\Downloadable;
+
 	protected $_primary_key = 'id_arquivo';
 	
 	/**
@@ -103,18 +96,6 @@ class InterAdminArquivo extends InterAdminAbstract {
 		$this->_parent = $parent;
 	}
 	/**
-	 * Returns the full url address of this file.
-	 *
-	 * @return string
-	 */
-	public function getUrl() {
-		$config = InterSite::config();
-		
-		$url = ($this->url) ? $this->url : $this->getFieldsValues('url');
-		$url = str_replace('../../', $config->url, $url);
-		return $url; 
-	}
-	/**
 	 * Returns the description of this file.
 	 *
 	 * @return string
@@ -186,17 +167,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 		}
 		return $this->url; 
 	}
-	
-	/**
-	 * Returns the extension of this file.
-	 * 
-	 * @return string Extension, such as 'jpg' or 'gif'.
-	 */
-	public function getExtension() {
-		$url = reset(explode('?', $this->url));
-		return preg_replace('/(.*)\.(.*)$/', '\2', $url);
-	}
-	
+		
     function getAttributesAliases() {
        return array();
     }
@@ -230,9 +201,4 @@ class InterAdminArquivo extends InterAdminAbstract {
     public function getAdminAttributes() {
         return array();
     }
-	public function getSize() {
-		$url = reset(explode('?', $this->url));
-		$url = jp7_replace_beginning('../../upload', 'upload', $url);
-		return jp7_file_size($url);
-	}
 }
