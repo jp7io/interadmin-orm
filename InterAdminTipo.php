@@ -292,6 +292,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $this->find();
 	}
 	
+	public function taggedWith() {
+		$query = $this->query();
+		foreach (func_get_args() as $tag) {
+			$query->where($tag->getTagFilters());
+		}
+		return $query;
+	}
+
 	/**
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
 	 * @return InterAdmin[] Array of InterAdmin objects.

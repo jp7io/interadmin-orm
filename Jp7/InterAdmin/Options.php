@@ -73,13 +73,14 @@ class Options extends BaseOptions {
 	}
 	
 	public function __call($method_name, $params) {
+		/*
 		$last = count($params) - 1;
 		if (is_array($params[$last])) {
 			$params[$last] = InterAdmin::mergeOptions($this->options, $params[$last]);
 		} else {
 			$params[] = $this->options;
 		}
-		
+		*/		
 		$retorno = call_user_func_array([$this->tipo, $method_name], $params);
 		if ($retorno instanceof self) {
 			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
