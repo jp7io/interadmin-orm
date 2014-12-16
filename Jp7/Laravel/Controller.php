@@ -2,7 +2,7 @@
 
 namespace Jp7\Laravel;
 
-class Controller extends \Controller {
+class Controller extends \Illuminate\Routing\Controller {
 
 	/* Internal use only */
 	static $tipo = null;
@@ -24,7 +24,6 @@ class Controller extends \Controller {
 		}
 		$this->beforeFilter('@setTipo');
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
-		$this->beforeFilter('@setMenuItens');
 	}
 	
 	public function &__get($key) {
@@ -43,10 +42,6 @@ class Controller extends \Controller {
 	public function getRootTipo() {
 		//$klass = \getDefaultClass();
 		return \InterAdminTipo::getInstance(0);
-	}
-        
-	public function setMenuItens() {
-		$this->menuItens = $this->getRootTipo()->getChildrenMenu();
 	}
         
 	public function setTipo() {
