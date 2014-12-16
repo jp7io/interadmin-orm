@@ -30,6 +30,6 @@ trait Downloadable {
 	}
 
 	public function getSize() {
-		return jp7_file_size($this->getFilename());
+		return human_filesize($this->getFilename());
 	}
 }

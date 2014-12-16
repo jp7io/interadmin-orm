@@ -1,13 +1,6 @@
 <?php
-/**
- * JP7's PHP Functions 
- * 
- * Contains the main custom functions and classes.
- * @author JP7
- * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package InterSite
- */
+
+use \Illuminate\Support\Str;
 
 /**
  * Configurations for a site.
@@ -224,7 +217,8 @@ class InterSite {
 			foreach ((array) $this->server->vars as $var => $value) {
 				$this->$var = $value;
 			}
-			$this->url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $this->server->host . '/' . jp7_path($this->server->path);
+			
+			$this->url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $this->server->host . '/' . Str::finish($this->server->path, '/');
 			
 			foreach ($this->langs as $sigla => $lang) {
 				if ($lang->default) {
@@ -246,68 +240,57 @@ class InterSite {
 				header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
 				exit;
 			case !$this->server: {
-				global $debugger;
-				
-				$message = 'Host não está presente nas configurações: ' . $_SERVER['HTTP_HOST'];
-				jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
-				$message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
-				if ($this->servers) {
-					if ($siteProducao = $this->getFirstServerByType(self::PRODUCTION)) {
-						$urlProducao = 'http://' . jp7_implode('/', array($siteProducao->host, $siteProducao->path));
-						$messageLink = 'Acesse o site: <a href="' . $urlProducao . '">' . $urlProducao . '</a>';
-					}
-				}
-				die($message . $messageLink);
+				throw new Exception('No settings for host: ' . $host);
 			}
 		}
 		
 		self::setConfig($this);
-		
-		/* @todo TEMP - Creating old globals */
-		/*
-		$oldtypes = array(
-			self::PRODUCAO => 'Principal',
-			self::QA => 'QA',
-			self::DESENVOLVIMENTO => 'Local'
-		);
-		$GLOBALS['c_url'] = $this->url;
-		$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
-		$GLOBALS['c_site'] = $this->name_id;
-		$GLOBALS['c_menu'] = $this->menu;
-		$GLOBALS['c_cache'] = $this->cache;
-		$GLOBALS['c_cache_delay'] = $this->cache_delay;
-		$GLOBALS['db_prefix'] = 'interadmin_' . $this->name_id;
-		$GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
-		$GLOBALS['c_analytics'] = $this->google_analytics;
-		$GLOBALS['googlemaps_key'] = $this->google_maps;
-		$GLOBALS['c_w3c'] = true;
-		$GLOBALS['c_doc_root'] = jp7_doc_root();
-		// DB
-		$GLOBALS['db_type'] = $this->db->type;
-		$GLOBALS['db_host'] = $this->db->host;
-		$GLOBALS['db_name'] = $this->db->name;
-		$GLOBALS['db_user'] = $this->db->user;
-		$GLOBALS['db_pass'] = $this->db->pass;
-		// FTP
-		$GLOBALS['ftp']['host'] = $this->server->ftp;
-		$GLOBALS['ftp']['user'] = $this->server->user;
-		$GLOBALS['ftp']['pass'] = $this->server->pass;
-		// InterAdmin
-		$GLOBALS['c_publish'] = $this->interadmin_preview;
-		$GLOBALS['c_remote'] = $this->interadmin_remote;
-		$GLOBALS['c_cliente_title'] = $this->name;
-		$GLOBALS['c_nobackup'] = $this->nobackup;
-		foreach ($this->servers as $host => $server) {
-			$GLOBALS['c_cliente_domains'][] = $host;
-			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
-		}
-		foreach($this->langs as $sigla => $lang) {
-			$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
-		}
-		$GLOBALS['c_lang_default'] = $this->lang_default;
-		*/
-		/* TEMP - Creating old globals */
 	}
+	/* @todo TEMP - Creating old globals */
+	/*
+	$oldtypes = array(
+		self::PRODUCAO => 'Principal',
+		self::QA => 'QA',
+		self::DESENVOLVIMENTO => 'Local'
+	);
+	$GLOBALS['c_url'] = $this->url;
+	$GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
+	$GLOBALS['c_site'] = $this->name_id;
+	$GLOBALS['c_menu'] = $this->menu;
+	$GLOBALS['c_cache'] = $this->cache;
+	$GLOBALS['c_cache_delay'] = $this->cache_delay;
+	$GLOBALS['db_prefix'] = 'interadmin_' . $this->name_id;
+	$GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
+	$GLOBALS['c_analytics'] = $this->google_analytics;
+	$GLOBALS['googlemaps_key'] = $this->google_maps;
+	$GLOBALS['c_w3c'] = true;
+	$GLOBALS['c_doc_root'] = jp7_doc_root();
+	// DB
+	$GLOBALS['db_type'] = $this->db->type;
+	$GLOBALS['db_host'] = $this->db->host;
+	$GLOBALS['db_name'] = $this->db->name;
+	$GLOBALS['db_user'] = $this->db->user;
+	$GLOBALS['db_pass'] = $this->db->pass;
+	// FTP
+	$GLOBALS['ftp']['host'] = $this->server->ftp;
+	$GLOBALS['ftp']['user'] = $this->server->user;
+	$GLOBALS['ftp']['pass'] = $this->server->pass;
+	// InterAdmin
+	$GLOBALS['c_publish'] = $this->interadmin_preview;
+	$GLOBALS['c_remote'] = $this->interadmin_remote;
+	$GLOBALS['c_cliente_title'] = $this->name;
+	$GLOBALS['c_nobackup'] = $this->nobackup;
+	foreach ($this->servers as $host => $server) {
+		$GLOBALS['c_cliente_domains'][] = $host;
+		$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
+	}
+	foreach($this->langs as $sigla => $lang) {
+		$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
+	}
+	$GLOBALS['c_lang_default'] = $this->lang_default;
+	*/
+	/* TEMP - Creating old globals */
+
 		
 	/**
 	 * Cacheando verificação, porque chega a demorar 1 segundo

@@ -66,7 +66,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				$termos = explode('And', $match['args']);
 				$options = $args[count($termos)];
 				foreach ($termos as $key => $termo) {
-					$options['where'][] = Jp7_Inflector::underscore($termo) . " = '" . addslashes($args[$key]) . "'";
+					$options['where'][] = snake_case($termo) . " = '" . addslashes($args[$key]) . "'";
 				}
 				if ($match[1]) {
 					$options['limit'] = 1;
@@ -623,7 +623,7 @@ class InterAdminTipo extends InterAdminAbstract {
 						$alias = $alias->nome;	
 					}
 				}
-				$alias = ($alias) ? toId($alias) : $field;
+				$alias = ($alias) ? to_slug($alias, '_') : $field;
 				$aliases[$field] = $alias;
 				// Cache
 				$update = true;
@@ -764,10 +764,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
-		// id_tipo_string
-		if (isset($this->nome)) {
-			$this->id_tipo_string = toId($this->nome);
-		}
 		// log
 		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		
@@ -956,7 +952,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$table = $this->db_prefix;
 		if ($this->language) {
 			if (!Lang::has('interadmin.affix')) {
-				throw new Exception('You need to add interadmin.affix to app/lang/pt-br/interadmin.php');
+				throw new Exception('You need to add interadmin.affix to app/lang/' . App::getLocale() . '/interadmin.php');
 			}
 			$table .= Lang::get('interadmin.affix');
 		}
@@ -992,7 +988,7 @@ class InterAdminTipo extends InterAdminAbstract {
 					$childrenArrParts = array_pad($childrenArrParts, 4, '');
 				}
 				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), $childrenArrParts);
-				$nome_id = Jp7_Inflector::camelize($child['nome']);
+				$nome_id = camel_case($child['nome']);
 				$children[$nome_id] = $child;
 			}
 			$this->_setMetadata('children', $children);

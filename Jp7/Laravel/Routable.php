@@ -26,7 +26,7 @@ trait Routable {
 	
 	// a-empresa
 	public function getSlug() {
-		$nome = toSlug($this->nome);
+		$nome = to_slug($this->nome);
 		if (is_numeric($nome)) {
 			// verificar maneira de tratar isso
 			$nome = 'list-' . $nome;

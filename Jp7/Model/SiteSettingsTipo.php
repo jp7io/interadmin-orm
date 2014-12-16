@@ -12,8 +12,8 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 	
 	public $attributes = array(
 		'id_tipo' => 'SiteSettings',
-		'nome' => 'Configurações do Site',
-		'campos' => 'tit_1{,}Cabeçalho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_3{,}Dados do Administrador{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_3{;}varchar_2{,}Nome{,}Nome utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_name{;}varchar_3{,}E-mail{,}E-mail utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_email{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::getTemplateFields{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}Template{,}{,}{,}template_data{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
+		'nome' => 'Configuraï¿½ï¿½es do Site',
+		'campos' => 'tit_1{,}Cabeï¿½alho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}varchar_key{,}Tï¿½tulo{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Subtï¿½tulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_3{,}Dados do Administrador{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_3{;}varchar_2{,}Nome{,}Nome utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_name{;}varchar_3{,}E-mail{,}E-mail utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_email{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::getTemplateFields{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}Template{,}{,}{,}template_data{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
 		'children' => '',
 		'arquivos_ajuda' => '',
 		'arquivos' => '',
@@ -42,11 +42,11 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 				self::$_theme_editor = true;
 				// sem break;
 			case 'edit':
-				// Não sei porque ele coloca &quot;
+				// Nï¿½o sei porque ele coloca &quot;
 				self::$_dados = unserialize(str_replace('&quot;', '"', $value));
 				
 				if (self::$_dados['css_template']) {
-					// Conversão temporária, retirando prefixo css_, TODO retirar código depois
+					// Conversï¿½o temporï¿½ria, retirando prefixo css_, TODO retirar cï¿½digo depois
 					foreach (self::$_dados as $key => $value) {
 						self::$_dados[substr($key, 4)] = $value;
 						unset(self::$_dados[$key]);
@@ -81,13 +81,13 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					
 				} else {
 					self::_getTit('Cores de Fundo');
-					self::_getColorField('body_background', 'Corpo da Página');
+					self::_getColorField('body_background', 'Corpo da Pï¿½gina');
 					self::_getColorField('master_background', 'Wrapper', true);
 									
-					self::_getTit('Cores do Cabeçalho');
+					self::_getTit('Cores do Cabeï¿½alho');
 					self::_getColorField('header_background', 'Cor de Fundo');
-					self::_getColorField('header_title_color', 'Título');
-					self::_getColorField('header_subtitle_color', 'Subtítulo', true);
+					self::_getColorField('header_title_color', 'Tï¿½tulo');
+					self::_getColorField('header_subtitle_color', 'Subtï¿½tulo', true);
 					
 					self::_breakTable();
 					
@@ -106,16 +106,16 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					self::_getColorField('breadcrumb_color', 'Texto', true );
 					
 					self::_getTit('Cores do Slideshow');
-					self::_getColorField('slideshow_title_color', 'Título');
-					self::_getColorField('slideshow_text_color', 'Subtítulo');
+					self::_getColorField('slideshow_title_color', 'Tï¿½tulo');
+					self::_getColorField('slideshow_text_color', 'Subtï¿½tulo');
 					self::_getColorField('slideshow_a_color', 'Link', true);				
 					
 					self::_breakTable();
 					
-					self::_getTit('Cores do Conteúdo');
+					self::_getTit('Cores do Conteï¿½do');
 					self::_getColorField('content_background', 'Cor de Fundo');
-					self::_getColorField('content_title_color', 'Título');
-					self::_getColorField('content_subtitle_color', 'Subtítulo');
+					self::_getColorField('content_title_color', 'Tï¿½tulo');
+					self::_getColorField('content_subtitle_color', 'Subtï¿½tulo');
 					self::_getColorField('content_color', 'Texto');
 					self::_getColorField('content_a_color', 'Links');
 					self::_getColorField('content_border_bottom', 'Separador', true);
@@ -124,19 +124,19 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 					
 					self::_getTit('Cores dos Boxes');
 					self::_getColorField('box_background', 'Cor de Fundo');
-					self::_getColorField('box_title_color', 'Título');
-					self::_getColorField('box_subtitle_color', 'Subtítulo');
+					self::_getColorField('box_title_color', 'Tï¿½tulo');
+					self::_getColorField('box_subtitle_color', 'Subtï¿½tulo');
 					self::_getColorField('box_color', 'Texto');
-					self::_getColorField('box_header_background', 'Cabeçalho');
-					self::_getColorField('box_header_color', 'Texto do Cabeçalho');
-					self::_getColorField('box_footer_background', 'Rodapé');
-					self::_getColorField('box_footer_color', 'Texto do Rodapé', true && !self::$_theme_editor);
+					self::_getColorField('box_header_background', 'Cabeï¿½alho');
+					self::_getColorField('box_header_color', 'Texto do Cabeï¿½alho');
+					self::_getColorField('box_footer_background', 'Rodapï¿½');
+					self::_getColorField('box_footer_color', 'Texto do Rodapï¿½', true && !self::$_theme_editor);
 					
 					self::_breakTable();
 					
-					self::_getTit('Cores do Rodapé');
+					self::_getTit('Cores do Rodapï¿½');
 					self::_getColorField('footer_background', 'Cor de Fundo');
-					self::_getColorField('footer_title_color', 'Título');
+					self::_getColorField('footer_title_color', 'Tï¿½tulo');
 					self::_getColorField('footer_color', 'Texto');
 					self::_getColorField('disclaimer_color', 'Disclaimer', true);
 					break;
@@ -211,7 +211,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract {
 		$filename = $c_interadminConfigPath . 'dynamic.css';
 		
 		$content = '/*' . "\r\n" . 
-			'NÃO EDITE ESTE ARQUIVO - Arquivo é gerado dinamicamente' . "\r\n" .
+			'Nï¿½O EDITE ESTE ARQUIVO - Arquivo ï¿½ gerado dinamicamente' . "\r\n" .
 			'DO NOT EDIT THIS FILE - File is dynamically generated' . "\r\n" .
 			'*/' .  "\r\n" .
 			

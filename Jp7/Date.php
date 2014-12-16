@@ -13,6 +13,7 @@
  * Helper for date utils.
  * 
  * @package Jp7_Date
+ * @deprecated Use Carbon instead
  */
 class Jp7_Date extends DateTime {
 	
@@ -26,6 +27,7 @@ class Jp7_Date extends DateTime {
 	 * @param string $time
 	 * @param DateTimeZone $timezone
 	 * @return Jp7_Date
+	 * @deprecated 
 	 */
 	public static function createFromFormat($format, $time, $timezone = null) {
 		if ($timezone) { 
@@ -40,6 +42,9 @@ class Jp7_Date extends DateTime {
 		}
 	}
 	
+	/**
+	 * @deprecated 
+	 */
 	public static function createFromString($time, $formats = array('d/m/Y', 'Y-m-d'), DateTimeZone $timezone = null) {
 		foreach ($formats as $format) {
 			if ($date = static::createFromFormat($format, $time, $timezone)) {

@@ -17,7 +17,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 */
 	public $db_prefix;
 	/**
-	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this recordï¿½s 'id_tipo'.
 	 * @var InterAdminTipo
 	 */
 	protected $_tipo;
@@ -131,7 +131,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder = $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$folder = $upload_root . to_slug($parent->getTipo()->getFieldsValues('nome'), '') . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
@@ -141,22 +141,22 @@ class InterAdminArquivo extends InterAdminAbstract {
 			@chmod(dirname($newurl), 0777);
 		}
 		
-		// Movendo arquivo temporário
+		// Movendo arquivo temporï¿½rio
 		if (!@rename($this->url, $newurl)) {
-			$msg = 'Impossível renomear arquivo "' . $this->url . '" para "' . $newurl . '".<br /> getcwd(): ' . getcwd();
+			$msg = 'Impossï¿½vel renomear arquivo "' . $this->url . '" para "' . $newurl . '".<br /> getcwd(): ' . getcwd();
 			if (!is_file($this->url)) {
-				$msg .= '<br /> Arquivo ' . basename($this->url) . ' não existe.';
+				$msg .= '<br /> Arquivo ' . basename($this->url) . ' nï¿½o existe.';
 			}
 			if (!is_dir(dirname($this->url))) {
-				$msg .= '<br /> Diretório ' . dirname($this->url) . ' não existe.';
+				$msg .= '<br /> Diretï¿½rio ' . dirname($this->url) . ' nï¿½o existe.';
 			}
 			if (!is_dir(dirname($newurl))) {
-				$msg .= '<br /> Diretório ' . dirname($newurl) . ' não existe.';
+				$msg .= '<br /> Diretï¿½rio ' . dirname($newurl) . ' nï¿½o existe.';
 			}
 			throw new Exception($msg);
 		}
 		
-		$clientSideFolder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$clientSideFolder = '../../upload/' . to_slug($parent->getTipo()->getFieldsValues('nome'), '') . '/';
 		$this->url = $clientSideFolder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
 		// Movendo o thumb

@@ -313,7 +313,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		$options = array();
 		if (strpos($field, 'date_') === 0) {
-			return new Jp7_Date($value);
+			return new \Date($value);
 		}
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
@@ -540,7 +540,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
 					} elseif (strpos($table, 'children_') === 0) {
-						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
+						$joinNome = camel_case(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' .
@@ -589,9 +589,9 @@ abstract class InterAdminAbstract implements Serializable {
 					
 					// Joins com children
 					if (strpos($table, 'children_') === 0) {
-						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
+						$joinNome = camel_case(substr($table, 9));
 					} else {
-						$joinNome = Jp7_Inflector::camelize($table);
+						$joinNome = camel_case($table);
 					}
 					if ($childrenArr[$joinNome]) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(

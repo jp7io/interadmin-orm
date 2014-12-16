@@ -163,12 +163,12 @@ class InterAdmin extends InterAdminAbstract {
 	protected function _findChild($nome_id) {
 		$children = $this->getTipo()->getInterAdminsChildren();
 		if (!$children[$nome_id]) {
-			$nome_id = explode('_', Jp7_Inflector::underscore($nome_id));
-			$nome_id[0] = Jp7_Inflector::plural($nome_id[0]);
-			$nome_id = Jp7_Inflector::camelize(implode('_', $nome_id));
+			$nome_id = explode('_', snake_case($nome_id));
+			$nome_id[0] = str_plural($nome_id[0]);
+			$nome_id = camel_case(implode('_', $nome_id));
 		}
 		if (!$children[$nome_id]) {
-			$nome_id = Jp7_Inflector::plural($nome_id);
+			$nome_id = str_plural($nome_id);
 		}
 		return $children[$nome_id];
 	}
@@ -216,14 +216,6 @@ class InterAdmin extends InterAdminAbstract {
 				if ($child = $this->_findChild($nome_id)) {
 					$options = (array) $args[1];
 					$options['where'][] = "id = " . intval($args[0]);
-					return $this->getFirstChild($child['id_tipo'], $options);
-				}
-			// get{ChildName}ByIdString
-			} elseif (substr($methodName, -10) == 'ByIdString') {
-				$nome_id = substr($methodName, strlen('get'), -strlen('ByStringId'));
-				if ($child = $this->_findChild($nome_id)) {
-					$options = (array) $args[1];
-					$options['where'][] = "id_string = '" . $args[0] . "'";
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
 			// get{ChildName}Count
@@ -522,7 +514,7 @@ class InterAdmin extends InterAdminAbstract {
 		$arquivoModel->setTipo($this->getTipo());
 		
 		if (!$options['fields']) {
-			$defaultFields = static::DEFAULT_FIELDS;
+			$defaultFields = '*';
 			if (strpos($defaultFields, ',') !== false) {
 				$defaultFields = explode(',', $defaultFields);
 			}
@@ -556,6 +548,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $arquivos;
 	}
+	
 	public function getFirstArquivo($options = array()) {
 		$retorno = $this->getArquivos($options + array('limit' => 1));
 		return $retorno[0];
@@ -808,14 +801,12 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
-		// id_string
+		// id_slug
 		if (isset($this->varchar_key)) {
-			$this->id_string = toId($this->varchar_key);
 			$this->id_slug = $this->generateSlug($this->varchar_key);
 		} else {
 			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
 			if (isset($this->$alias_varchar_key)) {
-				$this->id_string = toId($this->$alias_varchar_key);
 				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
 			}
 		}
@@ -828,8 +819,8 @@ class InterAdmin extends InterAdminAbstract {
 	}
 
 	public function generateSlug($string) {
-		$this->getByAlias('id_slug');
-		$newSlug = toSlug($string);
+		$this->loadAttributes(['id_slug']);
+		$newSlug = to_slug($string);
 		if (is_numeric($newSlug)) {
 			$newSlug = '--' . $newSlug;
 		}
