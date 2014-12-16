@@ -20,7 +20,7 @@ trait Downloadable {
 			return jp7_replace_beginning('../../upload/', $config->url . 'upload/', $this->url);
 		}
 	}	
-
+	
 	// Server side file name
 	public function getFilename() {
 		return str_replace('../../', storage_path() . '/', $this->url);
@@ -36,10 +36,8 @@ trait Downloadable {
 		$url = reset(explode('?', $this->url));
 		return preg_replace('/(.*)\.(.*)$/', '\2', $url);
 	}
+
 	public function getSize() {
-		kd('Not implemented');
-		$url = reset(explode('?', $this->url));
-		$url = jp7_replace_beginning('../../upload', 'upload', $url);
-		return jp7_file_size($url);
+		return jp7_file_size($this->getFilename());
 	}
 }

@@ -11,6 +11,70 @@ function isospecialchars($string) {
 }
 
 /**
+ * Gets file size
+ *
+ * @param string $file Path to the file.
+ * @return string Size of the file in KB or MB.
+ */
+function jp7_file_size($file){
+	$file = ceil(@filesize($file) / 1024);
+	$file = ($file < 1024) ? ceil($file) . 'KB' : round($file / 1024, 1) . 'MB';
+	return $file;
+}
+
+/**
+ * Returns textual representation for the day of the week, such as Sunday or Saturday. Supports english and portuguese.
+ *
+ * @param int|string $w A numeric representation of the day of the week (0 for Sunday through 6 for Saturday), or a date/time string.
+ * @param string $sigla If <tt>TRUE</tt> returns only the first three letters, the default value is <tt>FALSE</tt>.
+ * @global string
+ * @return string Textual representation for the day of the week.
+ * @version (2006/04/27)
+ */
+function jp7_date_week($w, $sigla = FALSE) {
+	global $lang;
+	switch($lang->lang) {
+		case "en": $W = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"); break;
+		case "de": $W = array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"); break;
+		case "es": $W = array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"); break;
+		default: $W = array("Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"); break;
+	}
+	if (!is_int($w)) $w = date("w", strtotime($w));
+	$return = $W[$w];
+	return ($sigla) ? substr($return, 0, 3) : $return;
+}
+
+/**
+ * Returns textual representation of a month, such as January or March. Supports english and portuguese.
+ *
+ * @param int $m Numeric representation of a month, (1 for January through 12 for December).
+ * @param string $sigla If <tt>TRUE</tt> returns only the first three letters, the default value is <tt>FALSE</tt>.
+ * @global string
+ * @return string Textual representation of a month.
+ * @version (2004/06/14)
+ */
+function jp7_date_month($m, $sigla = FALSE) {
+	global $lang;
+	switch($lang->lang) {
+		case 'en':
+			$M = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+			break;
+		case 'de':
+			$M = array('Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
+			break;
+		case 'es':
+			$M = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+			break;
+		default:
+			$M = array('Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
+			break;
+	}
+	$return = $M[$m - 1];
+	return ($sigla) ? substr($return, 0, 3) : $return;
+}
+
+
+/**
  * Adds a trailing slash on a path, in case it doesn't have one.
  *
  * @param string $S Input String (Path, URL).
