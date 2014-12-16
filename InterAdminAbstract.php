@@ -540,7 +540,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
 					} elseif (strpos($table, 'children_') === 0) {
-						$joinNome = camel_case(substr($table, 9));
+						$joinNome = studly_case(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' .
@@ -589,9 +589,9 @@ abstract class InterAdminAbstract implements Serializable {
 					
 					// Joins com children
 					if (strpos($table, 'children_') === 0) {
-						$joinNome = camel_case(substr($table, 9));
+						$joinNome = studly_case(substr($table, 9));
 					} else {
-						$joinNome = camel_case($table);
+						$joinNome = studly_case($table);
 					}
 					if ($childrenArr[$joinNome]) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(

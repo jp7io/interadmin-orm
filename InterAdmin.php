@@ -165,7 +165,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$children[$nome_id]) {
 			$nome_id = explode('_', snake_case($nome_id));
 			$nome_id[0] = str_plural($nome_id[0]);
-			$nome_id = camel_case(implode('_', $nome_id));
+			$nome_id = studly_case(implode('_', $nome_id));
 		}
 		if (!$children[$nome_id]) {
 			$nome_id = str_plural($nome_id);
