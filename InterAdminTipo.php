@@ -988,7 +988,7 @@ class InterAdminTipo extends InterAdminAbstract {
 					$childrenArrParts = array_pad($childrenArrParts, 4, '');
 				}
 				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), $childrenArrParts);
-				$nome_id = studly_case($child['nome']);
+				$nome_id = studly_case(to_slug($child['nome']));
 				$children[$nome_id] = $child;
 			}
 			$this->_setMetadata('children', $children);
