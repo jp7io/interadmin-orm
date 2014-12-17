@@ -71,7 +71,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				if ($match[1]) {
 					$options['limit'] = 1;
 				}
-				$retorno = $this->find($options);
+				$retorno = $this->deprecatedFind($options);
 				return ($match[1]) ? $retorno[0] : $retorno;
 			}
 		}
@@ -204,8 +204,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, class.
 	 * @return array Array of InterAdminTipo objects.
+	 * @deprecated
 	 */
-	public function getChildren($options = array()) {
+	public function getChildren($deprecated, $options = array()) {
+		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
+			throw new Exception("Use children()->all() instead.");			
+		}
+
 		$this->_whereArrayFix($options['where']); // FIXME
 				
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
@@ -239,57 +244,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function children() {
 		return new \Jp7\Interadmin\TipoOptions($this);
 	}
-
-	/**
-	 * Gets the first child.
-	 * 
-	 * @param array $options [optional]
-	 * @return InterAdminTipo
-	 */
-	public function getFirstChild($options = array()) {
-		$retorno = $this->getChildren(array('limit' => 1) + $options);
-		return $retorno[0];
-	}
-	/**
-	 * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
-	 * 
-	 * @param string|int	$model_id_tipo	
-	 * @param array $options Default array of options. Available keys: fields, where, order, class.
-	 * @return InterAdminTipo
-	 */
-	public function getFirstChildByModel($model_id_tipo, $options = array()) {
-		$retorno = $this->getChildrenByModel($model_id_tipo, array('limit' => 1) + $options);
-		return $retorno[0];
-	}
-	/**
-	 * Retrieves the first child of this InterAdminTipo with the given "nome"
-	 * 
-	 * @param array $options Default array of options. Available keys: fields, where, order, class.
-	 * @return InterAdminTipo
-	 */
-	public function getFirstChildByNome($nome, $options = array()) {
-		$options['where'][] = "nome = '" . $nome . "'";
-		return $this->getFirstChild($options);
-	}
-	/**
-	 * Retrieves the children of this InterAdminTipo which have the given model_id_tipo.
-	 * 
-	 * @param array $options Default array of options. Available keys: fields, where, order, class.
-	 * @return Array of InterAdminTipo objects.
-	 */
-	public function getChildrenByModel($model_id_tipo, $options = array()) {
-		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		// Necessário enquanto algumas tabelas ainda tem esse campo numérico
-		$options['where'][] = "model_id_tipo != '0'"; 
-		return $this->getChildren($options);
-	}
-
+	
 	/**
 	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
 	public function all() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->find();
+		return $this->deprecatedFind();
 	}
 	
 	public function taggedWith() {
@@ -301,28 +262,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 
 	/**
+	 *
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
 	 * @return InterAdmin[] Array of InterAdmin objects.
+	 * @deprecated
 	 */
-	public function find() {
-		if (func_num_args() > 2) {
-			throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0, 1 or 2 ($id, $options).');
-		}
-		$args = func_get_args();
-		if (is_array(end($args))) {
-			$options = array_pop($args);
-		} else {
-			$options = array();
-		}
-		if (!empty($args)) {
-			$id = array_pop($args);
-			if (is_numeric($id)) {
-				return $this->findById($id, $options);
-			} else {
-				return $this->findByIdSlug($id, $options);
-			}
-		}
-		
+	public function deprecatedFind($options = array()) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
@@ -363,7 +308,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// // $rs->Close();
 		return new Collection($records);
 	}
-	
+
 	public function distinct($column, $options = array()) {
 		return $this->_aggregate('DISTINCT', $column, $options);
 	}
@@ -409,15 +354,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return $array;	
 	}
-	
-	/**
-	 * @deprecated Use find() instead.
-	 * @param array $options
-	 */
-	public function getInterAdmins($options = array()) {
-		return $this->find($options);
-	}
-	
+		
 	/**
 	 * Returns the number of InterAdmins using COUNT(id).
 	 *
@@ -437,23 +374,19 @@ class InterAdminTipo extends InterAdminAbstract {
 		} else {
 			$options['fields'] = array('COUNT(id) AS count_id');
 		}
-		$retorno = $this->findFirst($options);
+		$retorno = $this->findFirst(InterAdmin::DEPRECATED_METHOD, $options);
 		return intval($retorno->count_id);
-	}
-	/**
-	 * @deprecated Use count() instead
-	 * @param unknown $options
-	 */
-	public function getInterAdminsCount($options = array()) {
-		return $this->count($options);
 	}
 	
 	/**
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, class.
 	 * @return InterAdmin 	First InterAdmin object found.
 	 */
-	public function findFirst($options = array()) {
-		return $this->find(array('limit' => 1) + $options)[0];
+	public function findFirst($deprecated, $options = array()) {
+		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
+			throw new Exception("Use first() instead.");
+		}
+		return $this->deprecatedFind(array('limit' => 1) + $options)[0];
 	}
 
 	/**
@@ -466,63 +399,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $this->limit(1)->all()[0];
 	}
 
-	/**
-	 * @deprecated use findFirst() instead.
-	 * @param array $options
-	 * @return InterAdmin
-	 */
-	public function getFirstInterAdmin($options = array()) {
-		return $this->findFirst($options);
-	}
-	/**
-	 * Retrieves the unique record which have this id
-	 * 
-	 * @param int $id Search value.
-	 * @param array $options
-	 * @return InterAdmin 	First InterAdmin object found.
-	 */
-	public function findById($id, $options = array()) {
-		$options['where'][] = "id = " . intval($id);
-		return $this->findFirst($options);
-	}
-	/**
-	 * @deprecated use findById() instead.
-	 * @param int $id
-	 * @param array $options
-	 * @return InterAdmin
-	 */
-	public function getInterAdminById($id, $options = array()) {
-		return $this->findById($id, $options);
-	}
-	/**
-	 * Retrieves the first record which have this id_string
-	 * 
-	 * @param string $id_string Search value.
-	 * @return InterAdmin First InterAdmin object found.
-	 */
-	public function findByIdString($id_string, $options = array()) {
-		$options['where'][] = "id_string = '" . addslashes($id_string) . "'";
-		return $this->findFirst($options);
-	}
-	/**
-	 * Retrieves the first record which have this id_slug
-	 *
-	 * @param string $id_slug Search value.
-	 * @return InterAdmin First InterAdmin object found.
-	 */
-	public function findByIdSlug($id_slug, $options = array()) {
-		$options['where'][] = "id_slug = '" . addslashes($id_slug) . "'";
-		return $this->findFirst($options);
-	}	
-	/**
-	 * @deprecated use findByIdString() instead.
-	 * @param string $id_string
-	 * @param array $options
-	 * @return InterAdmin
-	 */
-	public function getInterAdminByIdString($id_string, $options = array()) {
-		return $this->findByIdString($id_string, $options);
-	}
 	/**
 	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
 	 *
@@ -733,33 +609,6 @@ class InterAdminTipo extends InterAdminAbstract {
     }
     
 	/**
-	 * Returns the names of the parents separated by '/', e.g. 'countries/south-america/brazil'.
-	 * 
-	 * @return string
-	 */
-	public function getTreePath() {
-		global $implicit_parents_names, $seo, $lang;
-		$config = InterSite::config();
-		
-		$url = '';
-		$url_arr = '';
-		$parent = $this;
-		while ($parent) {
-			if ($seo) {
-				if (!in_array($parent->nome, (array)$implicit_parents_names)) {
-					$url_arr[] = toSeo($parent->nome);
-				}
-			} else {
-				$url_arr[] = $parent->nome;
-			}
-			$parent = $parent->getParent();
-		}
-		$url_arr = array_reverse((array)$url_arr);
-
-			$url = $config->url . join("/", $url_arr);
-		return $url;
-	}
-	/**
 	 * Saves this InterAdminTipo.
 	 * @return void
 	 */
@@ -832,7 +681,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of deleted InterAdmins.
 	 */
 	public function deleteInterAdmins($options = array()) {
-		$records = $this->find($options);
+		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
 			$record->delete();
 		}
@@ -846,7 +695,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of deleted InterAdmins.
 	 */
 	public function deleteInterAdminsForever($options = array()) {
-		$records = $this->find($options);
+		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
 			$record->deleteForever();
 		}
@@ -861,7 +710,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of updated InterAdmins.
 	 */
 	public function updateInterAdmins($attributes, $options = array()) {
-		$records = $this->find($options);
+		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
 			$record->updateAttributes($attributes);
 		}
@@ -1075,42 +924,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$child->mostrar = 'S';
 		return $child;
 	}
-	
-	/**
-	 * Returns the InterAdmins having the given tags.
-	 * 
-	 * @param InterAdmin[] $tags
-	 * @param array $options [optional]
-	 * @return InterAdmin[]
-	 */
-	public function findByTags($tags, $options = array()) {
-		if (!is_array($tags)) {
-			$tags = array($tags);
-		}
-		$tagsWhere = array();
-		foreach ($tags as $tag) {
-			if ($tag instanceof InterAdminAbstract) {
-				$tagsWhere[] = $tag->getTagFilters();
-			} elseif (is_numeric($tag)) {
-				$tagsWhere[] = "(tags.id_tipo = " . $tag . " AND tags.id > 0)";
-			}
-		}
-		if (!$tagsWhere) {
-			return array();
-		}		
-		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
-		return $this->find($options);
-	}
-	/**
-	 * @deprecated Use findByTags() instead
-	 * @param InterAdmin[] $tags
-	 * @param array $options
-	 * @return InterAdmin[]
-	 */
-	public function getInterAdminsByTags($tags, $options = array()) {
-		return $this->findByTags($tags, $options); 
-	}
-	
+		
 	/**
 	 * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
 	 * 
@@ -1397,5 +1211,13 @@ class InterAdminTipo extends InterAdminAbstract {
     public function query() {
     	return new \Jp7\Interadmin\Options($this);
     }
+
+	public function find($id) {
+		if (func_num_args() != 1) {
+			throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1 ($id).');
+		}
+		$options = new \Jp7\Interadmin\Options($this);
+		return $options->find($id);
+	}	
     
 }

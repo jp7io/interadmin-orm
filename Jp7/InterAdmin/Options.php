@@ -10,7 +10,7 @@ class Options extends BaseOptions {
 	}
 	
 	protected function _isChar($field) {
-		$aliases = array_flip($this->tipo->getCamposAlias());
+		$aliases = array_flip($this->provider->getCamposAlias());
 		if (isset($aliases[$field])) {
 			return strpos($aliases[$field], 'char_') === 0;
 		} else {
@@ -47,25 +47,31 @@ class Options extends BaseOptions {
 	
 	public function all() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->tipo->find($this->options);
+		return $this->provider->deprecatedFind($this->options);
 	}
 	
 	public function first() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->tipo->findFirst($this->options);
+		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
 	public function count() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->tipo->count($this->options);
+		return $this->provider->count($this->options);
 	}
 	
 	public function find($id) {
 		if (func_num_args() != 1) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1.');
-		if (!is_string($id) && !is_int($id)) {
+		
+		if (is_numeric($id)) {
+			$this->options['where'][] = "id = " . $this->_escapeParam($id);
+		} elseif (is_string($id)) {
+			$this->options['where'][] = "id_slug = " . $this->_escapeParam($id);
+		} else {
 			throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
 		}
-		return $this->tipo->find($id, $this->options);
+
+		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
 	public function findFirst() {
@@ -81,13 +87,13 @@ class Options extends BaseOptions {
 			$params[] = $this->options;
 		}
 		*/		
-		$retorno = call_user_func_array([$this->tipo, $method_name], $params);
+		$retorno = call_user_func_array([$this->provider, $method_name], $params);
 		if ($retorno instanceof self) {
 			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
 			return $this;
 		}
 		throw new BadMethodCallException('Unsupported method ' . $method_name);
-		return $retorno;
+		//return $retorno;
 	}
 	
 }

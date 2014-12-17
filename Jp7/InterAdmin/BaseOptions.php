@@ -1,14 +1,14 @@
 <?php
 
 namespace Jp7\Interadmin;
-use InterAdminTipo, BadMethodCallException;
+use InterAdminTipo, InterAdminAbstract, BadMethodCallException;
 
 abstract class BaseOptions {
-	protected $tipo;
+	protected $provider;
 	protected $options;
 	
-	public function __construct(InterAdminTipo $tipo) {
-		$this->tipo = $tipo;
+	public function __construct(InterAdminAbstract $provider) {
+		$this->provider = $provider;
 		$this->options = array(
 			'fields' => array(),
 			'where' => array()

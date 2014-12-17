@@ -1,6 +1,7 @@
 <?php
 
 namespace Jp7\Interadmin;
+use InterAdmin, BadMethodCallException;
 
 class TipoOptions extends BaseOptions {
 	
@@ -29,13 +30,17 @@ class TipoOptions extends BaseOptions {
 	}
 		
 	public function all() {
-		if (func_num_args() > 0) throw new \BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->tipo->getChildren($this->options);
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
+		return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
 	public function first() {
-		if (func_num_args() > 0) throw new \BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->tipo->getFistChild($this->options);
+		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
+		
+		$this->options['limit'] = 1;
+		
+		$children = $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options);
+		return $children[0];
 	}
 		
 }

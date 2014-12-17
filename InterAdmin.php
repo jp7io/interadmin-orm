@@ -1,13 +1,6 @@
 <?php
-/**
- * JP7's PHP Functions 
- * 
- * Contains the main custom functions and classes.
- * @author JP7
- * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category Jp7
- * @package InterAdmin
- */
+
+use Jp7\Interadmin\Collection;
  
 /**
  * Class which represents records on the table interadmin_{client name}.
@@ -15,6 +8,12 @@
  * @package InterAdmin
  */
 class InterAdmin extends InterAdminAbstract {
+
+	/**
+	 * To be used temporarily with deprecated methods
+	 */
+	const DEPRECATED_METHOD = '54dac5afe1fcac2f65c059fc97b44a58';
+
 	/**
 	 * DEPRECATED: Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
 	 * @var string
@@ -162,14 +161,11 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected function _findChild($nome_id) {
 		$children = $this->getTipo()->getInterAdminsChildren();
-		if (!$children[$nome_id]) {
-			$nome_id = explode('_', snake_case($nome_id));
-			$nome_id[0] = str_plural($nome_id[0]);
-			$nome_id = studly_case(implode('_', $nome_id));
-		}
+		
 		if (!$children[$nome_id]) {
 			$nome_id = str_plural($nome_id);
 		}
+		
 		return $children[$nome_id];
 	}
 	
@@ -202,65 +198,20 @@ class InterAdmin extends InterAdminAbstract {
 				return new \Jp7\Interadmin\EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
 			}
 			return new \Jp7\Interadmin\Options($childrenTipo);
-		// get{ChildName}, getFirst{ChildName} and get{ChildName}ById
-		} elseif (strpos($methodName, 'get') === 0) {
-			// getFirst{ChildName}
-			if (strpos($methodName, 'getFirst') === 0) {
-				$nome_id = substr($methodName, strlen('getFirst'));
-				if ($child = $this->_findChild($nome_id)) {
-					return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
-				}
-			// get{ChildName}ById
-			} elseif (substr($methodName, -4) == 'ById') {
-				$nome_id = substr($methodName, strlen('get'), -strlen('ById'));
-				if ($child = $this->_findChild($nome_id)) {
-					$options = (array) $args[1];
-					$options['where'][] = "id = " . intval($args[0]);
-					return $this->getFirstChild($child['id_tipo'], $options);
-				}
-			// get{ChildName}Count
-			} elseif (substr($methodName, -5) == 'Count') {
-				$nome_id = substr($methodName, strlen('get'), -strlen('Count'));
-				if ($child = $this->_findChild($nome_id)) {
-					return $this->getChildrenCount($child['id_tipo'], (array) $args[0]);
-				}
-			// get{ChildName}
-			} else {
-				$nome_id = substr($methodName, strlen('get'));
-				if ($child = $this->_findChild($nome_id)) {
-					return $this->getChildren($child['id_tipo'], (array) $args[0]);
-				}
-			}
-		// create{ChildName}
-		} elseif (strpos($methodName, 'create') === 0) {
-			$nome_id = substr($methodName, strlen('create')); 
-			if ($child = $this->_findChild($nome_id)) {
-				return $this->createChild($child['id_tipo'], (array) $args[0]);
-			}
-		// delete{ChildName}
-		} elseif (strpos($methodName, 'delete') === 0) {
-			$nome_id = substr($methodName, strlen('delete'));
-			if ($child = $this->_findChild($nome_id)) {
-				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
-			}
+		} elseif ($methodName === 'arquivos' && $this->getTipo()->arquivos) {
+			return new \Jp7\Interadmin\ArquivoOptions($this);
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
 		$children = $this->getTipo()->getInterAdminsChildren();
-		$patterns = array(
-			'get{ChildName}',
-			'getFirst{ChildName}',
-			'get{ChildName}ById',
-			'get{ChildName}ByIdString',
-			'get{ChildName}Count',
-			'create{ChildName}',
-			'delete{ChildName}'				
-		);
+		
 		foreach (array_keys($children) as $childName) {
-			foreach ($patterns as $pattern) {
-				$message .= "\t\t- " . str_replace('{ChildName}', $childName, $pattern) . "\n";
-			}
+			$message .= "\t\t- " . lcfirst($childName) . "()\n";
 		}
+		if ($this->getTipo()->arquivos) {
+			$message .= "\t\t- arquivos()\n";
+		}
+
 		die(jp7_debug($message));
 	}
 	/**
@@ -367,16 +318,7 @@ class InterAdmin extends InterAdminAbstract {
 		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
 		$this->_parent = $parent;
 	}
-	/**
-	 * Creates and returns a child record. 
-	 * 
-	 * @param int $id_tipo
-	 * @param array $attributes Attributes to be merged into the new record.
-	 * @return 
-	 */
-	public function createChild($id_tipo, array $attributes = array()) {
-		return $this->getChildrenTipo($id_tipo)->createInterAdmin($attributes);
-	}
+
 	/**
 	 * Instantiates an InterAdminTipo object and sets this record as its parent.
 	 * 
@@ -393,33 +335,6 @@ class InterAdmin extends InterAdminAbstract {
 		$childrenTipo->setParent($this);
 		return $childrenTipo;
 	}
-	/**
-	 * Retrieves this record´s children for the given $id_tipo.
-	 * 
-	 * @param int $id_tipo
-	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
-	 * @return array Array of InterAdmin objects.
-	 */
-	public function getChildren($id_tipo, $options = array()) {
-		$children = array();
-		if ($id_tipo) {
-			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
-			$children = $this->getChildrenTipo($id_tipo)->find($options);
-		}
-		return $children;
-	}
-	/**
-	 * Returns the number of children using COUNT(id).
-	 * 
-	 * @param int $id_tipo
-	 * @param array $options Default array of options. Available keys: where.
-	 * @return int Count of InterAdmins found.
-	 */
-	public function getChildrenCount($id_tipo, $options = array()) {
-		$options['fields'] = array('COUNT(DISTINCT id)');
-		$retorno = $this->getFirstChild($id_tipo, $options);
-		return intval($retorno->count_distinct_id);
-	}
 
 	/**
 	 * Returns siblings records
@@ -430,58 +345,6 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->getTipo()->whereNot(['id' => $this->id]);
 	}
 
-	/**
-	 * Returns the first Child.
-	 * 
-	 * @param int $id_tipo
-	 * @param array $options [optional]
-	 * @return InterAdmin
-	 */
-	public function getFirstChild($id_tipo, $options = array()) {
-		$retorno = $this->getChildren($id_tipo, array('limit' => 1) + $options);
-		return $retorno[0];	
-	}
-	/**
-	 * Returns the first Child by ID.
-	 * 
-	 * @param int $id_tipo
-	 * @param int $id
-	 * @param array $options [optional]
-	 * @return InterAdmin
-	 */
-	public function getChildById($id_tipo, $id, $options = array()) {
-		$options['limit'] = 1;
-		$options['where'][] = "id = " . intval($id);
-		$retorno = $this->getChildren($id_tipo, $options);
-		return $retorno[0];	
-	}
-	/**
-	 * Deletes all the children of a given $id_tipo.
-	 * 
-	 * @param int $id_tipo
-	 * @param array $options [optional]
-	 * @return int Number of deleted children.
-	 */
-	public function deleteChildren($id_tipo, $options = array()) {
-		$children = $this->getChildren($id_tipo, $options);
-		foreach ($children as $child) {
-			$child->delete();
-		}
-		return count($children);
-	}
-	/**
-	 *  Deletes the children of a given $id_tipo forever.
-	 *  
-	 * @param int $id_tipo
-	 * @param array $options [optional]
-	 * @return int Count of deleted InterAdmins.
-	 */
-	public function deleteChildrenForever($id_tipo, $options = array()) {
-		if ($id_tipo) {
-			$tipo = $this->getChildrenTipo($id_tipo);
-			return $tipo->deleteInterAdminsForever($options);
-		}
-	}
 	/**
 	 * Creates a new InterAdminArquivo with id_tipo, id and mostrar set.
 	 * 
@@ -505,8 +368,13 @@ class InterAdmin extends InterAdminAbstract {
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, limit.
 	 * @return array Array of InterAdminArquivo objects.
+	 * @deprecated 
 	 */
-	public function getArquivos($options = array()) {
+	public function getArquivos($deprecated, $options = array()) {
+		if ($deprecated != self::DEPRECATED_METHOD) {
+			throw new Exception("Use arquivos()->all() instead.");
+		}
+
 		$arquivos = array();
 		
 		$className = (class_exists($options['class'])) ? $options['class'] : static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
@@ -546,13 +414,9 @@ class InterAdmin extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $arquivo, $options);
 			$arquivos[] = $arquivo;
 		}
-		return $arquivos;
+		return new Collection($arquivos);
 	}
 	
-	public function getFirstArquivo($options = array()) {
-		$retorno = $this->getArquivos($options + array('limit' => 1));
-		return $retorno[0];
-	}
 	/**
 	 * Deletes all the InterAdminArquivo records related with this record.
 	 * 
@@ -573,8 +437,7 @@ class InterAdmin extends InterAdminAbstract {
 		$log->setTipo($this->getTipo());
 		return $log;
 	}
-	
-	
+		
 	/**
 	 * Return URL from the route associated with this record.
 	 * 
@@ -648,6 +511,7 @@ class InterAdmin extends InterAdminAbstract {
 		$filteredAttributes = array_intersect_key($attributes, $editableFields);
 		return $this->setAttributes($filteredAttributes);
 	}
+	
 	/**
 	 * Sets the tags for this record. It DELETES the previous records.
 	 * 
