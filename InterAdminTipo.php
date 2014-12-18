@@ -394,7 +394,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function first() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->limit(1)->all()[0];
+
+		$result = $this->limit(1)->all();
+		return count($result) ? $result[0] : null;
 	}
 
 	/**
@@ -486,10 +488,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		$aliases = array();
 		$update = false;
 		foreach ((array) $fields as $field) {
-			if ($campos[$field]['nome_id']) {
+			if (@$campos[$field]['nome_id']) {
 				$aliases[$field] = $campos[$field]['nome_id'];
 			} else {
-				$alias = $campos[$field]['nome'];
+				$alias = @$campos[$field]['nome'];
 				if (is_object($alias)) {
 					if ($campos[$field]['label']) {
 					 	$alias = $campos[$field]['label'];

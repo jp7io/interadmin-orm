@@ -93,7 +93,7 @@ class InterAdmin extends InterAdminAbstract {
 			) {
 				throw new Jp7_InterAdmin_Exception('Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
 			}
-			return null;
+			return $null; // Needs to be variable to be returned as reference
 		}
 	}
 	
@@ -160,11 +160,9 @@ class InterAdmin extends InterAdminAbstract {
 	protected function _findChild($nome_id) {
 		$children = $this->getTipo()->getInterAdminsChildren();
 		
-		if (!$children[$nome_id]) {
-			$nome_id = str_plural($nome_id);
+		if (isset($children[$nome_id])) {
+			return $children[$nome_id];
 		}
-		
-		return $children[$nome_id];
 	}
 	
 	public function getChildrenTipoByNome($nome_id) {
@@ -325,7 +323,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
-		if (!$options['db_prefix']) {
+		if (empty($options['db_prefix'])) {
 			$options['db_prefix'] = $this->getTipo()->db_prefix;
 		}
 		$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';

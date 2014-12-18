@@ -1,6 +1,7 @@
 <?php
 
 namespace Jp7\Laravel;
+use Blade;
 
 class Temp {
 	
@@ -31,10 +32,13 @@ class Temp {
 	*/
 
 	public static function extendBlade() {
-		\Blade::extend(function($view, $compiler) {
+		Blade::extend(function($view, $compiler) {
 			// @include with partials/_partial instead of partials/partial			
 		    $pattern = '/(?<!\w)(\s*)@include(\s*\((.*)\.)/';
 		    return preg_replace($pattern, '$1@include$2_', $view);
 		});
+		
+		Blade::setEscapedContentTags('{{', '}}');
+    	Blade::setContentTags('{!!', '!!}');
 	}
 }

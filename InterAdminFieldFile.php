@@ -50,7 +50,7 @@ class InterAdminFieldFile {
 		} elseif ($parent = $this->getParent()) {
 			$retorno = $parent->getNome();
 		}
-		return retorno;
+		return $retorno;
 	}
 	/**
      * Returns $parent.

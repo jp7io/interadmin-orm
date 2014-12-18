@@ -50,7 +50,7 @@ abstract class InterAdminAbstract implements Serializable {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
 		} else {
-			return null;
+			return $null;
 		}
 	}
 	/**
@@ -580,20 +580,22 @@ abstract class InterAdminAbstract implements Serializable {
 				$len = strlen($termo);
 				$table = 'main';
 				if (strpos($termo, '.') !== false) {
-					list($table, $termo, $subtermo) = explode('.', $termo);
+					@list($table, $termo, $subtermo) = explode('.', $termo);
 				}
 				if ($table === 'main') {
 					$campo = isset($aliases[$termo]) ? $aliases[$termo] : $termo;
 				} else {
-					$childrenArr = $childrenArr ?: $this->getInterAdminsChildren();
-					
+					if (!isset($childrenArr)) {
+						$childrenArr = $this->getInterAdminsChildren();
+					}
+
 					// Joins com children
 					if (strpos($table, 'children_') === 0) {
 						$joinNome = studly_case(substr($table, 9));
 					} else {
 						$joinNome = studly_case($table);
 					}
-					if ($childrenArr[$joinNome]) {
+					if (isset($childrenArr[$joinNome])) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
@@ -617,7 +619,7 @@ abstract class InterAdminAbstract implements Serializable {
 					} else {
 						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
-						if ($options['joins'] && $options['joins'][$table]) {
+						if (isset($options['joins']) && $options['joins'][$table]) {
 							$joinTipo = $options['joins'][$table][1];
 						} else {
 							if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
@@ -637,7 +639,7 @@ abstract class InterAdminAbstract implements Serializable {
 						if (!in_array($subtable, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $subtable;
 							$options['from'][] = $subJoinTipo->getInterAdminsTableName() .
-							' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] . ' AND ' . $subtable . '.id_tipo = ' . $subJoinTipo->id_tipo;
+								' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] . ' AND ' . $subtable . '.id_tipo = ' . $subJoinTipo->id_tipo;
 						}
 						$table = $subtable;
 						$termo = $subtermo;
@@ -819,7 +821,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$join = ($fields[$table]) ? $fields[$table] : $table;
 				$joinTipo = $this->getCampoTipo($campos[$join]);
 				
-				if (!$joinTipo && $options['joins'][$table]) {
+				if (!$joinTipo && @$options['joins'][$table]) {
 					// Joins no options
 					list($_joinType, $joinTipo, $_on) = $options['joins'][$table];
 					if (!is_object($attributes[$table])) {
