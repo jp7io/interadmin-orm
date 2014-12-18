@@ -339,7 +339,7 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 		
 		if ($isMulti) {
-			$value_arr = array_filter(explode(',', $value), 'boolval');
+			$value_arr = array_filter(explode(',', $value));
 			foreach ($value_arr as $key2 => $value2) {
 				if ($value2 && is_numeric($value2)) {
 					if ($isTipo) {
