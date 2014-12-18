@@ -92,8 +92,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array		$options 	[optional] Default array of options. Available keys: db_prefix, fields.
 	 */
 	public function __construct($id_tipo = null, $options = array()) {
-		$config = InterSite::config();
-
 		if (is_null($id_tipo) || is_array($id_tipo)) {
 			$options = (array) $id_tipo;
 			$id_tipo = static::ID_TIPO;
@@ -101,7 +99,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// id_tipo must be a string, because in_array will not work with integers and an array of objects
 		$id_tipo = (string) $id_tipo;
 		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
-		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
+		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : InterSite::config()->db->prefix;
 		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
 		if (!empty($options['fields'])) {

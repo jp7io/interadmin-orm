@@ -65,11 +65,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
 	 */
 	public function __construct($id = '0', $options = array()) {
-		$config = InterSite::config();
-		
 		$id = (string) $id;
 		$this->id = is_numeric($id) ? $id : '0';
-		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : $config->db->prefix;
+		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : InterSite::config()->db->prefix;
 		$this->table = isset($options['table']) ? '_' . $options['table'] : '';
 		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
@@ -848,5 +846,13 @@ class InterAdmin extends InterAdminAbstract {
 	
 	public function setEagerLoad($key, $data) {
 		$this->_eagerLoad[$key] = $data;
+	}
+
+	/**
+	 * Returns varchar_key using its alias, without loading it from DB again
+	 */
+	public function getNome() {
+		$varchar_key_alias = $this->getTipo()->getCamposAlias('varchar_key');
+		return $this->$varchar_key_alias;
 	}
 }

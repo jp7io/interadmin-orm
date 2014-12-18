@@ -32,14 +32,10 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @param int $id_arquivo This record's 'id_arquivo'.
 	 * @param array $options Default array of options. Available keys: db_prefix, fields.
 	 */
-	public function __construct($id_arquivo = 0, $options = array()) {
+	public function __construct($id_arquivo = '0', $options = array()) {
 		$this->id_arquivo = $id_arquivo;
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
-		
-		if ($options['fields']) {
-			$this->getFieldsValues($options['fields']);
-		}
+		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : InterSite::config()->db->prefix;
+		$this->_db = isset($options['db']) ? $options['db'] : null;
 	}
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
@@ -101,7 +97,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getText() {
-		return isospecialchars($this->getFieldsValues('legenda'));
+		return $this->legenda;
 	}
 	/**
 	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
@@ -131,7 +127,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder = $upload_root . to_slug($parent->getTipo()->getFieldsValues('nome'), '') . '/';
+		$folder = $upload_root . to_slug($parent->getTipo()->nome, '') . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
@@ -156,7 +152,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			throw new Exception($msg);
 		}
 		
-		$clientSideFolder = '../../upload/' . to_slug($parent->getTipo()->getFieldsValues('nome'), '') . '/';
+		$clientSideFolder = '../../upload/' . to_slug($parent->getTipo()->nome, '') . '/';
 		$this->url = $clientSideFolder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
 		// Movendo o thumb
