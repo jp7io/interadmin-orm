@@ -26,12 +26,14 @@ class Router extends \Illuminate\Routing\Router {
 					$this->createDynamicRoutes($subsection, $currentPath, false);
 				}
 			} else {
-				$this->group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], function() use ($section, $subsections, $currentPath) {
-					//$currentPath[] = $section->getSlug();
-					foreach ($subsections as $subsection) {
-						$this->createDynamicRoutes($subsection, $currentPath, false);
-					}
-				});
+				$this->logger->updateGroupStack(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()]);
+
+				//$currentPath[] = $section->getSlug();
+				foreach ($subsections as $subsection) {
+					$this->createDynamicRoutes($subsection, $currentPath, false);
+				}
+
+				$this->logger->popGroupStack();
 			}
 		}
 		if (!$section->isRoot()) {
@@ -48,6 +50,14 @@ class Router extends \Illuminate\Routing\Router {
 		}
 	}
 	
+	public function updateGroupStack(array $attributes)  {
+		return parent::updateGroupStack($attributes);
+	}
+
+	public function popGroupStack() {
+		array_pop($this->groupStack);
+	}
+
 	public function resource($name, $controller, array $options = array()) {
 		if (isset($options['id_tipo'])) {
 			// Saving routes for each id_tipo
