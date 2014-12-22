@@ -1,33 +1,50 @@
 <?php
 
 namespace Jp7\Laravel;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
+use Jp7\MethodLogger;
 
 class Router extends \Illuminate\Routing\Router {
 	
 	protected $mapIdTipos = [];
-	
-	public function createDynamicRoutes($section, $currentPath = []) {
+	protected $logger;
+
+	public function __construct(Dispatcher $events, Container $container = null) {
+		$this->logger = new MethodLogger($this);
+		return parent::__construct($events, $container);
+	}
+
+	public function createDynamicRoutes($section, $currentPath = [], $firstCall = true) {
+		if ($firstCall && \Cache::has('Interadmin.routes')) {
+			$this->logger->_replay(\Cache::get('Interadmin.routes'));
+			return;
+		}
 		if ($subsections = $section->getChildrenMenu()) {
 			if ($section->isRoot()) {
 				foreach ($subsections as $subsection) {
-					$this->createDynamicRoutes($subsection, $currentPath);
+					$this->createDynamicRoutes($subsection, $currentPath, false);
 				}
 			} else {
 				$this->group(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()], function() use ($section, $subsections, $currentPath) {
 					//$currentPath[] = $section->getSlug();
 					foreach ($subsections as $subsection) {
-						$this->createDynamicRoutes($subsection, $currentPath);
+						$this->createDynamicRoutes($subsection, $currentPath, false);
 					}
 				});
 			}
 		}
 		if (!$section->isRoot()) {
 			// Somente para debug na barra do laravel
-			$this->resource($section->getSlug(), $section->getControllerBasename(), [
+			$this->logger->resource($section->getSlug(), $section->getControllerBasename(), [
 				'only' => ['index', 'show'],
 				'id_tipo' => $section->id_tipo,
 				'dynamic' => $this->_checkTemplate($section) ? '|dynamic' : ''						
 			]);
+		}
+		if ($firstCall) {
+			// save cache after running all routes
+			\Cache::put('Interadmin.routes', $this->logger->_getLog(), 60);
 		}
 	}
 	
@@ -42,9 +59,8 @@ class Router extends \Illuminate\Routing\Router {
 			$before = 'setTipo:' . $options['id_tipo'] . $dynamic;
 			
 			$this->group(['before' => $before], function() use ($name, $controller, $options) {
-					parent::resource($name, $controller, $options);
-				}
-			);
+				parent::resource($name, $controller, $options);
+			});
 		} else {
 			parent::resource($name, $controller, $options);
 		}

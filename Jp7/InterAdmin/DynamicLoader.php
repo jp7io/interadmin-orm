@@ -3,8 +3,8 @@
 namespace Jp7\InterAdmin;
 
 class DynamicLoader {
-	private static $classMap = [];
-	private static $classTipoMap = [];
+	private static $classMap;
+	private static $classTipoMap;
 
 	// Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
 	public static function load($class) {
@@ -40,7 +40,7 @@ class DynamicLoader {
 				),
 				'class' => 'stdClass'
 			));
-			
+
 			foreach ($tipos as $tipo) {
 				$attr = &$tipo->attributes;
 				if ($attr['class']) {
