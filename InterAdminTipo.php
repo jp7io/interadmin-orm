@@ -125,28 +125,19 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
 	public static function getInstance($id_tipo, $options = array()) {
-		if (empty($options['default_class'])) {
-			$options['default_class'] = self::$_defaultClass;
-		}
 		if (isset($options['class'])) {
 			// Classe foi forçada
-			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
+			$classTipo = $options['class'];
 		} else {
-			// Classe não foi forçada, cria uma instância temporária para acessar o DB e verificar a classe correta
-			$instance = new $options['default_class']($id_tipo, array_merge($options, array(
-				'fields' => array('class_tipo')
-			)));
-			$class_name = $instance->class_tipo;
-			// Classe não é customizada, retornar a própria classe temporária
-			if (!$class_name || !class_exists($class_name)) {
-				if (isset($options['fields'])) {
-					$instance->loadAttributes($options['fields'], false);
-				}
-				return $instance;
+			// Classe não foi forçada, verificar classMap
+			$cm = \Jp7\InterAdmin\ClassMap::getInstance();
+			$classTipo = $cm->getClassTipo($id_tipo);
+			if (!$classTipo) {
+				$classTipo = isset($options['default_class']) ? $options['default_class'] : self::$_defaultClass;
 			}
 		}
 		// Classe foi encontrada, instanciar o objeto
-		return new $class_name($id_tipo, $options);
+		return new $classTipo($id_tipo, $options);
 	}
 	/*
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {

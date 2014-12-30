@@ -1,6 +1,7 @@
 <?php
 
 use Jp7\Interadmin\Collection;
+use Jp7\Interadmin\ClassMap;
  
 /**
  * Class which represents records on the table interadmin_{client name}.
@@ -115,41 +116,24 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param InterAdminTipo Set the record´s Tipo.
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
-	public static function getInstance($id, $options = array(), InterAdminTipo $tipo = null) {
-		$optionsWithoutFields = array_merge($options, array('fields' => array()));
-		
-		// Default Class
-		if (empty($options['default_class'])) {
-			$options['default_class'] = 'InterAdmin';
-		}
-		// Classe não foi forçada, descobrir a classe do Tipo
-		if (empty($options['class'])) {
-			if (!$tipo) {
-				$instance = new $options['default_class']($id, $optionsWithoutFields);
-				$tipo = $instance->getTipo();
-			}
-			$options['class'] = $tipo->class;
-		}
-		// Classe foi descoberta
-		if (!empty($instance) && $options['class'] == get_class($instance)) {
-			// Classe do objeto temporário já está correta
-			$finalInstance = $instance;
+	public static function getInstance($id, $options = array(), InterAdminTipo $tipo) {
+		// Classe foi forçada
+		if (isset($options['class'])) {
+			$class_name = $options['class'];
 		} else {
-			// Classe é outra
-			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
-			$finalInstance = new $class_name($id, $optionsWithoutFields);
+			$cm = ClassMap::getInstance();
+			$class_name = $cm->getClass($tipo->id_tipo);
+			if (!$class_name) {
+				$class_name = isset($options['default_class']) ? $options['default_class'] : 'InterAdmin';
+			}
 		}
-		if ($tipo) {
-			$finalInstance->setTipo($tipo);
-			$finalInstance->db_prefix = $tipo->db_prefix;
-			$finalInstance->setDb($tipo->getDb());
-		}
-		// Fields
-		if (!empty($options['fields'])) {
-			$finalInstance->_resolveWildcard($options['fields'], $finalInstance);
-			$finalInstance->loadAttributes($options['fields'], $options['fields_alias']);
-		}
-		return $finalInstance;
+
+		$instance = new $class_name($id, $options);
+		$instance->setTipo($tipo);
+		$instance->db_prefix = $tipo->db_prefix;
+		$instance->setDb($tipo->getDb());
+		
+		return $instance;
 	}
 	/**
 	 * Finds a Child Tipo by a camelcase keyword. 
@@ -247,11 +231,12 @@ class InterAdmin extends InterAdminAbstract {
 	}
 
 	public static function tipo() {
-		return \InterAdminTipo::findFirstTipo(array(
-			'where' => array(
-				"class = '" . get_called_class() . "'"
-			)
-		));
+		$cm = ClassMap::getInstance();
+
+		$id_tipo = $cm->getClassIdTipo(get_called_class());
+		if ($id_tipo) {
+			return \InterAdminTipo::getInstance($id_tipo);
+		}
 	}
 
 	/**
