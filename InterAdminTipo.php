@@ -199,10 +199,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
 			throw new Exception("Use children()->all() instead.");			
 		}
-
+		
 		$this->_whereArrayFix($options['where']); // FIXME
-				
-		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+		
+		if (empty($options['fields'])) {
+			$options['fields'] = $this->getAttributesNames();
+		} else {
+			$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+		}
 		$options['from'] = $this->getTableName() . " AS main";
 		$options['where'][] = "parent_id_tipo = " . $this->id_tipo;
 	 	if (empty($options['order'])) {
