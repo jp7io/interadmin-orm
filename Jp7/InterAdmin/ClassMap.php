@@ -65,11 +65,11 @@ class ClassMap {
 	}
 
 	public function getClass($id_tipo) {
-		return $this->classes[$id_tipo];
+		return isset($this->classes[$id_tipo]) ? $this->classes[$id_tipo] : null;
 	}
 
 	public function getClassTipo($id_tipo) {
-		return $this->classesTipos[$id_tipo];
+		return isset($this->classesTipos[$id_tipo]) ? $this->classesTipos[$id_tipo] : null;
 	}
 
 }

@@ -103,7 +103,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
 		if (!empty($options['fields'])) {
-			$this->loadAttributes($options['fields'], false);
+			throw new Exception('Deprecated __construct with $options[fields]');
 		}
 	}
 	public function &__get($attributeName) {
@@ -113,7 +113,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->loadAttributes($this->getAttributesNames(), false);
 			return $this->attributes[$attributeName];
 		}
-		return null;
+		return $null; // Needs to be variable to be returned as reference
 	}
 	/**
 	 * Returns an InterAdminTipo instance. If $options['class'] is passed, 
@@ -379,7 +379,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
 			throw new Exception("Use first() instead.");
 		}
-		return $this->deprecatedFind(array('limit' => 1) + $options)[0];
+		return $this->deprecatedFind(array('limit' => 1) + $options)->first();
 	}
 
 	/**
@@ -389,9 +389,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function first() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-
-		$result = $this->limit(1)->all();
-		return count($result) ? $result[0] : null;
+		
+		return $this->limit(1)->all()->first();
 	}
 
 	/**
@@ -479,26 +478,30 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 			return $aliases;
 		}
+		
 		$campos = $this->getCampos();
 		$aliases = array();
 		$update = false;
+		
 		foreach ((array) $fields as $field) {
-			if (@$campos[$field]['nome_id']) {
-				$aliases[$field] = $campos[$field]['nome_id'];
-			} else {
-				$alias = @$campos[$field]['nome'];
-				if (is_object($alias)) {
-					if ($campos[$field]['label']) {
-					 	$alias = $campos[$field]['label'];
-					} else {
-						$alias = $alias->nome;	
+			if (isset($campos[$field])) {
+				if ($campos[$field]['nome_id']) {
+					$aliases[$field] = $campos[$field]['nome_id'];
+				} else {
+					$alias = $campos[$field]['nome'];
+					if (is_object($alias)) {
+						if ($campos[$field]['label']) {
+						 	$alias = $campos[$field]['label'];
+						} else {
+							$alias = $alias->nome;	
+						}
 					}
+					$alias = ($alias) ? to_slug($alias, '_') : $field;
+					$aliases[$field] = $alias;
+					// Cache
+					$update = true;
+					$campos[$field]['nome_id'] = $alias; 
 				}
-				$alias = ($alias) ? to_slug($alias, '_') : $field;
-				$aliases[$field] = $alias;
-				// Cache
-				$update = true;
-				$campos[$field]['nome_id'] = $alias; 
 			}
 		}
 		if ($update) {
@@ -868,7 +871,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$alias = false;
 		}
 		$campos = $this->getCampos();
-		$campoTipo = $this->getCampoTipo($campos[$campoNome]);
+		$campoTipo = isset($campos[$campoNome]) ? $this->getCampoTipo($campos[$campoNome]) : null;
 		if ($campoTipo instanceof InterAdminTipo) {
 			return array(
 				'type' => 'select',

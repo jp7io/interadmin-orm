@@ -72,9 +72,8 @@ class InterAdmin extends InterAdminAbstract {
 		$this->table = isset($options['table']) ? '_' . $options['table'] : '';
 		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
-		if ($options['fields'] && $this->id) {
-			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
-			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
+		if (!empty($options['fields'])) {
+			throw new Exception('Deprecated __construct with $options[fields]');
 		}
 	}
 
@@ -357,17 +356,16 @@ class InterAdmin extends InterAdminAbstract {
 		}
 
 		$arquivos = array();
-		
-		$className = (class_exists($options['class'])) ? $options['class'] : static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
+		if (isset($options['class'])) {
+			$className = $options['class'];
+		} else {
+		 	$className = static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
+		}
 		$arquivoModel = new $className(0);
 		$arquivoModel->setTipo($this->getTipo());
 		
-		if (!$options['fields']) {
-			$defaultFields = '*';
-			if (strpos($defaultFields, ',') !== false) {
-				$defaultFields = explode(',', $defaultFields);
-			}
-			$options['fields'] = $defaultFields;
+		if (empty($options['fields'])) {
+			$options['fields'] = '*';
 		}
 		
 		$this->_resolveWildcard($options['fields'], $arquivoModel);
@@ -377,7 +375,7 @@ class InterAdmin extends InterAdminAbstract {
 		$options['from'] = $arquivoModel->getTableName() . " AS main";
 		$options['where'][] = "id_tipo = " . intval($this->id_tipo);
 		$options['where'][] = "id = " . intval($this->id);
-		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . ' ordem';
+		$options['order'] = (isset($options['order']) ? $options['order'] . ',' : '') . ' ordem';
 		// Internal use
 		$options['aliases'] = $arquivoModel->getAttributesAliases();
 		$options['campos'] = $arquivoModel->getAttributesCampos();

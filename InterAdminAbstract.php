@@ -609,7 +609,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					} elseif ($table == 'tags') {
-						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
+						if ($offset > $ignoreJoinsUntil && (empty($options['from_alias']) || !in_array($table, $options['from_alias']))) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
 							" ON " . $table . ".parent_id = main.id";
@@ -617,7 +617,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinAliases = array();
 					// Joins normais
 					} else {
-						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
+						$joinNome = isset($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
 						if (isset($options['joins']) && $options['joins'][$table]) {
 							$joinTipo = $options['joins'][$table][1];
@@ -645,7 +645,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$termo = $subtermo;
 						$joinAliases = array_flip($subJoinTipo->getCamposAlias());
 					}
-					$campo = ($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
+					$campo = isset($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
 				}
 				$termo = $table . '.' . $campo;
 				$clause = substr_replace($clause, $termo, $pos, $len);
@@ -818,10 +818,10 @@ abstract class InterAdminAbstract implements Serializable {
 				$attributes[$alias] = $value;
 			} else {
 				$joinAlias = '';
-				$join = ($fields[$table]) ? $fields[$table] : $table;
-				$joinTipo = $this->getCampoTipo($campos[$join]);
+				$join = isset($fields[$table]) ? $fields[$table] : $table;
+				$joinTipo = isset($campos[$join]) ? $this->getCampoTipo($campos[$join]) : null;
 				
-				if (!$joinTipo && @$options['joins'][$table]) {
+				if (!$joinTipo && !empty($options['joins'][$table])) {
 					// Joins no options
 					list($_joinType, $joinTipo, $_on) = $options['joins'][$table];
 					if (!is_object($attributes[$table])) {
@@ -838,7 +838,7 @@ abstract class InterAdminAbstract implements Serializable {
 					}
 				}
 				
-				if (is_object($attributes[$table])) {
+				if (isset($attributes[$table]) && is_object($attributes[$table])) {
 					$subobject = $attributes[$table];
 					$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
 					$value = $this->_getByForeignKey($value, $field, @$joinCampos[$field], $subobject);

@@ -38,9 +38,7 @@ class TipoOptions extends BaseOptions {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		
 		$this->options['limit'] = 1;
-		
-		$children = $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options);
-		return $children[0];
+		return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
 	}
 		
 }

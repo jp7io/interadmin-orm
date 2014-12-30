@@ -23,8 +23,7 @@ class ArquivoOptions extends BaseOptions {
 	public function first() {
 		$this->options['limit'] = 1;
 		
-		$arquivos = $this->provider->getArquivos(InterAdmin::DEPRECATED_METHOD, $this->options);
-		return $arquivos[0];
+		return $this->provider->getArquivos(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
 	}
 		
 }
