@@ -257,7 +257,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$records = array();
 		foreach ($rs as $row) {
-			$record = InterAdmin::getInstance($row->id, $optionsInstance, $this);
+			$_id = isset($row->id) ? $row->id : null;
+			$record = InterAdmin::getInstance($_id, $optionsInstance, $this);
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
 			}
@@ -342,18 +343,19 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
 			throw new Exception("Use records()->count() instead.");
 		}
-		if ($options['group'] == 'id') {
+		if (empty($options['group'])) {
+			$options['fields'] = array('COUNT(id) AS count_id');
+		} elseif ($options['group'] == 'id') {
 			// O COUNT() precisa trazer a contagem total em 1 linha
 			// Caso exista GROUP BY id, ele traria em várias linhas
 			// Esse é um tratamento especial apenas para o ID
 			$options['fields'] = array('COUNT(DISTINCT id) AS count_id');
 			unset($options['group']);
-		} elseif ($options['group']) {
+		} else {
 			// Se houver GROUP BY com outro campo, retornará a contagem errada
 			throw new Exception("GROUP BY is not supported when using count().");
-		} else {
-			$options['fields'] = array('COUNT(id) AS count_id');
 		}
+
 		$retorno = $this->findFirst(InterAdmin::DEPRECATED_METHOD, $options);
 		return intval($retorno->count_id);
 	}
