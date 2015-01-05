@@ -326,7 +326,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminOptions
 	 */
 	public function siblings() {
-		return $this->getTipo()->whereNot(['id' => $this->id]);
+		return $this->getTipo()->records()->whereNot(['id' => $this->id]);
 	}
 
 	/**
@@ -335,7 +335,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $attributes [optional]
 	 * @return InterAdminArquivo
 	 */
-	public function createArquivo(array $attributes = array()) {
+	public function deprecated_createArquivo(array $attributes = array()) {
 		$className = static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
 		if (!class_exists($className)) {
 			$className = 'InterAdminArquivo';
@@ -406,7 +406,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return int Number of deleted arquivos.
 	 */
-	public function deleteArquivos($options = array()) {
+	public function deprecated_deleteArquivos($options = array()) {
 		$arquivos = $this->getArquivos($options);
 		foreach ($arquivos as $arquivo) {
 			$arquivo->delete();
@@ -414,7 +414,7 @@ class InterAdmin extends InterAdminAbstract {
 		return count($arquivos);
 	}
 	
-	public function createLog(array $attributes = array()) {
+	public function deprecated_createLog(array $attributes = array()) {
 		$log = InterAdminLog::create($attributes);
 		$log->setParent($this);
 		$log->setTipo($this->getTipo());
@@ -489,7 +489,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $attributes
 	 * @return void
 	 */
-	public function setAttributesSafely(array $attributes) {
+	public function deprecated_setAttributesSafely(array $attributes) {
 		$editableFields = array_flip($this->getAttributesAliases());
 		$filteredAttributes = array_intersect_key($attributes, $editableFields);
 		return $this->setAttributes($filteredAttributes);
@@ -836,7 +836,7 @@ class InterAdmin extends InterAdminAbstract {
 	/**
 	 * Returns varchar_key using its alias, without loading it from DB again
 	 */
-	public function getNome() {
+	public function getName() {
 		$varchar_key_alias = $this->getTipo()->getCamposAlias('varchar_key');
 		return $this->$varchar_key_alias;
 	}

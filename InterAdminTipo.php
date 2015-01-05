@@ -237,14 +237,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function children() {
 		return new \Jp7\Interadmin\Query\Type($this);
 	}
-		
-	public function taggedWith() {
-		$query = $this->records();
-		foreach (func_get_args() as $tag) {
-			$query->where($tag->getTagFilters());
-		}
-		return $query;
-	}
 
 	/**
 	 *
@@ -294,26 +286,26 @@ class InterAdminTipo extends InterAdminAbstract {
 		return new Collection($records);
 	}
 
-	public function distinct($column, $options = array()) {
+	public function deprecated_distinct($column, $options = array()) {
 		return $this->_aggregate('DISTINCT', $column, $options);
 	}
 	
-	public function max($column, $options = array()) {
+	public function deprecated_max($column, $options = array()) {
 		$retorno = $this->_aggregate('MAX', $column, $options);
 		return $retorno[0];
 	}
 	
-	public function min($column, $options = array()) {
+	public function deprecated_min($column, $options = array()) {
 		$retorno = $this->_aggregate('MIN', $column, $options);
 		return $retorno[0];
 	}
 	
-	public function sum($column, $options = array()) {
+	public function deprecated_sum($column, $options = array()) {
 		$retorno = $this->_aggregate('SUM', $column, $options);
 		return $retorno[0];
 	}
 	
-	public function avg($column, $options = array()) {
+	public function deprecated_avg($column, $options = array()) {
 		$retorno = $this->_aggregate('AVG', $column, $options);
 		return $retorno[0];
 	}
@@ -346,7 +338,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: where.
 	 * @return int Count of InterAdmins found.
 	 */
-	public function count($options = array()) {
+	public function count($deprecated, $options = array()) {
+		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
+			throw new Exception("Use records()->count() instead.");
+		}
 		if ($options['group'] == 'id') {
 			// O COUNT() precisa trazer a contagem total em 1 linha
 			// Caso exista GROUP BY id, ele traria em várias linhas
@@ -369,7 +364,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function findFirst($deprecated, $options = array()) {
 		if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
-			throw new Exception("Use first() instead.");
+			throw new Exception("Use records()->first() instead.");
 		}
 		return $this->deprecatedFind(array('limit' => 1) + $options)->first();
 	}
@@ -551,7 +546,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * 
 	 * @return string 
 	 */
-	public function getNome() {
+	public function getName() {
 		$affix = Lang::get('interadmin.affix');
 		return $this->{'nome' . $affix} ?: $this->nome;
 	}
@@ -670,7 +665,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return int Count of deleted InterAdmins.
 	 */
-	public function deleteInterAdmins($options = array()) {
+	public function deprecated_deleteInterAdmins($options = array()) {
 		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
 			$record->delete();
@@ -684,7 +679,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return int Count of deleted InterAdmins.
 	 */
-	public function deleteInterAdminsForever($options = array()) {
+	public function deprecated_deleteInterAdminsForever($options = array()) {
 		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
 			$record->deleteForever();
@@ -699,7 +694,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return int Count of updated InterAdmins.
 	 */
-	public function updateInterAdmins($attributes, $options = array()) {
+	public function deprecated_updateInterAdmins($attributes, $options = array()) {
 		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
 			$record->updateAttributes($attributes);
@@ -890,7 +885,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $attributes Attributes to be merged into the new record.
 	 * @return InterAdmin
 	 */
-	public function createInterAdmin(array $attributes = array()) {
+	public function deprecated_createInterAdmin(array $attributes = array()) {
 		$options = array('default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin');
 		$record = InterAdmin::getInstance(0, $options, $this);
 		$mostrar = $this->getCamposAlias('char_key');
@@ -921,7 +916,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
 	 */
-	public function getTiposUsingThisModel($options = array()) {
+	public function deprecated_getTiposUsingThisModel($options = array()) {
 		if (!isset($this->_tiposUsingThisModel)) {
 			
 			$options2 = array(
@@ -1092,7 +1087,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
-	public function allUsingThisModel($options = array()) {
+	public function deprecated_allUsingThisModel($options = array()) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$tipos = $this->getTiposUsingThisModel();

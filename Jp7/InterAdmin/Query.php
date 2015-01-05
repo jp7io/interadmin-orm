@@ -40,6 +40,13 @@ class Query extends Query\Base {
 		
 		return $this;
 	}
+
+	public function taggedWith() {
+		foreach (func_get_args() as $tag) {
+			$this->where($tag->getTagFilters());
+		}
+		return $this;
+	}
 	
 	public function all() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
@@ -53,7 +60,7 @@ class Query extends Query\Base {
 	
 	public function count() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->provider->count($this->options);
+		return $this->provider->count(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
 	public function find($id) {
