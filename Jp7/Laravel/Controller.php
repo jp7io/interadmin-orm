@@ -64,7 +64,7 @@ class Controller extends \Illuminate\Routing\Controller {
 			$resourceName = end($resources);
 			$value = $route->getParameter($resourceName);
 			
-			$this->record = $this->tipo->find($value);
+			$this->record = $this->tipo->records()->find($value);
 		}
 	}
 

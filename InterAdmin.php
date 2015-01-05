@@ -2,6 +2,7 @@
 
 use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\ClassMap;
+use Jp7\Interadmin\Query;
  
 /**
  * Class which represents records on the table interadmin_{client name}.
@@ -99,7 +100,7 @@ class InterAdmin extends InterAdminAbstract {
 	
 	public static function __callStatic($name, array $arguments) {
 		if ($tipo = self::tipo()) {
-			$options = new \Jp7\Interadmin\Options($tipo);
+			$options = new \Jp7\Interadmin\Query($tipo);
 			return call_user_func_array([$options, $name], $arguments);
 		}
 		throw new BadMethodCallException('Call to undefined method ' . get_called_class() . '::' . $name);
@@ -176,9 +177,9 @@ class InterAdmin extends InterAdminAbstract {
 			if (isset($this->_eagerLoad[$methodName])) {
 				return new \Jp7\Interadmin\EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
 			}
-			return new \Jp7\Interadmin\Options($childrenTipo);
+			return new Query($childrenTipo);
 		} elseif ($methodName === 'arquivos' && $this->getTipo()->arquivos) {
-			return new \Jp7\Interadmin\ArquivoOptions($this);
+			return new \Jp7\Interadmin\Query\File($this);
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";

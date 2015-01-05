@@ -1,9 +1,9 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\Interadmin\Query;
 use InterAdmin, BadMethodCallException;
 
-class TipoOptions extends BaseOptions {
+class Type extends Base {
 	
 	protected function _isChar($field) {
 		$chars = array(

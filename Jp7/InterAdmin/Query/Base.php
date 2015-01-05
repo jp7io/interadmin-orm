@@ -1,9 +1,9 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\Interadmin\Query;
 use InterAdminTipo, InterAdminAbstract, BadMethodCallException;
 
-abstract class BaseOptions {
+abstract class Base {
 	protected $provider;
 	protected $options;
 	

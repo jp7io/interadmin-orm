@@ -3,7 +3,7 @@
 namespace Jp7\Interadmin;
 use InterAdminTipo, InterAdmin, BadMethodCallException;
 
-class Options extends BaseOptions {
+class Query extends Query\Base {
 	
 	public function query() {
 		return $this;

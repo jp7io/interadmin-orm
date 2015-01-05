@@ -235,19 +235,11 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 
 	public function children() {
-		return new \Jp7\Interadmin\TipoOptions($this);
+		return new \Jp7\Interadmin\Query\Type($this);
 	}
-	
-	/**
-	 * @return InterAdmin[] Array of InterAdmin objects.
-	 */
-	public function all() {
-		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
-		return $this->deprecatedFind();
-	}
-	
+		
 	public function taggedWith() {
-		$query = $this->query();
+		$query = $this->records();
 		foreach (func_get_args() as $tag) {
 			$query->where($tag->getTagFilters());
 		}
@@ -1145,77 +1137,9 @@ class InterAdminTipo extends InterAdminAbstract {
     public function getAdminAttributes() {
         return array();
     }
-	
-    public function where($_) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_func_array([$options, 'where'], func_get_args());
-    }
-    
-    public function fields($_) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_func_array([$options, 'fields'], func_get_args());
-    }
-    
-    public function with($_) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_func_array([$options, 'with'], func_get_args());
-    }
-    
-    public function join($alias, InterAdminTipo $tipo, $on) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->join($alias, $tipo, $on);
-    }
-    
-    public function joinThrough(InterAdminTipo $tipo, $relationshipPath) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->joinThrough($tipo, $relationshipPath);
-    }    
-    
-    public function leftJoin($alias, InterAdminTipo $tipo, $on) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->leftJoin($alias, $tipo, $on);
-    }
-    
-    public function rightJoin($alias, InterAdminTipo $tipo, $on) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->rightJoin($alias, $tipo, $on);
-    }
-    
-    public function limit($offset, $rows = null) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->limit($offset, $rows);
-    }
-    
-    public function group($group) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->group($group);
-    }
-    
-    public function order($_) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return call_user_func_array([$options, 'order'], func_get_args());
-    }
-    
-    public function whereNot(array $hash) {
-    	$options = new \Jp7\Interadmin\Options($this);
-    	return $options->whereNot($hash);
-    }
-    
-    public function debug($debug = true) {
-		$options = new \Jp7\Interadmin\Options($this);
-        return $options->debug($debug);
-    }
-    
-    public function query() {
-    	return new \Jp7\Interadmin\Options($this);
-    }
 
-	public function find($id) {
-		if (func_num_args() != 1) {
-			throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1 ($id).');
-		}
-		$options = new \Jp7\Interadmin\Options($this);
-		return $options->find($id);
-	}	
+    public function records() {
+    	return new \Jp7\Interadmin\Query($this);
+    }
     
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\Interadmin\Query;
 use InterAdmin;
 
-class ArquivoOptions extends BaseOptions {
+class File extends Base {
 	
 	protected function _isChar($field) {
 		$chars = array(
