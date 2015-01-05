@@ -5,10 +5,6 @@ use InterAdminTipo, InterAdmin, BadMethodCallException;
 
 class Query extends Query\Base {
 	
-	public function query() {
-		return $this;
-	}
-	
 	protected function _isChar($field) {
 		$aliases = array_flip($this->provider->getCamposAlias());
 		if (isset($aliases[$field])) {

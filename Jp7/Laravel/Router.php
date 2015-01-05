@@ -76,7 +76,7 @@ class Router extends \Illuminate\Routing\Router {
 		}
 	}
 	
-	public function tipo($name, $id_tipo) {
+	public function type($name, $id_tipo) {
 		$controller = studly_case(str_replace('.', '\\ ', $name )) . 'Controller';
 		$this->resource($name,  $controller, [
 			'id_tipo' => $id_tipo,

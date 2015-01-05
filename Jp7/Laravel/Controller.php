@@ -5,7 +5,7 @@ namespace Jp7\Laravel;
 class Controller extends \Illuminate\Routing\Controller {
 
 	/* Internal use only */
-	static $tipo = null;
+	static $type = null;
 	protected static $current = null;
 
 	protected $layout = 'layouts.master';
@@ -14,7 +14,7 @@ class Controller extends \Illuminate\Routing\Controller {
 	 * @var Variables to send to view
 	 */
 	protected $_viewData = null;
-	protected $tipoClassName = null;
+	protected $typeClassName = null;
 	
 	public function __construct() {
 		static::$current = $this;
@@ -45,26 +45,26 @@ class Controller extends \Illuminate\Routing\Controller {
 	}
         
 	public function setTipo() {
-		if (!static::$tipo && $this->tipoClassName) {
-			$className = '\\' . $this->tipoClassName;
+		if (!static::$type && $this->typeClassName) {
+			$className = '\\' . $this->typeClassName;
 			
 			if (class_exists($className)) {
-				static::$tipo = new $className;
+				static::$type = new $className;
 			}
 		}
 		
-		$this->tipo = static::$tipo;
+		$this->type = static::$type;
 	}
 
 	public function setRecord() {
 		$route = \Route::getCurrentRoute();
 		$resources = $route->parameterNames();
 		
-		if ($this->tipo && count($resources) == 1) {
+		if ($this->type && count($resources) == 1) {
 			$resourceName = end($resources);
 			$value = $route->getParameter($resourceName);
 			
-			$this->record = $this->tipo->records()->find($value);
+			$this->record = $this->type->records()->find($value);
 		}
 	}
 

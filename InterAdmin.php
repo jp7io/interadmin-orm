@@ -77,7 +77,7 @@ class InterAdmin extends InterAdminAbstract {
 			throw new Exception('Deprecated __construct with $options[fields]');
 		}
 	}
-
+	
 	/**
 	 * Magic get acessor.
 	 * 
@@ -99,11 +99,23 @@ class InterAdmin extends InterAdminAbstract {
 	}
 	
 	public static function __callStatic($name, array $arguments) {
-		if ($tipo = self::tipo()) {
-			$options = new \Jp7\Interadmin\Query($tipo);
-			return call_user_func_array([$options, $name], $arguments);
+		if ($query = self::query()) {
+			return call_user_func_array([$query, $name], $arguments);
 		}
 		throw new BadMethodCallException('Call to undefined method ' . get_called_class() . '::' . $name);
+	}
+	
+	public static function query() {
+		if ($type = self::type()) {
+			return new Query($type);
+		}
+	}
+	
+	public static function type() {
+		$cm = ClassMap::getInstance();
+		if ($id_tipo = $cm->getClassIdTipo(get_called_class())) {
+			return \InterAdminTipo::getInstance($id_tipo);
+		}
 	}
 
 	/**
@@ -228,15 +240,6 @@ class InterAdmin extends InterAdminAbstract {
 			)));
 		}
 		return $this->_tipo;
-	}
-
-	public static function tipo() {
-		$cm = ClassMap::getInstance();
-
-		$id_tipo = $cm->getClassIdTipo(get_called_class());
-		if ($id_tipo) {
-			return \InterAdminTipo::getInstance($id_tipo);
-		}
 	}
 
 	/**

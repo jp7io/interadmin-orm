@@ -7,12 +7,12 @@ use InterAdminTipo, BadMethodCallException;
 class EagerLoaded {
 	
 	protected $data;
-	protected $tipo;
+	protected $type;
 	protected $debug;
 	
-	public function __construct(InterAdminTipo $tipo, $data) {
+	public function __construct(InterAdminTipo $type, $data) {
 		$this->data = $data;
-		$this->tipo = $tipo;
+		$this->type = $type;
 	}
 	
 	public function all() {
@@ -45,9 +45,9 @@ class EagerLoaded {
 	}
 	
 	public function __call($method_name, $params) {
-		$target = $this->tipo;
+		$target = $this->type;
 		if ($this->debug) {
-			$target = $this->tipo->debug();
+			$target = $this->type->debug();
 		}
 		return call_user_func_array([$target, $method_name], $params);
 	}

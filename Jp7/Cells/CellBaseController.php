@@ -15,7 +15,7 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 
 	public function setSharedVariables() {
 		// Current section
-		$this->tipo = Controller::getCurrentController()->tipo;
+		$this->type = Controller::getCurrentController()->type;
 	}
 
 	public function init() {
