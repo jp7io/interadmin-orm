@@ -32,7 +32,7 @@ class Router extends \Illuminate\Routing\Router {
 				foreach ($subsections as $subsection) {
 					$this->createDynamicRoutes($subsection, $currentPath, false);
 				}
-
+				
 				$this->logger->popGroupStack();
 			}
 		}
@@ -66,7 +66,7 @@ class Router extends \Illuminate\Routing\Router {
 				$this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute . '.' : '') . $name;
 			}
 			$dynamic = isset($options['dynamic']) ? $options['dynamic'] : '';
-			$before = 'setTipo:' . $options['id_tipo'] . $dynamic;
+			$before = 'setType:' . $options['id_tipo'] . $dynamic;
 			
 			$this->group(['before' => $before], function() use ($name, $controller, $options) {
 				parent::resource($name, $controller, $options);

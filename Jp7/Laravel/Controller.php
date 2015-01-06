@@ -22,7 +22,7 @@ class Controller extends \Illuminate\Routing\Controller {
 		if (is_null($this->_viewData)) {
 			$this->_viewData = new \stdClass();
 		}
-		$this->beforeFilter('@setTipo');
+		$this->beforeFilter('@setType');
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
 	}
 	
@@ -39,12 +39,12 @@ class Controller extends \Illuminate\Routing\Controller {
 		return static::$current;
 	}
 	
-	public function getRootTipo() {
+	public function getRootType() {
 		//$klass = \getDefaultClass();
 		return \InterAdminTipo::getInstance(0);
 	}
         
-	public function setTipo() {
+	public function setType() {
 		if (!static::$type && $this->typeClassName) {
 			$className = '\\' . $this->typeClassName;
 			
