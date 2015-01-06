@@ -16,6 +16,7 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 	public function setSharedVariables() {
 		// Current section
 		$this->type = Controller::getCurrentController()->type;
+		$this->record = Controller::getCurrentController()->record;
 	}
 
 	public function init() {
@@ -43,5 +44,4 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 		return "Cells.{$path}.{$this->uniqueCacheId}";
 	}
 }
-
 
