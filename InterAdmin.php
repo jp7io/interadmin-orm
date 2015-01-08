@@ -278,7 +278,7 @@ class InterAdmin extends InterAdminAbstract {
 					$this->getTipo()->setParent($this->_parent);
 				}
 			}
-		} elseif ($options['fields']) {
+		} elseif (isset($options['fields'])) {
 			$this->_parent->loadAttributes($options['fields'], $options['fields_alias']);
 		}
 		return $this->_parent;
