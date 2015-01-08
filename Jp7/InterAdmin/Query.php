@@ -47,7 +47,10 @@ class Query extends Query\Base {
 		}
 		return $this;
 	}
-	
+
+	/**
+	 * @return InterAdmin[]
+	 */
 	public function all() {
 		if (func_num_args() > 0) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
 		return $this->provider->deprecatedFind($this->options);

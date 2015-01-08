@@ -6,6 +6,9 @@ use Jp7\Laravel\Controller;
 
 abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 
+	public $type;
+	public $record;
+
 	// Multiple calls to a cell will run __construct only once
 	public function __construct(Factory $view, $caching_disabled) {
 		parent::__construct($view, $caching_disabled);
