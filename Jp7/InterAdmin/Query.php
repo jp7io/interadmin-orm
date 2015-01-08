@@ -85,21 +85,18 @@ class Query extends Query\Base {
 	}
 	
 	public function __call($method_name, $params) {
-		/*
-		$last = count($params) - 1;
-		if (is_array($params[$last])) {
-			$params[$last] = InterAdmin::mergeOptions($this->options, $params[$last]);
-		} else {
-			$params[] = $this->options;
-		}
-		*/		
-		$retorno = call_user_func_array([$this->provider, $method_name], $params);
-		if ($retorno instanceof self) {
-			$this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
-			return $this;
+		// Scope support
+		if ($classname = $this->provider->class) {
+			// Cria instancia para simular comportamento do Eloquent
+			$instance = new $classname(0);  
+			array_unshift($params, $this);
+			$return = call_user_func_array([$instance, 'scope' . ucfirst($method_name)], $params);
+			if (!$return instanceof self) {
+				throw new BadMethodCallException('Method scope' . ucfirst($method_name) . ' should return instance of \Jp7\Interadmin\Query');
+			}
+			return $return;
 		}
 		throw new BadMethodCallException('Unsupported method ' . $method_name);
-		//return $retorno;
 	}
 	
 }
