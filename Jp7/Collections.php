@@ -293,7 +293,7 @@ class Jp7_Collections {
 		if (count($array) > 0) {
 			$first = reset($array);
 			
-			$tipo = $first->getTipo();
+			$tipo = $first->getType();
 			$retornos = $tipo->find(array(
 				'class' => 'InterAdmin',
 				'fields' => $fields,
@@ -389,7 +389,7 @@ class Jp7_Collections {
 		}
 		$model = reset($records);
 		
-		if ($data = $model->getTipo()->getRelationshipData($relationship)) {
+		if ($data = $model->getType()->getRelationshipData($relationship)) {
 			if ($data['type'] == 'select') {
 				// select.id = record.select_id
 				$indexed = self::separate($records, $relationship . '.id');

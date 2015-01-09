@@ -51,7 +51,7 @@ class Jp7_InterAdmin_Util {
 			}
 			$export->_children[$tipoChildren->id_tipo] = $children;
 		}
-		$export->setTipo(null);
+		$export->setType(null);
 	}
 	
 	protected static function _prepareOptionsForIdString($options, $tipo) {
@@ -70,7 +70,7 @@ class Jp7_InterAdmin_Util {
 		foreach ($record->attributes as $attributeName => $attribute) {
 			if ($attribute instanceof InterAdmin && $attribute->id_string) {
 				$attributeTipo = InterAdminTipo::getInstance($attribute->id_tipo);
-				//$attribute->setTipo($attributeTipo);
+				//$attribute->setType($attributeTipo);
 				if ($attributeTipo) {
 					$options = array();
 					if ($bind_children) {
@@ -104,7 +104,7 @@ class Jp7_InterAdmin_Util {
 			$tipo = InterAdminTipo::getInstance($id_tipo);
 			
 			$record->parent_id = $parent_id;
-			$record->setTipo($tipo);
+			$record->setType($tipo);
 				
 			if ($use_id_string) {
 				self::_importAttributeFromIdString($record);
@@ -129,7 +129,7 @@ class Jp7_InterAdmin_Util {
 				unset($child->id);
 				
 				$child->parent_id = $record->id;
-				$child->setTipo($child_tipo);
+				$child->setType($child_tipo);
 				
 				if ($use_id_string || $bind_children) {
 					self::_importAttributeFromIdString($child, $bind_children);

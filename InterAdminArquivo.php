@@ -43,7 +43,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: class.
 	 * @return InterAdminTipo
 	 */
-	public function getTipo($options = array()) {
+	public function getType($options = array()) {
 		if (!$this->_tipo) {
 			if (!$this->id_tipo) {
 				$this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
@@ -62,7 +62,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @param InterAdminTipo $tipo
 	 * @return void
 	 */
-	public function setTipo($tipo) {
+	public function setType($tipo) {
 		$this->id_tipo = $tipo->id_tipo;
 		$this->_tipo = $tipo;
 	}
@@ -74,7 +74,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 */
 	public function getParent($options = array()) {
 		if (!$this->_parent) {
-			$tipo = $this->getTipo();
+			$tipo = $this->getType();
 			if ($this->id || $this->getFieldsValues('id')) {
 				$this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
 			}
@@ -127,7 +127,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder = $upload_root . to_slug($parent->getTipo()->nome, '') . '/';
+		$folder = $upload_root . to_slug($parent->getType()->nome, '') . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
@@ -152,7 +152,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			throw new Exception($msg);
 		}
 		
-		$clientSideFolder = '../../upload/' . to_slug($parent->getTipo()->nome, '') . '/';
+		$clientSideFolder = '../../upload/' . to_slug($parent->getType()->nome, '') . '/';
 		$this->url = $clientSideFolder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
 		// Movendo o thumb
@@ -175,7 +175,7 @@ class InterAdminArquivo extends InterAdminAbstract {
     }
 	function getTableName() {
     	if ($this->id_tipo) {
-			return $this->getTipo()->getArquivosTableName();
+			return $this->getType()->getArquivosTableName();
 		} else {
 			return $this->db_prefix . '_arquivos';
 		}

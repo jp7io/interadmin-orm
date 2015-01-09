@@ -89,7 +89,7 @@ class InterAdmin extends InterAdminAbstract {
 			return $this->attributes[$attributeName];
 		} else {
 			if (
-				in_array($attributeName, $this->getTipo()->getCamposAlias()) || 
+				in_array($attributeName, $this->getType()->getCamposAlias()) || 
 				in_array($attributeName, $this->getAdminAttributes())
 			) {
 				throw new Jp7_InterAdmin_Exception('Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
@@ -141,7 +141,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 
 		$instance = new $class_name($id, $options);
-		$instance->setTipo($tipo);
+		$instance->setType($tipo);
 		$instance->db_prefix = $tipo->db_prefix;
 		$instance->setDb($tipo->getDb());
 		
@@ -154,7 +154,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return 	array 
 	 */
 	protected function _findChild($nome_id) {
-		$children = $this->getTipo()->getInterAdminsChildren();
+		$children = $this->getType()->getInterAdminsChildren();
 		
 		if (isset($children[$nome_id])) {
 			return $children[$nome_id];
@@ -190,17 +190,17 @@ class InterAdmin extends InterAdminAbstract {
 				return new \Jp7\Interadmin\EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
 			}
 			return new Query($childrenTipo);
-		} elseif ($methodName === 'arquivos' && $this->getTipo()->arquivos) {
+		} elseif ($methodName === 'arquivos' && $this->getType()->arquivos) {
 			return new \Jp7\Interadmin\Query\File($this);
 		}
 		// Default error when method doesn´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
-		$children = $this->getTipo()->getInterAdminsChildren();
+		$children = $this->getType()->getInterAdminsChildren();
 		
 		foreach (array_keys($children) as $childName) {
 			$message .= "\t\t- " . lcfirst($childName) . "()\n";
 		}
-		if ($this->getTipo()->arquivos) {
+		if ($this->getType()->arquivos) {
 			$message .= "\t\t- arquivos()\n";
 		}
 
@@ -223,7 +223,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: class.
 	 * @return InterAdminTipo
 	 */
-	public function getTipo($options = array()) {
+	public function getType($options = array()) {
 		if (!$this->_tipo) {
 			if (!$id_tipo = $this->id_tipo) {
 				global $db;
@@ -233,7 +233,7 @@ class InterAdmin extends InterAdminAbstract {
 					$id_tipo = $row->id_tipo;
 				}				
 			}
-			$this->setTipo(InterAdminTipo::getInstance($id_tipo, array(
+			$this->setType(InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
 				'class' => $options['class']
@@ -248,7 +248,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param InterAdminTipo $tipo
 	 * @return void
 	 */
-	public function setTipo(InterAdminTipo $tipo = null) {
+	public function setType(InterAdminTipo $tipo = null) {
 		$this->id_tipo = $tipo->id_tipo;
 		$this->_tipo = $tipo;
 	}
@@ -275,7 +275,7 @@ class InterAdmin extends InterAdminAbstract {
 			if ($this->parent_id) {
 				$this->_parent = InterAdmin::getInstance($this->parent_id, $options, $parentTipo);
 				if ($this->_parent->id) {
-					$this->getTipo()->setParent($this->_parent);
+					$this->getType()->setParent($this->_parent);
 				}
 			}
 		} elseif (isset($options['fields'])) {
@@ -312,7 +312,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
 		if (empty($options['db_prefix'])) {
-			$options['db_prefix'] = $this->getTipo()->db_prefix;
+			$options['db_prefix'] = $this->getType()->db_prefix;
 		}
 		$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
 		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
@@ -326,7 +326,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminOptions
 	 */
 	public function siblings() {
-		return $this->getTipo()->records()->whereNot(['id' => $this->id]);
+		return $this->getType()->records()->whereNot(['id' => $this->id]);
 	}
 
 	/**
@@ -342,7 +342,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		$arquivo = new $className();
 		$arquivo->setParent($this);
-		$arquivo->setTipo($this->getTipo());
+		$arquivo->setType($this->getType());
 		$arquivo->mostrar = 'S';
 		$arquivo->setAttributes($attributes);
 		return $arquivo;
@@ -366,7 +366,7 @@ class InterAdmin extends InterAdminAbstract {
 		 	$className = static::DEFAULT_NAMESPACE . 'InterAdminArquivo';
 		}
 		$arquivoModel = new $className(0);
-		$arquivoModel->setTipo($this->getTipo());
+		$arquivoModel->setType($this->getType());
 		
 		if (empty($options['fields'])) {
 			$options['fields'] = '*';
@@ -389,10 +389,10 @@ class InterAdmin extends InterAdminAbstract {
 		$records = array();
 		foreach ($rs as $row) {
 			$arquivo = new $className($row->id_arquivo, array(
-				'db_prefix' => $this->getTipo()->db_prefix,
+				'db_prefix' => $this->getType()->db_prefix,
 				'db' => $this->_db
 			));
-			$arquivo->setTipo($this->getTipo());
+			$arquivo->setType($this->getType());
 			$arquivo->setParent($this);
 			$this->_getAttributesFromRow($row, $arquivo, $options);
 			$arquivos[] = $arquivo;
@@ -417,7 +417,7 @@ class InterAdmin extends InterAdminAbstract {
 	public function deprecated_createLog(array $attributes = array()) {
 		$log = InterAdminLog::create($attributes);
 		$log->setParent($this);
-		$log->setTipo($this->getTipo());
+		$log->setType($this->getType());
 		return $log;
 	}
 		
@@ -462,7 +462,7 @@ class InterAdmin extends InterAdminAbstract {
 	}
 	
 	public function getRoute($action = 'index') {
-		return $this->getTipo()->getRoute($action);
+		return $this->getType()->getRoute($action);
 	}
 	
 	/**
@@ -588,7 +588,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected function _getFieldsValuesAsString($sqlRow, $fields_alias) {
 		global $lang;
-		$campos = $this->getTipo()->getCampos();
+		$campos = $this->getType()->getCampos();
 		
 		foreach((array) $sqlRow as $key => $value) {
 			if (strpos($key, 'select_') === 0) {
@@ -616,7 +616,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
 	 */
 	public function getStringValue() {
-		$campos = $this->getTipo()->getCampos();
+		$campos = $this->getType()->getCampos();
 		$camposCombo = array();
 		if (key_exists('varchar_key', $campos)) {
 			$campos['varchar_key']['combo'] = 'S';
@@ -652,7 +652,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (isset($this->varchar_key)) {
 			$this->id_slug = $this->generateSlug($this->varchar_key);
 		} else {
-			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
+			$alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
 			if (isset($this->$alias_varchar_key)) {
 				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
 			}
@@ -687,20 +687,20 @@ class InterAdmin extends InterAdminAbstract {
 	}
 		
 	public function getAttributesNames() {
-		return $this->getTipo()->getCamposNames();
+		return $this->getType()->getCamposNames();
 	}
 	public function getAttributesCampos() {
-		return $this->getTipo()->getCampos();
+		return $this->getType()->getCampos();
 	}
 	public function getCampoTipo($campo) {
-		return $this->getTipo()->getCampoTipo($campo);
+		return $this->getType()->getCampoTipo($campo);
 	}
 	public function getAttributesAliases() {
-		return $this->getTipo()->getCamposAlias();
+		return $this->getType()->getCamposAlias();
 	}
 	public function getTableName() {
 		if ($this->id_tipo) {
-			return $this->getTipo()->getInterAdminsTableName();
+			return $this->getType()->getInterAdminsTableName();
 		} else {
 			// Compatibilidade, tenta encontrar na tabela global
 			return $this->db_prefix . $this->table;
@@ -785,14 +785,14 @@ class InterAdmin extends InterAdminAbstract {
 	}
 	
 	public function getTagFilters() {
-		return "(tags.id = " . $this->id . " AND tags.id_tipo = " . intval($this->getTipo()->id_tipo) . ")";
+		return "(tags.id = " . $this->id . " AND tags.id_tipo = " . intval($this->getType()->id_tipo) . ")";
 	}
     
     /**
      * @see InterAdminAbstract::getAdminAttributes()
      */
     public function getAdminAttributes() {
-		return $this->getTipo()->getInterAdminsAdminAttributes();
+		return $this->getType()->getInterAdminsAdminAttributes();
     }
 	
     /**
@@ -803,8 +803,8 @@ class InterAdmin extends InterAdminAbstract {
      * @throws Exception
      */
     public function setAttributeBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
-		$campos = $this->getTipo()->getCampos();
-		$aliases = array_flip($this->getTipo()->getCamposAlias());
+		$campos = $this->getType()->getCampos();
+		$aliases = array_flip($this->getType()->getCamposAlias());
 		$nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 		
 		if (!startsWith('select_', $nomeCampo)) {
@@ -837,7 +837,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * Returns varchar_key using its alias, without loading it from DB again
 	 */
 	public function getName() {
-		$varchar_key_alias = $this->getTipo()->getCamposAlias('varchar_key');
+		$varchar_key_alias = $this->getType()->getCamposAlias('varchar_key');
 		return $this->$varchar_key_alias;
 	}
 }
