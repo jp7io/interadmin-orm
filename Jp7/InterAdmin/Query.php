@@ -2,6 +2,7 @@
 
 namespace Jp7\Interadmin;
 use InterAdminTipo, InterAdmin, BadMethodCallException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Query extends Query\Base {
 	
@@ -80,6 +81,14 @@ class Query extends Query\Base {
 		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
+	public function findOrFail($id) {
+		$result = $this->find($id);
+		if (!$result) {
+			throw new ModelNotFoundException('Unable to find a record with id: ' . $id);
+		}
+		return $result;
+	}
+	
 	public function findFirst() {
 		throw new BadMethodCallException('Use first() instead of findFirst().');
 	}
@@ -89,12 +98,17 @@ class Query extends Query\Base {
 		if ($classname = $this->provider->class) {
 			// Cria instancia para simular comportamento do Eloquent
 			$instance = new $classname(0);  
+			
 			array_unshift($params, $this);
-			$return = call_user_func_array([$instance, 'scope' . ucfirst($method_name)], $params);
-			if (!$return instanceof self) {
-				throw new BadMethodCallException('Method scope' . ucfirst($method_name) . ' should return instance of \Jp7\Interadmin\Query');
+			$method_name = 'scope' . ucfirst($method_name);
+			if (!method_exists($instance, $method_name)) {
+				throw new BadMethodCallException('Method ' . $method_name .  ' does not exist.');
+			}			
+			$query = call_user_func_array([$instance, $method_name], $params);
+			if (!$query instanceof self) {
+				throw new BadMethodCallException('Method ' . $method_name . ' should return instance of ' . __CLASS__);
 			}
-			return $return;
+			return $query;
 		}
 		throw new BadMethodCallException('Unsupported method ' . $method_name);
 	}
