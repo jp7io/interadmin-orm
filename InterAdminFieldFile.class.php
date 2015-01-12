@@ -62,9 +62,7 @@ class InterAdminFieldFile {
 			if ($fieldsAlias) {
 				$varchar_key = $parent->getTipo()->getCamposAlias($varchar_key);
 			}
-			if (isset($parent->$varchar_key)) {
-				$retorno = $parent->$varchar_key;
-			}
+			$retorno = $parent->$varchar_key;
 		}
 		return isospecialchars($retorno);
 	}

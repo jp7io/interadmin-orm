@@ -17,7 +17,7 @@
 abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
-	const DEFAULT_FIELDS = '*';
+	const DEFAULT_FIELDS = null;
 	
 	private static $_cache = false;
 	
@@ -165,39 +165,7 @@ abstract class InterAdminAbstract implements Serializable {
 			return $this->attributes[$fields];
 		}
 	}
-
-	/**
-	 * Loads attributes if they are not set yet.
-	 * 
-	 * @param array $attributes
-	 * @return null
-	 */
-	public function loadAttributes($attributes, $fieldsAlias = true) {
-		if ($this->_deleted) {
-			throw new Exception('This record has been deleted.');
-		}
-		
-		$fieldsToLoad = array_diff($attributes, array_keys($this->attributes));
-		// Retrieving data
-		if ($fieldsToLoad) {
-			$options = array(
-				'fields' => (array) $fieldsToLoad,
-				'fields_alias' => $fieldsAlias,
-				'from' => $this->getTableName() . ' AS main',
-				'where' => array($this->_primary_key . ' = ' . intval($this->{$this->_primary_key})),
-				// Internal use
-				'aliases' => $this->getAttributesAliases(),
-				'campos' => $this->getAttributesCampos(),
-				'skip_published_filters' => array('main')
-			);
-			$rs = $this->_executeQuery($options);
-			if ($row = $rs->FetchNextObj()) {
-				$this->_getAttributesFromRow($row, $this, $options);
-			}
-			$rs->Close();
-		}
-	}
-
+	
 	/**
 	 * DEPRECATED: Updates the values into the database table. If this object has no 'id', the data is inserted.
 	 * 
@@ -660,7 +628,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		foreach ($fields as $key => $campo) {
 			// Traduzindo 'join.campo' para 'join' => array('campo')
-			if (is_string($campo) && strpos($campo, '.') !== false && strpos($campo, '(') === false) {
+			if (is_string($campo) && strpos($campo, '.') && strpos($campo, '(') === false) {
 				list($join, $nome) = explode('.', $campo);
 				$fields[$join][] = $nome;
 				unset($fields[$key]);
@@ -687,18 +655,13 @@ abstract class InterAdminAbstract implements Serializable {
 					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					    // Join e Recursividade
 					    if (!in_array($join, (array) $options['from_alias'])) {
-							$joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
-							if ($joinClasse !== 'tipo') {
-								$fields[$join][] = 'id_slug';
-							}
+							$this->_addJoinAlias($options, $join, $campos[$nome]);
 					    }
 					    $joinTipo = $this->getCampoTipo($campos[$nome]);
 					}
 					if ($joinTipo) {
-						$wildcardPos = array_search('*', $fields[$join]);
-						if ($wildcardPos !== false) {
-							unset($fields[$join][$wildcardPos]);
-							$fields[$join] = array_merge($fields[$join], $joinTipo->getCamposNames(), $joinTipo->getInterAdminsAdminAttributes());
+						if ($fields[$join] == array('*')) {
+							$fields[$join] = $joinTipo->getCamposNames();
 						}
 						$joinOptions = array(
 							'fields' => $fields[$join],
@@ -752,16 +715,13 @@ abstract class InterAdminAbstract implements Serializable {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join (' . get_class($this) . ' - PK: ' . $this->__toString() . ').'));
 		}
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
-		
+		// @todo testar
 		if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {
             $options['from'][] = $joinTipo->getTableName() . 
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id_tipo';
-            
-            return 'tipo';
         } else {
             $options['from'][] = $joinTipo->getInterAdminsTableName() .
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id';
-            return 'interadmin';
         }
 	}
 	/**
@@ -822,14 +782,13 @@ abstract class InterAdminAbstract implements Serializable {
 				}
 				
 				if (is_object($attributes[$table])) {
-					$subobject = $attributes[$table];
 					$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-					$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $subobject);
+					$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $attributes[$table]);
 					
-					if (isset($subobject->$alias) && is_object($subobject->$alias)) {
+					if (is_object($attributes[$table]->$alias)) {
 						continue;
 					}
-					$subobject->$alias = $value;
+					$attributes[$table]->$alias = $value;
 				}
 			}
 		}
@@ -845,7 +804,7 @@ abstract class InterAdminAbstract implements Serializable {
 		if ($fields == '*' || (is_array($fields) && in_array('*', $fields))) {
 			$fields = (array) $fields;
 			unset($fields[array_search('*', $fields)]);
-			$fields = array_merge($object->getAttributesNames(), $object->getAdminAttributes(), $fields);
+			$fields = array_merge($object->getAttributesNames(), $fields);
 		}
 	}
 	/**
