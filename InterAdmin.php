@@ -88,13 +88,16 @@ class InterAdmin extends InterAdminAbstract {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
 		} else {
-			if (
-				in_array($attributeName, $this->getType()->getCamposAlias()) || 
-				in_array($attributeName, $this->getAdminAttributes())
-			) {
-				$this->loadAttributes([$attributeName]);
+			$attributes = array_merge(
+				$this->getType()->getCamposAlias($this->getType()->getCamposNames()), 
+				$this->getAdminAttributes()
+			);
+			if (in_array($attributeName, $attributes)) {
+				if (class_exists('Debugbar')) {
+					Debugbar::warning('N+1 query: Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
+				}
+				$this->loadAttributes($attributes);
 				return $this->attributes[$attributeName];
-				//throw new Jp7_InterAdmin_Exception('Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
 			}
 			return $null; // Needs to be variable to be returned as reference
 		}
