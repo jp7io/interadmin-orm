@@ -92,7 +92,9 @@ class InterAdmin extends InterAdminAbstract {
 				in_array($attributeName, $this->getType()->getCamposAlias()) || 
 				in_array($attributeName, $this->getAdminAttributes())
 			) {
-				throw new Jp7_InterAdmin_Exception('Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
+				$this->loadAttributes([$attributeName]);
+				return $this->attributes[$attributeName];
+				//throw new Jp7_InterAdmin_Exception('Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
 			}
 			return $null; // Needs to be variable to be returned as reference
 		}
