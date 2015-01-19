@@ -918,7 +918,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
 	 */
-	public function deprecated_getTiposUsingThisModel($options = array()) {
+	public function getTiposUsingThisModel($options = array()) {
 		if (!isset($this->_tiposUsingThisModel)) {
 			
 			$options2 = array(
@@ -1078,31 +1078,16 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getInterAdminsAdminAttributes() {
 		return array('id_slug', 'id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
 	}
-	
-	public function getInterAdminsUsingThisModel($options = array()) {
-		return $this->allUsingThisModel($options);
-	}
-	
+		
 	/**
 	 * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
 	 * 
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
-	public function deprecated_allUsingThisModel($options = array()) {
-		$this->_prepareInterAdminsOptions($options, $optionsInstance);
-		
+	public function modelRecords() {
 		$tipos = $this->getTiposUsingThisModel();
-		$options['where'][] = "id_tipo IN (" . implode(',', $tipos) . ')';
-		
-		$rs = $this->_executeQuery($options);
-		$records = array();
-		foreach ($rs as $row) {
-			$record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->id_tipo]);
-			$this->_getAttributesFromRow($row, $record, $options);
-			$records[] = $record;
-		}
-		return $records;
+		return $this->records()->where(['id_tipo' => $tipos]);
 	}
 	
 	public function getTagFilters() {
