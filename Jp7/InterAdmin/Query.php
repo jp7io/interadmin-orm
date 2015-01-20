@@ -70,14 +70,16 @@ class Query extends Query\Base {
 	public function find($id) {
 		if (func_num_args() != 1) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1.');
 		
-		if (is_numeric($id)) {
-			$this->options['where'][] = "id = " . $this->_escapeParam($id);
-		} elseif (is_string($id)) {
-			$this->options['where'][] = "id_slug = " . $this->_escapeParam($id);
-		} else {
+		if (is_array($id)) {
 			throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
 		}
-
+		
+		if (is_string($id) && !is_numeric($id)) {
+			$this->_whereHash(['id_slug' => $id]);
+		} else {
+			$this->_whereHash(['id' => $id]);
+		}
+		
 		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	

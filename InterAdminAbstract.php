@@ -510,6 +510,10 @@ abstract class InterAdminAbstract implements Serializable {
 		$offset = 0;
 		$ignoreJoinsUntil = -1;
 			
+		if (empty($options['from_alias'])) {
+			$options['from_alias'] = array();
+		}
+					
 		while(preg_match('/(' . $quoted . '|' . $keyword . $not_function . '|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
 			// Resolvendo true e false para char
@@ -601,7 +605,8 @@ abstract class InterAdminAbstract implements Serializable {
 							'db' => $this->_db,
 							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
-						if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
+						
+						if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $joinTipo->getInterAdminsTableName() .
 							' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
@@ -609,7 +614,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					} elseif ($table == 'tags') {
-						if ($offset > $ignoreJoinsUntil && (empty($options['from_alias']) || !in_array($table, $options['from_alias']))) {
+						if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
 							" ON " . $table . ".parent_id = main.id";

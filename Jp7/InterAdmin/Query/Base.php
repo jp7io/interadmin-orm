@@ -19,25 +19,23 @@ abstract class Base {
 		$args = func_get_args();
 		if (count($args) > 1) {
 			// Prepared statement: email LIKE ?
-			$where = $this->_wherePreparedStatement($args);
-		} else {
-			$where = $args[0];
-			if (!is_array($where)) {
-				$where = array($where);
-			} elseif (!is_numeric(key($where))) {
-				// Hash = [a => 1, b => 2]
-				$where = $this->_whereHash($where);
-			}
+			return $this->_wherePreparedStatement($args);
+		}
+		$where = $args[0];
+		if (is_array($where) && !array_key_exists(0, $where)) {
+			// Hash = [a => 1, b => 2]
+			return $this->_whereHash($where);
+		}
+		// normal where
+		if (is_scalar($where)) {
+			$where = array($where);
 		}
 		$this->options['where'] = array_merge($this->options['where'], $where);
-		return $this;  
+		return $this;
 	}
 	
 	public function whereNot(array $hash) {
-		$where = $this->_whereHash($hash, true);
-		
-		$this->options['where'] = array_merge($this->options['where'], $where);
-		return $this;
+		return $this->_whereHash($hash, true);
 	}
 	
 	protected function _wherePreparedStatement($args) {
@@ -51,30 +49,45 @@ abstract class Base {
 		
 		array_unshift($where, $format);
 			
-		return array(call_user_func_array('sprintf', $where));
+		$where = array(call_user_func_array('sprintf', $where));
+		
+		$this->options['where'] = array_merge($this->options['where'], $where);
+		return $this;
 	}
 	
 	protected function _whereHash($hash, $reverse = false) {
 		$where = array();
 		foreach ($hash as $key => $value) {
-			if (is_array($value)) {
-				$escaped = array_map([$this, '_escapeParam'], $value);
-				$operator = ($reverse ? 'NOT IN' : 'IN');
-				$where[] = "$key $operator (" . implode(',', $escaped) . ")";
-			} elseif (is_bool($value) && $this->_isChar($key)) {
-				$operator = ($value && !$reverse ? "<>" : "=");
-				$where[] = "$key $operator ''";
-			} else {
-				$operator = ($reverse ? '<>' : '=');
-				$where[] = "$key $operator " . $this->_escapeParam($value);
-			}
+			$where[] = $this->_parseComparison($key, $value, $reverse);
 		}
-		return $where;
+		$this->options['where'] = array_merge($this->options['where'], $where);
+		return $this;
 	}
-		
+	
+	protected function _parseComparison($key, $value, $reverse) {
+		if (is_array($value)) {
+			$escaped = array_map([$this, '_escapeParam'], $value);
+			$operator = ($reverse ? 'NOT IN' : 'IN');
+			return "$key $operator (" . implode(',', $escaped) . ")";
+		}
+		if (is_bool($value) && $this->_isChar($key)) {
+			$operator = ($value && !$reverse ? "<>" : "=");
+			return "$key $operator ''";
+		}
+		if (is_null($value)) {
+			$operator = ($reverse ? 'IS NOT' : 'IS');
+		} else {
+			$operator = ($reverse ? '<>' : '=');
+		}
+		return "$key $operator " . $this->_escapeParam($value);		
+	}
+	
 	protected function _escapeParam($value) {
 		if (is_string($value)) {
 			$value = "'" . addslashes($value) . "'";
+		}
+		if (is_null($value)) {
+			$value = 'NULL';
 		}
 		return $value;
 	}
