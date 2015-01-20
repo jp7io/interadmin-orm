@@ -474,7 +474,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		foreach ((array) $fields as $field) {
 			if (isset($campos[$field])) {
-				if ($campos[$field]['nome_id']) {
+				if (isset($campos[$field]['nome_id'])) {
 					$aliases[$field] = $campos[$field]['nome_id'];
 				} else {
 					$alias = $campos[$field]['nome'];
