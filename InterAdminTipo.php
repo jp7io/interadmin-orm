@@ -1087,9 +1087,26 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function modelRecords() {
 		$tipos = $this->getTiposUsingThisModel();
-		return $this->records()->where(['id_tipo' => $tipos]);
+
+		$query = new \Jp7\Interadmin\TypelessQuery($this);
+		return $query->where(['id_tipo' => $tipos]);
 	}
 	
+	public function deprecatedTypelessFind($options = array()) {
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
+		
+		$rs = $this->_executeQuery($options);
+		$records = array();
+		foreach ($rs as $row) {
+			$type = InterAdminTipo::getInstance($row->id_tipo);
+
+			$record = InterAdmin::getInstance($row->id, $optionsInstance, $type);
+			$this->_getAttributesFromRow($row, $record, $options);
+			$records[] = $record;
+		}
+		return new Collection($records);
+	}
+
 	public function getTagFilters() {
 		return "(tags.id_tipo = " . $this->id_tipo . " AND tags.id = 0)";
 	}
