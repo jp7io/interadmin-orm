@@ -20,8 +20,7 @@ function jp7_debug($msg) {
 	throw new Exception($msg);
 }
 
-
-// OVERIDE LARAVEL FUNCTIONS
+// OVERRIDE LARAVEL FUNCTIONS
 function snake_case($value, $delimiter = '_') {
 	if (ctype_lower($value)) return $value;
 	
@@ -42,6 +41,13 @@ function img_tag($img, $template = null, $options = array()) {
 	}
 }
 
+function km($object, $search = '.*') {
+	$methods = get_class_methods($object);
+	$methods = array_filter($methods, function ($a) use ($search) {
+		return preg_match('/' . $search . '/i', $a);
+	});
+	kd($methods);
+}
 /*
 function link_to($url, $title = null, $attributes = array(), $secure = null, $entities = false)
 {
