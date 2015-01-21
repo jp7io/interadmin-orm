@@ -14,7 +14,7 @@ class TypelessQuery extends Query {
 	}
 	
 	public function first() {
-		throw new BadMethodCallException('Not implemented.');
+		return $this->provider->deprecatedTypelessFind($this->options + array('limit' => 1))->first();
 	}
 	
 	public function count() {
