@@ -479,10 +479,12 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters) {
 		$resolvedWhere = $this->_resolveSql($options['where'], $options, $use_published_filters); 
-		
+		if (isset($options['order'])) {
+			$resolvedOrder = $this->_resolveSql($options['order'], $options, $use_published_filters); 
+		}
 		// Group by para wheres com children, DISTINCT é usado para corrigir COUNT() com children
 		$firstField = reset($options['fields']);
-		if (!empty($options['group']) && strpos($firstField, 'DISTINCT') === false) {
+		if (empty($options['group']) && strpos($firstField, 'DISTINCT') === false) {
 			foreach ($options['from'] as $join) {
 				// Isso pode ser feito por flag depois
 				if (strpos($join, '.parent_id = main.id') !== false || strpos($join, 'AS tags ON') !== false) {
@@ -492,10 +494,11 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 		
 		$clause = ((!empty($options['group'])) ? " GROUP BY " . $options['group'] : '') .
-			((!empty($options['having'])) ? " HAVING " . implode(' AND ', $options['having']) : '') .
-			((!empty($options['order'])) ? " ORDER BY " . $options['order'] : '');
+			((!empty($options['having'])) ? " HAVING " . implode(' AND ', $options['having']) : '');
 		
-		return $resolvedWhere . $this->_resolveSql($clause, $options, $use_published_filters);
+		return $resolvedWhere .
+			$this->_resolveSql($clause, $options, $use_published_filters) .
+			((isset($resolvedOrder)) ? " ORDER BY " . $resolvedOrder : '');
 	}
 	protected function _resolveSql($clause, &$options = array(), $use_published_filters) {
 		$campos = &$options['campos'];
