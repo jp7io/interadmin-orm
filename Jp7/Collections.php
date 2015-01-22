@@ -136,7 +136,7 @@ class Jp7_Collections {
 		foreach ($array as $item) {
 			$key = $item;
 			foreach ($properties as $property) {
-				$key = $key->$property;
+				$key = @$key->$property;
 			}
 			$separated[$key][] = $item;
 		}
@@ -394,11 +394,10 @@ class Jp7_Collections {
 				// select.id = record.select_id
 				$indexed = self::separate($records, $relationship . '.id');
 				
-				$rows = $data['tipo']->find(array(
-					'fields' => '*',
-					'fields_alias' => $data['alias'],
-					'where' => array('id IN (' . implode(',', array_keys($indexed)) . ')')
-				));
+				$rows = $data['tipo']
+					->records()
+					->where(['id' => array_keys($indexed)])
+					->all();
 				
 				if ($relationships) {
 					self::eagerLoad($rows, $relationships);
