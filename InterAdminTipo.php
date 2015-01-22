@@ -1108,7 +1108,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 
 	public function getTagFilters() {
-		return "(tags.id_tipo = " . $this->id_tipo . " AND tags.id = 0)";
+		return [
+			'tags.id_tipo' => $this->id_tipo,
+			'tags.id' => 0
+		];
 	}
 	
     /**

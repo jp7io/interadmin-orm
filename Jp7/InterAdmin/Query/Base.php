@@ -7,6 +7,13 @@ abstract class Base {
 	protected $provider;
 	protected $options;
 	
+	protected $operators = array(
+		'=', '<', '>', '<=', '>=', '<>', '!=',
+		'like', 'not like', 'between', 'ilike',
+		'&', '|', '^', '<<', '>>',
+		'rlike', 'regexp', 'not regexp',
+	);
+	
 	public function __construct(InterAdminAbstract $provider) {
 		$this->provider = $provider;
 		$this->options = array(
@@ -15,71 +22,54 @@ abstract class Base {
 		);
 	}
 	
-	public function where($_) {
-		$args = func_get_args();
-		if (count($args) > 1) {
-			// Prepared statement: email LIKE ?
-			return $this->_wherePreparedStatement($args);
-		}
-		$where = $args[0];
-		if (is_array($where) && !array_key_exists(0, $where)) {
+	public function where($column, $operator = null, $value = null) {
+		if (is_array($column)) {
 			// Hash = [a => 1, b => 2]
-			return $this->_whereHash($where);
+			if (array_key_exists(0, $column)) {
+				throw new \InvalidArgumentException("Invalid column.");
+			}
+			return $this->_whereHash($column);
 		}
-		// normal where
-		if (is_scalar($where)) {
-			$where = array($where);
+		if (func_num_args() == 2) {
+			list($value, $operator) = array($operator, '=');
+		} elseif ($this->invalidOperatorAndValue($operator, $value)) {
+			throw new \InvalidArgumentException("Value must be provided.");
 		}
-		$this->options['where'] = array_merge($this->options['where'], $where);
-		return $this;
-	}
-	
-	public function whereNot(array $hash) {
-		return $this->_whereHash($hash, true);
-	}
-	
-	protected function _wherePreparedStatement($args) {
-		$format = array_shift($args);
-		if (strpos($format, '?') === false) {
-			throw new BadMethodCallException('Expected a prepared statement such as: "email LIKE ?". Got ' . var_export(func_get_args(), true) . ' instead.');
+		if (!in_array(strtolower($operator), $this->operators, true)) {
+			throw new \InvalidArgumentException("Invalid operator.");
 		}
-		$format = str_replace('?', '%s', $format);
 		
-		$where = array_map([$this, '_escapeParam'], $args);
+		$this->options['where'][] = $this->_parseComparison($column, $operator, $value);
 		
-		array_unshift($where, $format);
-			
-		$where = array(call_user_func_array('sprintf', $where));
-		
-		$this->options['where'] = array_merge($this->options['where'], $where);
 		return $this;
 	}
 	
 	protected function _whereHash($hash, $reverse = false) {
 		$where = array();
 		foreach ($hash as $key => $value) {
-			$where[] = $this->_parseComparison($key, $value, $reverse);
+			$where[] = $this->_parseComparison($key, '=', $value);
 		}
 		$this->options['where'] = array_merge($this->options['where'], $where);
 		return $this;
 	}
 	
-	protected function _parseComparison($key, $value, $reverse) {
-		if (is_array($value)) {
-			$escaped = array_map([$this, '_escapeParam'], $value);
-			$operator = ($reverse ? 'NOT IN' : 'IN');
-			return "$key $operator (" . implode(',', $escaped) . ")";
+	protected function _parseComparison($column, $operator, $value) {
+		if (is_bool($value) && $this->_isChar($column)) {
+			if ($operator != '=') {
+				throw new \InvalidArgumentException("Invalid operator.");
+			}
+			$operator = ($value ? '<>' : '=');
+			$value = '';
+		} elseif (is_null($value) && $operator == '=') {
+			$operator = 'IS';
 		}
-		if (is_bool($value) && $this->_isChar($key)) {
-			$operator = ($value && !$reverse ? "<>" : "=");
-			return "$key $operator ''";
-		}
-		if (is_null($value)) {
-			$operator = ($reverse ? 'IS NOT' : 'IS');
-		} else {
-			$operator = ($reverse ? '<>' : '=');
-		}
-		return "$key $operator " . $this->_escapeParam($value);		
+		return $column . ' ' . $operator . ' ' . $this->_escapeParam($value);		
+	}
+	
+	protected function invalidOperatorAndValue($operator, $value) {
+		$isOperator = in_array($operator, $this->operators);
+
+		return ($isOperator && $operator != '=' && is_null($value));
 	}
 	
 	protected function _escapeParam($value) {

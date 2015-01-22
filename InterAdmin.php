@@ -323,7 +323,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminOptions
 	 */
 	public function siblings() {
-		return $this->getType()->records()->whereNot(['id' => $this->id]);
+		return $this->getType()->records()->where('id', '<>', $this->id);
 	}
 
 	/**
@@ -782,7 +782,10 @@ class InterAdmin extends InterAdminAbstract {
 	}
 	
 	public function getTagFilters() {
-		return "(tags.id = " . $this->id . " AND tags.id_tipo = " . intval($this->getType()->id_tipo) . ")";
+		return [
+			'tags.id' => $this->id,
+			'tags.id_tipo' => intval($this->getType()->id_tipo)
+		];
 	}
     
     /**
