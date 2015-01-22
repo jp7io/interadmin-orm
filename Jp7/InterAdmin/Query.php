@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Query extends Query\Base {
 	
+	public function type() {
+		return $this->provider;
+	}
+	
 	protected function _isChar($field) {
 		$aliases = array_flip($this->provider->getCamposAlias());
 		if (isset($aliases[$field])) {

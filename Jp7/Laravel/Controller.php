@@ -15,6 +15,7 @@ class Controller extends \Illuminate\Routing\Controller {
 	 */
 	protected $_viewData = null;
 	protected $typeClassName = null;
+	protected $scope = null;
 	
 	public function __construct() {
 		static::$current = $this;
@@ -22,6 +23,7 @@ class Controller extends \Illuminate\Routing\Controller {
 		if (is_null($this->_viewData)) {
 			$this->_viewData = new \stdClass();
 		}
+		$this->beforeFilter('@setScope');
 		$this->beforeFilter('@setType');
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
 	}
@@ -43,8 +45,8 @@ class Controller extends \Illuminate\Routing\Controller {
 		//$klass = \getDefaultClass();
 		return \InterAdminTipo::getInstance(0);
 	}
-        
-	public function setType() {
+       
+	public function setScope($route) {
 		if (!static::$type && $this->typeClassName) {
 			$className = '\\' . $this->typeClassName;
 			
@@ -53,18 +55,19 @@ class Controller extends \Illuminate\Routing\Controller {
 			}
 		}
 		
-		$this->type = static::$type;
+		$this->scope = static::$type->records();
+	}
+	
+	public function setType($route) {
+		$this->type = $this->scope->type();
 	}
 
-	public function setRecord() {
-		$route = \Route::getCurrentRoute();
-		$resources = $route->parameterNames();
-		
-		if ($this->type && count($resources) == 1) {
-			$resourceName = end($resources);
-			$value = $route->getParameter($resourceName);
+	public function setRecord($route) {
+		$parameters = $route->parameterNames();
+		if ($this->scope && count($parameters) > 0) {
+			$slug = $route->getParameter(end($parameters));
 			
-			$this->record = $this->type->records()->find($value);
+			$this->record = $this->scope->find($slug);
 		}
 	}
 
@@ -78,23 +81,24 @@ class Controller extends \Illuminate\Routing\Controller {
 	public function callAction($method, $parameters) {
 		$response = call_user_func_array(array($this, $method), $parameters);
 		
-		if (is_null($response)) {
-			if ($method == 'show' && !$this->record) {
-				throw new \Exception('Show action without record. You need to set $this->record inside your controller.');	
-			}
-				
-			$viewName = $this->_getViewName($method);
-			$viewContent = \View::make($viewName, (array) $this->_viewData);
-			
-			if (is_null($this->layout)) {
-				$response = $viewContent;
-			} else {
-				$this->_viewData->content = $viewContent;
-				$response = \View::make($this->layout, (array) $this->_viewData);
-			}
+		if (!is_null($response)) {
+			return $response;
 		}
+		if ($method == 'show' && !$this->record) {
+			throw new \Exception('Show action without record. You need to set $this->record inside your controller.');	
+		}
+		return $this->_makeView($method);
+	}
 	
-		return $response;
+	private function _makeView($method) {
+		$viewName = $this->_getViewName($method);
+		$viewContent = \View::make($viewName, (array) $this->_viewData);
+		
+		if ($this->layout) {
+			$this->_viewData->content = $viewContent;
+			$viewContent = \View::make($this->layout, (array) $this->_viewData);
+		}
+		return $viewContent;
 	}
 	
 	/**
@@ -102,8 +106,8 @@ class Controller extends \Illuminate\Routing\Controller {
 	 * 
 	 * @return string
 	 */
-	private function _getViewName($action) {
-		$action = str_replace('_', '-', snake_case($action));
+	private function _getViewName($method) {
+		$action = str_replace('_', '-', snake_case($method));
 		
 		$viewRoute = $this->_viewRoute(get_class($this), $action);
 		if ($this->_viewExists($viewRoute)) {
