@@ -122,6 +122,10 @@ class InterAdmin extends InterAdminAbstract {
 			return \InterAdminTipo::getInstance($id_tipo);
 		}
 	}
+	
+	public static function create(array $attributes = array()) {
+		return self::type()->deprecated_createInterAdmin();
+	}
 
 	/**
 	 * Returns an InterAdmin instance. If $options['class'] is passed, 
@@ -674,7 +678,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		$siblingSlugs = $this->siblings()
 			->where('id_slug', 'LIKE', "$newSlug%")
-			->distinct('id_slug');
+			->lists('id_slug');
 		
 		$i = 2;
 		$newSlugCopy = $newSlug;

@@ -263,7 +263,7 @@ abstract class InterAdminAbstract implements Serializable {
 		$aliases = array_flip($this->getAttributesAliases());
 		
 		foreach ($attributes as $key => $value) {
-			$key = ($aliases[$key]) ? $aliases[$key] : $key;
+			$key = isset($aliases[$key]) ? $aliases[$key] : $key;
 			switch (gettype($value)) {
 				case 'object':
 					$valuesToSave[$key] = (string) $value;

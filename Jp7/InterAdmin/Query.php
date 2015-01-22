@@ -83,6 +83,10 @@ class Query extends Query\Base {
 		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
+	public function lists($column) {
+		return $this->provider->deprecated_distinct($column);
+	}
+	
 	public function findOrFail($id) {
 		$result = $this->find($id);
 		if (!$result) {
