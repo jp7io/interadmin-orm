@@ -565,6 +565,10 @@ class InterAdminTipo extends InterAdminAbstract {
     		list($action, $parameters) = ['index', $action];
     	}
     	
+		if ($this->getParent() instanceof InterAdmin) {
+			array_unshift($parameters, $this->getParent());
+		}
+		
     	$route = $this->getRoute($action);
     	if (!$route) {
     		throw new BadMethodCallException('There is no route for id_tipo: ' . $this->id_tipo .
