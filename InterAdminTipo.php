@@ -1089,7 +1089,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$tipos = $this->getTiposUsingThisModel();
 
 		$query = new \Jp7\Interadmin\TypelessQuery($this);
-		return $query->where(['id_tipo' => $tipos]);
+		return $query->whereIn('id_tipo', $tipos);
 	}
 	
 	public function deprecatedTypelessFind($options = array()) {

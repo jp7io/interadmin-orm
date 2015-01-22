@@ -396,7 +396,7 @@ class Jp7_Collections {
 				
 				$rows = $data['tipo']
 					->records()
-					->where(['id' => array_keys($indexed)])
+					->whereIn('id', array_keys($indexed))
 					->all();
 				
 				if ($relationships) {
@@ -411,7 +411,9 @@ class Jp7_Collections {
 			} elseif ($data['type'] == 'children') {
 				// child.parent_id = parent.id
 				$data['tipo']->setParent(null);
-				$children = $data['tipo']->where(['parent_id' => $records])->all();
+				$children = $data['tipo']
+					->whereIn('parent_id', $records)
+					->all();
 				if ($relationships) {
 					self::eagerLoad($children, $relationships);
 				}

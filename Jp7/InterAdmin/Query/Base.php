@@ -44,6 +44,18 @@ abstract class Base {
 		return $this;
 	}
 	
+	public function whereIn($column, $values) {
+		$values = array_map([$this, '_escapeParam'], $values);
+		$this->options['where'][] = $column . ' IN (' . implode(',', $values) . ')';
+		return $this;
+	}
+	
+	public function whereNotIn($column, $values) {
+		$values = array_map([$this, '_escapeParam'], $values);
+		$this->options['where'][] = $column . ' NOT IN (' . implode(',', $values) . ')';
+		return $this;
+	}
+	
 	protected function _whereHash($hash, $reverse = false) {
 		$where = array();
 		foreach ($hash as $key => $value) {

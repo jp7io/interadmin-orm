@@ -672,7 +672,9 @@ class InterAdmin extends InterAdminAbstract {
 			// Está igual, evitar query
 			return $newSlug; 
 		}
-		$siblingSlugs = $this->siblings()->where('id_slug LIKE ?', "$newSlug%")->distinct('id_slug');
+		$siblingSlugs = $this->siblings()
+			->where('id_slug', 'LIKE', "$newSlug%")
+			->distinct('id_slug');
 		
 		$i = 2;
 		$newSlugCopy = $newSlug;
