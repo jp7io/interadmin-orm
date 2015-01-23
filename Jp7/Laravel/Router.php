@@ -106,6 +106,7 @@ class Router extends \Illuminate\Routing\Router {
 	
 	public function uriToBreadcrumb($uri, $resolveParameter) {
 		$breadcrumb = [];
+		$uri = trim($uri, '/');
 		if ($uri == '') {
 			return $breadcrumb;
 		}

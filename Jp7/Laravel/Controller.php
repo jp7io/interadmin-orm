@@ -45,7 +45,7 @@ class Controller extends \Illuminate\Routing\Controller {
 	}
     
 	public function setScope($route) {
-		$uri = trim($route->getUri(), '/');
+		$uri = $route->getUri();
 		
 		$action = explode('@', $route->getActionName())[1];
 		if (in_array($action, array('show', 'edit', 'update', 'destroy'))) {
