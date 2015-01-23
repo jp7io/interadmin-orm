@@ -58,6 +58,12 @@ class Controller extends \Illuminate\Routing\Controller {
 		});
 		
 		if ($type = end($breadcrumb)) {
+			$parent = $type->getParent();
+			if ($parent instanceof \InterAdmin && !$parent->hasChildrenTipo($type->id_tipo)) {
+				throw new \Jp7_InterAdmin_Exception('It seems this route has a'
+					. ' special structure. You need to define a custom '
+					. 'setScope() to handle this.');
+			}
 			$this->scope = $type->records();
 		}
 	}

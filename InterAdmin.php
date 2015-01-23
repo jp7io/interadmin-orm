@@ -320,7 +320,16 @@ class InterAdmin extends InterAdminAbstract {
 		$childrenTipo->setParent($this);
 		return $childrenTipo;
 	}
-
+	
+	public function hasChildrenTipo($id_tipo) {
+		foreach ($this->getType()->getInterAdminsChildren() as $childrenArr) {
+			if ($childrenArr['id_tipo'] == $id_tipo) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Returns siblings records
 	 * 
