@@ -127,6 +127,11 @@ class InterAdmin extends InterAdminAbstract {
 		return self::type()->deprecated_createInterAdmin();
 	}
 
+	public function hasMany($className, $foreign_key, $local_key = 'id') {
+		$query = call_user_func([$className, 'query']);
+		return $query->join();
+	}
+	
 	/**
 	 * Returns an InterAdmin instance. If $options['class'] is passed, 
 	 * it will be returned an object of the given class, otherwise it will search 

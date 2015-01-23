@@ -550,6 +550,7 @@ abstract class InterAdminAbstract implements Serializable {
 					if ($table == 'tags') {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
+					/*
 					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = studly_case(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
@@ -567,6 +568,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table .
 						' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
 						(($existsMatches[4]) ? ' AND ' : '');
+					*/
 					} elseif ($options['joins'][$table]) {
 						$joinTipo = $options['joins'][$table][1];
 						$onClause = array(
@@ -601,11 +603,7 @@ abstract class InterAdminAbstract implements Serializable {
 					}
 
 					// Joins com children
-					if (strpos($table, 'children_') === 0) {
-						$joinNome = studly_case(substr($table, 9));
-					} else {
-						$joinNome = studly_case($table);
-					}
+					$joinNome = studly_case($table);
 					if (isset($childrenArr[$joinNome])) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
