@@ -41,7 +41,7 @@ class Router extends \Illuminate\Routing\Router {
 			$this->logger->resource($section->getSlug(), $section->getControllerBasename(), [
 				'only' => ['index', 'show'],
 				'id_tipo' => $section->id_tipo,
-				'dynamic' => $this->_checkTemplate($section) ? '|dynamic' : ''						
+				'dynamic' => $this->_checkTemplate($section)					
 			]);
 		}
 		if ($firstCall) {
@@ -65,8 +65,8 @@ class Router extends \Illuminate\Routing\Router {
 			if (!array_key_exists($options['id_tipo'], $this->mapIdTipos)) {
 				$this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute . '.' : '') . $name;
 			}
-			$dynamic = isset($options['dynamic']) ? $options['dynamic'] : '';
-			$before = 'setType:' . $options['id_tipo'] . $dynamic;
+			
+			$before = empty($options['dynamic']) ? '' : 'dynamic';
 			
 			$this->group(['before' => $before], function() use ($name, $controller, $options) {
 				parent::resource($name, $controller, $options);
@@ -102,6 +102,43 @@ class Router extends \Illuminate\Routing\Router {
 		$matches = array();
 		preg_match_all('/{(\w+)}/', $route->getUri(), $matches);
 		return $matches[1] ?: array();
+	}
+	
+	public function uriToBreadcrumb($uri, $resolveParameter) {
+		$breadcrumb = [];
+		if ($uri == '') {
+			return $breadcrumb;
+		}
+		$parameter = null;
+		$type = null;
+		
+		$segments = explode('/', $uri);
+		$routeParts = [];
+		
+		foreach ($segments as $segment) {
+			if (starts_with($segment, '{')) {
+				$parameter = $resolveParameter($type, $segment);
+				$breadcrumb[] = $parameter;
+			} else {
+				$routeParts[] = $segment;
+				$routeName = implode('.', $routeParts);
+				
+				$type = $this->getTypeByRoute($routeName);
+				if ($type && $parameter) {
+					$type->setParent($parameter);
+				}
+				$breadcrumb[] = $type;
+			}
+		}
+		return $breadcrumb;
+	}
+	
+	public function getTypeByRoute($routeName) {
+		$id_tipo = $this->getIdTipoByRoute($routeName);
+		if (!$id_tipo) {
+			return null;
+		}
+		return \InterAdminTipo::getInstance($id_tipo);
 	}
 	
 	protected function _checkTemplate($section) {

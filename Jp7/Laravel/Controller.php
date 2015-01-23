@@ -3,9 +3,7 @@
 namespace Jp7\Laravel;
 
 class Controller extends \Illuminate\Routing\Controller {
-
-	/* Internal use only */
-	static $type = null;
+	
 	protected static $current = null;
 
 	protected $layout = 'layouts.master';
@@ -14,7 +12,6 @@ class Controller extends \Illuminate\Routing\Controller {
 	 * @var Variables to send to view
 	 */
 	protected $_viewData = null;
-	protected $typeClassName = null;
 	protected $scope = null;
 	
 	public function __construct() {
@@ -41,33 +38,47 @@ class Controller extends \Illuminate\Routing\Controller {
 		return static::$current;
 	}
 	
+	// FIXME Where is it Used??
 	public function getRootType() {
-		//$klass = \getDefaultClass();
+		//$klass = \getDefaultClass(); 
 		return \InterAdminTipo::getInstance(0);
 	}
-       
+    
 	public function setScope($route) {
-		if (!static::$type && $this->typeClassName) {
-			$className = '\\' . $this->typeClassName;
-			
-			if (class_exists($className)) {
-				static::$type = new $className;
-			}
+		$uri = trim($route->getUri(), '/');
+		
+		$action = explode('@', $route->getActionName())[1];
+		if (in_array($action, array('show', 'edit', 'update', 'destroy'))) {
+			$uri = dirname($uri); // Do not resolve $record yet
 		}
 		
-		$this->scope = static::$type->records();
+		$breadcrumb = \Route::uriToBreadcrumb($uri, function($type, $segment) use ($route) {
+			$slug = $route->getParameter(trim($segment, '{}'));
+			return $type->records()->find($slug);
+		});
+		
+		if ($type = end($breadcrumb)) {
+			$this->scope = $type->records();
+		}
 	}
 	
-	public function setType($route) {
+	public function setType() {
+		if (!$this->scope) {
+			throw new \Jp7_InterAdmin_Exception('setScope() could not resolve the'
+				. ' type associated with this URI. You need to map it on routes.php.'
+				. ' You can also define a custom setScope() or setType()');
+		}
 		$this->type = $this->scope->type();
 	}
-
+	
 	public function setRecord($route) {
-		$parameters = $route->parameterNames();
-		if ($this->scope && count($parameters) > 0) {
-			$slug = $route->getParameter(end($parameters));
-			
-			$this->record = $this->scope->find($slug);
+		if ($this->scope) {
+			$parameters = $route->parameterNames();
+			if (count($parameters) > 0) {
+				$slug = $route->getParameter(end($parameters));
+				
+				$this->record = $this->scope->find($slug);
+			}
 		}
 	}
 
