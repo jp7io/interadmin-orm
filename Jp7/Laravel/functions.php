@@ -29,7 +29,12 @@ function snake_case($value, $delimiter = '_') {
 
 function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
-		$url = $img->getUrl();
+		if (!is_file($img->getFilename())) {
+			// FIXME temporario local
+			$url = 'assets/placeholder.gif';
+		} else {
+			$url = $img->getUrl();
+		}
 	} else {
 		$url = $img;
 	}
