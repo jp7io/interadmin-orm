@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\InterAdmin;
+namespace Jp7\Interadmin;
 
 class DynamicLoader {
 

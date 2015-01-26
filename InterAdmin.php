@@ -3,6 +3,7 @@
 use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\ClassMap;
 use Jp7\Interadmin\Query;
+use Jp7\Interadmin\Relation\HasMany;
  
 /**
  * Class which represents records on the table interadmin_{client name}.
@@ -128,8 +129,7 @@ class InterAdmin extends InterAdminAbstract {
 	}
 
 	public function hasMany($className, $foreign_key, $local_key = 'id') {
-		$query = call_user_func([$className, 'query']);
-		return $query->join();
+		return new HasMany($this, $className, $foreign_key, $local_key);
 	}
 	
 	/**

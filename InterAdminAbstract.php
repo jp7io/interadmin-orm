@@ -485,11 +485,8 @@ abstract class InterAdminAbstract implements Serializable {
 		// Group by para wheres com children, DISTINCT é usado para corrigir COUNT() com children
 		$firstField = reset($options['fields']);
 		if (empty($options['group']) && strpos($firstField, 'DISTINCT') === false) {
-			foreach ($options['from'] as $join) {
-				// Isso pode ser feito por flag depois
-				if (strpos($join, '.parent_id = main.id') !== false || strpos($join, 'AS tags ON') !== false) {
-					$options['group'] = 'main.id';
-				}
+			if (!empty($options['auto_group_flag'])) {
+				$options['group'] = 'main.id';
 			}
 		}
 		
@@ -516,10 +513,11 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		$offset = 0;
 		$ignoreJoinsUntil = -1;
-			
-		if (empty($options['from_alias'])) {
-			$options['from_alias'] = array();
-		}
+
+		$options += array(
+			'from_alias' => array(),
+			'joins' => array()
+		);
 					
 		while(preg_match('/(' . $quoted . '|' . $keyword . $not_function . '|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
@@ -546,7 +544,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
 					$table = $existsMatches[2];
-					// TODO unificar l�gica
+					// TODO unificar logica
 					if ($table == 'tags') {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
@@ -617,6 +615,7 @@ abstract class InterAdminAbstract implements Serializable {
 							' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
 						}
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
+						$options['auto_group_flag'] = true;
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					} elseif ($table == 'tags') {
 						if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
@@ -625,17 +624,36 @@ abstract class InterAdminAbstract implements Serializable {
 							" ON " . $table . ".parent_id = main.id";
 						}
 						$joinAliases = array();
-					// Joins normais
+						$options['auto_group_flag'] = true;
 					} else {
 						$joinNome = isset($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
-						if (isset($options['joins']) && $options['joins'][$table]) {
+						if (isset($options['joins'][$table])) {
 							$joinTipo = $options['joins'][$table][1];
-						} else {
-							if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
+						// Joins de select / special
+						} elseif (isset($campos[$joinNome])) {
+							if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
 								$this->_addJoinAlias($options, $table, $campos[$joinNome]);
 							}
 							$joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						} elseif (method_exists($options['model'], $joinNome)) {
+							$relationshipData = $options['model']->$joinNome()->getRelationshipData();
+
+							$joinTipo = $relationshipData['tipo'];
+							if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
+								$conditions = array_map(function($x) use ($table) {
+									return $table . '.' . $x;
+								}, $relationshipData['conditions']);
+
+								$options['from_alias'][] = $table;
+								$options['from'][] = $joinTipo->getInterAdminsTableName() .
+									' AS ' . $table . ' ON ' . implode(' AND ', $conditions) .
+									' AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
+								
+								$options['auto_group_flag'] = true;
+							}
+						} else {
+							die(jp7_debug('The field "' . $joinNome . '" cannot be used as a join (' . get_class($this) . ' - PK: ' . $this->__toString() . ').'));
 						}
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
@@ -646,7 +664,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
 		
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
-						if (!in_array($subtable, (array) $options['from_alias'])) {
+						if (!in_array($subtable, $options['from_alias'])) {
 							$options['from_alias'][] = $subtable;
 							$options['from'][] = $subJoinTipo->getInterAdminsTableName() .
 								' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] . ' AND ' . $subtable . '.id_tipo = ' . $subJoinTipo->id_tipo;

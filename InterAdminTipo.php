@@ -1031,6 +1031,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		);
 		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+		if ($this->_parent instanceof InterAdmin) {
+			$recordModel->setParent($this->_parent);
+		}
 		
 		if (empty($options['fields'])) {
 			$defaultFields = static::DEFAULT_FIELDS;
@@ -1054,6 +1057,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();
+		$options['model'] = $recordModel;
 		$options['eager_load'] = array();
 		
 		if (isset($options['with'])) {
@@ -1080,7 +1084,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 		
 	public function getInterAdminsAdminAttributes() {
-		return array('id_slug', 'id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+		return array('id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
 	}
 		
 	/**
