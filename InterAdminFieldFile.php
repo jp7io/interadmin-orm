@@ -19,7 +19,7 @@ class InterAdminFieldFile {
 
 	protected $_parent;
 	/**
-	 * Créditos/Legenda da imagem.
+	 * Crï¿½ditos/Legenda da imagem.
 	 *
 	 * @var InterAdmin
 	 */
@@ -40,7 +40,7 @@ class InterAdminFieldFile {
 
 	/**
 	 * Retorna texto para ser usado no "alt" ou "title" da imagem.
-     * Utiliza o campo "Créditos/Leg.:" do arquivo ou o varchar_key do Registro.
+     * Utiliza o campo "Creditos/Leg.:" do arquivo ou o varchar_key do Registro.
 	 *
 	 * @return string
 	 */
@@ -48,7 +48,7 @@ class InterAdminFieldFile {
         if ($this->text) {
 			$retorno = $this->text;
 		} elseif ($parent = $this->getParent()) {
-			$retorno = $parent->getNome();
+			$retorno = $parent->getName();
 		}
 		return $retorno;
 	}
