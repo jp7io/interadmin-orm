@@ -56,6 +56,22 @@ abstract class Base {
 		return $this;
 	}
 	
+	public function whereExists($relationship, $conditions = null, $_not = false) {
+		$where = [];
+		foreach ($conditions as $key => $value) {
+			$where[] = $this->_parseComparison($key, '=', $value);
+		}
+		
+		$this->options['where'][] = ($_not ? 'NOT ' : '') . "EXISTS (" .
+			$relationship . " WHERE " . implode(' AND ', $where) . 
+		")";
+		return $this;
+	}
+	
+	public function whereNotExists($relationship, $conditions = null) {
+		return $this->whereExists($relationship, $conditions, true);
+	}
+	
 	protected function _whereHash($hash, $reverse = false) {
 		$where = array();
 		foreach ($hash as $key => $value) {

@@ -26,6 +26,9 @@ class Query extends Query\Base {
 	public function joinThrough(InterAdminTipo $tipo, $relationshipPath) {
 		$path = explode('.', $relationshipPath);
 		$tableLeft = array_shift($path);
+		if (!$path) {
+			throw new BadMethodCallException('Bad relationship path: ' . $relationshipPath);
+		}
 		
 		$joins = array();
 		

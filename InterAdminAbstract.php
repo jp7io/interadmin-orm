@@ -147,7 +147,6 @@ abstract class InterAdminAbstract implements Serializable {
 				// Internal use
 				'aliases' => $this->getAttributesAliases(),
 				'campos' => $this->getAttributesCampos()
-				//'skip_published_filters' => array('main')
 			);
 			$rs = $this->_executeQuery($options);
 			if ($row = $rs[0]) {
@@ -193,8 +192,7 @@ abstract class InterAdminAbstract implements Serializable {
 				'where' => array($this->_primary_key . ' = ' . intval($this->{$this->_primary_key})),
 				// Internal use
 				'aliases' => $this->getAttributesAliases(),
-				'campos' => $this->getAttributesCampos(),
-				'skip_published_filters' => array('main')
+				'campos' => $this->getAttributesCampos()
 			);
 			$rs = $this->_executeQuery($options);
 			if ($row = array_shift($rs)) {
@@ -415,14 +413,10 @@ abstract class InterAdminAbstract implements Serializable {
 				foreach ($options['from'] as $key => $from) {
 					list($table, $alias) = explode(' AS ', $from);
 					if ($alias == 'main') {
-						if (empty($options['skip_published_filters']) || !in_array('main', $options['skip_published_filters'])) {
-							$filters = static::getPublishedFilters($table, 'main');
-						}			
+						$filters = static::getPublishedFilters($table, 'main');
 					} else {
 						$joinArr = explode(' ON', $alias);
-						if (empty($options['skip_published_filters']) || !in_array($joinArr[0], $options['skip_published_filters'])) {
-							$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
-						}
+						$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
 					}
 				}
 			}
@@ -545,17 +539,12 @@ abstract class InterAdminAbstract implements Serializable {
 				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
 					$table = $existsMatches[2];
 					// TODO unificar logica
-					if ($table == 'tags') {
-						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
-						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
-					/*
-					} elseif (strpos($table, 'children_') === 0) {
-						$joinNome = studly_case(substr($table, 9));
+					if (!isset($childrenArr)) {
 						$childrenArr = $this->getInterAdminsChildren();
-						if (!$childrenArr[$joinNome]) {
-							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' .
-									'Expected a child named "' . $joinNome . '". Found: ' . implode(', ', array_keys($childrenArr)));
-						}
+					}
+					
+					$joinNome = studly_case($table);
+					if (isset($childrenArr[$joinNome])) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
@@ -566,7 +555,9 @@ abstract class InterAdminAbstract implements Serializable {
 						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table .
 						' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
 						(($existsMatches[4]) ? ' AND ' : '');
-					*/
+					} elseif ($table == 'tags') {
+						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
+						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
 					} elseif ($options['joins'][$table]) {
 						$joinTipo = $options['joins'][$table][1];
 						$onClause = array(
@@ -612,19 +603,22 @@ abstract class InterAdminAbstract implements Serializable {
 						if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $joinTipo->getInterAdminsTableName() .
-							' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
+								' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
+							
+							$options['auto_group_flag'] = true;
 						}
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
-						$options['auto_group_flag'] = true;
+						
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					} elseif ($table == 'tags') {
 						if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
 							$options['from_alias'][] = $table;
 							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
-							" ON " . $table . ".parent_id = main.id";
+								" ON " . $table . ".parent_id = main.id";
+							
+							$options['auto_group_flag'] = true;
 						}
 						$joinAliases = array();
-						$options['auto_group_flag'] = true;
 					} else {
 						$joinNome = isset($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
