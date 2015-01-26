@@ -25,7 +25,7 @@ class Collection extends BaseCollection {
 		return new self($subitems);
 	}
 	
-	public function pluck($value, $key = null) {
+	public function collect($value, $key = null) {
 		return new self(array_pluck($this->items, $value, $key));		
 	}
 }

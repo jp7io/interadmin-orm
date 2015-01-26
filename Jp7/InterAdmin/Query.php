@@ -92,16 +92,13 @@ class Query extends Query\Base {
 	}
 	
 	public function lists($column, $key = null) {
-		$result = [];
 		$array = $this->provider->deprecated_raw_fields(array_filter([$column, $key]), $this->options);
-		foreach ($array as $item) {
-			if ($key) {
-				$result[$item[$key]] = $item[$column];
-			} else {
-				$result[] = $item[$column];
-			}
-		}
-		return $result;
+		
+		return array_pluck($array, $column, $key);
+	}
+	
+	public function collect($column) {
+		return new Collection($this->lists($column));
 	}
 	
 	public function findOrFail($id) {
