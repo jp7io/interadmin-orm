@@ -123,10 +123,6 @@ class InterAdmin extends InterAdminAbstract {
 			return \InterAdminTipo::getInstance($id_tipo);
 		}
 	}
-	
-	public static function create(array $attributes = array()) {
-		return self::type()->deprecated_createInterAdmin();
-	}
 
 	public function hasMany($className, $foreign_key, $local_key = 'id') {
 		return new HasMany($this, $className, $foreign_key, $local_key);

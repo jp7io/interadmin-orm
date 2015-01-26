@@ -10,6 +10,10 @@ class Query extends Query\Base {
 		return $this->provider;
 	}
 	
+	public function create(array $attributes = array()) {
+		return $this->provider->deprecated_createInterAdmin($attributes);
+	}
+	
 	protected function _isChar($field) {
 		$aliases = array_flip($this->provider->getCamposAlias());
 		if (isset($aliases[$field])) {
@@ -87,8 +91,17 @@ class Query extends Query\Base {
 		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
-	public function lists($column) {
-		return $this->provider->deprecated_distinct($column);
+	public function lists($column, $key = null) {
+		$result = [];
+		$array = $this->provider->deprecated_raw_fields(array_filter([$column, $key]), $this->options);
+		foreach ($array as $item) {
+			if ($key) {
+				$result[$item[$key]] = $item[$column];
+			} else {
+				$result[] = $item[$column];
+			}
+		}
+		return $result;
 	}
 	
 	public function findOrFail($id) {
