@@ -332,26 +332,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return $array;	
 	}
-	
-	public function deprecated_raw_fields($fields, $options = array()) {
-		$this->_prepareInterAdminsOptions($options, $optionsInstance);
-		
-		$options['fields'] = $fields;
-		$options['where'][] = "id_tipo = " . $this->id_tipo;
-		
-		if ($this->_parent instanceof InterAdmin) {
-			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
-		}
-		
-		$rs = $this->_executeQuery($options);
-		$array = array();
-		foreach ($rs as $row) {
-			$record = new stdClass();
-			$this->_getAttributesFromRow($row, $record, $options);
-			$array[] = $record->attributes;
-		}
-		return $array;	
-	}
 		
 	/**
 	 * Returns the number of InterAdmins using COUNT(id).

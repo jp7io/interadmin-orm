@@ -95,7 +95,9 @@ class Query extends Query\Base {
 	}
 	
 	public function lists($column, $key = null) {
-		$array = $this->provider->deprecated_raw_fields(array_filter([$column, $key]), $this->options);
+		$array = $this->provider->deprecatedFind(array(
+			'fields' => array_filter([$column, $key]),
+		) + $this->options);
 		
 		return array_pluck($array, $column, $key);
 	}
