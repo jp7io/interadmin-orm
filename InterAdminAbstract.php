@@ -434,8 +434,9 @@ abstract class InterAdminAbstract implements Serializable {
 		    
 			// Sql
 			$sql = "SELECT " . implode(',', $options['fields']) .
-				" FROM " . implode(' LEFT JOIN ', $options['from']) .
+				" FROM " . array_shift($options['from']) .
 			    $joins .
+			    ($options['from'] ? ' LEFT JOIN ' . implode(' LEFT JOIN ', $options['from']) : '') .
 				" WHERE " . $filters . $clauses .
 				((!empty($options['limit'])) ? " LIMIT " . $options['limit'] : '');
 
