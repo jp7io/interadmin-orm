@@ -50,6 +50,12 @@ abstract class Base {
 		return $this;
 	}
 	
+	public function whereFindInSet($column, $value) {
+		$value = $this->_escapeParam($value);
+		$this->options['where'][] = ' FIND_IN_SET (' . $value . ', ' . $column . ')';
+		return $this;
+	}
+	
 	public function whereNotIn($column, $values) {
 		$values = array_map([$this, '_escapeParam'], $values);
 		$this->options['where'][] = $column . ' NOT IN (' . implode(',', $values) . ')';
