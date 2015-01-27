@@ -63,10 +63,7 @@ abstract class Base {
 	}
 	
 	public function whereExists($relationship, $conditions = null, $_not = false) {
-		$where = [];
-		foreach ($conditions as $key => $value) {
-			$where[] = $this->_parseComparison($relationship . '.' . $key, '=', $value);
-		}
+		$where = $this->_parseConditions($conditions, $relationship . '.');
 		
 		$this->options['where'][] = ($_not ? 'NOT ' : '') . "EXISTS (" .
 			$relationship . " WHERE " . implode(' AND ', $where) . 
@@ -87,6 +84,18 @@ abstract class Base {
 		return $this;
 	}
 	
+	protected function _parseConditions($conditions, $prefix = '') {
+		$where = [];
+		if (is_string($conditions)) {
+			$where[] = $conditions;
+		} else {
+			foreach ($conditions as $key => $value) {
+				$where[] = $this->_parseComparison($prefix . $key, '=', $value);
+			}
+		}
+		return $where;
+	}
+	
 	protected function _parseComparison($column, $operator, $value) {
 		if (is_bool($value) && $this->_isChar($column)) {
 			if ($operator != '=') {
@@ -98,6 +107,16 @@ abstract class Base {
 			$operator = 'IS';
 		}
 		return $column . ' ' . $operator . ' ' . $this->_escapeParam($value);		
+	}
+	
+	protected function _resolveType($var) {
+		if (is_string($var)) {
+			return call_user_func([$var, 'type']);
+		}
+		if ($var instanceof InterAdminTipo) {
+			return $var;
+		}
+		throw new BadMethodCallException('Expected class name or InterAdminTipo, got: ' . gettype($var));
 	}
 	
 	protected function invalidOperatorAndValue($operator, $value) {
@@ -122,19 +141,19 @@ abstract class Base {
 		return $this;
 	}
 	
-	public function join($alias, InterAdminTipo $tipo, $on) {
-		$this->options['joins'][$alias] = array('INNER', $tipo, $on);
+	public function join($alias, $className, $conditions, $_joinType = 'INNER') {
+		$type = $this->_resolveType($className);
+		$on = $this->_parseConditions($conditions, $alias . '.')[0];
+		$this->options['joins'][$alias] = array($_joinType, $type, $on);
 		return $this;
 	}
 	
-	public function leftJoin($alias, InterAdminTipo $tipo, $on) {
-		$this->options['joins'][$alias] = array('LEFT', $tipo, $on);
-		return $this;
+	public function leftJoin($alias, $className, $conditions) {
+		return $this->join($alias, $className, $conditions, 'LEFT');
 	}
 	
-	public function rightJoin($alias, InterAdminTipo $tipo, $on) {
-		$this->options['joins'][$alias] = array('RIGHT', $tipo, $on);
-		return $this;
+	public function rightJoin($alias, $className, $conditions) {
+		return $this->join($alias, $className, $conditions, 'RIGHT');
 	}
 	
 	public function limit($offset, $rows = null) {

@@ -23,7 +23,9 @@ class Query extends Query\Base {
 		}
 	}
 	
-	public function joinThrough(InterAdminTipo $tipo, $relationshipPath) {
+	public function joinThrough($className, $relationshipPath) {
+		$type = $this->_resolveType($className);
+		
 		$path = explode('.', $relationshipPath);
 		$tableLeft = array_shift($path);
 		if (!$path) {
@@ -33,17 +35,17 @@ class Query extends Query\Base {
 		$joins = array();
 		
 		while ($relationship = array_shift($path)) {
-			$relationshipData = $tipo->getRelationshipData($relationship);
+			$relationshipData = $type->getRelationshipData($relationship);
 			$tableRight = (empty($path)) ? '' : $relationship . '.';
 			
 			if ($relationshipData['type'] == 'children') {
-				$joins[] = [$tableLeft, $tipo, "{$tableLeft}.id = {$tableRight}parent_id"];
+				$joins[] = [$tableLeft, $type, "{$tableLeft}.id = {$tableRight}parent_id"];
 			} else {
-				$joins[] = [$tableLeft, $tipo, "{$tableLeft}.{$relationship} = {$tableRight}id"];
+				$joins[] = [$tableLeft, $type, "{$tableLeft}.{$relationship} = {$tableRight}id"];
 			}
 			
 			$tableLeft = $relationship;
-			$tipo = $relationshipData['tipo'];
+			$type = $relationshipData['tipo'];
 		}
 		
 		foreach (array_reverse($joins) as $join) {
