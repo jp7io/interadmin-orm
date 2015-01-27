@@ -59,7 +59,7 @@ abstract class Base {
 	public function whereExists($relationship, $conditions = null, $_not = false) {
 		$where = [];
 		foreach ($conditions as $key => $value) {
-			$where[] = $this->_parseComparison($key, '=', $value);
+			$where[] = $this->_parseComparison($relationship . '.' . $key, '=', $value);
 		}
 		
 		$this->options['where'][] = ($_not ? 'NOT ' : '') . "EXISTS (" .
