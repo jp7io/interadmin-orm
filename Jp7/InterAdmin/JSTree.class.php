@@ -70,7 +70,8 @@ class Jp7_InterAdmin_JSTree {
 			),
 			'metadata' => array(
 				//'id_tipo' => $tipo->id_tipo,
-				'model_id_tipo' => $tipo->model_id_tipo
+				'model_id_tipo' => $tipo->model_id_tipo,
+				'class' => $tipo->class,
 			),
 			'children' => array()
 		);
