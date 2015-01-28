@@ -14,6 +14,8 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 		parent::__construct($view, $caching_disabled);
 		// CoC - name is always snake_case of the class name
 		$this->name = snake_case(substr(get_called_class(),4), '-');
+				
+		if (class_exists('Debugbar')) \Debugbar::startMeasure('Cell ' . $this->name);
 	}
 
 	public function setSharedVariables() {
@@ -36,8 +38,10 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 
 		// Use data on $this
 		$this->data = array_merge($this->attributes, (array) $this);
+		
+		if (class_exists('Debugbar')) \Debugbar::stopMeasure('Cell ' . $this->name);
 	}
-
+	
 	public function isCached() {
 		return $this->cache && \Cache::has($this->getCacheKey());
 	}
