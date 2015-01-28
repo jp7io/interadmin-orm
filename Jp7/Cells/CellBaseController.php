@@ -7,6 +7,7 @@ use Jp7\Laravel\Controller;
 abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 
 	private $_returned;
+	private $_initialized;
 	public $type;
 	public $record;
 
@@ -31,13 +32,17 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController {
 
 	public function initCell( $viewAction = 'display' )	{
 		$this->viewAction = $viewAction;
-
-		$this->setSharedVariables();
-		$this->init();
-
+		
+		if (!$this->_initialized) {
+			$this->setSharedVariables();
+			$this->init();
+			$this->_initialized = true;
+		}
+		
 		$this->_returned = $this->$viewAction();
 		
 		// Use data on $this
+		unset($this->data);
 		$this->data = array_merge($this->attributes, (array) $this);
 		
 		if (class_exists('Debugbar')) \Debugbar::stopMeasure('Cell ' . $this->name);
