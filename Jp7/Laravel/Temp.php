@@ -1,9 +1,7 @@
 <?php
 
 namespace Jp7\Laravel;
-use Blade;
-use App;
-Use Input;
+use Blade, App, Input, Request;
 
 class Temp {
 	
@@ -45,6 +43,7 @@ class Temp {
 	}
 	
 	public static function extendWhoops() {
+		if (Request::ajax()) return;
 		if (App::bound("whoops")) {
 			$whoops = App::make("whoops");
 
