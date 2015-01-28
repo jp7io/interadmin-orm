@@ -4,7 +4,7 @@ namespace Jp7\Former;
 
 class Collection {
 	protected $element;
-	protected $options;
+	protected $options = [];
 	protected $blank = 'Selecione';
 
 	function __construct($element) {
