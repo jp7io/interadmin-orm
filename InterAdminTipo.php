@@ -169,14 +169,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
-	public function getBreadcrumb() {
+	public function getAncestors() {
 		$parents = array();
 		$parent = $this;
-		do {
-			$parents[] = $parent;
-		} while (($parent = $parent->getParent()) && $parent->id_tipo);
 		
-		return array_reverse($parents);
+		while (($parent = $parent->getParent()) && $parent->id_tipo) {
+			array_unshift($parents, $parent);
+		}
+		
+		return $parents;
 	}
 	
 	/**
