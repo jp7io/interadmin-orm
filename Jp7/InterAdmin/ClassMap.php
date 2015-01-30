@@ -19,33 +19,29 @@ class ClassMap {
 			self::$instance = \Cache::remember('Interadmin.classMap', 60, function() {
 				// cache instance
 				$instance = new self();
-
-				$tipos = \InterAdminTipo::findTipos(array(
-					'fields' => array('class', 'class_tipo'),
-					'where' => array(
-						"(class <> '' OR class_tipo <> '')"
-					),
-					'class' => 'stdClass'
-				));
-
-				$classes = [];
-				$classesTipos = [];
-				foreach ($tipos as $tipo) {
-					$attr = &$tipo->attributes;
-					if ($attr['class']) {
-						$classes[$attr['id_tipo']] = $attr['class'];
-					}
-					if ($attr['class_tipo']) {
-						$classesTipos[$attr['id_tipo']] = $attr['class_tipo'];
-					}
-				}
+				$instance->setClasses(self::loadMap('class'));
+				$instance->setClassesTipos(self::loadMap('class_tipo'));
 				// return cached instance
-				$instance->setClasses($classes);
-				$instance->setClassesTipos($classesTipos);
 				return $instance;
 			});
 		}
 		return self::$instance;
+	}
+
+	private static function loadMap($attr) {
+		$config = \InterSite::config();
+
+		$tipos = \DB::table($config->db->prefix . '_tipos')
+			->select($attr, 'id_tipo', 'inherited')
+			->where($attr, '<>', '')
+			->orderByRaw("inherited LIKE '%" . $attr. "%'")
+			->get();
+
+		$arr = [];				
+		foreach ($tipos as $tipo) {
+			$arr[$tipo->id_tipo] = $tipo->$attr;
+		}
+		return $arr;
 	}
 
 	public function setClasses(array $classes) {
