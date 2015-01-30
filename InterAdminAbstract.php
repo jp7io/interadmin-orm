@@ -583,7 +583,7 @@ abstract class InterAdminAbstract implements Serializable {
 				}
 			}
 				
-			if ($termo[0] != "'" && !is_numeric($termo) && !in_array($termo, $reserved)) {
+			if ($termo[0] != "'" && !is_numeric($termo) && !in_array(strtoupper($termo), $reserved)) {
 				$len = strlen($termo);
 				$table = 'main';
 				if (strpos($termo, '.') !== false) {
