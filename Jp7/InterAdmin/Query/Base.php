@@ -43,6 +43,11 @@ abstract class Base {
 		
 		return $this;
 	}
+
+	public function whereRaw($where) {
+		$this->options['where'][] = $where;
+		return $this;
+	}
 	
 	public function whereIn($column, $values) {
 		$values = array_map([$this, '_escapeParam'], $values);
@@ -62,7 +67,7 @@ abstract class Base {
 		return $this;
 	}
 	
-	public function whereExists($relationship, $conditions = null, $_not = false) {
+	public function whereHas($relationship, $conditions = null, $_not = false) {
 		$where = $this->_parseConditions($conditions, $relationship . '.');
 		
 		$this->options['where'][] = ($_not ? 'NOT ' : '') . "EXISTS (" .
@@ -71,8 +76,8 @@ abstract class Base {
 		return $this;
 	}
 	
-	public function whereNotExists($relationship, $conditions = null) {
-		return $this->whereExists($relationship, $conditions, true);
+	public function whereDoesntHave($relationship, $conditions = null) {
+		return $this->whereHas($relationship, $conditions, true);
 	}
 	
 	protected function _whereHash($hash, $reverse = false) {
@@ -135,7 +140,7 @@ abstract class Base {
 		return $value;
 	}
 	
-	public function fields($_) {
+	public function select($_) {
 		$fields = is_array($_) ? $_ : func_get_args();
 		$this->options['fields'] = array_merge($this->options['fields'], $fields);
 		return $this;
@@ -156,20 +161,50 @@ abstract class Base {
 		return $this->join($alias, $className, $conditions, 'RIGHT');
 	}
 	
-	public function limit($offset, $rows = null) {
-		$limit = $offset . (is_null($rows) ? '' : ',' . $rows);
+	public function skip($offset) {
+		if (!is_numeric($offset)) {
+			throw new BadMethodCallException('Offset must be numeric.');
+		}
+		$this->options['skip'] = $offset;
+		return $this;
+	}
+
+	public function take($limit) {
+		return $this->limit($limit);
+	}
+
+	public function limit($limit) {
+		if (!is_numeric($limit)) {
+			throw new BadMethodCallException('Limit must be numeric.');
+		}
 		$this->options['limit'] = $limit;
 		return $this;
 	}
 	
-	public function group($group) {
-		$this->options['group'] = $group;
+	public function groupBy($column) {
+		if (str_contains($column, ' ') || str_contains($column, '(')) {
+			throw new BadMethodCallException('Invalid column.');
+		}
+		if (!isset($this->options['group'])) {
+			$this->options['group'] = null;
+		}
+		$this->options['group'] = implode(',', array_filter([$this->options['group'], $column]));
 		return $this;
 	}
 	
-	public function order($_) {
-		$order = func_get_args();
-		$this->options['order'] = implode(',', $order);
+	public function orderBy($column, $direction = 'asc') {
+		if (str_contains($column, ' ') || str_contains($column, '(')) {
+			throw new BadMethodCallException('Use orderByRaw instead.');
+		}
+		$order = $column . ' ' . $direction;
+		return $this->orderByRaw($order);
+	}
+
+	public function orderByRaw($order) {
+		if (!isset($this->options['order'])) {
+			$this->options['order'] = null;
+		}
+		$this->options['order'] = implode(',', array_filter([$this->options['order'], $order]));
 		return $this;
 	}
 
@@ -178,7 +213,7 @@ abstract class Base {
 		return $this;
 	}
 	
-	public function usePublishedFilters($filters = true) {
+	public function published($filters = true) {
 		$this->options['use_published_filters'] = (bool) $filters;	
 		return $this;
 	}

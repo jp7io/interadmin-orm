@@ -432,6 +432,10 @@ abstract class InterAdminAbstract implements Serializable {
 			    }
 		    }
 		    
+		    if (isset($options['skip'])) {
+		    	$options['limit'] = $options['skip'] . ',' . $options['limit'];
+		    }
+
 			// Sql
 			$sql = "SELECT " . implode(',', $options['fields']) .
 				" FROM " . array_shift($options['from']) .
