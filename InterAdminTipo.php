@@ -743,7 +743,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getTableName() {
 		return $this->db_prefix . '_tipos';
 	}
-	public function getInterAdminsOrder($order = '') {
+	public function getInterAdminsOrder() {
 		if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
 			$interadminsOrderBy = array();
 			$campos = $this->getCampos();
@@ -762,10 +762,6 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 			$interadminsOrderBy[] = 'date_publish DESC';
 			$this->_setMetadata('interadmins_order', $interadminsOrderBy);
-		}
-		if ($order) {
-			$order = explode(',', $order);
-			$interadminsOrderBy = array_unique(array_merge($order, $interadminsOrderBy));
 		}
 		return implode(',', $interadminsOrderBy);
 	}
@@ -1053,7 +1049,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		
 		$options['from'] = $recordModel->getTableName() . " AS main";
-		$options['order'] = $this->getInterAdminsOrder(isset($options['order']) ? $options['order'] : '');
+		if (empty($options['order'])) {
+			$options['order'] = $this->getInterAdminsOrder();
+		}
 		
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
