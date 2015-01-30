@@ -86,6 +86,9 @@ class Router extends \Illuminate\Routing\Router {
 	}
 	
 	public function getRouteByIdTipo($id_tipo, $action = 'index') {
+		if (!isset($this->mapIdTipos[$id_tipo])) {
+			throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
+		}
 		$mappedRoute = $this->mapIdTipos[$id_tipo];
 		return $this->routes->getByName($mappedRoute . '.' . $action);
 	}
