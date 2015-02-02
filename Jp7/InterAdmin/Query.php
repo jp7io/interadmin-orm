@@ -103,6 +103,22 @@ class Query extends Query\Base {
 		
 		return array_pluck($array, $column, $key);
 	}
+
+	public function listArray($column, $key) {
+		$items = $this->provider->deprecatedFind(array(
+			'fields' => array_filter([$column, $key]),
+		) + $this->options);
+		
+		$array = [];
+		foreach ($items as $item) {
+			$array[] = [
+				'key' => $item->$key,
+				'value' => $item->$column
+			];
+		}
+
+		return $array;
+	}
 	
 	public function collect($column) {
 		return new Collection($this->lists($column));

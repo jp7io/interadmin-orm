@@ -752,7 +752,7 @@ abstract class InterAdminAbstract implements Serializable {
 					unset($fields[$join]);
 				}
 			// Com função
-			} elseif (strpos($campo, '(') !== false || strpos($campo, 'CASE') !== false) {
+			} elseif (strpos($campo, '(') !== false || strpos($campo, ' ') !== false) {
 				if (strpos($campo, ' AS ') === false) {
 					$aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
 				} else {

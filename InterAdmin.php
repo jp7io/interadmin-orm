@@ -4,13 +4,14 @@ use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\ClassMap;
 use Jp7\Interadmin\Query;
 use Jp7\Interadmin\Relation\HasMany;
+use Illuminate\Support\Contracts\ArrayableInterface;
  
 /**
  * Class which represents records on the table interadmin_{client name}.
  *
  * @package InterAdmin
  */
-class InterAdmin extends InterAdminAbstract {
+class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 
 	/**
 	 * To be used temporarily with deprecated methods
@@ -855,5 +856,9 @@ class InterAdmin extends InterAdminAbstract {
 	public function getName() {
 		$varchar_key_alias = $this->getType()->getCamposAlias('varchar_key');
 		return $this->$varchar_key_alias;
+	}
+	
+	public function toArray() {
+		return $this->attributes;
 	}
 }
