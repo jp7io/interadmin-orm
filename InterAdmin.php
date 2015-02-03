@@ -688,7 +688,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			return $newSlug; 
 		}
 		$siblingSlugs = $this->siblings()
-			->where('id_slug', 'LIKE', "$newSlug%")
+			->where('id_slug', 'REGEXP', '^' . $newSlug . '[0-9]*$')
 			->lists('id_slug');
 		
 		$i = 2;
