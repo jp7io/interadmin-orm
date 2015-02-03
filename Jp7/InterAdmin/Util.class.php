@@ -37,6 +37,8 @@ class Jp7_InterAdmin_Util {
 		$export->_children = array();
 		foreach ($tiposChildren as $tipoChildrenArr) {
 			$optionsChildren = $options;
+			$optionsChildren['where'][] = "deleted = ''";
+			
 			$tipoChildren = $export->getChildrenTipo($tipoChildrenArr['id_tipo']);
 			if ($use_id_string) {
 				$optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
