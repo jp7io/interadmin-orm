@@ -709,12 +709,12 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function save() {
 		// id_string
-		if (isset($this->varchar_key)) {
+		if (isset($this->varchar_key) && $this->varchar_key) {
 			$this->id_string = toId($this->varchar_key);
 			$this->id_slug = $this->generateSlug($this->varchar_key);
 		} else {
 			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
-			if (isset($this->$alias_varchar_key)) {
+			if (isset($this->$alias_varchar_key) && $this->$alias_varchar_key) {
 				$this->id_string = toId($this->$alias_varchar_key);
 				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
 			}			
