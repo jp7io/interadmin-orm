@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Util {
 	
-	protected static $_default_vars = array('parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+	protected static $_default_vars = array('id_slug', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
 	
 	/**
 	 * Exports records and their children.
