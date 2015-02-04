@@ -104,7 +104,7 @@ class Query extends Query\Base {
 		return array_pluck($array, $column, $key);
 	}
 
-	public function listArray($column, $key) {
+	public function jsonList($column, $key) {
 		$items = $this->provider->deprecatedFind(array(
 			'fields' => array_filter([$column, $key]),
 		) + $this->options);
