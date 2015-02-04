@@ -37,10 +37,11 @@ class Router extends \Illuminate\Routing\Router {
 			}
 		}
 		if (!$section->isRoot()) {
-			// Somente para debug na barra do laravel
 			$this->logger->resource($section->getSlug(), $section->getControllerBasename(), [
 				'only' => ['index', 'show'],
 				'id_tipo' => $section->id_tipo,
+				// Somente para debug na barra do laravel
+				// FIXME nao ira rodar isso em todas requests
 				'dynamic' => $this->_checkTemplate($section)					
 			]);
 		}
@@ -76,8 +77,13 @@ class Router extends \Illuminate\Routing\Router {
 		}
 	}
 	
-	public function type($name, $id_tipo) {
-		// $type = call_user_func([$className, 'type']);
+	public function type($name, $classNameOrIdTipo) {
+		if (is_numeric($classNameOrIdTipo)) {
+			$id_tipo = $classNameOrIdTipo;
+		} else {
+			$id_tipo = call_user_func([$classNameOrIdTipo, 'type'])->id_tipo;
+		}
+		
 		$controller = studly_case(str_replace('.', '\\ ', $name )) . 'Controller';
 		$this->resource($name,  $controller, [
 			'id_tipo' => $id_tipo,
