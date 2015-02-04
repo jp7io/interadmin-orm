@@ -15,10 +15,14 @@ class Collection {
 		$this->blank = $text;
 		return $this;
 	}
-
+	
 	function options($list) {
 		if ($list instanceof \Illuminate\Support\Collection) {
-			$list = $list->lists('nome', 'id');
+			if ($first = $list->first()) {
+				$varchar_key = $first->getType()->getCamposAlias('varchar_key');
+
+				$list = $list->lists($varchar_key, 'id');
+			}
 		}
 		$this->options = $list;
 		return $this;
