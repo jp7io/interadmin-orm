@@ -67,6 +67,10 @@ abstract class Base {
 		return $this;
 	}
 	
+	public function has($relationship) {
+		return $this->whereHas($relationship, '1 = 1');
+	}
+
 	public function whereHas($relationship, $conditions = null, $_not = false) {
 		$where = $this->_parseConditions($conditions, $relationship . '.');
 		

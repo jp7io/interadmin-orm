@@ -563,7 +563,7 @@ abstract class InterAdminAbstract implements Serializable {
 					} elseif ($table == 'tags') {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
-					} elseif ($options['joins'][$table]) {
+					} elseif (isset($options['joins'][$table])) {
 						$joinTipo = $options['joins'][$table][1];
 						$onClause = array(
 							'joins' => $options['joins'],
@@ -572,8 +572,23 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
 						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table .
 						' WHERE ' . $joinFilter . $this->_resolveSqlClausesAlias($onClause, $use_published_filters) . (($existsMatches[4]) ? ' AND ' : '');
-					}
+					} elseif (method_exists($options['model'], $joinNome)) {
+						$relationshipData = $options['model']->$joinNome()->getRelationshipData();
 						
+						$joinTipo = $relationshipData['tipo'];
+
+						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
+						
+						$conditions = array_map(function($x) use ($table) {
+								return $table . '.' . $x;
+							}, $relationshipData['conditions']);
+
+						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table .
+							' WHERE ' . $joinFilter . implode(' AND ', $conditions) .
+							' AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
+							(($existsMatches[4]) ? ' AND ' : '');
+					}
+					
 					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
 					$clause = $inicioRep . substr($clause, strlen($inicio . $existsMatches[0]));
 					$offset = strlen($inicioRep);
