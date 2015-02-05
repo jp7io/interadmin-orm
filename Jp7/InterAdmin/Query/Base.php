@@ -25,9 +25,6 @@ abstract class Base {
 	public function where($column, $operator = null, $value = null, $_or = false) {
 		if (is_array($column)) {
 			// Hash = [a => 1, b => 2]
-			if (array_key_exists(0, $column)) {
-				throw new \InvalidArgumentException("Invalid column.");
-			}
 			$where = $this->_whereHash($column);
 		} elseif ($column instanceof \Closure) {
 			$where = $this->_whereClosure($column);
@@ -47,15 +44,18 @@ abstract class Base {
 			}
 			$where = $this->_parseComparison($column, $operator, $value);
 		}
+		$this->_addWhere($where, $_or);
+		return $this;
+	}
+
+	protected function _addWhere($where, $or) {
 		if ($where) {
-			if ($_or) {
+			if ($or) {
 				$last = array_pop($this->options['where']);
 				$where = $last . ' OR ' . $where;
 			}
-
 			$this->options['where'][] = $where;
 		}
-		return $this;
 	}
 
 	public function orWhere($column, $operator = null, $value = null) {
@@ -103,6 +103,9 @@ abstract class Base {
 	}
 	
 	protected function _whereHash($hash, $reverse = false) {
+		if (array_key_exists(0, $hash)) {
+			throw new \InvalidArgumentException("Invalid column.");
+		}
 		$where = array();
 		foreach ($hash as $key => $value) {
 			$where[] = $this->_parseComparison($key, '=', $value);
@@ -180,8 +183,8 @@ abstract class Base {
 	
 	public function join($alias, $className, $conditions, $_joinType = 'INNER') {
 		$type = $this->_resolveType($className);
-		$on = $this->_parseConditions($conditions, $alias . '.')[0];
-		$this->options['joins'][$alias] = array($_joinType, $type, $on);
+		$joinOn = $this->_parseConditions($conditions, $alias . '.')[0];
+		$this->options['joins'][$alias] = array($_joinType, $type, $joinOn);
 		return $this;
 	}
 	

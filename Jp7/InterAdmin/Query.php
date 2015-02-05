@@ -88,9 +88,9 @@ class Query extends Query\Base {
 		}
 		
 		if (is_string($id) && !is_numeric($id)) {
-			$this->_whereHash(['id_slug' => $id]);
+			$this->options['where'][] = $this->_parseComparison('id_slug', '=', $id);
 		} else {
-			$this->_whereHash(['id' => $id]);
+			$this->options['where'][] = $this->_parseComparison('id', '=', $id);
 		}
 		
 		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
