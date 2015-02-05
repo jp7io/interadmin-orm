@@ -22,26 +22,44 @@ abstract class Base {
 		);
 	}
 	
-	public function where($column, $operator = null, $value = null) {
+	public function where($column, $operator = null, $value = null, $_or = false) {
 		if (is_array($column)) {
 			// Hash = [a => 1, b => 2]
 			if (array_key_exists(0, $column)) {
 				throw new \InvalidArgumentException("Invalid column.");
 			}
-			return $this->_whereHash($column);
+			$where = $this->_whereHash($column);
+		} elseif ($column instanceof \Closure) {
+			$where = $this->_whereClosure($column);
+		} else {
+			if (func_num_args() == 2) {
+				list($value, $operator) = array($operator, '=');
+			} elseif ($this->invalidOperatorAndValue($operator, $value)) {
+				throw new \InvalidArgumentException("Value must be provided.");
+			}
+			if (!in_array(strtolower($operator), $this->operators, true)) {
+				if (is_null($value)) {
+					// short circuit operator
+					list($operator, $value) = ['=', $operator];
+				} else {
+					throw new \InvalidArgumentException("Invalid operator.");
+				}
+			}
+			$where = $this->_parseComparison($column, $operator, $value);
 		}
-		if (func_num_args() == 2) {
-			list($value, $operator) = array($operator, '=');
-		} elseif ($this->invalidOperatorAndValue($operator, $value)) {
-			throw new \InvalidArgumentException("Value must be provided.");
+		if ($where) {
+			if ($_or) {
+				$last = array_pop($this->options['where']);
+				$where = $last . ' OR ' . $where;
+			}
+
+			$this->options['where'][] = $where;
 		}
-		if (!in_array(strtolower($operator), $this->operators, true)) {
-			throw new \InvalidArgumentException("Invalid operator.");
-		}
-		
-		$this->options['where'][] = $this->_parseComparison($column, $operator, $value);
-		
 		return $this;
+	}
+
+	public function orWhere($column, $operator = null, $value = null) {
+		return $this->where($column, $operator, $value, true);
 	}
 
 	public function whereRaw($where) {
@@ -89,8 +107,18 @@ abstract class Base {
 		foreach ($hash as $key => $value) {
 			$where[] = $this->_parseComparison($key, '=', $value);
 		}
-		$this->options['where'] = array_merge($this->options['where'], $where);
-		return $this;
+		if ($where) {
+			return '(' . implode(' AND ', $where) . ')';
+		}
+	}
+
+	protected function _whereClosure($closure) {
+		$innerQuery = new static($this->provider);
+		$closure($innerQuery);
+
+		if ($where = $innerQuery->getOptionsArray()['where']) {
+			return '(' . implode(' AND ', $where) . ')';
+		}
 	}
 	
 	protected function _parseConditions($conditions, $prefix = '') {
