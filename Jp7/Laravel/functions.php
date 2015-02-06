@@ -31,7 +31,19 @@ function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
 		if (!is_file($img->getFilename())) {
 			// FIXME temporario local
-			$url = 'assets/placeholder.gif';
+			$remoteUrl = preg_replace('/^\.\.\/\.\./', 'http://static.ci.com.br', $img->url);
+			
+			if ($file = @file_get_contents($remoteUrl)) {
+				$dir = dirname($img->getFilename());
+				if (!is_dir($dir)) {
+					mkdir($dir);
+				}
+				file_put_contents($img->getFilename(), $file);
+
+				$url = $img->getUrl();
+			} else {
+				$url = 'assets/placeholder.gif?' . $img->url;
+			}
 		} else {
 			$url = $img->getUrl();
 		}
