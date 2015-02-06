@@ -47,14 +47,16 @@ function img_tag($img, $template = null, $options = array()) {
 		} else {
 			$url = $img->getUrl();
 		}
+		$alt = $img->text;
 	} else {
 		$url = $img;
+		$alt = isset($options['alt']) ? $options['alt'] : '';
 	}
 	if ($url) {
 		if ($template) {
 			$url = preg_replace('~^assets/~', 'imagecache/' . $template . '/', $url);
 		}
-		return \HtmlObject\Image::create(URL::to($url), $img->text, $options);
+		return \HtmlObject\Image::create(URL::to($url), $alt, $options);
 	}
 }
 
