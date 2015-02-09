@@ -561,9 +561,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @throws BadMethodCallException
 	 * @return string
 	 */
-	public function getUrl($action = 'index', array $parameters = array()) {
+	public function getUrl($action = null, array $parameters = array()) {
     	if (func_num_args() === 1 && is_array($action)) {
-    		list($action, $parameters) = ['index', $action];
+    		list($action, $parameters) = [null, $action];
+    	}
+    	if (is_null($action)) {
+    		// First action, normally should be 'index'
+    		$action = $this->getRouteActions()[0];
     	}
     	
 		if ($this->getParent() instanceof InterAdmin) {
@@ -600,6 +604,10 @@ class InterAdminTipo extends InterAdminAbstract {
     	return Route::getRouteByIdTipo($this->id_tipo, $action);
     }
     
+    public function getRouteActions() {
+    	return ['index', 'show'];
+    }
+
 	/**
 	 * Saves this InterAdminTipo.
 	 * @return void

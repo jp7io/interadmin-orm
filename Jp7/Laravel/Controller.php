@@ -45,13 +45,8 @@ class Controller extends \Illuminate\Routing\Controller {
 	}
     
 	public function setScope($route) {
-		$uri = $route->getUri();
-		
-		$action = explode('@', $route->getActionName())[1];
-		if (in_array($action, array('show', 'edit', 'update', 'destroy'))) {
-			$uri = dirname($uri); // Do not resolve $record yet
-		}
-		
+		$uri = $this->_getResourceUri($route);
+
 		$breadcrumb = \Route::uriToBreadcrumb($uri, function($type, $segment) use ($route) {
 			$slug = $route->getParameter(trim($segment, '{}'));
 			return $type->records()->find($slug);
@@ -68,6 +63,20 @@ class Controller extends \Illuminate\Routing\Controller {
 		}
 	}
 	
+	protected function _getResourceUri($route) {
+		$uri = $route->getUri();
+		
+		$action = explode('@', $route->getActionName())[1];
+
+		if (in_array($action, array('create', 'edit'))) {
+			$uri = dirname($uri); // Remove last part
+		}
+		if (in_array($action, array('show', 'edit', 'update', 'destroy'))) {
+			$uri = dirname($uri); // Do not resolve $record yet
+		}
+		return $uri;
+	}
+
 	public function setType() {
 		if (!$this->scope) {
 			throw new \Jp7_InterAdmin_Exception('setScope() could not resolve the'
@@ -117,13 +126,15 @@ class Controller extends \Illuminate\Routing\Controller {
 		}
 		return $viewContent;
 	}
-	
+
 	/**
 	 * Get the view name
 	 * 
 	 * @return string
 	 */
 	private function _getViewName($method) {
+		//\Route::getCurrentRoute()->getAction()['as']
+
 		$action = str_replace('_', '-', snake_case($method));
 		
 		$viewRoute = $this->_viewRoute(get_class($this), $action);
@@ -158,12 +169,11 @@ class Controller extends \Illuminate\Routing\Controller {
 	
 	protected function _controllerRoute($controllerClass) {
 		$explodedClassName = explode('\\', $controllerClass);
-		$snakeArray = array_map(function($string) {
+		$slugArray = array_map(function($string) {
 			$string = snake_case($string);
 			$string = str_replace('_', '-', $string);
 			return str_replace('-controller', '', $string);
 		}, $explodedClassName);
-		return implode('.', $snakeArray);
+		return implode('.', $slugArray);
 	}
-
 }

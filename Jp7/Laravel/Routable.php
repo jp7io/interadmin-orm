@@ -9,6 +9,7 @@ trait Routable {
 	}
 	
 	// AEmpresa\PerfilController
+	/*
 	public function getControllerName() {
 		$namespace = $this->getNamespace();
 		return ($namespace ? $namespace . '\\' : '') . $this->getControllerBasename();
@@ -17,12 +18,16 @@ trait Routable {
 	public function getNamespace() {
 		$parent = $this->getParent();
 		$namespace = array();
-		while ($parent && $parent->id_tipo > 0) {
+		while ($parent && !$parent->isRoot()) {
 			$namespace[] = $parent->getStudly();
 			$parent = $parent->getParent();
 		}
+		if ($this->id_tipo == 4178) {
+			kd($namespace);
+		}
 		return implode($namespace, '\\');
 	}
+	*/
 	
 	// a-empresa
 	public function getSlug() {

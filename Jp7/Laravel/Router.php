@@ -4,6 +4,8 @@ namespace Jp7\Laravel;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Jp7\MethodLogger;
+use Cache;
+use InterAdminTipo;
 
 class Router extends \Illuminate\Routing\Router {
 	
@@ -15,47 +17,51 @@ class Router extends \Illuminate\Routing\Router {
 		return parent::__construct($events, $container);
 	}
 
-	public function createDynamicRoutes($section, $currentPath = [], $firstCall = true) {
-		if ($firstCall && \Cache::has('Interadmin.routes')) {
-			$this->logger->_replay(\Cache::get('Interadmin.routes'));
+	public function createDynamicRoutes($section, $currentPath = []) {
+		if (Cache::has('Interadmin.routes')) {
+			$this->logger->_replay(Cache::get('Interadmin.routes'));
 			return;
 		}
-		if ($subsections = $section->getChildrenMenu()) {
-			if ($section->isRoot()) {
-				foreach ($subsections as $subsection) {
-					$this->createDynamicRoutes($subsection, $currentPath, false);
-				}
-			} else {
-				$this->logger->updateGroupStack(['namespace' => $section->getStudly(), 'prefix' => $section->getSlug()]);
+		
+		// run routes without cache
+		$this->_createDynamicRoutes($section, $currentPath);
+		
+		// save cache after running all routes
+		Cache::put('Interadmin.routes', $this->logger->_getLog(), 60);
+	}
 
-				//$currentPath[] = $section->getSlug();
-				foreach ($subsections as $subsection) {
-					$this->createDynamicRoutes($subsection, $currentPath, false);
-				}
-				
+	protected function _createDynamicRoutes($section, $currentPath = []) {
+		$isRoot = $section->isRoot();
+
+		if ($subsections = $section->getChildrenMenu()) {
+			if (!$isRoot) {
+				$this->logger->updateGroupStack([
+					'namespace' => $section->getStudly(),
+					'prefix' => $section->getSlug()
+				]);
+			}
+			foreach ($subsections as $subsection) {
+				$this->_createDynamicRoutes($subsection, $currentPath, false);
+			}
+			if (!$isRoot) {
 				$this->logger->popGroupStack();
 			}
 		}
-		if (!$section->isRoot()) {
+		if (!$isRoot) {
 			$this->logger->resource($section->getSlug(), $section->getControllerBasename(), [
-				'only' => ['index', 'show'],
-				'id_tipo' => $section->id_tipo,
-				// Somente para debug na barra do laravel
-				// FIXME nao ira rodar isso em todas requests
-				'dynamic' => $this->_checkTemplate($section)					
+				'only' => $section->getRouteActions(),
+				'id_tipo' => $section->id_tipo
 			]);
-		}
-		if ($firstCall) {
-			// save cache after running all routes
-			\Cache::put('Interadmin.routes', $this->logger->_getLog(), 60);
 		}
 	}
 	
 	public function updateGroupStack(array $attributes)  {
+		// Make it public for cache
 		return parent::updateGroupStack($attributes);
 	}
 
 	public function popGroupStack() {
+		// Make it public for cache
 		array_pop($this->groupStack);
 	}
 
@@ -65,29 +71,22 @@ class Router extends \Illuminate\Routing\Router {
 			$groupRoute = str_replace('/', '.', $this->getLastGroupPrefix());
 			if (!array_key_exists($options['id_tipo'], $this->mapIdTipos)) {
 				$this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute . '.' : '') . $name;
-			}
-			
-			$before = empty($options['dynamic']) ? '' : 'dynamic';
-			
-			$this->group(['before' => $before], function() use ($name, $controller, $options) {
-				parent::resource($name, $controller, $options);
-			});
-		} else {
-			parent::resource($name, $controller, $options);
+			}			
 		}
+		parent::resource($name, $controller, $options);
 	}
 	
-	public function type($name, $classNameOrIdTipo) {
-		if (is_numeric($classNameOrIdTipo)) {
-			$id_tipo = $classNameOrIdTipo;
+	public function type($name, $className_Or_IdTipo, array $options = array()) {
+		if (is_numeric($className_Or_IdTipo)) {
+			$type = InterAdminTipo::getInstance($className_Or_IdTipo);
 		} else {
-			$id_tipo = call_user_func([$classNameOrIdTipo, 'type'])->id_tipo;
+			$type = call_user_func([$className_Or_IdTipo, 'type']);
 		}
-		
+
 		$controller = studly_case(str_replace('.', '\\ ', $name )) . 'Controller';
-		$this->resource($name,  $controller, [
-			'id_tipo' => $id_tipo,
-			'only' => ['index', 'show']
+		$this->resource($name,  $controller, $options + [
+			'id_tipo' => $type->id_tipo,
+			'only' => $type->getRouteActions()
 		]);
 	}
 	
@@ -101,6 +100,14 @@ class Router extends \Illuminate\Routing\Router {
 	
 	public function getIdTipoByRoute($route) {
 		return array_search($route, $this->mapIdTipos);
+	}
+
+	public function getTypeByRoute($routeName) {
+		$id_tipo = $this->getIdTipoByRoute($routeName);
+		if (!$id_tipo) {
+			return null;
+		}
+		return InterAdminTipo::getInstance($id_tipo);
 	}
 
 	public function getMapIdTipos() {
@@ -143,14 +150,7 @@ class Router extends \Illuminate\Routing\Router {
 		return $breadcrumb;
 	}
 	
-	public function getTypeByRoute($routeName) {
-		$id_tipo = $this->getIdTipoByRoute($routeName);
-		if (!$id_tipo) {
-			return null;
-		}
-		return \InterAdminTipo::getInstance($id_tipo);
-	}
-	
+	/*	
 	protected function _checkTemplate($section) {
 		$dynamic = false;
 		if (!class_exists($section->getControllerName())) {
@@ -183,5 +183,6 @@ class Router extends \Illuminate\Routing\Router {
 		$parts = array_map('studly_case', $parts);
 		return implode('\\', $parts) . 'Controller';
 	}
+	*/
 	
 }
