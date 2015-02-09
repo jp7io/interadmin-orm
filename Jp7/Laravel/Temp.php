@@ -1,7 +1,7 @@
 <?php
 
 namespace Jp7\Laravel;
-use Blade, App, Input, Request;
+use Blade, App, Input, Request, Cache;
 
 class Temp {
 	
@@ -43,7 +43,7 @@ class Temp {
 	}
 	
 	public static function extendWhoops() {
-		if (Request::ajax()) return;
+		if (Request::ajax() || PHP_SAPI === 'cli') return;
 		if (App::bound("whoops")) {
 			$whoops = App::make("whoops");
 
@@ -74,6 +74,13 @@ class Temp {
 				</div>
 				<?php
 			});			
+		}
+	}
+	
+	public static function clearCache() {
+		if (Request::server('HTTP_CACHE_CONTROL') === 'no-cache' || PHP_SAPI === 'cli') {
+			Cache::forget('Interadmin.routes');
+			Cache::forget('Interadmin.classMap');
 		}
 	}
 }
