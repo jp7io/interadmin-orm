@@ -1158,5 +1158,20 @@ class InterAdminTipo extends InterAdminAbstract {
     public function records() {
     	return new \Jp7\Interadmin\Query($this);
     }
+
+    public function getRules() {
+    	$rules = [];
+    	foreach ($this->getCampos() as $campo) {
+    		$alias = $campo['nome_id'];
+
+    		if ($campo['obrigatorio']) {
+    			$rules[$alias][] = 'required';
+    		}
+    		if ($campo['xtra'] === 'email') {
+    			$rules[$alias][] = 'email';
+    		}
+    	}
+    	return $rules;
+    }
     
 }

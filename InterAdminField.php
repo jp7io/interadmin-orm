@@ -409,7 +409,7 @@ class InterAdminField {
 			if ($campo['label']) {
 				return $campo['label'];
 			} elseif ($campo['nome'] instanceof InterAdminTipo) {
-				return $campo['nome']->getFieldsValues('nome');
+				return $campo['nome']->nome;
 			} elseif (is_numeric($campo['nome'])) {
 				return interadmin_tipos_nome($campo['nome']);				
 			} elseif ($campo['nome'] == 'all') {

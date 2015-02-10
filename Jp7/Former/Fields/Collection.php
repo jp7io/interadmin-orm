@@ -1,22 +1,17 @@
 <?php
 
-namespace Jp7\Former;
+namespace Jp7\Former\Fields;
 
-class Collection {
-	protected $element;
-	protected $options = [];
+class Collection extends \Former\Form\Fields\Select {
 	protected $blank = 'Selecione';
-
-	function __construct($element) {
-		$this->element = $element;
-	}
-
+	protected $options = [];
+	
 	function blank($text) {
 		$this->blank = $text;
 		return $this;
 	}
-	
-	function options($list) {
+
+	function options($list, $selected = NULL, $valuesAsKeys = false) {
 		if ($list instanceof \Illuminate\Support\Collection) {
 			if ($first = $list->first()) {
 				$varchar_key = $first->getType()->getCamposAlias('varchar_key');
@@ -27,14 +22,10 @@ class Collection {
 		$this->options = $list;
 		return $this;
 	}
-
-	public function __toString() {
+	
+	public function render() {
 		$this->options = ['' => $this->blank] + $this->options;
-		return $this->element->options($this->options)->__toString();
-	}
-
-	function __call($method, $arguments) {
-		call_user_func_array([$this->element, $method], $arguments);
-		return $this;
+		parent::options($this->options);
+		return parent::render();
 	}
 }
