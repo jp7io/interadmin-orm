@@ -10,12 +10,15 @@ class Collection extends \Former\Form\Fields\Select {
 		$this->blank = $text;
 		return $this;
 	}
-
+	
 	function options($list, $selected = NULL, $valuesAsKeys = false) {
+		if ($list instanceof \Jp7\Interadmin\Query\Base) {
+			$list = $list->all();
+		}
 		if ($list instanceof \Illuminate\Support\Collection) {
 			if ($first = $list->first()) {
 				$varchar_key = $first->getType()->getCamposAlias('varchar_key');
-
+				
 				$list = $list->lists($varchar_key, 'id');
 			}
 		}

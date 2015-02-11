@@ -8,7 +8,7 @@ class Facade extends \Former\Facades\Former {
 
 	public static function getFacadeRoot() {
 		if (!self::$extension) {
-			self::$extension = new Extension(parent::getFacadeRoot());
+			self::$extension = new FormerExtension(parent::getFacadeRoot());
 		}
 		return self::$extension;
 	}

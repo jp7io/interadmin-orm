@@ -1163,12 +1163,16 @@ class InterAdminTipo extends InterAdminAbstract {
     	$rules = [];
     	foreach ($this->getCampos() as $campo) {
     		$alias = $campo['nome_id'];
-
-    		if ($campo['obrigatorio']) {
-    			$rules[$alias][] = 'required';
-    		}
-    		if ($campo['xtra'] === 'email') {
-    			$rules[$alias][] = 'email';
+    		if ($campo['form']) {
+	    		if ($campo['obrigatorio']) {
+	    			$rules[$alias][] = 'required';
+	    		}
+	    		if ($campo['xtra'] === 'email') {
+	    			$rules[$alias][] = 'email';
+	    		}
+	    		if (starts_with($campo['tipo'], 'int_')) {
+	    			$rules[$alias][] = 'integer';
+	    		}
     		}
     	}
     	return $rules;
