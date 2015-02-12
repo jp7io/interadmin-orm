@@ -44,11 +44,25 @@ class FormRequest {
 	}
 
 	public function redirect() {
-		return \Redirect::back()->withInput()->withErrors($this->validator);
+		return \Redirect::route($this->getRouteBack())
+			->withInput()
+			->withErrors($this->validator);
 	}
-
+	
 	public function all() {
 		return $this->input;
 	}
+	
+	protected function getRouteBack() {
+		$route = \Route::getCurrentRoute()->getAction()['as'];
+		$parts = explode('.', $route);
 
+		$action = array_pop($parts);
+		if ($action === 'store') {
+			array_push($parts, 'create');
+		} elseif ($action === 'update') {
+			array_push($parts, 'edit');
+		}
+		return implode('.', $parts);
+	}
 }

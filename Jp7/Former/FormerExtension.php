@@ -34,7 +34,7 @@ class FormerExtension {
 		}
 		return $result;
 	}
-
+	
 	public function type(\InterAdminTipo $type) {
 		$this->type = $type;
 	}
@@ -58,25 +58,39 @@ class FormerExtension {
 
 	private function decorateTypeField($field) {
 		// Settings from InterAdmin
-		if ($alias = $field->getName()) {
-			$campos = $this->type->getCampos();
-			$aliases = array_flip($this->type->getCamposAlias());
-			
-			if (isset($aliases[$alias])) {
-				$name = $aliases[$alias];
-				$campo = $campos[$name];
+		if (!$alias = $field->getName()) {
+			return;
+		}
+		
+		$campos = $this->type->getCampos();
+		$aliases = array_flip($this->type->getCamposAlias());
+		
+		if (empty($aliases[$alias])) {
+			return;
+		}
 
-				// Set label
-				$label = \InterAdminField::getCampoHeader($campo);
-				$field->label($label);
-				
-				// Populate options
-				if ($field->getType() === 'collection' && starts_with($name, 'select_')) {
-					$campoType = $campo['nome'];
-					$options = $campoType->records();
-					$field->options($options);
-				}
+		$name = $aliases[$alias];
+		$campo = $campos[$name];
+
+		// Set label
+		$label = \InterAdminField::getCampoHeader($campo);
+		$field->label($label);
+		
+		// Populate options
+		if (starts_with($name, 'select_')) {
+			$this->populateOptions($field, $campo['nome']);
+		}
+	}
+
+	private function populateOptions($field, $campoType) {
+		if ($field->getType() === 'collection') {
+			$field->options($campoType->records());
+		} elseif ($field->getType() === 'radios') {
+			$radios = [];
+			foreach ($campoType->records()->all() as $record) {
+				$radios[$record->getName()] = array('value' => $record->id);
 			}
+			$field->radios($radios);
 		}
 	}
 }
