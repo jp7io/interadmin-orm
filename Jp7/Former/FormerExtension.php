@@ -9,7 +9,7 @@ use Debugbar;
 class FormerExtension {
 	use RowTrait, DecoratorTrait;
 	
-	private $type;
+	private $model;
 	private $former;
 	
 	public function __construct(\Former\Former $former) {
@@ -28,30 +28,38 @@ class FormerExtension {
 		if ($result instanceof \Former\Traits\Field) {
 			$this->decorateField($result);
 
-			if ($this->type) {
+			if ($this->model) {
 				$this->decorateTypeField($result);
 			}
 		}
 		return $result;
 	}
 	
-	public function type(\InterAdminTipo $type) {
-		$this->type = $type;
+	public function __get($property) {
+		return $this->former->$property;
+	}
+
+	public function __set($property, $value) {
+		$this->former->$property = $value;	
+	}
+
+	public function model(\InterAdmin $model) {
+		$this->model = $model;
 	}
 	
 	public function open() {
 		$form = $this->former->open();
-		if ($this->type) {
-			$form->rules($this->type->getRules());
-			if ($this->type->getRoute('store')) {
-				$form->action($this->type->getUrl('store'));
+		if ($this->model) {
+			$form->rules($this->model->getRules());
+			if ($this->model->getRoute('store')) {
+				$form->action($this->model->getUrl('store'));
 			}
 		}
 		return $form;
 	}
 
 	public function close() {
-		$this->type = null;
+		$this->model = null;
 		
 		return $this->former->close();
 	}
@@ -62,8 +70,9 @@ class FormerExtension {
 			return;
 		}
 		
-		$campos = $this->type->getCampos();
-		$aliases = array_flip($this->type->getCamposAlias());
+		$type = $this->model->getType();
+		$campos = $type->getCampos();
+		$aliases = array_flip($type->getCamposAlias());
 		
 		if (empty($aliases[$alias])) {
 			return;

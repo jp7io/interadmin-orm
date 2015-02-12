@@ -6,10 +6,23 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class Query extends Query\Base {
 	
+	protected $model = null;
+
 	public function type() {
 		return $this->provider;
 	}
 	
+	public function getModel() {
+		if (is_null($this->model)) {
+			// Cria instancia para simular comportamento do Eloquent
+			if ($classname = $this->provider->class) {
+				$this->model = new $classname(0);
+				$this->model->setType($this->provider);
+			}
+		}
+		return $this->model;
+	}
+
 	public function create(array $attributes = array()) {
 		return $this->provider->deprecated_createInterAdmin($attributes);
 	}
@@ -138,16 +151,13 @@ class Query extends Query\Base {
 	
 	public function __call($method_name, $params) {
 		// Scope support
-		if ($classname = $this->provider->class) {
-			// Cria instancia para simular comportamento do Eloquent
-			$instance = new $classname(0);  
-			
+		if ($model = $this->getModel()) {
 			array_unshift($params, $this);
 			$method_name = 'scope' . ucfirst($method_name);
-			if (!method_exists($instance, $method_name)) {
+			if (!method_exists($model, $method_name)) {
 				throw new BadMethodCallException('Method ' . $method_name .  ' does not exist.');
 			}			
-			$query = call_user_func_array([$instance, $method_name], $params);
+			$query = call_user_func_array([$model, $method_name], $params);
 			if (!$query instanceof self) {
 				throw new BadMethodCallException('Method ' . $method_name . ' should return instance of ' . __CLASS__);
 			}

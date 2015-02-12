@@ -861,4 +861,23 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	public function toArray() {
 		return $this->attributes;
 	}
+
+	public function getRules() {
+    	$rules = [];
+    	foreach ($this->getType()->getCampos() as $campo) {
+    		$alias = $campo['nome_id'];
+    		if ($campo['form']) {
+	    		if ($campo['obrigatorio']) {
+	    			$rules[$alias][] = 'required';
+	    		}
+	    		if ($campo['xtra'] === 'email') {
+	    			$rules[$alias][] = 'email';
+	    		}
+	    		if (starts_with($campo['tipo'], 'int_')) {
+	    			$rules[$alias][] = 'integer';
+	    		}
+    		}
+    	}
+    	return $rules;
+    }
 }

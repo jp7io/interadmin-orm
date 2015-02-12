@@ -605,6 +605,9 @@ class InterAdminTipo extends InterAdminAbstract {
     }
     
     public function getRouteActions() {
+    	if (method_exists($this->class, 'getRouteActions')) {
+    		return call_user_func([$this->class, 'getRouteActions']);
+    	}
     	return ['index', 'show'];
     }
 
@@ -1157,25 +1160,5 @@ class InterAdminTipo extends InterAdminAbstract {
 
     public function records() {
     	return new \Jp7\Interadmin\Query($this);
-    }
-
-    public function getRules() {
-    	$rules = [];
-    	foreach ($this->getCampos() as $campo) {
-    		$alias = $campo['nome_id'];
-    		if ($campo['form']) {
-	    		if ($campo['obrigatorio']) {
-	    			$rules[$alias][] = 'required';
-	    		}
-	    		if ($campo['xtra'] === 'email') {
-	    			$rules[$alias][] = 'email';
-	    		}
-	    		if (starts_with($campo['tipo'], 'int_')) {
-	    			$rules[$alias][] = 'integer';
-	    		}
-    		}
-    	}
-    	return $rules;
-    }
-    
+    }    
 }
