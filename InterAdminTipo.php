@@ -561,13 +561,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @throws BadMethodCallException
 	 * @return string
 	 */
-	public function getUrl($action = null, array $parameters = array()) {
+	public function getUrl($action = 'index', array $parameters = array()) {
     	if (func_num_args() === 1 && is_array($action)) {
     		list($action, $parameters) = [null, $action];
-    	}
-    	if (is_null($action)) {
-    		// First action, normally should be 'index'
-    		$action = $this->getRouteActions()[0];
     	}
     	
 		if ($this->getParent() instanceof InterAdmin) {
@@ -605,7 +601,7 @@ class InterAdminTipo extends InterAdminAbstract {
     }
     
     public function getRouteActions() {
-    	if (method_exists($this->class, 'getRouteActions')) {
+    	if ($this->class && method_exists($this->class, 'getRouteActions')) {
     		return call_user_func([$this->class, 'getRouteActions']);
     	}
     	return ['index', 'show'];
@@ -911,8 +907,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			// Childs are published by default on InterAdmin.
 			$record->publish = 'S';
 		}
-		$record->setAttributes($attributes);
-		return $record;
+		return $record->fill($attributes)->save();
 	}
 	
 	public function createChild($model_id_tipo = 0) {
@@ -1097,6 +1092,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		return array('id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
 	}
 		
+	public function getFillable() {
+		return $this->getAttributesNames();
+	}
+
 	/**
 	 * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
 	 * 

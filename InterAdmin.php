@@ -496,18 +496,6 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	}
 	
 	/**
-	 * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
-	 * 
-	 * @param array $attributes
-	 * @return void
-	 */
-	public function deprecated_setAttributesSafely(array $attributes) {
-		$editableFields = array_flip($this->getAttributesAliases());
-		$filteredAttributes = array_intersect_key($attributes, $editableFields);
-		return $this->setAttributes($filteredAttributes);
-	}
-	
-	/**
 	 * Sets the tags for this record. It DELETES the previous records.
 	 * 
 	 * @param array $tags Array of object to be saved as tags.
@@ -865,8 +853,9 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	public function getRules() {
     	$rules = [];
     	foreach ($this->getType()->getCampos() as $campo) {
-    		$alias = $campo['nome_id'];
     		if ($campo['form']) {
+    			$alias = $campo['nome_id'];
+
 	    		if ($campo['obrigatorio']) {
 	    			$rules[$alias][] = 'required';
 	    		}
@@ -879,5 +868,17 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
     		}
     	}
     	return $rules;
+    }
+
+    public function getFillable() {
+    	$fillable = [];
+
+    	foreach ($this->getType()->getCampos() as $campo) {
+    		if ($campo['form']) {
+    			$fillable[] = $campo['nome_id'];
+    		}
+    	}
+
+    	return $fillable;
     }
 }

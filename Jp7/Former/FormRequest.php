@@ -16,8 +16,8 @@ class FormRequest {
 
 	protected $input;
 
-	public function __construct(\InterAdminTipo $type) {
-		$this->rules = $type->getRules();
+	public function __construct(\InterAdmin $model) {
+		$this->rules = $model->getRules();
 		$this->input = \Input::all();
 	}
 

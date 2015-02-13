@@ -202,23 +202,27 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 	}
 
+	public function getFillable() {
+		return [];
+	}
+
+    public function fill(array $attributes) {
+    	foreach ($this->getFillable() as $name) {
+    		if (isset($attributes[$name])) {
+    			$this->attributes[$name] = $attributes[$name];
+    		}
+    	}
+    	return $this;
+    }
+
 	/**
-	 * DEPRECATED: Updates the values into the database table. If this object has no 'id', the data is inserted.
+	 * Updates all the attributes from the passed-in array and saves the record.
 	 * 
-	 * @param array $fields_values Array with the values, the keys are the fields names.
-	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
+	 * @param array $attributes Array with fields names and values.
 	 * @return void
-	 * @todo Verificar necessidade de $force_magic_quotes_gpc no jp7_db_insert
-	 * @deprecated Utilizar save() ou updateAttributes()
 	 */
-	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = false) {
-		$pk = $this->_primary_key;
-		if ($this->$pk) {
-			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $fields_values, true, $force_magic_quotes_gpc);
-		} else {
-			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $fields_values, true, $force_magic_quotes_gpc);
-		}
-		$this->_updated = true; // FIXME Hack tempor�rio
+	public function update(array $attributes) {
+		return $this->fill($attributes)->save();
 	}
 	/**
 	 * Updates all the attributes from the passed-in array and saves the record.
@@ -226,8 +230,8 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param array $attributes Array with fields names and values.
 	 * @return void
 	 */
-	public function updateAttributes($attributes) {
-		$this->setAttributes($attributes);
+	public function updateRawAttributes(array $attributes) {
+		$this->setRawAttributes($attributes);
 		$this->_update($attributes);
 	}
 	/**
@@ -236,7 +240,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return void
 	 */
 	public function save() {
-		$this->_update($this->attributes);
+		return $this->_update($this->attributes);
 	}
 	/**
 	 * Increments a numeric attribute
@@ -300,6 +304,7 @@ abstract class InterAdminAbstract implements Serializable {
 			
 			$this->$pk = DB::getPdo()->lastInsertId();
 		}
+		return $this;
 	}
 	/**
 	 * Gets an object by its key, which may be its 'id' or 'id_tipo', and then returns it.
@@ -913,7 +918,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param array $attributes
 	 * @return void
 	 */
-	public function setAttributes(array $attributes) {
+	public function setRawAttributes(array $attributes) {
 		foreach ($attributes as $key => $value) {
 			$this->$key = $value;
 		}
