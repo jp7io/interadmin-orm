@@ -237,7 +237,7 @@ class InterSite {
 				exit;
 			case !$this->server: {
 				$message = 'Host não está presente nas configurações: ' . $_SERVER['HTTP_HOST'];
-				jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
+				//jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
 				$message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
 				if ($this->servers) {
 					if ($siteProducao = $this->getFirstServerByType(self::PRODUCAO)) {
