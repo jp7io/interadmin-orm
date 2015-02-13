@@ -34,12 +34,14 @@ function img_tag($img, $template = null, $options = array()) {
 			$remoteUrl = preg_replace('/^\.\.\/\.\./', 'http://static.ci.com.br', $img->url);
 			
 			if ($file = @file_get_contents($remoteUrl)) {
-				$dir = dirname($img->getFilename());
+				$dir = storage_path() . '/upload/' . basename(dirname($img->getFilename())); # ex.: app/storage/upload/cursos
+				
 				if (!is_dir($dir)) {
 					mkdir($dir);
 				}
-				file_put_contents($img->getFilename(), $file);
-
+				
+				file_put_contents($dir . '/' . basename($img->getFilename()), $file);
+				
 				$url = $img->getUrl();
 			} else {
 				$url = 'assets/placeholder.gif?' . $img->url;

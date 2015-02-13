@@ -36,6 +36,13 @@ class Query extends Query\Base {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param InterAdmin $className
+	 * @param string $relationshipPath
+	 * @throws BadMethodCallException
+	 * @return \Jp7\Interadmin\Query
+	 */
 	public function joinThrough($className, $relationshipPath) {
 		$type = $this->_resolveType($className);
 		
