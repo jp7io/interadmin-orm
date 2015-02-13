@@ -75,8 +75,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				return ($match[1]) ? $retorno[0] : $retorno;
 			}
 		}
-		// Default error when method doesn´t exist
-		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $method . '()'));
+		throw new Exception('Call to undefined method ' . get_class($this) . '->' . $method . '()');
 	}
 
 	/**

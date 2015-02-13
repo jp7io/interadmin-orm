@@ -29,23 +29,8 @@ function snake_case($value, $delimiter = '_') {
 
 function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
-		if (!is_file($img->getFilename())) {
-			// FIXME temporario local
-			$remoteUrl = preg_replace('/^\.\.\/\.\./', 'http://static.ci.com.br', $img->url);
-			
-			if ($file = @file_get_contents($remoteUrl)) {
-				$dir = storage_path() . '/upload/' . basename(dirname($img->getFilename())); # ex.: app/storage/upload/cursos
-				
-				if (!is_dir($dir)) {
-					mkdir($dir);
-				}
-				
-				file_put_contents($dir . '/' . basename($img->getFilename()), $file);
-				
-				$url = $img->getUrl();
-			} else {
-				$url = 'assets/placeholder.gif?' . $img->url;
-			}
+		if ($img->getFilename() && !is_file($img->getFilename())) {
+			$url = copy_production_file($img);
 		} else {
 			$url = $img->getUrl();
 		}
@@ -62,6 +47,26 @@ function img_tag($img, $template = null, $options = array()) {
 	}
 }
 
+function copy_production_file($img) {
+	$filename = $img->getFilename();
+	// FIXME temporario local
+	$remoteUrl = preg_replace('/^\.\.\/\.\./', 'http://static.ci.com.br', $img->url);
+	
+	if ($file = @file_get_contents($remoteUrl)) {
+		$dir = dirname($filename);
+
+		if (!is_dir($dir)) {
+			mkdir($dir);
+		}
+		
+		file_put_contents($filename, $file);
+		
+	 	return $img->getUrl();
+	} else {
+		return 'assets/placeholder.gif?' . $img->url;
+	}
+}
+
 function km($object, $search = '.*') {
 	$methods = get_class_methods($object);
 	$methods = array_filter($methods, function ($a) use ($search) {
@@ -69,11 +74,3 @@ function km($object, $search = '.*') {
 	});
 	kd($methods);
 }
-/*
-function link_to($url, $title = null, $attributes = array(), $secure = null, $entities = false)
-{
-	if (is_null($title) || $title === false) $title = $url;
-
-	return '<a href="'.$url.'"'.HTML::attributes($attributes).'>'. ($entities ? HTML::entities($title) : $title) .'</a>';
-}
-*/

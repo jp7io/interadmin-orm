@@ -214,8 +214,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		if ($this->getType()->arquivos) {
 			$message .= "\t\t- arquivos()\n";
 		}
-
-		die(jp7_debug($message));
+		
+		throw new Exception($message);
 	}
 	/**
 	 * Gets fields values by their alias.

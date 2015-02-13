@@ -16,7 +16,12 @@ trait Downloadable {
 	
 	// Server side file name
 	public function getFilename() {
-		$path = parse_url($this->url)['path']; // remove query string
+		$parsed = parse_url($this->url);
+		if (!empty($parsed['host'])) {
+			return false;
+		}
+
+		$path = $parsed['path']; // remove query string
 		return str_replace('../../', storage_path() . '/', $path);
 	}
 	

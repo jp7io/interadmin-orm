@@ -37,8 +37,9 @@ class Query extends Query\Base {
 	}
 	
 	/**
+	 * Example: TipoDeCurso::joinThrough('Ci_Escola', 'escola.cursos.tipo');
 	 * 
-	 * @param InterAdmin $className
+	 * @param string $className
 	 * @param string $relationshipPath
 	 * @throws BadMethodCallException
 	 * @return \Jp7\Interadmin\Query
