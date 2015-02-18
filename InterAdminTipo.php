@@ -600,8 +600,11 @@ class InterAdminTipo extends InterAdminAbstract {
     }
     
     public function getRouteActions() {
-    	if ($this->class && method_exists($this->class, 'getRouteActions')) {
-    		return call_user_func([$this->class, 'getRouteActions']);
+    	$cm = \Jp7\InterAdmin\ClassMap::getInstance();
+		$class = $cm->getClass($this->id_tipo);
+		
+    	if ($class && method_exists($class, 'getRouteActions')) {
+    		return call_user_func([$class, 'getRouteActions']);
     	}
     	return ['index', 'show'];
     }
