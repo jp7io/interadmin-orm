@@ -41,7 +41,7 @@ function img_tag($img, $template = null, $options = array()) {
 	}
 	if ($url) {
 		if ($template) {
-			$url = preg_replace('~^assets/~', 'imagecache/' . $template . '/', $url);
+			$url = str_replace('/assets/', '/imagecache/' . $template . '/', $url);
 		}
 		return \HtmlObject\Image::create(URL::to($url), $alt, $options);
 	}
@@ -72,5 +72,5 @@ function km($object, $search = '.*') {
 	$methods = array_filter($methods, function ($a) use ($search) {
 		return preg_match('/' . $search . '/i', $a);
 	});
-	kd($methods);
+	kd($methods, KRUMO_EXPAND_ALL);
 }

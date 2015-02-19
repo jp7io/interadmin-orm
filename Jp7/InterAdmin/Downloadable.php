@@ -5,7 +5,7 @@ namespace Jp7\Interadmin;
 trait Downloadable {
 	// For client side use
 	public function getUrl() {
-		return str_replace('../../upload', 'assets', $this->url);
+		return str_replace('../../upload', \URL::to('assets'), $this->url);
 	}
 	
 	// Absolute client side URL
