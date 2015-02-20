@@ -698,7 +698,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function deprecated_deleteInterAdminsForever($options = array()) {
 		$records = $this->deprecatedFind($options);
 		foreach ($records as $record) {
-			$record->deleteForever();
+			$record->forceDelete();
 		}
 		return count($records);
 	}

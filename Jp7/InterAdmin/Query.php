@@ -22,9 +22,17 @@ class Query extends Query\Base {
 		}
 		return $this->model;
 	}
-
+	
 	public function create(array $attributes = array()) {
 		return $this->provider->deprecated_createInterAdmin($attributes);
+	}
+	
+	public function delete() {
+		return $this->provider->deprecated_deleteInterAdmins($this->options);
+	}
+	
+	public function forceDelete() {
+		return $this->provider->deprecated_deleteInterAdminsForever($this->options);
 	}
 	
 	protected function _isChar($field) {

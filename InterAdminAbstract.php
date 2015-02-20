@@ -1,14 +1,6 @@
 <?php
-/**
- * JP7's PHP Functions 
- * 
- * Contains the main custom functions and classes.
- * @author JP7
- * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package InterAdmin
- */
-
+use Illuminate\Database\Eloquent\MassAssignmentException;
+use Illuminate\Database\ConnectionInterface;
 /**
  * Class which represents records on the table interadmin_{client name}.
  *
@@ -19,22 +11,15 @@ abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_NAMESPACE = '';
 	const DEFAULT_FIELDS = '*';
 	
-	private static $_cache = false;
-	
+	protected static $unguarded = false;
+
 	protected $_primary_key = 'id';
 	/**
 	 * Array of all the attributes with their names as keys and the values of the attributes as values.
 	 * @var array 
 	 */
 	public $attributes = array();
-	/**
-	 * Used to know if the values were updated through setFieldsValues(). 
-	 * Hack for compatibility with legacy sites.
-	 * 
-	 * @var bool
-	 */
-	protected $_updated = false;
-	protected $_deleted = false;
+	
 	/**
 	 * @var ADOConnection
 	 */
@@ -110,67 +95,6 @@ abstract class InterAdminAbstract implements Serializable {
     	$this->_db = $db;
     }
 	
-	/** 
-	 * Gets values from this record on the database.
-	 *
-	 * @param array|string $fields Array of fields or name of the field to be retrieved, '*' to get all the fields.
-	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
-	 * @param bool $fieldsAlias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
-	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
-	 * @todo Multiple languages - When there is no id_tipo yet, the function is unable to decide which language table it should use.
-	 * @deprecated Use loadAttributes() or just set fields() with all().
-	 */
-	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
-		throw new Exception('getFieldsValues() has been removed.');
-		if ($this->_deleted) {
-			throw new Exception('This record has been deleted.');
-		}
-		$this->_resolveWildcard($fields, $this);
-		
-		if ($forceAsString || $this->_updated) {
-			// reload
-			$fieldsToLoad = $fields;
-		} elseif (is_string($fields) && isset($this->attributes[$fields])) {
-			// Performance for 1 field only, does the same thing as the last line
-			return $this->attributes[$fields]; 
-		} else {
-			// use cache
-			$fieldsToLoad = array_diff((array) $fields, array_keys($this->attributes));
-		}
-		// Retrieving data
-		if ($fieldsToLoad) {
-			$options = array(
-				'fields' => (array) $fieldsToLoad,
-				'fields_alias' => $fieldsAlias,
-				'from' => $this->getTableName() . ' AS main',
-				'where' => array($this->_primary_key . ' = ' . intval($this->{$this->_primary_key})),
-				// Internal use
-				'aliases' => $this->getAttributesAliases(),
-				'campos' => $this->getAttributesCampos()
-			);
-			$rs = $this->_executeQuery($options);
-			if ($row = $rs[0]) {
-				if ($forceAsString) {
-					$this->_getFieldsValuesAsString($row, $fieldsAlias);
-				} else {
-					$this->_getAttributesFromRow($row, $this, $options);
-				}
-			}
-			//$rs->Close();
-		}
-		if (is_array($fields)) {
-			// returns only the fields requested on $fields
-			foreach ($fields as $key => $value) {
-				if (is_array($value)) {
-					$fields[$key] = $key;
-				}
-			}
-			return (object) array_intersect_key($this->attributes, array_flip($fields));
-		} else {
-			return $this->attributes[$fields];
-		}
-	}
-
 	/**
 	 * Loads attributes if they are not set yet.
 	 * 
@@ -178,10 +102,6 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return null
 	 */
 	public function loadAttributes($attributes, $fieldsAlias = true) {
-		if ($this->_deleted) {
-			throw new Exception('This record has been deleted.');
-		}
-		
 		$fieldsToLoad = array_diff($attributes, array_keys($this->attributes));
 		// Retrieving data
 		if ($fieldsToLoad) {
@@ -201,17 +121,30 @@ abstract class InterAdminAbstract implements Serializable {
 			//$rs->Close();
 		}
 	}
-
+	
 	public function getFillable() {
 		return [];
 	}
-
+	
     public function fill(array $attributes) {
-    	foreach ($this->getFillable() as $name) {
+    	if (!$attributes) {
+    		return $this;
+    	}
+		if (static::$unguarded) {
+			$this->setRawAttributes($attributes);
+			return $this;
+		}
+		
+    	$fillable = $this->getFillable();
+    	if (!$fillable) {
+    		throw new MassAssignmentException(key($attributes));
+    	}
+    	foreach ($fillable as $name) {
     		if (isset($attributes[$name])) {
     			$this->attributes[$name] = $attributes[$name];
     		}
     	}
+    	
     	return $this;
     }
 
@@ -287,22 +220,22 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		$pk = $this->_primary_key;
 		if ($this->$pk) {
-			DB::table($this->getTableName())
+			if (
+				!$db->table($this->getTableName())
 				->where($pk, $this->$pk)
-				->update($valuesToSave) 
-			or die(jp7_debug('Error while updating values in `' . $this->getTableName() .  '` ' . $db->ErrorMsg(), print_r($valuesToSave, true)));
-
-			//$db->AutoExecute($this->getTableName(), $valuesToSave, 'UPDATE', $pk . ' = ' .  $this->$pk) 
-			//	or die(jp7_debug('Error while updating values in `' . $this->getTableName() .  '` ' . $db->ErrorMsg(), print_r($valuesToSave, true)));
+				->update($valuesToSave)
+			) {
+				throw new Exception('Error while updating values in `' . $this->getTableName() .  '` ' . $db->ErrorMsg(), print_r($valuesToSave, true));
+			}
 		} else {
-			DB::table($this->getTableName())
-				->insert($valuesToSave) 
-			or die(jp7_debug('Error while inserting data into `' . $this->getTableName() . '` ' . $db->ErrorMsg(), print_r($valuesToSave, true)));
-
-			// $db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT') 
-			// 	or die(jp7_debug('Error while inserting data into `' . $this->getTableName() . '` ' . $db->ErrorMsg(), print_r($valuesToSave, true)));
+			if (
+				!$db->table($this->getTableName())
+				->insert($valuesToSave)
+			) {
+				throw new Exception('Error while inserting data into `' . $this->getTableName() . '` ' . $db->ErrorMsg(), print_r($valuesToSave, true));
+			}
 			
-			$this->$pk = DB::getPdo()->lastInsertId();
+			$this->$pk = $db->getPdo()->lastInsertId();
 		}
 		return $this;
 	}
@@ -401,78 +334,67 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
-		/*
-		$cache = null;
-		if (self::$_cache) {
-			$cache = new Jp7_Cache_Recordset($options);
-		}
-		if (!$cache || !($rs = $cache->load())) {
-		*/
-			// Resolve Alias and Joins for 'fields' and 'from'
-			$this->_resolveFieldsAlias($options);
-			// Resolve Alias and Joins for 'where', 'group' and 'order';
-			$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
-			
-			$filters = '';
-			if ($use_published_filters) {
-				foreach ($options['from'] as $key => $from) {
-					list($table, $alias) = explode(' AS ', $from);
-					if ($alias == 'main') {
-						$filters = static::getPublishedFilters($table, 'main');
-					} else {
-						$joinArr = explode(' ON', $alias);
-						$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
-					}
+		
+		// Resolve Alias and Joins for 'fields' and 'from'
+		$this->_resolveFieldsAlias($options);
+		// Resolve Alias and Joins for 'where', 'group' and 'order';
+		$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
+		
+		$filters = '';
+		if ($use_published_filters) {
+			foreach ($options['from'] as $key => $from) {
+				list($table, $alias) = explode(' AS ', $from);
+				if ($alias == 'main') {
+					$filters = static::getPublishedFilters($table, 'main');
+				} else {
+					$joinArr = explode(' ON', $alias);
+					$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
 				}
 			}
-			
-		    $joins = '';
-		    if (isset($options['joins']) && $options['joins']) {
-			    foreach ($options['joins'] as $alias => $join) {
-				    list($joinType, $tipo, $on) = $join;
-				    $table = $tipo->getInterAdminsTableName();
-				    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
-					    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '') . 
-					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSql($on, $options, $use_published_filters);
-			    }
-		    }
-		    
-		    if (isset($options['skip'])) {
-		    	$options['limit'] = $options['skip'] . ',' . $options['limit'];
-		    }
-
-			// Sql
-			$sql = "SELECT " . implode(',', $options['fields']) .
-				" FROM " . array_shift($options['from']) .
-			    $joins .
-			    ($options['from'] ? ' LEFT JOIN ' . implode(' LEFT JOIN ', $options['from']) : '') .
-				" WHERE " . $filters . $clauses .
-				((!empty($options['limit'])) ? " LIMIT " . $options['limit'] : '');
-
-
-			$rs = DB::select($sql);
-
-			if (!$rs && !is_array($rs)) {
-				$erro = $db->ErrorMsg();
-				if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
-					$erro .= ". Available fields: \n\t\t- " . implode("\n\t\t- ", array_keys($options['aliases']));
-				}			
-				
-				throw new Exception($erro . ' - SQL: ' . $sql);
-			}
-			
-			if (!empty($options['debug'])) {
-				// $time = $debugger->getTime($options['debug']);
-				echo Jp7_Debugger::syntaxHighlightSql($sql);
-			}
-			$select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;		
-			
-			/*
-			if ($cache) {
-				$rs = $cache->save($rs);
-			}
 		}
-		*/
+		
+	    $joins = '';
+	    if (isset($options['joins']) && $options['joins']) {
+		    foreach ($options['joins'] as $alias => $join) {
+			    list($joinType, $tipo, $on) = $join;
+			    $table = $tipo->getInterAdminsTableName();
+			    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
+				    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '') . 
+				    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSql($on, $options, $use_published_filters);
+		    }
+	    }
+	    
+	    if (isset($options['skip'])) {
+	    	$options['limit'] = $options['skip'] . ',' . $options['limit'];
+	    }
+
+		// Sql
+		$sql = "SELECT " . implode(',', $options['fields']) .
+			" FROM " . array_shift($options['from']) .
+		    $joins .
+		    ($options['from'] ? ' LEFT JOIN ' . implode(' LEFT JOIN ', $options['from']) : '') .
+			" WHERE " . $filters . $clauses .
+			((!empty($options['limit'])) ? " LIMIT " . $options['limit'] : '');
+
+
+		$rs = $db->select($sql);
+
+		if (!$rs && !is_array($rs)) {
+			$erro = $db->ErrorMsg();
+			if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
+				$erro .= ". Available fields: \n\t\t- " . implode("\n\t\t- ", array_keys($options['aliases']));
+			}			
+			
+			throw new Exception($erro . ' - SQL: ' . $sql);
+		}
+		
+		if (!empty($options['debug'])) {
+			// $time = $debugger->getTime($options['debug']);
+			echo Jp7_Debugger::syntaxHighlightSql($sql);
+		}
+		$select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;		
+		
+	
 		return $rs;
 	}
 	/**
@@ -967,16 +889,12 @@ abstract class InterAdminAbstract implements Serializable {
 	 * 
 	 * @return 
 	 */
-	public function deleteForever() {
-		$db = $this->getDb();
+	public function forceDelete() {
 		$pk = $this->_primary_key;
-		if ($this->$pk) {
-			$sql = "DELETE FROM " . $this->getTableName() . 
-				" WHERE " . $this->_primary_key . " = " . $this->$pk;
-			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		}
-		$this->attributes = array();
-		$this->_deleted = true;
+		
+		$this->getDb()->table($this->getTableName())
+			->where($pk, $this->$pk)
+			->delete();
 	}
 	
 	/**
@@ -1052,7 +970,26 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param ADOConnection $db
 	 * @return void
 	 */
-	public function setDb(\Illuminate\Database\ConnectionInterface $db) {
+	public function setDb(ConnectionInterface $db) {
 		$this->_db = $db;
+	}
+
+
+    /**
+	 * Disable all mass assignable restrictions.
+	 *
+	 * @return void
+	 */
+	public static function unguard() {
+		static::$unguarded = true;
+	}
+
+	/**
+	 * Enable the mass assignment restrictions.
+	 *
+	 * @return void
+	 */
+	public static function reguard() {
+		static::$unguarded = false;
 	}
 }
