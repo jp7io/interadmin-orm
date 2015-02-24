@@ -474,9 +474,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		foreach ((array) $fields as $field) {
 			if (isset($campos[$field])) {
-				if (isset($campos[$field]['nome_id'])) {
-					$aliases[$field] = $campos[$field]['nome_id'];
-				} else {
+				if (empty($campos[$field]['nome_id'])) {
 					$alias = $campos[$field]['nome'];
 					if (is_object($alias)) {
 						if ($campos[$field]['label']) {
@@ -489,7 +487,10 @@ class InterAdminTipo extends InterAdminAbstract {
 					$aliases[$field] = $alias;
 					// Cache
 					$update = true;
-					$campos[$field]['nome_id'] = $alias; 
+					
+					$campos[$field]['nome_id'] = $alias;
+				} else {
+					$aliases[$field] = $campos[$field]['nome_id'];
 				}
 			}
 		}
