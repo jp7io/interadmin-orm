@@ -34,9 +34,11 @@ class ClassMap {
 		$tipos = \DB::table($config->db->prefix . '_tipos')
 			->select($attr, 'id_tipo', 'inherited')
 			->where($attr, '<>', '')
+			->where('deleted_tipo', '=', '')
+			->where('mostrar', '<>', '')
 			->orderByRaw("inherited LIKE '%" . $attr. "%'")
 			->get();
-
+		
 		$arr = [];				
 		foreach ($tipos as $tipo) {
 			$arr[$tipo->id_tipo] = $tipo->$attr;
