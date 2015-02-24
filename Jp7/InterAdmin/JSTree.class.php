@@ -6,13 +6,13 @@ class Jp7_InterAdmin_JSTree {
 	public $options = array();
 	protected static $_nivelPermissao = 3;
 	
-	public function __construct($options = array()) {
+	public function __construct($options = array(), $root_id_tipo = 0) {
 		global $lang;
 		
 		$this->options = $options;
 		
 		if (!$options['static']) {
-			$this->addTipo($this->tree, new InterAdminTipo(0));
+			$this->addTipo($this->tree, new InterAdminTipo($root_id_tipo));
 		}
 	}
 	
