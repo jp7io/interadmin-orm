@@ -47,6 +47,10 @@ function img_tag($img, $template = null, $options = array()) {
 	}
 }
 
+function collect($arr) {
+	return new \Jp7\Interadmin\Collection($arr);
+}
+
 function copy_production_file($img) {
 	$filename = $img->getFilename();
 	// FIXME temporario local
