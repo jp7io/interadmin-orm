@@ -1,7 +1,7 @@
 <?php
 
 namespace Jp7\Interadmin\Query;
-use InterAdmin, BadMethodCallException;
+use InterAdmin, InterAdminTipo, BadMethodCallException;
 
 class Type extends Base {
 	
@@ -39,6 +39,16 @@ class Type extends Base {
 		
 		$this->options['limit'] = 1;
 		return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
+	}
+
+	public function create(array $attributes = array()) {
+		$className = InterAdminTipo::getDefaultClass();
+
+		$child = new $className;
+		$child->parent_id_tipo = $this->provider->id_tipo;
+		$child->mostrar = 'S';
+
+		return $child->fill($attributes)->save();
 	}
 		
 }

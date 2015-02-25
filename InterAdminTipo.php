@@ -237,7 +237,11 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function children() {
 		return new \Jp7\Interadmin\Query\Type($this);
 	}
-
+	
+	public function childrenByModel($model_id_tipo) {
+		return $this->children()->where('model_id_tipo', $model_id_tipo);
+	}
+	
 	/**
 	 *
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
@@ -637,7 +641,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	
 	public function syncInheritance() {
 		// Retornando ao valor real
-		foreach (jp7_explode(',', $this->inherited) as $inherited_var) {
+		foreach (array_filter(explode(',', $this->inherited)) as $inherited_var) {
 			$this->attributes[$inherited_var] = '';
 		}
 		$this->inherited = array();
@@ -913,15 +917,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $record->fill($attributes)->save();
 	}
 	
-	public function createChild($model_id_tipo = 0) {
-		$child = new InterAdminTipo();
-		$child->db_prefix = $this->db_prefix;
-		$child->model_id_tipo = $model_id_tipo;
-		$child->parent_id_tipo = $this->id_tipo;
-		$child->mostrar = 'S';
-		return $child;
-	}
-		
 	/**
 	 * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
 	 * 
