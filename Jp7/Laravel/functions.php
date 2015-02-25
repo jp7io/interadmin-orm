@@ -42,6 +42,7 @@ function img_tag($img, $template = null, $options = array()) {
 	if ($url) {
 		if ($template) {
 			$url = str_replace('/assets/', '/imagecache/' . $template . '/', $url);
+			$options['class'] = trim(@$options['class'] . ' '  . $template);
 		}
 		return \HtmlObject\Image::create(URL::to($url), $alt, $options);
 	}
