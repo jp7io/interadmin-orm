@@ -68,7 +68,7 @@ function copy_production_file($img) {
 		
 	 	return $img->getUrl();
 	} else {
-		return 'assets/placeholder.gif?' . $img->url;
+		return URL::to('assets/placeholder.gif?' . $img->url);
 	}
 }
 
