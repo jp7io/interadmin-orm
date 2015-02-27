@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Laravel;
+namespace Jp7\Laravel\Controller;
 
 trait DynamicViewTrait {
 

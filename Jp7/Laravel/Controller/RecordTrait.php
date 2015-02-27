@@ -1,6 +1,9 @@
 <?php
 
-namespace Jp7\Laravel;
+namespace Jp7\Laravel\Controller;
+
+use Jp7_InterAdmin_Exception as InterAdminException;
+use Route, InterAdminTipo, InterAdmin;
 
 trait RecordTrait {
 	/**
@@ -17,21 +20,21 @@ trait RecordTrait {
 	// FIXME Where is it Used??
 	public function getRootType() {
 		//$klass = \getDefaultClass(); 
-		return \InterAdminTipo::getInstance(0);
+		return InterAdminTipo::getInstance(0);
 	}
 	    
 	public function setScope($route) {
 		$uri = $this->_getResourceUri($route);
 
-		$breadcrumb = \Route::uriToBreadcrumb($uri, function($type, $segment) use ($route) {
+		$breadcrumb = Route::uriToBreadcrumb($uri, function($type, $segment) use ($route) {
 			$slug = $route->getParameter(trim($segment, '{}'));
 			return $type->records()->find($slug);
 		});
 		
 		if ($type = end($breadcrumb)) {
 			$parent = $type->getParent();
-			if ($parent instanceof \InterAdmin && !$parent->hasChildrenTipo($type->id_tipo)) {
-				throw new \Jp7_InterAdmin_Exception('It seems this route has a'
+			if ($parent instanceof InterAdmin && !$parent->hasChildrenTipo($type->id_tipo)) {
+				throw new InterAdminException('It seems this route has a'
 					. ' special structure. You need to define a custom '
 					. 'setScope() to handle this.');
 			}
@@ -55,7 +58,7 @@ trait RecordTrait {
 
 	public function setType() {
 		if (!$this->scope) {
-			throw new \Jp7_InterAdmin_Exception('setScope() could not resolve the'
+			throw new InterAdminException('setScope() could not resolve the'
 				. ' type associated with this URI. You need to map it on routes.php.'
 				. ' You can also define a custom setScope() or setType()');
 		}
