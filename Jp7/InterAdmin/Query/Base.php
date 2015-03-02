@@ -166,6 +166,9 @@ abstract class Base {
 	}
 	
 	protected function _escapeParam($value) {
+		if (is_object($value)) {
+			$value = $value->__toString();
+		}
 		if (is_string($value)) {
 			$value = "'" . addslashes($value) . "'";
 		}
