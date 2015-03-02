@@ -285,7 +285,12 @@ abstract class InterAdminAbstract implements Serializable {
 					if ($isTipo) {
 						$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
 					} else {
-						$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
+						if (!$tipo instanceof InterAdminTipo) {
+							$tipo = $this->_getSpecialTipo($value2);
+						}
+						if ($tipo instanceof InterAdminTipo) {
+							$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
+						}
 					}
 				} else {
 					//FIXME Retirar quando 7.form.lib parar de salvar N no special
@@ -303,6 +308,16 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		return $value;
 	}
+
+	protected function _getSpecialTipo($id) {
+		// Temporario enquando specials nao tem id_tipo
+		$config = InterSite::config();
+		$data = DB::table($config->db->prefix)->select('id_tipo')->where('id', $id)->first();
+		if ($data) {
+			return InterAdminTipo::getInstance($data->id_tipo);
+		}
+	}
+
 	/**
 	 * Executes a SQL Query based on the values passed by $options.
 	 * 
