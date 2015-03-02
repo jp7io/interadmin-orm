@@ -76,7 +76,10 @@ class Router extends \Illuminate\Routing\Router {
 		parent::resource($name, $controller, $options);
 	}
 	
-	public function type($name, $className_Or_IdTipo, array $options = array()) {
+	public function type($name, $className_Or_IdTipo, $function = null) {
+		if ($function) {
+			$this->group(['namespace' => studly_case($name), 'prefix' => $name], $function);
+		}
 		if (is_numeric($className_Or_IdTipo)) {
 			$type = InterAdminTipo::getInstance($className_Or_IdTipo);
 		} else {
@@ -84,12 +87,12 @@ class Router extends \Illuminate\Routing\Router {
 		}
 
 		$controller = studly_case(str_replace('.', '\\ ', $name )) . 'Controller';
-		$this->resource($name,  $controller, $options + [
+		$this->resource($name,  $controller, [
 			'id_tipo' => $type->id_tipo,
 			'only' => $type->getRouteActions()
 		]);
 	}
-	
+		
 	public function getRouteByIdTipo($id_tipo, $action = 'index') {
 		if (!isset($this->mapIdTipos[$id_tipo])) {
 			throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
