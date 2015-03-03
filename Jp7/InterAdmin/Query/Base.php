@@ -42,6 +42,9 @@ abstract class Base {
 					throw new \InvalidArgumentException("Invalid operator.");
 				}
 			}
+			if (str_contains($column, ' ') || str_contains($column, '(')) {
+				throw new BadMethodCallException('Invalid column.');
+			}
 			$where = $this->_parseComparison($column, $operator, $value);
 		}
 		$this->_addWhere($where, $_or);
@@ -97,7 +100,22 @@ abstract class Base {
 		")";
 		return $this;
 	}
+
+	public function whereYear($column, $value) {
+		$this->options['where'][] =  $this->_parseComparison('YEAR(' . $column . ')', '=', $value);
+		return $this;
+	}
+
+	public function whereMonth($column, $value) {
+		$this->options['where'][] =  $this->_parseComparison('MONTH(' . $column . ')', '=', $value);
+		return $this;
+	}
 	
+	public function whereDay($column, $value) {
+		$this->options['where'][] =  $this->_parseComparison('DAY(' . $column . ')', '=', $value);
+		return $this;
+	}
+
 	public function whereDoesntHave($relationship, $conditions = null) {
 		return $this->whereHas($relationship, $conditions, true);
 	}
