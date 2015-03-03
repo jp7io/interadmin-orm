@@ -79,6 +79,10 @@ abstract class InterAdminAbstract implements Serializable {
 	public function __krumoTitle() {
 		return $this->__toString() . ' - ' . $this->getName();
 	}
+
+	public function __krumoProperties() {
+		return $this->attributes;
+	}
 	
 	public function serialize() {
 		$vars = get_object_vars($this);
