@@ -25,7 +25,14 @@ class Collection extends BaseCollection {
 		return new self($subitems);
 	}
 	
+	/**
+	 * Just like ->lists(), but chainable
+	 */
 	public function collect($value, $key = null) {
 		return new self(array_pluck($this->items, $value, $key));		
+	}
+	
+	public function split($parts) {
+		return $this->chunk(ceil(count($this) / $parts));
 	}
 }
