@@ -59,8 +59,6 @@ trait DynamicViewTrait {
 	 * @return string
 	 */
 	private function _getViewName($method) {
-		//\Route::getCurrentRoute()->getAction()['as']
-
 		$action = str_replace('_', '-', snake_case($method));
 		
 		$viewRoute = $this->_viewRoute(get_class($this), $action);
@@ -75,11 +73,10 @@ trait DynamicViewTrait {
 		
 		return "templates.{$action}";
 	}
-
+	
 	protected function _viewRoute($controllerClass, $action) {
 		$controllerRoute = $this->_controllerRoute($controllerClass);
 		return "{$controllerRoute}.{$action}";
-		
 	}
 	
 	protected function _viewExists($route) {

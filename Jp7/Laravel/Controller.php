@@ -7,9 +7,12 @@ class Controller extends \Illuminate\Routing\Controller {
 	protected static $current = null;
 
 	protected $layout = 'layouts.master';
+	protected $action = '';
 
 	public function __construct() {
 		static::$current = $this;
+		
+		$this->action = explode('@', \Route::getCurrentRoute()->getActionName())[1];
 	}
 
 	/* Temporary solution - Avoid using this as much as possible */

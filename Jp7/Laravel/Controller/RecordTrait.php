@@ -16,13 +16,7 @@ trait RecordTrait {
 		$this->beforeFilter('@setType');
 		$this->beforeFilter('@setRecord', ['only' => ['show']]);
 	}
-
-	// FIXME Where is it Used??
-	public function getRootType() {
-		//$klass = \getDefaultClass(); 
-		return InterAdminTipo::getInstance(0);
-	}
-	    
+		    
 	public function setScope($route) {
 		$uri = $this->_getResourceUri($route);
 
@@ -45,12 +39,10 @@ trait RecordTrait {
 	protected function _getResourceUri($route) {
 		$uri = $route->getUri();
 		
-		$action = explode('@', $route->getActionName())[1];
-
-		if (in_array($action, array('create', 'edit'))) {
+		if (in_array($this->action, array('create', 'edit'))) {
 			$uri = dirname($uri); // Remove last part
 		}
-		if (in_array($action, array('show', 'edit', 'update', 'destroy'))) {
+		if ($this->isRecordAction()) {
 			$uri = dirname($uri); // Do not resolve $record yet
 		}
 		return $uri;
@@ -66,14 +58,23 @@ trait RecordTrait {
 	}
 	
 	public function setRecord($route) {
-		if ($this->scope) {
-			$parameters = $route->parameterNames();
-			if (count($parameters) > 0) {
-				$slug = $route->getParameter(end($parameters));
-				
-				$this->record = $this->scope->find($slug);
-			}
+		if (!$this->isRecordAction()) {
+			return;
 		}
+		$reflection = new \ReflectionMethod($this, $this->action);
+		if (count($reflection->getParameters()) > 0)  {
+			return; // tem parametros -> achar record no controller
+		}
+		if ($this->scope) {
+			$parameters = $route->parameters();
+			if (count($parameters) > 0) {
+				$slug = end($parameters);				
+				$this->record = $this->scope->findOrFail($slug);
+			}
+		}	
 	}
 
+	protected function isRecordAction() {
+		return in_array($this->action, array('show', 'edit', 'update', 'destroy'));
+	}
 }
