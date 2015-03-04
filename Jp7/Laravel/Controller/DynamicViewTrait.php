@@ -2,25 +2,25 @@
 
 namespace Jp7\Laravel\Controller;
 
+use View, Response, stdClass, Exception, Config;
+
 trait DynamicViewTrait {
 
 	/**
 	 * @var Variables to send to view
 	 */
-	protected $_viewData = null;
+	protected $_view;
 
 	public function constructDynamicViewTrait() {
-		if (is_null($this->_viewData)) {
-			$this->_viewData = new \stdClass();
-		}
+		$this->_view = new stdClass;
 	}
 	
 	public function &__get($key) {
-		return $this->_viewData->$key;
+		return $this->_view->$key;
 	}
 	
 	public function __set($key, $value) {
-		$this->_viewData->$key = $value;
+		$this->_view->$key = $value;
 	}
 
 	/**
@@ -37,22 +37,22 @@ trait DynamicViewTrait {
 			return $response;
 		}
 		if ($method == 'show' && !$this->record) {
-			throw new \Exception('Show action without record. You need to set $this->record inside your controller.');	
+			throw new Exception('Show action without record. You need to set $this->record inside your controller.');	
 		}
-		return $this->_makeView($method);
+		return $this->makeView();
 	}
 	
-	private function _makeView($method) {
-		$viewName = $this->_getViewName($method);
-		$viewContent = \View::make($viewName, (array) $this->_viewData);
+	public function makeView() {
+		$viewName = $this->_getViewName($this->action);
+		$data = (array) $this->_view;
+		$view = View::make($viewName, $data);
 		
 		if ($this->layout) {
-			$this->_viewData->content = $viewContent;
-			$viewContent = \View::make($this->layout, (array) $this->_viewData);
+			$view = View::make($this->layout, ['content' => $view] + $data);
 		}
-		return $viewContent;
+		return $view;
 	}
-
+	
 	/**
 	 * Get the view name
 	 * 
@@ -82,7 +82,7 @@ trait DynamicViewTrait {
 	protected function _viewExists($route) {
 		$filename = str_replace('.', '/', $route);
 		
-		foreach (\Config::get('view.paths') as $viewPath) {
+		foreach (Config::get('view.paths') as $viewPath) {
 			if (file_exists($viewPath . '/' . $filename . '.blade.php')) {
 				return true;
 			}
