@@ -138,15 +138,7 @@ class Query extends Query\Base {
 			'fields' => array_filter([$column, $key]),
 		) + $this->options);
 		
-		$array = [];
-		foreach ($items as $item) {
-			$array[] = [
-				'key' => $item->$key,
-				'value' => $item->$column
-			];
-		}
-
-		return $array;
+		return $items->jsonList($column, $key);
 	}
 	
 	public function collect($column) {

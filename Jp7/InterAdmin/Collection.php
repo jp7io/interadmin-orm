@@ -35,4 +35,15 @@ class Collection extends BaseCollection {
 	public function split($parts) {
 		return $this->chunk(ceil(count($this) / $parts));
 	}
+	
+	public function jsonList($column, $key) {
+		$array = [];
+		foreach ($this->items as $item) {
+			$array[] = [
+				'key' => $item->$key,
+				'value' => $item->$column
+			];
+		}
+		return $array;
+	}
 }
