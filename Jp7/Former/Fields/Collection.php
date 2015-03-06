@@ -11,7 +11,7 @@ class Collection extends \Former\Form\Fields\Select {
 		return $this;
 	}
 	
-	function options($list, $selected = NULL, $valuesAsKeys = false) {
+	function options($list, $selected = null, $valuesAsKeys = false) {
 		if ($list instanceof \Jp7\Interadmin\Query\Base) {
 			$list = $list->all();
 		}
@@ -24,6 +24,11 @@ class Collection extends \Former\Form\Fields\Select {
 			}
 		}
 		$this->options = $list;
+
+		if (!is_null($selected)) {
+			$this->value = $selected;
+		}
+
 		return $this;
 	}
 	
