@@ -164,12 +164,8 @@ class Query extends Query\Base {
 			$method_name = 'scope' . ucfirst($method_name);
 			if (!method_exists($model, $method_name)) {
 				throw new BadMethodCallException('Method ' . $method_name .  ' does not exist.');
-			}			
-			$query = call_user_func_array([$model, $method_name], $params);
-			if (!$query instanceof self) {
-				throw new BadMethodCallException('Method ' . $method_name . ' should return instance of ' . __CLASS__);
 			}
-			return $query;
+			return call_user_func_array([$model, $method_name], $params);
 		}
 		throw new BadMethodCallException('Unsupported method ' . $method_name);
 	}
