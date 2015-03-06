@@ -580,6 +580,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			return implode(' - ', $stringValue);
 		}
 	}
+	
 	/**
 	 * Saves this record and updates date_modify.
 	 * 
@@ -602,7 +603,16 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		
 		return parent::save();
 	}
-
+	
+	/**
+	 * Saves without logs and triggers
+	 * 
+	 * @return void
+	 */
+	public function saveRaw() {
+		return parent::save();
+	}
+	
 	public function generateSlug($string) {
 		$this->loadAttributes(['id_slug']);
 		$newSlug = to_slug($string);
@@ -785,7 +795,13 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	}
 	
 	public function toArray() {
-		return $this->attributes;
+		$array = $this->attributes;
+		foreach ($array as &$value) {
+			if ($value instanceof ArrayableInterface) {
+				$value = $value->toArray();
+			}
+		}
+		return $array;
 	}
 
 	public function getRules() {
