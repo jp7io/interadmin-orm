@@ -162,16 +162,6 @@ abstract class InterAdminAbstract implements Serializable {
 		return $this->fill($attributes)->save();
 	}
 	/**
-	 * Updates all the attributes from the passed-in array and saves the record.
-	 * 
-	 * @param array $attributes Array with fields names and values.
-	 * @return void
-	 */
-	public function updateRawAttributes(array $attributes) {
-		$this->setRawAttributes($attributes);
-		$this->_update($attributes);
-	}
-	/**
 	 * Saves this record.
 	 * 
 	 * @return void
@@ -224,19 +214,14 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		$pk = $this->_primary_key;
 		if ($this->$pk) {
-			if (
-				!$db->table($this->getTableName())
-				->where($pk, $this->$pk)
-				->update($valuesToSave)
-			) {
-				throw new Exception('Error while updating values in `' . $this->getTableName() .  '` ' . $db->ErrorMsg(), print_r($valuesToSave, true));
+			if ($db->table($this->getTableName())->where($pk, $this->$pk)->update($valuesToSave) === false) {
+				throw new Exception('Error while updating values in `' . $this->getTableName() .  '` ' . 
+					$db->getPdo()->errorCode(), print_r($valuesToSave, true));
 			}
 		} else {
-			if (
-				!$db->table($this->getTableName())
-				->insert($valuesToSave)
-			) {
-				throw new Exception('Error while inserting data into `' . $this->getTableName() . '` ' . $db->ErrorMsg(), print_r($valuesToSave, true));
+			if ($db->table($this->getTableName())->insert($valuesToSave) === false) {
+				throw new Exception('Error while inserting data into `' . $this->getTableName() . '` ' . 
+					$db->getPdo()->errorCode(), print_r($valuesToSave, true));
 			}
 			
 			$this->$pk = $db->getPdo()->lastInsertId();
@@ -864,36 +849,7 @@ abstract class InterAdminAbstract implements Serializable {
 			$this->$key = $value;
 		}
 	}
-	/**
-	 * Reloads all the attributes.
-	 * 
-	 * @todo Not implemented yet. Won't work with recursive objects and alias.
-	 * @return void
-	 */
-	public function reload($fields = null) {
-		if (is_null($fields)) {
-			$fields = array_keys($this->attributes);
-			$existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
-			$fields = array_intersect($fields, $existingFields);
-		}
-		// Esvaziando valores para forçar atualização
-		foreach ($fields as $key) {
-			unset($this->attributes[$key]);
-		}
-		$isAliased = static::DEFAULT_FIELDS_ALIAS;
-		$this->getFieldsValues($fields, false, $isAliased);
-	}
-	/**
-	 * Creates a object of the given Class name with the same attributes.
-	 * 
-	 * @param object $className
-	 * @return InterAdminAbstract An instance of the given Class name.
-	 */
-	public function becomes($className) {
-		$newobject = new $className();
-		$newobject->attributes = $this->attributes;
-		return $newobject;
-	}
+
 	/**
 	 * Sets this row as deleted as saves it.
 	 * 
