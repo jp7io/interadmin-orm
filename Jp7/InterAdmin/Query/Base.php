@@ -6,6 +6,7 @@ use InterAdminTipo, InterAdminAbstract, BadMethodCallException;
 abstract class Base {
 	protected $provider;
 	protected $options;
+	protected $or = false;
 	
 	protected $operators = array(
 		'=', '<', '>', '<=', '>=', '<>', '!=',
@@ -21,8 +22,19 @@ abstract class Base {
 			'where' => array()
 		);
 	}
+
+	public function __call($method_name, $params) {
+		if (starts_with($method_name, 'or')) {
+			$original = lcfirst(substr($method_name, 2));
+			if (method_exists($this, $original)) {
+				$this->or = true;
+				return call_user_func_array([$this, $original], $params);
+			}
+		}
+		throw new BadMethodCallException('Unsupported method ' . $method_name);
+	}
 	
-	public function where($column, $operator = null, $value = null, $_or = false) {
+	public function where($column, $operator = null, $value = null) {
 		if (is_array($column)) {
 			// Hash = [a => 1, b => 2]
 			$where = $this->_whereHash($column);
@@ -47,73 +59,76 @@ abstract class Base {
 			}
 			$where = $this->_parseComparison($column, $operator, $value);
 		}
-		$this->_addWhere($where, $_or);
-		return $this;
+		return $this->_addWhere($where);
 	}
-
-	protected function _addWhere($where, $or) {
+	
+	public function orWhere($column, $operator = null, $value = null) {
+		$this->or = true;
+		return $this->where($column, $operator, $value);
+	}
+	
+	protected function _addWhere($where) {
 		if ($where) {
-			if ($or) {
+			if ($this->or) {
+				$this->or = false;
+
 				$last = array_pop($this->options['where']);
 				$where = $last . ' OR ' . $where;
 			}
 			$this->options['where'][] = $where;
 		}
-	}
-
-	public function orWhere($column, $operator = null, $value = null) {
-		return $this->where($column, $operator, $value, true);
+		return $this;
 	}
 
 	public function whereRaw($where) {
-		$this->options['where'][] = $where;
-		return $this;
+		return $this->_addWhere($where);
 	}
 	
 	public function whereIn($column, $values) {
 		$values = array_map([$this, '_escapeParam'], $values);
-		$this->options['where'][] = $column . ' IN (' . implode(',', $values) . ')';
-		return $this;
+		$where = $column . ' IN (' . implode(',', $values) . ')';
+		return $this->_addWhere($where);
 	}
-	
+
 	public function whereFindInSet($column, $value) {
 		$value = $this->_escapeParam($value);
-		$this->options['where'][] = ' FIND_IN_SET (' . $value . ', ' . $column . ')';
-		return $this;
+		$where = 'FIND_IN_SET (' . $value . ', ' . $column . ')';
+		return $this->_addWhere($where);
 	}
-	
+
 	public function whereNotIn($column, $values) {
 		$values = array_map([$this, '_escapeParam'], $values);
-		$this->options['where'][] = $column . ' NOT IN (' . implode(',', $values) . ')';
-		return $this;
+		$where = $column . ' NOT IN (' . implode(',', $values) . ')';
+		return $this->_addWhere($where);
 	}
-	
+		
 	public function has($relationship) {
 		return $this->whereHas($relationship, '1 = 1');
 	}
 
 	public function whereHas($relationship, $conditions = null, $_not = false) {
-		$where = $this->_parseConditions($conditions, $relationship . '.');
+		$relWhere = $this->_parseConditions($conditions, $relationship . '.');
 		
-		$this->options['where'][] = ($_not ? 'NOT ' : '') . "EXISTS (" .
-			$relationship . " WHERE " . implode(' AND ', $where) . 
+		$where = ($_not ? 'NOT ' : '') . "EXISTS (" .
+			$relationship . " WHERE " . implode(' AND ', $relWhere) . 
 		")";
-		return $this;
+		
+		return $this->_addWhere($where);
 	}
 
 	public function whereYear($column, $value) {
-		$this->options['where'][] =  $this->_parseComparison('YEAR(' . $column . ')', '=', $value);
-		return $this;
+		$where = $this->_parseComparison('YEAR(' . $column . ')', '=', $value);
+		return $this->_addWhere($where);
 	}
 
 	public function whereMonth($column, $value) {
-		$this->options['where'][] =  $this->_parseComparison('MONTH(' . $column . ')', '=', $value);
-		return $this;
+		$where =  $this->_parseComparison('MONTH(' . $column . ')', '=', $value);
+		return $this->_addWhere($where);
 	}
 	
 	public function whereDay($column, $value) {
-		$this->options['where'][] =  $this->_parseComparison('DAY(' . $column . ')', '=', $value);
-		return $this;
+		$where =  $this->_parseComparison('DAY(' . $column . ')', '=', $value);
+		return $this->_addWhere($where);
 	}
 
 	public function whereDoesntHave($relationship, $conditions = null) {

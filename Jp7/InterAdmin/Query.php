@@ -160,14 +160,13 @@ class Query extends Query\Base {
 	public function __call($method_name, $params) {
 		// Scope support
 		if ($model = $this->getModel()) {
-			array_unshift($params, $this);
-			$method_name = 'scope' . ucfirst($method_name);
-			if (!method_exists($model, $method_name)) {
-				throw new BadMethodCallException('Method ' . $method_name .  ' does not exist.');
-			}
-			return call_user_func_array([$model, $method_name], $params);
+			$scope = 'scope' . ucfirst($method_name);
+			if (method_exists($model, $scope)) {
+				array_unshift($params, $this);
+				return call_user_func_array([$model, $scope], $params);
+			}			
 		}
-		throw new BadMethodCallException('Unsupported method ' . $method_name);
+		return parent::__call($method_name, $params);
 	}
 	
 }
