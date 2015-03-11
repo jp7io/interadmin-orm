@@ -816,12 +816,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function getAttributesNames() {
-		$db = $this->getDb();
-		if (!$attributes  = $this->_getMetadata('attributes')) {
-			$attributes = $db->MetaColumnNames($this->getTableName()) or die(jp7_debug($db->ErrorMsg()));
-			$this->_setMetadata('attributes', $attributes);
-		}
-		return $attributes;
+		return $this->getColumns();
 	}
 	public function getAttributesCampos() {
 		return array();
@@ -952,6 +947,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$record->$mostrar = 'S';
 		$record->date_publish = date('c');
 		$record->date_insert = date('c');
+		$record->log = '';
 		if ($this->_parent instanceof InterAdmin) {
 			$record->setParent($this->_parent);
 			// Childs are published by default on InterAdmin.

@@ -20,6 +20,7 @@ abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS = null;
 	
 	private static $_cache = false;
+	private static $_columns = [];
 	
 	protected $_primary_key = 'id';
 	/**
@@ -898,6 +899,15 @@ abstract class InterAdminAbstract implements Serializable {
 	abstract function getAttributesAliases();
 	abstract function getAdminAttributes();
 	abstract function getTableName();
+	
+	public function getColumns() {
+		$table = $this->getTableName();
+		if (empty(self::$_columns[$table])) {
+			$db = $this->getDb();
+			self::$_columns[$table] = $db->MetaColumnNames($table);
+		}
+		return self::$_columns[$table];
+	}
 	
 	public static function getPublishedFilters($table, $alias) {
 		global $db, $config, $s_session;

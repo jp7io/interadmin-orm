@@ -37,6 +37,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @var InterAdmin
 	 */
 	protected $_parent;
+
+	protected $_childrenTipos = [];
+
 	/**
 	 * Contains an array of objects (InterAdmin and InterAdminTipo).
 	 * @var array
@@ -344,13 +347,17 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
-		if (!$options['db_prefix']) {
-			$options['db_prefix'] = $this->getTipo()->db_prefix;
+		if (empty($this->_childrenTipos[$id_tipo])) {
+			if (!$options['db_prefix']) {
+				$options['db_prefix'] = $this->getTipo()->db_prefix;
+			}
+			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
+			$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
+			$childrenTipo->setParent($this);
+			
+			$this->_childrenTipos[$id_tipo] = $childrenTipo;
 		}
-		$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
-		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
-		$childrenTipo->setParent($this);
-		return $childrenTipo;
+		return $this->_childrenTipos[$id_tipo];
 	}
 	/**
 	 * Retrieves this record´s children for the given $id_tipo.
@@ -709,16 +716,22 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function save() {
 		// id_string
-		if (isset($this->varchar_key) && $this->varchar_key) {
-			$this->id_string = toId($this->varchar_key);
-			$this->id_slug = $this->generateSlug($this->varchar_key);
+		$columns = $this->getColumns();
+		
+		if (isset($this->varchar_key)) {
+			$alias_varchar_key = 'varchar_key';
 		} else {
 			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
-			if (isset($this->$alias_varchar_key) && $this->$alias_varchar_key) {
-				$this->id_string = toId($this->$alias_varchar_key);
-				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
-			}			
 		}
+		if (isset($this->$alias_varchar_key)) {
+			if (in_array('id_string', $columns)) {
+				$this->id_string = toId($this->$alias_varchar_key);
+			}
+			if (in_array('id_slug', $columns)) {
+				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
+			}
+		}
+		
 		// log
 		if ($this->id && !isset($this->log)) {
 			// Evita bug em que um registro despublicado tem seu log zerado
