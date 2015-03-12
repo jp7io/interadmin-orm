@@ -46,4 +46,13 @@ class Collection extends BaseCollection {
 		}
 		return $array;
 	}
+
+	public function humanImplode($column, $glue, $lastGlue) {
+		if ($items = $this->lists($column)) {
+			$last = implode($lastGlue, array_splice($items, -2));
+			array_push($items, $last);
+		}
+		return implode($glue, $items);
+	}
+
 }
