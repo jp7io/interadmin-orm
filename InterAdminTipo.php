@@ -51,34 +51,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected $_tiposUsingThisModel;
 	
 	/**
-	 * Magic method calls(On Development)
-	 * 
-	 * Available magic methods:
-	 * - getInterAdminBy{Field}(mixed $value, array $options = array())
-	 * - getInterAdminsBy{Field}(mixed $value, array $options = array())
-	 * 
-	 * @param string $method
-	 * @return mixed
-	 */
-	public function __call($method, $args) {
-		if (strpos($method, 'find') === 0) {
-			if (preg_match('/find(First)?By(?<args>.*)/', $method, $match)) {
-				$termos = explode('And', $match['args']);
-				$options = $args[count($termos)];
-				foreach ($termos as $key => $termo) {
-					$options['where'][] = snake_case($termo) . " = '" . addslashes($args[$key]) . "'";
-				}
-				if ($match[1]) {
-					$options['limit'] = 1;
-				}
-				$retorno = $this->deprecatedFind($options);
-				return ($match[1]) ? $retorno[0] : $retorno;
-			}
-		}
-		throw new Exception('Call to undefined method ' . get_class($this) . '->' . $method . '()');
-	}
-
-	/**
 	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
 	 * This method has 4 possible calls:
 	 * 
