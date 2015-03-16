@@ -370,7 +370,9 @@ class InterAdmin extends InterAdminAbstract {
 		$children = array();
 		if ($id_tipo) {
 			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
-			$children = $this->getChildrenTipo($id_tipo)->find($options);
+			if ($childrenTipo = $this->getChildrenTipo($id_tipo)) {
+				$children = $childrenTipo->find($options);
+			}
 		}
 		return $children;
 	}
