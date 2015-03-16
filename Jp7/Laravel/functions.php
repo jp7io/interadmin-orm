@@ -29,7 +29,7 @@ function snake_case($value, $delimiter = '_') {
 
 function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
-		if ($img->getFilename() && !is_file($img->getFilename())) {
+		if ($img->getFilename() && !is_file($img->getFilename()) && InterSite::config()->isDevelopment()) {
 			$url = copy_production_file($img);
 		} else {
 			$url = $img->getUrl();
