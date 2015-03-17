@@ -52,6 +52,12 @@ function collect($arr) {
 	return new \Jp7\Interadmin\Collection($arr);
 }
 
+function interadmin_data($record) {
+	if ($record instanceof InterAdmin) {
+		echo ' data-ia="' . $record->id . ':' . $record->id_tipo . '"';
+	}
+}
+
 function copy_production_file($img) {
 	$filename = $img->getFilename();
 	// FIXME temporario local

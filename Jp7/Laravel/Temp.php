@@ -38,6 +38,12 @@ class Temp {
 		    return preg_replace($pattern, '$1@include$2_', $view);
 		});
 		
+		Blade::extend(function($view, $compiler) {
+			 $pattern = $compiler->createMatcher('ia');
+			 
+			 return preg_replace($pattern, '$1<?php echo interadmin_data$2; ?>', $view);
+		});
+		
 		Blade::setEscapedContentTags('{{', '}}');
     	Blade::setContentTags('{!!', '!!}');
 	}
