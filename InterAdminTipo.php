@@ -74,7 +74,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->_db = isset($options['db']) ? $options['db'] : null;
 		
 		if (!empty($options['fields'])) {
-			throw new Exception('Deprecated __construct with $options[fields]');
+			throw new BadMethodCallException('Deprecated __construct with $options[fields]');
 		}
 	}
 	public function &__get($attributeName) {
@@ -86,6 +86,25 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return $null; // Needs to be variable to be returned as reference
 	}
+	
+	public function __call($methodName, $args) {
+		$childrenType = $this->children()
+			->where('id_slug', snake_case($methodName, '-'))
+			->first();
+		
+		if ($childrenType) {
+			return $childrenType->records();
+		}
+		// Default error when method doesn´t exist
+		$message = 'Call to undefined method ' . get_class($this) . '->' . 
+			$methodName . '(). Available magic methods: ' . "\n";
+		
+		foreach ($this->children()->all() as $child) {
+			$message .= "\t\t- " . lcfirst(camel_case($child->id_slug)) . "()\n";
+		}
+		throw new BadMethodCallException($message);
+	}
+		
 	/**
 	 * Returns an InterAdminTipo instance. If $options['class'] is passed, 
 	 * it will be returned an object of the given class, otherwise it will search 
@@ -535,6 +554,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
+		$this->id_slug = to_slug($this->nome);
+		
 		// log
 		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		

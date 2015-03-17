@@ -215,18 +215,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			$message .= "\t\t- arquivos()\n";
 		}
 		
-		throw new Exception($message);
-	}
-	/**
-	 * Gets fields values by their alias.
-	 *  
-	 * @param array|string $fields
-	 * @see InterAdmin::getFieldsValues()
-	 * @deprecated
-	 * @return
-	 */
-	public function getByAlias($fields) {
-		throw new Exception('getByAlias() was removed, load fields previously.');
+		throw new BadMethodCallException($message);
 	}
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
