@@ -29,11 +29,7 @@ function snake_case($value, $delimiter = '_') {
 
 function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
-		if ($img->getFilename() && !is_file($img->getFilename()) && InterSite::config()->isDevelopment()) {
-			$url = copy_production_file($img);
-		} else {
-			$url = $img->getUrl();
-		}
+		$url = img_resize_url($img, $template);
 		$alt = $img->text;
 	} else {
 		$url = $img;
@@ -41,11 +37,22 @@ function img_tag($img, $template = null, $options = array()) {
 	}
 	if ($url) {
 		if ($template) {
-			$url = str_replace('/assets/', '/imagecache/' . $template . '/', $url);
 			$options['class'] = trim(@$options['class'] . ' '  . $template);
 		}
 		return \HtmlObject\Image::create(URL::to($url), $alt, $options);
 	}
+}
+
+function img_resize_url($img, $template = null) {
+	if ($img->getFilename() && !is_file($img->getFilename()) && InterSite::config()->isDevelopment()) {
+		$url = copy_production_file($img);
+	} else {
+		$url = $img->getUrl();
+	}	
+	if ($template) {
+		$url = str_replace('/assets/', '/imagecache/' . $template . '/', $url);
+	}
+	return $url;	
 }
 
 function collect($arr) {
