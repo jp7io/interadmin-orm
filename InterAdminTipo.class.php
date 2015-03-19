@@ -702,6 +702,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (isset($this->nome)) {
 			$this->id_tipo_string = toId($this->nome);
 		}
+		
+		$this->id_slug = toSlug($this->nome);
+				
 		// log
 		if ($this->id_tipo && !isset($this->log)) {
 			// Evita bug em que um tipo despublicado tem seu log zerado
