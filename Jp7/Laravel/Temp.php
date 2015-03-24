@@ -30,12 +30,12 @@ class Temp {
 		/* /DB Connection *-/
 	}
 	*/
-
+	
 	public static function extendBlade() {
 		Blade::extend(function($view, $compiler) {
 			// @include with partials/_partial instead of partials/partial			
-		    $pattern = '/(?<!\w)(\s*)@include(\s*\((.*)\.)/';
-		    return preg_replace($pattern, '$1@include$2_', $view);
+		    $pattern = '/(?<!\w)(\s*)@include\(([^,\)]+)/';
+		    return preg_replace($pattern, '$1@include(\Jp7\Laravel\Temp::inc($2)', $view);
 		});
 		
 		Blade::extend(function($view, $compiler) {
@@ -46,6 +46,12 @@ class Temp {
 		
 		Blade::setEscapedContentTags('{{', '}}');
     	Blade::setContentTags('{!!', '!!}');
+	}
+	
+	public static function inc($file) {
+		$parts = explode('.', $file);
+		$parts[] = '_' . array_pop($parts);
+		return implode('.', $parts);
 	}
 	
 	public static function extendWhoops() {
