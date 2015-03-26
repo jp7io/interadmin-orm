@@ -12,9 +12,11 @@ class Query extends Query\Base {
 		return $this->provider;
 	}
 	
+	/**
+	 * Returns a instance with id 0, to get scopes, rules, and so on.
+	 */
 	public function getModel() {
 		if (is_null($this->model)) {
-			// Cria instancia para simular comportamento do Eloquent
 			if ($classname = $this->provider->class) {
 				$this->model = new $classname(0);
 				$this->model->setType($this->provider);
@@ -23,18 +25,30 @@ class Query extends Query\Base {
 		return $this->model;
 	}
 	
+	/**
+	 * Create a record without saving.
+	 */	
 	public function build(array $attributes = array()) {
 		return $this->provider->deprecated_createInterAdmin($attributes);
 	}
 	
+	/**
+	 * Create and save a record.
+	 */	
 	public function create(array $attributes = array()) {
 		return $this->build()->save();
 	}
 		
+	/**
+	 * Set deleted = 'S' and update the records.
+	 */
 	public function delete() {
 		return $this->provider->deprecated_deleteInterAdmins($this->options);
 	}
 	
+	/**
+	 * Remove permanently from the database.
+	 */
 	public function forceDelete() {
 		return $this->provider->deprecated_deleteInterAdminsForever($this->options);
 	}
@@ -140,7 +154,10 @@ class Query extends Query\Base {
 		
 		return array_pluck($array, $column, $key);
 	}
-
+	
+	/**
+	 * List to be used on json, with {key: 1, value: 'Lorem'}
+	 */
 	public function jsonList($column, $key) {
 		$items = $this->provider->deprecatedFind(array(
 			'fields' => array_filter([$column, $key]),
@@ -149,6 +166,9 @@ class Query extends Query\Base {
 		return $items->jsonList($column, $key);
 	}
 	
+	/**
+	 * Just like lists, but returns a collection.
+	 */
 	public function collect($column) {
 		return new Collection($this->lists($column));
 	}
@@ -159,10 +179,6 @@ class Query extends Query\Base {
 			throw new ModelNotFoundException('Unable to find a record with id: ' . $id);
 		}
 		return $result;
-	}
-	
-	public function findFirst() {
-		throw new BadMethodCallException('Use first() instead of findFirst().');
 	}
 	
 	public function __call($method_name, $params) {
