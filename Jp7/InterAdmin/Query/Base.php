@@ -241,15 +241,15 @@ abstract class Base {
 	}
 
 	public function take($limit) {
-		return $this->limit($limit);
-	}
-
-	public function limit($limit) {
 		if (!is_numeric($limit)) {
 			throw new BadMethodCallException('Limit must be numeric.');
 		}
 		$this->options['limit'] = $limit;
 		return $this;
+	}
+	
+	public function limit($limit) {
+		return $this->take($limit);
 	}
 	
 	public function groupBy($column) {
