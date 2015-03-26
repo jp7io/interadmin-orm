@@ -23,10 +23,14 @@ class Query extends Query\Base {
 		return $this->model;
 	}
 	
-	public function create(array $attributes = array()) {
+	public function build(array $attributes = array()) {
 		return $this->provider->deprecated_createInterAdmin($attributes);
 	}
 	
+	public function create(array $attributes = array()) {
+		return $this->build()->save();
+	}
+		
 	public function delete() {
 		return $this->provider->deprecated_deleteInterAdmins($this->options);
 	}
@@ -36,6 +40,10 @@ class Query extends Query\Base {
 	}
 	
 	protected function _isChar($field) {
+		if (in_array($field, ['deleted', 'publish'])) {
+			return true;
+		}
+
 		$aliases = array_flip($this->provider->getCamposAlias());
 		if (isset($aliases[$field])) {
 			return strpos($aliases[$field], 'char_') === 0;

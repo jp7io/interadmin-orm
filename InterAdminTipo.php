@@ -842,8 +842,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function deprecated_createInterAdmin(array $attributes = array()) {
 		$options = array('default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin');
 		$record = InterAdmin::getInstance(0, $options, $this);
-		$mostrar = $this->getCamposAlias('char_key');
-		$record->$mostrar = 'S';
+		if ($mostrar = $this->getCamposAlias('char_key')) {
+			$record->$mostrar = 'S';
+		}
 		$record->date_publish = date('c');
 		$record->date_insert = date('c');
 		if ($this->_parent instanceof InterAdmin) {
@@ -851,7 +852,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			// Childs are published by default on InterAdmin.
 			$record->publish = 'S';
 		}
-		return $record->fill($attributes)->save();
+		return $record->fill($attributes);
 	}
 	
 	/**

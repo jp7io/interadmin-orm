@@ -40,15 +40,19 @@ class Type extends Base {
 		$this->options['limit'] = 1;
 		return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
 	}
-
-	public function create(array $attributes = array()) {
+	
+	public function build(array $attributes = array()) {
 		$className = InterAdminTipo::getDefaultClass();
 
 		$child = new $className;
 		$child->parent_id_tipo = $this->provider->id_tipo;
 		$child->mostrar = 'S';
 
-		return $child->fill($attributes)->save();
+		return $child->fill($attributes);
+	}
+	
+	public function create(array $attributes = array()) {
+		return $this->build()->save();
 	}
 		
 }
