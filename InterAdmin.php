@@ -505,71 +505,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			!$this->deleted
 		);
 	}
-	/**
-	 * DEPRECATED: Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
-	 * 
-	 * @param array $sqlRow
-	 * @param string $tipoLanguage
-	 * @deprecated Kept for backwards compatibility
-	 * @return mixed
-	 */
-	protected function _getFieldsValuesAsString($sqlRow, $fields_alias) {
-		global $lang;
-		$campos = $this->getType()->getCampos();
 		
-		foreach((array) $sqlRow as $key => $value) {
-			if (strpos($key, 'select_') === 0) {
-				$tipoObj = $this->getCampoTipo($campos[$key]);
-				$value_arr = explode(',', $value);
-				$str_arr = array();
-				foreach($value_arr as $value_id) {
-					$str_arr[] = jp7_fields_values($tipoObj->getInterAdminsTableName(), 'id', $value_id, 'varchar_key');
-				}
-				$value = implode(', ', $str_arr);
-			}
-			if ($fields_alias) {
-				$alias = $this->_tipo->getCamposAlias($key);
-				unset($sqlRow->$key);
-			} else {
-				$alias = $key;
-			}
-			$this->$alias = $sqlRow->$alias = $value;
-		}
-	}
-	/**
-	 * Returns this object´s varchar_key and all the fields marked as 'combo', if the field 
-	 * is an InterAdmin such as a select_key, its getStringValue() method is used.
-	 *
-	 * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
-	 */
-	public function getStringValue() {
-		$campos = $this->getType()->getCampos();
-		$camposCombo = array();
-		if (key_exists('varchar_key', $campos)) {
-			$campos['varchar_key']['combo'] = 'S';
-		} elseif (key_exists('select_key', $campos)) {
-			$campos['select_key']['combo'] = 'S';
-		}
-		foreach ($campos as $key => $campo) {
-			if ($campo['combo']) {
-				$camposCombo[] = $campo['tipo'];
-			}
-		}
-		if ($camposCombo) {
-			$valoresCombo = $this->getFieldsValues($camposCombo);
-			$stringValue = array();
-			foreach ($valoresCombo as $key => $value) {
-				if ($value instanceof InterAdminFieldFile) {
-					continue;
-				} elseif ($value instanceof InterAdminAbstract) {
-					 $value = $value->getStringValue();
-				}
-				$stringValue[] = $value;
-			}
-			return implode(' - ', $stringValue);
-		}
-	}
-	
 	/**
 	 * Saves this record and updates date_modify.
 	 * 
@@ -763,14 +699,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			$this->$attribute = $record;
 		}
     }
-    
-	/**
-	 * @deprecated use setAttributeBySearch
-	 */
-	public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key') {
-		return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
-	}
-	
+    	
 	public function setEagerLoad($key, $data) {
 		$this->_eagerLoad[$key] = $data;
 	}
