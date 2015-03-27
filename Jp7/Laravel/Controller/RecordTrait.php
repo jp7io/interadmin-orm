@@ -39,8 +39,8 @@ trait RecordTrait {
 	protected function _getResourceUri($route) {
 		$uri = $route->getUri();
 		
-		if (in_array($this->action, array('create', 'edit'))) {
-			$uri = dirname($uri); // Remove last part
+		if (!in_array($this->action, array('index', 'store', 'show', 'update', 'destroy'))) {
+			$uri = dirname($uri); // Remove extra directory
 		}
 		if ($this->isRecordAction()) {
 			$uri = dirname($uri); // Do not resolve $record yet
