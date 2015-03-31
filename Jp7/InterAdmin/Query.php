@@ -147,6 +147,18 @@ class Query extends Query\Base {
 		return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
+	public function findMany($ids) {
+		$sample = reset($ids);
+		if (is_string($sample) && !is_numeric($sample)) {
+			$key = 'id_slug';
+		} else {
+			$key = 'id';
+		}
+		
+		$this->whereIn($key, $ids);
+		return $this->provider->deprecatedFind($this->options);
+	}
+	
 	public function lists($column, $key = null) {
 		$array = $this->provider->deprecatedFind(array(
 			'fields' => array_filter([$column, $key]),
