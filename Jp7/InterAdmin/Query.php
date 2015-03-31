@@ -36,7 +36,7 @@ class Query extends Query\Base {
 	 * Create and save a record.
 	 */	
 	public function create(array $attributes = array()) {
-		return $this->build()->save();
+		return $this->build($attributes)->save();
 	}
 		
 	/**

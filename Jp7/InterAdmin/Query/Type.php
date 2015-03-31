@@ -52,7 +52,7 @@ class Type extends Base {
 	}
 	
 	public function create(array $attributes = array()) {
-		return $this->build()->save();
+		return $this->build($attributes)->save();
 	}
 		
 }
