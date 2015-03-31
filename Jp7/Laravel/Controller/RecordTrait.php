@@ -69,7 +69,8 @@ trait RecordTrait {
 			$parameters = $route->parameters();
 			if (count($parameters) > 0) {
 				$slug = end($parameters);				
-				$this->record = $this->scope->findOrFail($slug);
+				$query = clone $this->scope;
+				$this->record = $query->findOrFail($slug);
 			}
 		}	
 	}
