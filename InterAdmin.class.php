@@ -759,7 +759,11 @@ class InterAdmin extends InterAdminAbstract {
 			return $newSlug; 
 		}
 		$siblingSlugs = $this->getTipo()->distinct('id_slug', array(
-			'where' => array("id_slug REGEXP '^" . $newSlug . "[0-9]*$'"),
+			'where' => array(
+				"id_slug REGEXP '^" . $newSlug . "[0-9]*$'",
+				'id <> ' . $this->id
+			),
+			'use_published_filters' => true,
 			'order' => 'id'
 		));
 		
