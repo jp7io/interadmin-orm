@@ -540,6 +540,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	
 	public function generateSlug($string) {
 		$this->loadAttributes(['id_slug']);
+		
 		$newSlug = to_slug($string);
 		if (is_numeric($newSlug)) {
 			$newSlug = '--' . $newSlug;
@@ -549,6 +550,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			return $newSlug; 
 		}
 		$siblingSlugs = $this->siblings()
+			->published(true)
 			->where('id_slug', 'REGEXP', '^' . $newSlug . '[0-9]*$')
 			->lists('id_slug');
 		
