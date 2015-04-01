@@ -66,38 +66,60 @@ class FormInspector {
 		
 	public function compare($ar1, $ar2, $ignoreList = []) {
 		foreach ($ar2 as $name => $data) {
-			if (!array_key_exists($name, $ar1)) {
-				continue;
-			}
-			$other = $ar1[$name];
-			$ignore = isset($ignoreList[$name]) ? $ignoreList[$name] : '';
+			$ok = false;
 			
-			if ($data->value != $other->value && $ignore != 'value') {
-				// Valor diferente
-				if ($data->type == 'date' || $other->type == 'date') {
-					if ($this->normalizeDate($data->value) != $this->normalizeDate($other->value)) {
-						continue; // errado
-					}
-				} elseif ($data->type != 'checkbox' ) {
-					continue; // errado
+			if ($data->type == 'submit') {
+				$ok = true; // Submit nao precisa existir
+			}
+			
+			if (array_key_exists($name, $ar1)) {
+				$other = $ar1[$name];
+				$ignore = isset($ignoreList[$name]) ? $ignoreList[$name] : '';
+				
+				if ($data->type == 'checkbox') {
+					$ok = true; // ignora valor
+				} elseif ($data->tag == 'select') {
+					$ok = $this->compareSelect($data, $other, $ignore);	
+				} elseif ($data->type == 'date' || $other->type == 'date') {
+					$ok = $this->compareDate($data, $other, $ignore);
+				} else {
+					$ok = $this->compareOther($data, $other, $ignore);
 				}
 			}
-			if ($data->tag == 'select') {
-				// Verificar options
-				if ($other->tag != 'select') {
-					$other->options = [];
-				}
-				if ($ignore == 'options' || array_keys($data->options) == array_keys($other->options)) {
-					unset($ar2[$name]);
-				} else {
-					$data->options_diff = array_diff_key($data->options, $other->options);					
-				}				
-			} else {
-				// Se chegou aqui eh input com value igual
+			if ($ok) {
 				unset($ar2[$name]);
 			}
 		}
 		return $ar2;
+	}
+	
+	private function compareDate($data, $other, $ignore) {
+		if ($ignore == 'value' || $data->value == $other->value) {
+			return true;
+		} elseif ($this->normalizeDate($data->value) == $this->normalizeDate($other->value)) {
+			return true;
+		}
+		return false;
+	}
+	
+	private function compareSelect($data, $other, $ignore) {
+		if ($ignore == 'value' || $data->value == $other->value) {
+			if ($other->tag != 'select') {
+				$other->options = [];
+			}
+			if ($ignore == 'options' || array_keys($data->options) == array_keys($other->options)) {
+				return true;
+			}
+			$data->options_diff = array_diff_key($data->options, $other->options);
+		}
+		return false;
+	}
+	
+	private function compareOther($data, $other, $ignore) {
+		if ($ignore == 'value' || $data->value == $other->value) {
+			return true;
+		}
+		return false;
 	}
 	
 	private function normalizeDate($value) {
