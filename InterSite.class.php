@@ -20,6 +20,9 @@ class InterSite {
 	const QA = 'QA';
 	const DESENVOLVIMENTO = 'Desenvolvimento';
 	
+	const PRODUCTION = 'Produção';
+	const DEVELOPMENT = 'Desenvolvimento';
+	
 	const HOST_MAIN = 'main';
 	const HOST_ALIAS = 'alias';
 	const HOST_REMOTE = 'remote';
@@ -65,6 +68,8 @@ class InterSite {
 	 * @var string
 	 */
 	public $lang_default = 'pt-br';
+	
+	protected static $instance = null;
 		
 	/**
 	 * Checks if it´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
@@ -83,11 +88,18 @@ class InterSite {
 	}
 	
 	/**
-	 * Checks if the server type is PRODUCAO.
+	 * @deprecated
 	 * @return bool
 	 */
 	public function isProducao() {
 		return $this->server->type === self::PRODUCAO;
+	}
+	/**
+	 * Checks if the server type is PRODUCAO.
+	 * @return bool
+	 */
+	public function isProduction() {
+		return $this->server->type === self::PRODUCTION;
 	}
 	/**
 	 * Checks if the server type is QA.
@@ -97,11 +109,18 @@ class InterSite {
 		return $this->server->type === self::QA;
 	}
 	/**
-	 * Checks if the server type is DESENVOLVIMENTO.
+	 * @deprecated
 	 * @return bool
 	 */
 	public function isDesenvolvimento() {
 		return $this->server->type === self::DESENVOLVIMENTO;
+	}
+	/**
+	 * Checks if the server type is PRODUCAO.
+	 * @return bool
+	 */
+	public function isDevelopment() {
+		return $this->server->type === self::DEVELOPMENT;
 	}
 	
 	/**
@@ -116,6 +135,14 @@ class InterSite {
 				return $server;
 			}
 		}
+	}
+		
+	public static function config() {
+		return self::$instance;
+	}
+	
+	public static function setConfig(InterSite $instance) {
+		self::$instance = $instance;
 	}
 	
 	public static function setWakeupEnabled($bool) {
@@ -207,12 +234,7 @@ class InterSite {
 		}
 	}
 	
-	/**
-	 * Executada quando é utilizado unserialize().
-	 * 
-	 * @return void
-	 */
-	function __wakeup() {
+	function start() {
 		global $debugger;
 		
 		if (!self::isWakeupEnabled()) {
@@ -292,152 +314,31 @@ class InterSite {
 		$GLOBALS['c_lang_default'] = $this->lang_default;
 		/* TEMP - Creating old globals */
 	}
-		
+	
 	/**
-	 * Testa as configurações do site, conecta com o DB e o FTP e recupera dados do PHPInfo.
+	 * Executada quando é utilizado unserialize().
 	 * 
 	 * @return void
-	 * @todo Atualizar código
 	 */
-	public function testConfig() {
-		foreach($this->servers as $server) {
-			$fieldsValues = '';
-			$fieldsValuesDB = '';
-			if ($server->type != 'Desenvolvimento') {
-				echo '<br /><br /><div style="font-weight:bold">&bull; ' . $server->name . '</div>';
-				if (!$server->ftp) $server->ftp = $server->host;
-				$conn_id = @ftp_connect($server->ftp); 
-				$login_result = @ftp_login($conn_id, $server->user, $server->pass);
-				if ($login_result) {
-					echo '<div class="configok">Conectado com FTP: ' .  $server->ftp . '</div>';
-					$fieldsValues = array(
-						'varchar_5' => ftp_systype($conn_id),
-						'date_1' => date('Y-m-d H:i:s'),
-						'char_1' => $login_result
-					);
-				} else {
-					echo '<div class="configerror">Erro de conexão com FTP: ' .  $server->ftp . '</div>';
-				}
-				@ftp_close($conn_id);
-				// PHP Info
-				$content = $this->_socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php');
-				$pos1_str = 'login/index.php?error=3';
-				$pos1 = strpos($content, $pos1_str);
-				$cookie = '';
-				// Login required
-				if ($pos1 !== false) {
-					$WS_parameters = 'user=jp7_jp&pass=naocolocar';
-					$content_2 = $this->_socketRequest($server->host, '/_admin/login/login.php', $WS_parameters, 'POST', 'http://' . $server->host . '/_admin/login/index.php');
-					$content_header = explode('\r\n\r\n', $content_2);
-					$pos1_str = 'Set-Cookie: ';
-					$pos1 = strpos($content_2, $pos1_str) + strlen($pos1_str);
-					$pos2 = strpos($content_2, ';', $pos1);
-					$cookie = substr($content_2, $pos1, $pos2-$pos1);
-					$content = $this->_socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
-				}
-				// Version not found - Trying another file
-				$pos1_str = 'PHP Version';
-				$pos1 = strpos($content, $pos1_str);
-				if ($pos1 === false) {
-					$content = $this->_socketRequest($server->host, '/_admin/phpinfo_manual.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
-					$content = str_replace("phpversion:", "PHP Version", $content);
-				}
-				if ($content) { 
-					echo '<div class="configok">Arquivo phpinfo.php lido.</div>';
-					// Preparing to update file
-					$pos1 = strpos($content, '<html>') + strlen('<html>');
-					$pos2 = strpos($content, '</html>', $pos1);
-					$fieldsValues['text_1'] = substr($content, $pos1, $pos2 - $pos1);
-					// Getting only the <body>
-					$pos1_str = '<body>';
-					$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
-					$pos2 = strpos($content, '</body>', $pos1);
-					$content = substr($content, $pos1, $pos2 - $pos1);
-					// Table to array conversion
-					$content = str_replace("</tr>", "{;}", $content);
-					$content = str_replace("</td>", "{,}", $content);
-					$content = strip_tags($content);
-					$arr = explode('{;}', $content);
-					// Getting PHP Version
-					$pos1_str = 'PHP Version';
-					$pos1 = strpos($content, $pos1_str) + strlen($pos1_str);
-					$pos2 = strpos($content, "\n", $pos1);
-					$php = substr($content, $pos1, $pos2-$pos1);
-					$server->phpinfo = null;
-					$server->phpinfo['PHP'] = trim($php, " \r\n\t");
-					// Sets other parameters
-					$parameters = array('PHP', 'host', 'SERVER_ADDR', 'LOCAL_ADDR', 'register_globals', 'GD Version', 'MySQL', 'MySQL Version');
-					foreach ($arr as $value) {
-						$value_arr = explode('{,}', $value);
-						foreach ((array)$value_arr as $position=>$parameter) {
-							$parameter = trim($parameter, " \r\n\t");
-							if (in_array($parameter, $parameters)) {
-								$server->phpinfo[$parameter] = $value_arr[$position + 1];
-							}
-						}
-					}
-					$fieldsValues['varchar_6'] = $server->phpinfo['PHP'];
-					
-				} else {
-					echo '<div class="configerror">Não foi possível abrir phpinfo.php.</div>';
-				}
-				// Saving FTP and PHP Info data		
-				if ($fieldsValues) {
-					//jp7_print_r($fieldsValues);
-					$server->setFieldsValues($fieldsValues, true);
-				}
-				
-				// DB
-				$dsn = (($server->db->type) ? $server->db->type : 'mysql') . ':host='.$server->db->host;
-				try {
-		    		$server_db_conn = new PDO($dsn, $server->db->user, $server->db->pass);
-				} catch (PDOException $e) {
-					echo '<div class="configerror">Erro de conexão com DB: ' . $server->db->host . ' - ' . $e->getMessage() . '</div>';
-				}
-				if ($server_db_conn) {
-					echo '<div class="configok">Conectado com DB: ' . $server->db->host . '</div>';
-					if ($server->db->type == 'mssql') $db_select = "(CAST(SERVERPROPERTY('productversion') as varchar(255)) + ' - ' + CAST(SERVERPROPERTY('productlevel') as varchar(255)) + ' - ' + CAST(SERVERPROPERTY('edition') as varchar(255)))";
-					else $db_select = "Version()";
-					$ver_result = $server_db_conn->prepare("SELECT " . $db_select . " AS version"); 
-					$ver_result->execute();
-					$result = $ver_result->fetch(PDO::FETCH_ASSOC);
-					$fieldsValuesDB = array(
-						'varchar_5' => $result['version'],
-						'date_1' => date('Y-m-d H:i:s'),
-						'char_1' => $login_result
-					);
-					//jp7_print_r($fieldsValuesDB);
-					$server->db->setFieldsValues($fieldsValuesDB);
-				}
-			}
-		}
+	function __wakeup() {
+		$this->start(); // Backwards compatibility
 	}
 	
-	protected function _socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
-		$header = "" .
-		$method . " " . $url . " HTTP/1.1\r\n" .
-		"Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, */*\r\n" .
-		"Referer: " . $referer."\r\n" .
-		"Accept-Language: pt-br\r\n" .
-		"Content-Type: application/x-www-form-urlencoded\r\n" .
-		"Accept-Encoding: gzip, deflate\r\n" .
-		"User-Agent: " . $_SERVER['HTTP_USER_AGENT'] . "\r\n" .
-		"Host: " . $host . "\r\n" .
-		"Content-Length: " . strlen($parameters) . "\r\n" .
-		"Connection: Close\r\n" .
-		"Cache-Control: no-cache\r\n" .
-		"Cookie: " . $cookie . "\r\n\r\n" .
-		$parameters;
-		
-		$fp = @fsockopen ($host, 80, $errno, $errstr, 30);
-		if ($fp) {
-		   	fputs ($fp, $header);
-			while (!feof($fp)) {
-				$content.= fgets ($fp,128);
-			}
-			fclose ($fp);
+	public static function __set_state($array) {
+		$instance = new self;
+		foreach ($array as $key => $value) {
+			$instance->$key = $value;
 		}
-		return $content;
+		return $instance;
+	}
+	
+	public function export() {
+		$code = var_export($this, true);
+		
+		$code = preg_replace("/' => \n\s+/", "' => ", $code);
+		$code = str_replace('stdClass::__set_state', '(object)', $code);
+		
+		return $code;
 	}
 	
 	/**
