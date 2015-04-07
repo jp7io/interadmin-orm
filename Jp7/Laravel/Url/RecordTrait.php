@@ -34,7 +34,7 @@ trait RecordTrait {
 		}
 		
 		$parameters = array_map(function($p) {
-			return $p->id_slug;
+			return $p->id_slug ?: $p->id;
 		}, $parameters);
 		
 		if (count($parameters) != count($variables)) {

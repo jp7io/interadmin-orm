@@ -37,7 +37,11 @@ trait TypeTrait {
 	    }
 	    
 	    $parameters = array_map(function($p) {
-	    	return is_object($p) ? $p->id_slug : $p;
+	    	if (is_object($p)) {
+	    		return $p->id_slug ?: $p->id;
+	    	} else {
+	    		return $p;
+	    	}
 	    }, $parameters);
     	
     	return URL::route(null, $parameters, true, $route);
