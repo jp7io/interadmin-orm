@@ -14,7 +14,7 @@ trait RecordTrait {
 	public function constructRecordTrait() {
 		$this->beforeFilter('@setScope');
 		$this->beforeFilter('@setType');
-		$this->beforeFilter('@setRecord', ['only' => ['show']]);
+		$this->beforeFilter('@setRecord', ['only' => ['show', 'edit', 'update', 'destroy']]);
 	}
 		    
 	public function setScope($route) {
@@ -58,9 +58,6 @@ trait RecordTrait {
 	}
 	
 	public function setRecord($route) {
-		if (!$this->isRecordAction()) {
-			return;
-		}
 		$reflection = new \ReflectionMethod($this, $this->action);
 		if (count($reflection->getParameters()) > 0)  {
 			return; // tem parametros -> achar record no controller
