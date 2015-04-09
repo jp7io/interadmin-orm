@@ -67,14 +67,12 @@ class FormInspector {
 	public function compare($ar1, $ar2, $ignoreList = []) {
 		foreach ($ar2 as $name => $data) {
 			$ok = false;
+			$ignore = isset($ignoreList[$name]) ? $ignoreList[$name] : '';
 			
-			if ($data->type == 'submit') {
+			if ($data->type == 'submit' || $ignore == 'isset') {
 				$ok = true; // Submit nao precisa existir
-			}
-			
-			if (array_key_exists($name, $ar1)) {
+			} elseif (array_key_exists($name, $ar1)) {
 				$other = $ar1[$name];
-				$ignore = isset($ignoreList[$name]) ? $ignoreList[$name] : '';
 				
 				if ($data->type == 'checkbox') {
 					$ok = true; // ignora valor
