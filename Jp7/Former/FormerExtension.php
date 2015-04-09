@@ -1,7 +1,9 @@
 <?php
 
 namespace Jp7\Former;
-use Debugbar;
+
+use Former\Former as OriginalFormer;
+use Debugbar, InterAdmin, InterAdminField;
 
 /**
  * Add InterAdmin settings on former automatically
@@ -12,7 +14,7 @@ class FormerExtension {
 	private $model;
 	private $former;
 	
-	public function __construct(\Former\Former $former) {
+	public function __construct(OriginalFormer $former) {
 		if ($errors = app()['session']->get('errors')) {
 			if (class_exists('Debugbar')) {
 				Debugbar::error($errors->all());
@@ -42,9 +44,12 @@ class FormerExtension {
 	public function __set($property, $value) {
 		$this->former->$property = $value;	
 	}
-
-	public function model(\InterAdmin $model) {
-		$this->model = $model;
+	
+	public function populate($model) {
+		if ($model instanceof InterAdmin) {
+			$this->model = $model;	
+		}		
+		return $this->former->populate($model);
 	}
 	
 	public function open() {
@@ -82,7 +87,7 @@ class FormerExtension {
 		$campo = $campos[$name];
 
 		// Set label
-		$label = \InterAdminField::getCampoHeader($campo);
+		$label = InterAdminField::getCampoHeader($campo);
 		$field->label($label);
 		
 		// Populate options
