@@ -833,11 +833,9 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		$record->date_publish = date('c');
 		$record->date_insert = date('c');
-		if ($this->_parent instanceof InterAdmin) {
-			$record->setParent($this->_parent);
-			// Childs are published by default on InterAdmin.
-			$record->publish = 'S';
-		}
+		$record->publish = 'S';
+		$record->log = '';
+		
 		return $record->fill($attributes);
 	}
 	
