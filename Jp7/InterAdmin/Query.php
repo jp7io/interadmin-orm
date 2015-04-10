@@ -54,11 +54,21 @@ class Query extends Query\Base {
 	}
 	
 	protected function _isChar($field) {
+		if (str_contains($field, '.')) {
+			list($relationship, $field) = explode('.', $field);
+			
+			$data = $this->provider->getRelationshipData($relationship);
+			
+			$type = $data['tipo'];
+		} else {
+			$type = $this->provider;
+		}
+		
 		if (in_array($field, ['deleted', 'publish'])) {
 			return true;
 		}
-
-		$aliases = array_flip($this->provider->getCamposAlias());
+		
+		$aliases = array_flip($type->getCamposAlias());
 		if (isset($aliases[$field])) {
 			return strpos($aliases[$field], 'char_') === 0;
 		} else {

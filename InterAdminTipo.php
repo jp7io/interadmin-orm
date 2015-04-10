@@ -792,8 +792,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getInterAdminsChildrenTipo($nome_id) {
 		$childrenTipos = $this->getInterAdminsChildren();
-		$id_tipo = $childrenTipos[$nome_id]['id_tipo'];
-		if ($id_tipo) {
+		if (isset($childrenTipos[$nome_id])) {
+			$id_tipo = $childrenTipos[$nome_id]['id_tipo'];
 			return InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
@@ -821,6 +821,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				'alias' => $alias
 			);
 		}
+		// As children
 		$studlyCased = ucfirst($relationship);
 		if ($childrenTipo = $this->getInterAdminsChildrenTipo($studlyCased)) {
 			return array(
@@ -829,6 +830,12 @@ class InterAdminTipo extends InterAdminAbstract {
 				'name' => $relationship,
 				'alias' => true
 			);
+		}
+		// As method
+		$optionsInstance = ['default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin'];
+		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+		if (method_exists($recordModel, $relationship)) {
+			return $recordModel->$relationship()->getRelationshipData();
 		}
 		throw new Exception('Unknown relationship: ' . $relationship);
 	}
