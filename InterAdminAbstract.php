@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
+use Jp7\Interadmin\TipoCache;
 /**
  * Class which represents records on the table interadmin_{client name}.
  *
@@ -896,7 +897,30 @@ abstract class InterAdminAbstract implements Serializable {
 	abstract function getAttributesAliases();
 	abstract function getAdminAttributes();
 	abstract function getTableName();
+		
+	public function getColumns() {
+		$dbName = $this->getDb()->getDatabaseName();
+		$table = $this->getTableName();
+		$cache = TipoCache::getInstance($dbName);
+		
+		if (!$columns = $cache->get($table)) {
+			$columns = $this->_pdoColumnNames($table);
+			$cache->set($table, $columns);
+		}
+		return $columns;	
+	}
 	
+	private function _pdoColumnNames($table) {
+		$db = $this->getDb()->getPdo();
+		
+		$rs = $db->query('SELECT * FROM `' . $table . '` LIMIT 0');
+		for ($i = 0; $i < $rs->columnCount(); $i++) {
+			$col = $rs->getColumnMeta($i);
+			$columns[] = $col['name'];
+		}
+		return $columns;
+	}	
+		
 	public static function getPublishedFilters($table, $alias) {
 		global $db, $s_session;
 		$config = InterSite::config();

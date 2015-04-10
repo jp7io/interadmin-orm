@@ -661,30 +661,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function getAttributesNames() {
-		$db = $this->getDb();
-		$db_identifier = 'todo';
-		
-		// Todos os tipos tem os mesmo campos na tabela
-		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix);
-		
-		if (!$attributes = $cache->get('attributes')) {
-			$attributes = $this->_pdoColumnNames($this->getTableName());
-			$cache->set('attributes', $attributes);
-		}
-		return $attributes;
+		return $this->getColumns();
 	}
-	
-	private function _pdoColumnNames($table) {
-		$db = $this->getDb()->getPdo();
 		
-		$rs = $db->query('SELECT * FROM `' . $table . '` LIMIT 0');
-		for ($i = 0; $i < $rs->columnCount(); $i++) {
-			$col = $rs->getColumnMeta($i);
-			$columns[] = $col['name'];
-		}
-		return $columns;
-	}	
-	
 	public function getAttributesCampos() {
 		return array();
 	}
@@ -747,13 +726,13 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $table;
 	}	
 	protected function _setMetadata($varname, $value) {
-		$db_identifier = 'todo';
+		$db_identifier = $this->getDb()->getDatabaseName();
 		
 		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix, $this->id_tipo);
 		$cache->set($varname, $value);
 	}
 	protected function _getMetadata($varname) {
-		$db_identifier = 'todo';
+		$db_identifier = $this->getDb()->getDatabaseName();
 		
 		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix, $this->id_tipo);
 		return $cache->get($varname);

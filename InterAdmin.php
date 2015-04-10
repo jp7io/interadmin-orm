@@ -89,7 +89,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	public function &__get($attributeName) {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
-		} else {
+		} elseif ($this->id) {
+			// Lazy loading
 			$attributes = array_merge(
 				$this->getType()->getCamposAlias($this->getType()->getCamposNames()), 
 				$this->getAdminAttributes()
@@ -101,8 +102,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 				$this->loadAttributes($attributes);
 				return $this->attributes[$attributeName];
 			}
-			return $null; // Needs to be variable to be returned as reference
 		}
+		return $null; // Needs to be variable to be returned as reference
 	}
 	
 	public static function __callStatic($name, array $arguments) {
@@ -513,14 +514,24 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 */
 	public function save() {
 		// id_slug
+		$columns = $this->getColumns();
+		
 		if (isset($this->varchar_key)) {
-			$this->id_slug = $this->generateSlug($this->varchar_key);
+			$alias_varchar_key = 'varchar_key';
 		} else {
 			$alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
-			if (isset($this->$alias_varchar_key)) {
+		}
+		if (isset($this->$alias_varchar_key)) {
+			/*
+			if (in_array('id_string', $columns)) {
+				$this->id_string = toId($this->$alias_varchar_key);
+			}
+			*/
+			if (in_array('id_slug', $columns)) {
 				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
 			}
 		}
+		
 		// log
 		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . array_get($_SERVER, 'REMOTE_ADDR') . chr(13) . $this->log;
 		// date_modify
