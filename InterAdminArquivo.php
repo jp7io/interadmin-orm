@@ -99,6 +99,11 @@ class InterAdminArquivo extends InterAdminAbstract {
 	public function getText() {
 		return $this->legenda;
 	}
+	
+	public function getName() {
+		return $this->nome;
+	}
+	
 	/**
 	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
 	 * '$this->url' needs to have the path to the temporary file and it must have a parent.
