@@ -6,54 +6,48 @@ namespace Jp7\Former;
  * Handles validation and redirection
  */
 class FormRequest {
-	protected $rules = [];
-	
 	protected $validator;
-	/**
-	 * @var array
-	 */
-	protected $messages = [];
-
+	
 	protected $input;
-
+	protected $model;
+	
 	public function __construct(\InterAdmin $model) {
-		$this->rules = $model->getRules();
-		$this->input = \Input::all();
-	}
-
-	public function fails() {
-		$this->validator = \Validator::make($this->input, $this->rules, $this->messages);
-		
-	   	return $this->validator->fails();
-	}
-
-	public function getRules() {
-		return $this->rules;
-	}
-
-	public function setRules(array $rules) {
-		$this->rules = $rules;
-	}
-
-	public function getMessages() {
-		return $this->messages;
-	}
-
-	public function setMessages(array $messages) {
-		$this->messages = $messages;
-	}
-
-	public function redirect() {
-		return \Redirect::route($this->getRouteBack())
-			->withInput()
-			->withErrors($this->validator);
+		$this->model = $model;
 	}
 	
-	public function all() {
+	public function save() {
+		if (!$this->validator()->fails()) {
+			return $this->model
+		  		->fill($this->input())
+		  		->save();	
+		}
+	}
+	
+	public function redirect() {
+		return \Redirect::route($this->backRoute())
+			->withInput()
+			->withErrors($this->validator());
+	}
+	
+	public function input() {
+		if (is_null($this->input)) {
+			$this->input = \Input::all();
+		}
 		return $this->input;
 	}
 	
-	protected function getRouteBack() {
+	public function validator() {
+		if (is_null($this->validator)) {
+			$this->validator = \Validator::make(
+				$this->input(),
+				$this->model->getRules(),
+				[] // messages
+			);
+		}
+		return $this->validator;
+	}
+	
+	protected function backRoute() {
 		$route = \Route::getCurrentRoute()->getAction()['as'];
 		$parts = explode('.', $route);
 
