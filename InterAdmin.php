@@ -19,18 +19,6 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	const DEPRECATED_METHOD = '54dac5afe1fcac2f65c059fc97b44a58';
 
 	/**
-	 * DEPRECATED: Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
-	 * @var string
-	 * @deprecated It will only use this property if there is no id_tipo yet
-	 */
-	public $db_prefix;
-	/**
-	 * DEPRECATED: Table suffix of this record. e.g.: the table 'interadmin_client_registrations' would have 'registrations' as $table.
-	 * @var string
-	 * @deprecated It will only use this property if there is no id_tipo yet
-	 */
-	public $table;
-	/**
 	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
 	 * @var InterAdminTipo
 	 */
@@ -63,21 +51,14 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * @var int
 	 */
 	protected static $timestamp;
+	
 	/**
-	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
-	 * @param string $id This record's 'id'.
-	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
+	 * Public Constructor
+	 *
+	 * @param int $id This record's 'id'.
 	 */
-	public function __construct($id = '0', $options = array()) {
-		$id = (string) $id;
-		$this->id = is_numeric($id) ? $id : '0';
-		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : InterSite::config()->db->prefix;
-		$this->table = isset($options['table']) ? '_' . $options['table'] : '';
-		$this->_db = isset($options['db']) ? $options['db'] : null;
-		
-		if (!empty($options['fields'])) {
-			throw new Exception('Deprecated __construct with $options[fields]');
-		}
+	public function __construct($id = 0) {
+		$this->id = $id;
 	}
 	
 	/**
@@ -136,7 +117,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * on the database which class to instantiate.
 	 *
 	 * @param int $id This record's 'id'.
-	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class, default_class.
+	 * @param array $options Default array of options. Available keys: fields, fields_alias, class, default_class.
 	 * @param InterAdminTipo Set the record´s Tipo.
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
@@ -151,10 +132,9 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 				$class_name = isset($options['default_class']) ? $options['default_class'] : 'InterAdmin';
 			}
 		}
-
-		$instance = new $class_name($id, $options);
+		
+		$instance = new $class_name($id);
 		$instance->setType($tipo);
-		$instance->db_prefix = $tipo->db_prefix;
 		$instance->setDb($tipo->getDb());
 		
 		return $instance;
@@ -235,7 +215,6 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 				}				
 			}
 			$this->setType(InterAdminTipo::getInstance($id_tipo, array(
-				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
 				'class' => $options['class']
 			)));
@@ -256,7 +235,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	/**
 	 * Gets the parent InterAdmin object for this record, which is then cached on the $_parent property.
 	 * 
-	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class.
+	 * @param array $options Default array of options. Available keys: fields, fields_alias, class.
 	 * @return InterAdmin
 	 */
 	public function getParent($options = array()) {
@@ -300,13 +279,10 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * Instantiates an InterAdminTipo object and sets this record as its parent.
 	 * 
 	 * @param int $id_tipo
-	 * @param array $options Default array of options. Available keys: db_prefix, fields, class.
+	 * @param array $options Default array of options. Available keys: class.
 	 * @return InterAdminTipo
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
-		if (empty($options['db_prefix'])) {
-			$options['db_prefix'] = $this->getType()->db_prefix;
-		}
 		$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';
 		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
 		$childrenTipo->setParent($this);
@@ -391,7 +367,6 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		$records = array();
 		foreach ($rs as $row) {
 			$arquivo = new $className($row->id_arquivo, array(
-				'db_prefix' => $this->getType()->db_prefix,
 				'db' => $this->_db
 			));
 			$arquivo->setType($this->getType());
@@ -430,12 +405,13 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * @return void
 	 */
 	public function setTags(array $tags) {
+		kd('not implemented');
 		$db = $this->getDb();
-		$sql = "DELETE FROM " . $this->db_prefix . "_tags WHERE parent_id = " .  $this->id;
+		$sql = "DELETE FROM " . $this->getDb()->getTablePrefix() . "_tags WHERE parent_id = " .  $this->id;
 		$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		
 		foreach ($tags as $tag) {
-			$sql = "INSERT INTO " . $this->db_prefix . "_tags (parent_id, id, id_tipo) VALUES 
+			$sql = "INSERT INTO " . $this->getDb()->getTablePrefix() . "_tags (parent_id, id, id_tipo) VALUES 
 				(" . $this->id . "," .
 				(($tag instanceof InterAdmin) ? $tag->id : 0) . "," .
 				(($tag instanceof InterAdmin) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo) . ")";
@@ -453,7 +429,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			$db = $this->getDb();
 			
 			$options['where'][] = "parent_id = " . $this->id;	
-			$sql = "SELECT * FROM " . $this->db_prefix . "_tags " .
+			$sql = "SELECT * FROM " . $this->getDb()->getTablePrefix() . "_tags " .
 				"WHERE " . implode(' AND ', $options['where']) .
 				(($options['group']) ? " GROUP BY " . $options['group'] : '') .
 				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
@@ -550,8 +526,6 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	}
 	
 	public function generateSlug($string) {
-		$this->loadAttributes(['id_slug']);
-		
 		$newSlug = to_slug($string);
 		if (is_numeric($newSlug)) {
 			$newSlug = '--' . $newSlug;
@@ -591,7 +565,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			return $this->getType()->getInterAdminsTableName();
 		} else {
 			// Compatibilidade, tenta encontrar na tabela global
-			return $this->db_prefix . $this->table;
+			return $this->getDb()->getTablePrefix() . $this->table;
 		}
 	}
     /**

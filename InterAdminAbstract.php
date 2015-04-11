@@ -214,13 +214,16 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 		
 		$pk = $this->_primary_key;
+		$table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
+		
 		if ($this->$pk) {
-			if ($db->table($this->getTableName())->where($pk, $this->$pk)->update($valuesToSave) === false) {
+			if ($db->table($table)->where($pk, $this->$pk)->update($valuesToSave) === false) {
 				throw new Exception('Error while updating values in `' . $this->getTableName() .  '` ' . 
 					$db->getPdo()->errorCode(), print_r($valuesToSave, true));
 			}
 		} else {
-			if ($db->table($this->getTableName())->insert($valuesToSave) === false) {
+			
+			if ($db->table($table)->insert($valuesToSave) === false) {
 				throw new Exception('Error while inserting data into `' . $this->getTableName() . '` ' . 
 					$db->getPdo()->errorCode(), print_r($valuesToSave, true));
 			}
@@ -238,7 +241,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param InterAdminAbstract Object which will receive the attribute.
 	 * @return mixed The object created by the key or the value itself.
 	 */
-	protected function _getByForeignKey(&$value, $field, $campo = '', $object) {
+	protected function _getByForeignKey(&$value, $field, $campo, $object) {
 		$interAdminClass = static::DEFAULT_NAMESPACE . 'InterAdmin';
 		
 		$options = array();
@@ -301,8 +304,7 @@ abstract class InterAdminAbstract implements Serializable {
 
 	protected function _getSpecialTipo($id) {
 		// Temporario enquando specials nao tem id_tipo
-		$config = InterSite::config();
-		$data = DB::table($config->db->prefix)->select('id_tipo')->where('id', $id)->first();
+		$data = DB::table('')->select('id_tipo')->where('id', $id)->first();
 		if ($data) {
 			return InterAdminTipo::getInstance($data->id_tipo);
 		}
@@ -380,7 +382,6 @@ abstract class InterAdminAbstract implements Serializable {
 		    ($options['from'] ? ' LEFT JOIN ' . implode(' LEFT JOIN ', $options['from']) : '') .
 			" WHERE " . $filters . $clauses .
 			((!empty($options['limit'])) ? " LIMIT " . $options['limit'] : '');
-
 
 		$rs = $db->select($sql);
 
@@ -483,7 +484,6 @@ abstract class InterAdminAbstract implements Serializable {
 					$joinNome = studly_case($table);
 					if (isset($childrenArr[$joinNome])) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
-							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
 							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
@@ -493,7 +493,7 @@ abstract class InterAdminAbstract implements Serializable {
 						' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
 						(($existsMatches[4]) ? ' AND ' : '');
 					} elseif ($table == 'tags') {
-						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
+						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->getDb()->getTablePrefix() . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
 					} elseif (isset($options['joins'][$table])) {
 						$joinTipo = $options['joins'][$table][1];
@@ -547,7 +547,6 @@ abstract class InterAdminAbstract implements Serializable {
 					$joinNome = studly_case($table);
 					if (isset($childrenArr[$joinNome])) {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
-							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
 							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
@@ -565,7 +564,7 @@ abstract class InterAdminAbstract implements Serializable {
 					} elseif ($table == 'tags') {
 						if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
 							$options['from_alias'][] = $table;
-							$options['from'][] = $this->db_prefix . "_tags AS " . $table .
+							$options['from'][] = $this->getDb()->getTablePrefix() . "_tags AS " . $table .
 								" ON " . $table . ".parent_id = main.id";
 							
 							$options['auto_group_flag'] = true;
@@ -833,10 +832,14 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return void
 	 */
 	protected function _resolveWildcard(&$fields, InterAdminAbstract $object) {
-		if ($fields == '*' || (is_array($fields) && in_array('*', $fields))) {
-			$fields = (array) $fields;
+		if ($fields == '*') {
+			$fields = [$fields];
+		}
+		if (is_array($fields) && in_array('*', $fields)) {
 			unset($fields[array_search('*', $fields)]);
-			$fields = array_merge($object->getAttributesNames(), $object->getAdminAttributes(), $fields);
+			
+			$adminFields = array_intersect($object->getAdminAttributes(), $object->getColumns());
+			$fields = array_merge($object->getAttributesNames(), $adminFields, $fields);
 		}
 	}
 	/**

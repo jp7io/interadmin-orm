@@ -29,9 +29,7 @@ class ClassMap {
 	}
 
 	private static function loadMap($attr) {
-		$config = \InterSite::config();
-
-		$tipos = \DB::table($config->db->prefix . '_tipos')
+		$tipos = \DB::table('_tipos')
 			->select($attr, 'id_tipo', 'inherited')
 			->where($attr, '<>', '')
 			->where('deleted_tipo', '=', '')

@@ -32,10 +32,8 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @param int $id_arquivo This record's 'id_arquivo'.
 	 * @param array $options Default array of options. Available keys: db_prefix, fields.
 	 */
-	public function __construct($id_arquivo = '0', $options = array()) {
+	public function __construct($id_arquivo = 0) {
 		$this->id_arquivo = $id_arquivo;
-		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : InterSite::config()->db->prefix;
-		$this->_db = isset($options['db']) ? $options['db'] : null;
 	}
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
@@ -46,10 +44,10 @@ class InterAdminArquivo extends InterAdminAbstract {
 	public function getType($options = array()) {
 		if (!$this->_tipo) {
 			if (!$this->id_tipo) {
+				kd('not implemented');
 				$this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
 			}
 			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
-				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
 				'class' => $options['class']
 			));

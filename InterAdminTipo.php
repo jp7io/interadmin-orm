@@ -32,11 +32,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected static $_defaultClass = 'InterAdminTipo';
 	
 	protected $_primary_key = 'id_tipo';
-	/**
-	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
-	 * @var string
-	 */
-	public $db_prefix;
+	
 	/**
 	 * Caches the url retrieved by getUrl().
 	 * @var string
@@ -51,32 +47,17 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected $_tiposUsingThisModel;
 	
 	/**
-	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
-	 * This method has 4 possible calls:
+	 * Construct
 	 * 
-	 * __construct()
-	 * __construct(string $id_tipo)
-	 * __construct(array $options)
-	 * __construct(string $id_tipo, array $options)
-	 * 
-	 * @param string 	$id_tipo 	[optional] This record's 'id_tipo'.
-	 * @param array		$options 	[optional] Default array of options. Available keys: db_prefix, fields.
+	 * @param int 		$id_tipo 	[optional] This record's 'id_tipo'.
 	 */
-	public function __construct($id_tipo = null, $options = array()) {
-		if (is_null($id_tipo) || is_array($id_tipo)) {
-			$options = (array) $id_tipo;
+	public function __construct($id_tipo = null) {
+		if (is_null($id_tipo)) {
 			$id_tipo = static::ID_TIPO;
 		}
-		// id_tipo must be a string, because in_array will not work with integers and an array of objects
-		$id_tipo = (string) $id_tipo;
-		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
-		$this->db_prefix = isset($options['db_prefix']) ? $options['db_prefix'] : InterSite::config()->db->prefix;
-		$this->_db = isset($options['db']) ? $options['db'] : null;
-		
-		if (!empty($options['fields'])) {
-			throw new BadMethodCallException('Deprecated __construct with $options[fields]');
-		}
+		$this->id_tipo = $id_tipo;
 	}
+	
 	public function &__get($attributeName) {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
@@ -111,7 +92,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * on the database which class to instantiate.
 	 *
 	 * @param int $id_tipo This record's 'id_tipo'.
-	 * @param array $options Default array of options. Available keys: db_prefix, fields, class, default_class.
+	 * @param array $options Default array of options. Available keys: class, default_class.
 	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
 	public static function getInstance($id_tipo, $options = array()) {
@@ -127,7 +108,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 		}
 		// Classe foi encontrada, instanciar o objeto
-		return new $classTipo($id_tipo, $options);
+		return new $classTipo($id_tipo);
 	}
 	/*
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
@@ -147,7 +128,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	/**
 	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
 	 * 
-	 * @param array $options Default array of options. Available keys: db_prefix, fields, class.
+	 * @param array $options Default array of options. Available keys: class.
 	 * @return InterAdminTipo|InterAdminAbstract
 	 */
 	public function getParent($options = array()) {
@@ -212,7 +193,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		$tipos = array();
 		foreach ($rs as $row) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
-				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
 				'class' => isset($options['class']) ? $options['class'] : null,
 				'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
@@ -380,13 +360,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	/**
 	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
 	 *
-	 * @param array $options Default array of options. Available keys: db_prefix, fields.
+	 * @param array $options Default array of options.
 	 * @return InterAdminTipo Model used by this InterAdminTipo.
 	 */
-	public function getModel($options = array()) {
+	public function getModel() {
 		if ($this->model_id_tipo) {
 			if (is_numeric($this->model_id_tipo)) {
-				$model = new InterAdminTipo($this->model_id_tipo, $options);
+				$model = new InterAdminTipo($this->model_id_tipo);
 			} else {
 				$className = 'Jp7_Model_' . $this->model_id_tipo . 'Tipo';
 				$model = new $className();
@@ -422,7 +402,6 @@ class InterAdminTipo extends InterAdminAbstract {
 					if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
 						$id_tipo = $A[$parameters[0]]['nome'];
 						$A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
-							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
 							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
@@ -671,7 +650,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		return array();
 	}
 	public function getTableName() {
-		return $this->db_prefix . '_tipos';
+		return $this->getDb()->getTablePrefix() . '_tipos';
 	}
 	public function getInterAdminsOrder() {
 		if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
@@ -716,7 +695,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */	
 	protected function _getTableLang() {
-		$table = $this->db_prefix;
+		$table = $this->getDb()->getTablePrefix();
 		if ($this->language) {
 			if (!Lang::has('interadmin.affix')) {
 				throw new Exception('You need to add interadmin.affix to app/lang/' . App::getLocale() . '/interadmin.php');
@@ -728,13 +707,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _setMetadata($varname, $value) {
 		$db_identifier = $this->getDb()->getDatabaseName();
 		
-		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix, $this->id_tipo);
+		$cache = TipoCache::getInstance($db_identifier, $this->getDb()->getTablePrefix(), $this->id_tipo);
 		$cache->set($varname, $value);
 	}
 	protected function _getMetadata($varname) {
 		$db_identifier = $this->getDb()->getDatabaseName();
 		
-		$cache = TipoCache::getInstance($db_identifier, $this->db_prefix, $this->id_tipo);
+		$cache = TipoCache::getInstance($db_identifier, $this->getDb()->getTablePrefix(), $this->id_tipo);
 		return $cache->get($varname);
 	}
 	/**
@@ -774,7 +753,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (isset($childrenTipos[$nome_id])) {
 			$id_tipo = $childrenTipos[$nome_id]['id_tipo'];
 			return InterAdminTipo::getInstance($id_tipo, array(
-				'db_prefix' => $this->db_prefix,
 				'db' => $this->_db,
 				'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 			));
@@ -911,9 +889,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (isset($options['db'])) {
 			$instance->setDb($options['db']);
 		}
-		if (isset($options['db_prefix'])) {
-			$instance->db_prefix = $options['db_prefix'];
-		}
 		if (!isset($options['fields'])) {
 			$options['fields'] = [];
 		}		
@@ -935,7 +910,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		foreach ($rs as $row) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
-				'db_prefix' => $instance->db_prefix,
 				'db' => $instance->getDb(),
 				'class' => isset($options['class']) ? $options['class'] : null
 			));
@@ -970,8 +944,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
+		
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-			$options['fields'] = array_merge(array('id', 'id_tipo', 'id_slug'), (array) $options['fields']);
+			$requiredFields = array_intersect(array('id', 'id_tipo', 'id_slug'), $recordModel->getColumns());
+			$options['fields'] = array_merge($requiredFields, (array) $options['fields']);
 		}
 		
 		$options['from'] = $recordModel->getTableName() . " AS main";
