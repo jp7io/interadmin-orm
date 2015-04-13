@@ -814,6 +814,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		$record->publish = 'S';
 		$record->log = '';
 		
+		if ($this->_parent instanceof InterAdmin) {
+			$record->setParent($this->_parent);
+		}
+		
 		return $record->fill($attributes);
 	}
 	
