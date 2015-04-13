@@ -19,7 +19,10 @@ abstract class Base {
 		$this->provider = $provider;
 		$this->options = array(
 			'fields' => array(),
-			'where' => array()
+			'where' => array(),
+			'order' => null,
+			'group' => null,
+			'limit' => null
 		);
 	}
 
@@ -252,12 +255,23 @@ abstract class Base {
 		return $this->take($limit);
 	}
 	
+	/**
+	 * Determine if any rows exist for the current query.
+	 *
+	 * @return bool
+	 */
+	public function exists() {
+		$limit = $this->options['limit'];
+
+		$result = $this->limit(1)->count() > 0;
+
+		$this->options['limit'] = $limit;
+		return $result;
+	}
+	
 	public function groupBy($column) {
 		if (str_contains($column, ' ') || str_contains($column, '(')) {
 			throw new BadMethodCallException('Invalid column.');
-		}
-		if (!isset($this->options['group'])) {
-			$this->options['group'] = null;
 		}
 		$this->options['group'] = implode(',', array_filter([$this->options['group'], $column]));
 		return $this;
@@ -272,9 +286,6 @@ abstract class Base {
 	}
 
 	public function orderByRaw($order) {
-		if (!isset($this->options['order'])) {
-			$this->options['order'] = null;
-		}
 		$this->options['order'] = implode(',', array_filter([$this->options['order'], $order]));
 		return $this;
 	}
