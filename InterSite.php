@@ -246,6 +246,24 @@ class InterSite {
 		
 		self::setConfig($this);
 	}
+	
+	public static function __set_state($array) {
+		$instance = new self;
+		foreach ($array as $key => $value) {
+			$instance->$key = $value;
+		}
+		return $instance;
+	}
+	
+	public function export() {
+		$code = var_export($this, true);
+		
+		$code = preg_replace("/' => \n\s+/", "' => ", $code);
+		$code = str_replace('stdClass::__set_state', '(object)', $code);
+		
+		return $code;
+	}
+	
 	/* @todo TEMP - Creating old globals */
 	/*
 	$oldtypes = array(
