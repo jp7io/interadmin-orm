@@ -955,9 +955,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		
 		$options['from'] = $recordModel->getTableName() . " AS main";
-		if (empty($options['order'])) {
-			$options['order'] = $this->getInterAdminsOrder();
-		}
+		$options['order'] = (isset($options['order']) ? $options['order'] . ', ' : '') . $this->getInterAdminsOrder();
 		
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
@@ -1026,8 +1024,8 @@ class InterAdminTipo extends InterAdminAbstract {
 
 	public function getTagFilters() {
 		return [
-			'tags.id_tipo' => $this->id_tipo,
-			'tags.id' => 0
+			'id_tipo' => $this->id_tipo,
+			'id' => 0
 		];
 	}
 	

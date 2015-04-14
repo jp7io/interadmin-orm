@@ -7,6 +7,7 @@ abstract class Base {
 	protected $provider;
 	protected $options;
 	protected $or = false;
+	protected $prefix = '';
 	
 	protected $operators = array(
 		'=', '<', '>', '<=', '>=', '<>', '!=',
@@ -153,8 +154,9 @@ abstract class Base {
 
 	protected function _whereClosure($closure) {
 		$innerQuery = new static($this->provider);
+		$innerQuery->prefix = $this->prefix;
 		$closure($innerQuery);
-
+		
 		if ($where = $innerQuery->getOptionsArray()['where']) {
 			return '(' . implode(' AND ', $where) . ')';
 		}
@@ -162,13 +164,17 @@ abstract class Base {
 	
 	protected function _parseConditions($conditions, $prefix = '') {
 		$where = [];
-		if (is_string($conditions)) {
-			$where[] = $conditions;
+		$this->prefix = $prefix;
+		
+		if (is_array($conditions)) {
+			$where[] = $this->_whereHash($conditions);
+		} elseif ($conditions instanceof \Closure) {
+			$where[] = $this->_whereClosure($conditions);
 		} else {
-			foreach ($conditions as $key => $value) {
-				$where[] = $this->_parseComparison($prefix . $key, '=', $value);
-			}
+			$where[] = $conditions;
 		}
+		
+		$this->prefix = '';
 		return $where;
 	}
 	
@@ -182,7 +188,7 @@ abstract class Base {
 		} elseif (is_null($value) && $operator == '=') {
 			$operator = 'IS';
 		}
-		return $column . ' ' . $operator . ' ' . $this->_escapeParam($value);		
+		return $this->prefix . $column . ' ' . $operator . ' ' . $this->_escapeParam($value);		
 	}
 	
 	protected function _resolveType($var) {

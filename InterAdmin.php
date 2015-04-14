@@ -648,8 +648,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	
 	public function getTagFilters() {
 		return [
-			'tags.id' => $this->id,
-			'tags.id_tipo' => intval($this->getType()->id_tipo)
+			'id' => $this->id,
+			'id_tipo' => intval($this->getType()->id_tipo)
 		];
 	}
     

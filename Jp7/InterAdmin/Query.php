@@ -118,7 +118,7 @@ class Query extends Query\Base {
 
 	public function taggedWith() {
 		foreach (func_get_args() as $tag) {
-			$this->where($tag->getTagFilters());
+			$this->whereHas('tags', $tag->getTagFilters());
 		}
 		return $this;
 	}
