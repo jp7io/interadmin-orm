@@ -179,7 +179,7 @@ abstract class Base {
 	}
 	
 	protected function _parseComparison($column, $operator, $value) {
-		if (is_bool($value) && $this->_isChar($column)) {
+		if (is_bool($value) && $this->_isChar($this->prefix . $column)) {
 			if ($operator != '=') {
 				throw new \InvalidArgumentException("Invalid operator.");
 			}
