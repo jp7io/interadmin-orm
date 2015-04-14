@@ -27,6 +27,17 @@ function snake_case($value, $delimiter = '_') {
 	return strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 }
 
+function _try($object) {
+	return $object ?: new \Jp7\NullObject;	
+}
+
+function init_var(&$variable, $default) {
+	if (is_null($variable)) {
+		$variable = ($default instanceof Closure) ? $default() : $default;
+	}
+	return $variable;
+}
+
 function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
 		$url = img_resize_url($img, $template);
