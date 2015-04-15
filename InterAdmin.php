@@ -740,4 +740,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 
     	return $fillable;
     }
+    
+    public function _try($attribute) {
+    	return $this->$attribute ?: new \Jp7\NullObject;
+    }
 }
