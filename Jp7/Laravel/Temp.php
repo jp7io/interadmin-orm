@@ -62,9 +62,14 @@ class Temp {
 			$whoops->pushHandler(function($exception, $exceptionInspector, $runInstance) {
 				?>
 				<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+				<style>
+				.frame.app {
+      				background-color: #ffeeee;
+      			}
+				</style>
 				<script>
 				setTimeout(function() {
-					$('.frame:contains("app"):first()').click();
+					$('.frame:contains("app")').addClass('app');
 				}, 200);
 				</script>
 				<?php
