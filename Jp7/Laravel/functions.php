@@ -31,11 +31,21 @@ function _try($object) {
 	return $object ?: new \Jp7\NullObject;	
 }
 
-function init_var(&$variable, $default) {
-	if (is_null($variable)) {
-		$variable = ($default instanceof Closure) ? $default() : $default;
+function memoize(Closure $closure) {
+	static $memoized = [];
+	
+	list(, $caller) = debug_backtrace(false, 2);
+	
+	$cache = &$memoized[$caller['class'] . ':' . $caller['function']];
+	
+	foreach ($caller['args'] as $arg) {
+		$cache = &$cache[(string) $arg];
 	}
-	return $variable;
+	
+	if (!isset($cache)) {
+		$cache = call_user_func_array($closure, $caller['args']);
+	}
+	return $cache;
 }
 
 function img_tag($img, $template = null, $options = array()) {
