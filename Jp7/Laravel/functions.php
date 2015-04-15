@@ -36,11 +36,13 @@ function memoize(Closure $closure) {
 	
 	list(, $caller) = debug_backtrace(false, 2);
 	
-	$cache = &$memoized[$caller['class'] . ':' . $caller['function']];
+	$key = $caller['class'] . ':' . $caller['function'];
 	
 	foreach ($caller['args'] as $arg) {
-		$cache = &$cache[(string) $arg];
+		$key .= ",\0" . (is_array($arg) ? serialize($arg) : (string) $arg);
 	}
+	
+	$cache = &$memoized[$key];
 	
 	if (!isset($cache)) {
 		$cache = call_user_func_array($closure, $caller['args']);
