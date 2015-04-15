@@ -58,32 +58,15 @@ class Temp {
 		if (Request::ajax() || PHP_SAPI === 'cli') return;
 		if (App::bound("whoops")) {
 			$whoops = App::make("whoops");
-
+			
 			$whoops->pushHandler(function($exception, $exceptionInspector, $runInstance) {
-				if (!Input::get('whoopsAll')) {
-					// Get the collection of stack frames for the current exception:
-					$frames = $exceptionInspector->getFrames();
-					
-					$originalFrames = $frames->getArray(); 
-					// Filter existing frames so we only keep the ones inside the app/ folder
-					$frames->filter(function($frame) {
-						$filePath = $frame->getFile();
-
-						// Match any file path containing /app/...
-						return preg_match("/\/app\/.+/i", $filePath);
-					});
-					if (!count($frames)) {
-						$frames->prependFrames($originalFrames);
-					}					
-				}
-				
-				$query = $_GET;
-				unset($query['whoopsAll']);
 				?>
-				<div style="position: absolute;z-index: 999;left: 435px;top:0;border-radius: 5px;">
-					<a href="?<?= http_build_query($query) ?>" style="color:white;background:#666; padding: 5px;display:inline-block;border-right: 1px solid black">app</a><!--
-					--><a href="?<?= http_build_query($query + array('whoopsAll' => true)) ?>" style="color:white;background:#666; padding: 5px;display:inline-block;">all</a>
-				</div>
+				<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+				<script>
+				setTimeout(function() {
+					$('.frame:contains("app"):first()').click();
+				}, 200);
+				</script>
 				<?php
 			});			
 		}
