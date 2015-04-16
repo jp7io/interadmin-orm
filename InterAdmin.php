@@ -404,7 +404,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * @param array $tags Array of object to be saved as tags.
 	 * @return void
 	 */
-	public function setTags(array $tags) {
+	public function deprecated_setTags(array $tags) {
 		kd('not implemented');
 		$db = $this->getDb();
 		$sql = "DELETE FROM " . $this->getDb()->getTablePrefix() . "_tags WHERE parent_id = " .  $this->id;
@@ -424,7 +424,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * @param array $options Available keys: where, group, limit.
 	 * @return array
 	 */
-	public function getTags($options = array()) {
+	public function deprecated_getTags($options = array()) {
+		kd('not implemented');
 		if (!$this->_tags || $options) {
 			$db = $this->getDb();
 			

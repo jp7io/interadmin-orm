@@ -1,6 +1,8 @@
 <?php
 
 namespace Jp7\Interadmin\Query;
+
+use Illuminate\Database\Query\Expression;
 use InterAdminTipo, InterAdminAbstract, BadMethodCallException;
 
 abstract class Base {
@@ -111,7 +113,14 @@ abstract class Base {
 	}
 
 	public function whereHas($relationship, $conditions = null, $_not = false) {
-		$relWhere = $this->_parseConditions($conditions, $relationship . '.');
+		try {
+			$type = $this->provider->getRelationshipData($relationship)['tipo'];
+		} catch (\InvalidArgumentException $e) {
+			// Temporario para tags
+			$type = $this->provider;
+		}
+		
+		$relWhere = $this->_parseConditions($conditions, $type, $relationship);
 		
 		$where = ($_not ? 'NOT ' : '') . "EXISTS (" .
 			$relationship . " WHERE " . implode(' AND ', $relWhere) . 
@@ -162,24 +171,24 @@ abstract class Base {
 		}
 	}
 	
-	protected function _parseConditions($conditions, $prefix = '') {
-		$where = [];
-		$this->prefix = $prefix;
-		
-		if (is_array($conditions)) {
-			$where[] = $this->_whereHash($conditions);
-		} elseif ($conditions instanceof \Closure) {
-			$where[] = $this->_whereClosure($conditions);
-		} else {
-			$where[] = $conditions;
+	protected function _parseConditions($conditions, $type, $relationship) {
+		if (is_string($conditions)) {
+			return [$conditions]; // TODO remove support
 		}
 		
-		$this->prefix = '';
-		return $where;
+		$innerQuery = new static($type);
+		$innerQuery->prefix = $relationship . '.';
+		
+		if (is_array($conditions)) {
+			return [$innerQuery->_whereHash($conditions)];
+		} elseif ($conditions instanceof \Closure) {
+			return [$innerQuery->_whereClosure($conditions)];
+		}
+		throw new \InvalidArgumentException("Invalid conditions.");
 	}
 	
 	protected function _parseComparison($column, $operator, $value) {
-		if (is_bool($value) && $this->_isChar($this->prefix . $column)) {
+		if (is_bool($value) && $this->_isChar($column)) {
 			if ($operator != '=') {
 				throw new \InvalidArgumentException("Invalid operator.");
 			}
@@ -209,6 +218,9 @@ abstract class Base {
 	
 	protected function _escapeParam($value) {
 		if (is_object($value)) {
+			if ($value instanceof Expression) {
+				return $value;
+			}			
 			$value = $value->__toString();
 		}
 		if (is_string($value)) {
@@ -228,7 +240,7 @@ abstract class Base {
 	
 	public function join($alias, $className, $conditions, $_joinType = 'INNER') {
 		$type = $this->_resolveType($className);
-		$joinOn = $this->_parseConditions($conditions, $alias . '.')[0];
+		$joinOn = $this->_parseConditions($conditions, $type, $alias)[0];
 		$this->options['joins'][$alias] = array($_joinType, $type, $joinOn);
 		return $this;
 	}

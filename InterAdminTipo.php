@@ -794,7 +794,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (method_exists($recordModel, $relationship)) {
 			return $recordModel->$relationship()->getRelationshipData();
 		}
-		throw new Exception('Unknown relationship: ' . $relationship);
+		throw new InvalidArgumentException('Unknown relationship: ' . $relationship);
 	}
 	
 	/**
