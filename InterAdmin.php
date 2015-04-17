@@ -71,11 +71,22 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
 		} elseif ($this->id) {
+			// relationship
+			$relationships = $this->getType()->getRelationships();
+			if (isset($relationships[$attributeName])) {
+				$type = $relationships[$attributeName];
+				if ($fk = $this->{$attributeName . '_id'}) {
+					if ($type === 'InterAdminTipo') {
+						$related = InterAdminTipo::getInstance($fk);
+					} else {
+					 	$related = $type->records()->find($fk);
+					}
+				}
+				return $related;
+			}
+			
 			// Lazy loading
-			$attributes = array_merge(
-				$this->getType()->getCamposAlias($this->getType()->getCamposNames()), 
-				$this->getAdminAttributes()
-			);
+			$attributes = array_merge($this->getType()->getCamposAlias(), $this->getAdminAttributes());
 			if (in_array($attributeName, $attributes)) {
 				if (class_exists('Debugbar')) {
 					Debugbar::warning('N+1 query: Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);

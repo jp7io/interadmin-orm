@@ -408,6 +408,21 @@ class InterAdminTipo extends InterAdminAbstract {
 					}
 				}
 			}
+			// Alias
+			foreach ($A as $campo => $array) {
+				if (empty($array['nome_id'])) {
+					// Gerar nome_id
+					$alias = $array['nome'];
+					if (is_object($alias)) {
+						$alias = $array['label'] ?: $alias->nome;
+					}
+					if (!$alias) {
+						kd('inesperado');
+						$alias = $campo;
+					}
+					$A[$campo]['nome_id'] = to_slug($alias, '_');
+				}			
+			}
 			$this->_setMetadata('campos', $A);
 		}
 		return $A;
@@ -433,50 +448,47 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array|string Resulting alias(es).
 	 */
 	public function getCamposAlias($fields = null) {
+		$this->_camposMetadata();
+		
+		$aliases = $this->_getMetadata('camposAlias');
+		
 		if (is_null($fields)) {
-			if (!$aliases = $this->_getMetadata('camposAlias')) {
-				$allFields = array_keys($this->getCampos());
-				$aliases = $this->getCamposAlias($allFields);
-				$this->_setMetadata('camposAlias', $aliases);
-			}
 			return $aliases;
 		}
+		return isset($aliases[$fields]) ? $aliases[$fields] : null;
+	}
+	
+	public function getRelationships() {
+		$this->_camposMetadata();
 		
-		$campos = $this->getCampos();
-		$aliases = array();
-		$update = false;
-		
-		foreach ((array) $fields as $field) {
-			if (isset($campos[$field])) {
-				if (empty($campos[$field]['nome_id'])) {
-					$alias = $campos[$field]['nome'];
-					if (is_object($alias)) {
-						if ($campos[$field]['label']) {
-						 	$alias = $campos[$field]['label'];
-						} else {
-							$alias = $alias->nome;	
-						}
-					}
-					$alias = ($alias) ? to_slug($alias, '_') : $field;
-					$aliases[$field] = $alias;
-					// Cache
-					$update = true;
-					
-					$campos[$field]['nome_id'] = $alias;
-				} else {
-					$aliases[$field] = $campos[$field]['nome_id'];
+		return $this->_getMetadata('relationships');
+	}
+	
+	protected function _camposMetadata() {
+		if (is_null($this->_getMetadata('camposAlias'))) {
+			$aliases = [];
+			$relationships = [];
+			
+			foreach ($this->getCampos() as $campo => $array) {
+				if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
+					continue;	
 				}
+				if (strpos($campo, 'select_') === 0 && strpos($campo, 'select_multi_') !== 0) {
+					if (in_array($array['xtra'], InterAdminField::getSelectTipoXtras())) {
+						$relationships[$array['nome_id']] = 'InterAdminTipo';
+					} else {
+						$relationships[$array['nome_id']] = $array['nome'];
+					}
+					$array['nome_id'] .= '_id';
+				}
+				$aliases[$campo] = $array['nome_id'];
 			}
-		}
-		if ($update) {
-			$this->_setMetadata('campos', $campos);
-		}
-		if (is_array($fields)) {
-			return $aliases;
-		} else {
-			return reset($aliases);
+					
+			$this->_setMetadata('relationships', $relationships);
+			$this->_setMetadata('camposAlias', $aliases);
 		}
 	}
+	
 	/**
 	 * Returns the InterAdminTipo for a field.
 	 * 
@@ -760,22 +772,14 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	public function getRelationshipData($relationship) {
-		$aliases = $this->getCamposAlias();
+		$relationships = $this->getRelationships();
 		
-		$campoNome = array_search($relationship, $aliases);
-		$alias = true;
-		if ($campoNome === false) {
-			$campoNome = $relationship;
-			$alias = false;
-		}
-		$campos = $this->getCampos();
-		$campoTipo = isset($campos[$campoNome]) ? $this->getCampoTipo($campos[$campoNome]) : null;
-		if ($campoTipo instanceof InterAdminTipo) {
+		if (isset($relationships[$relationship])) {
 			return array(
 				'type' => 'select',
-				'tipo' => $campoTipo,
+				'tipo' => $relationships[$relationship],
 				'name' => $relationship,
-				'alias' => $alias
+				'alias' => true
 			);
 		}
 		// As children
@@ -787,7 +791,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				'name' => $relationship,
 				'alias' => true
 			);
-		}
+		}			
 		// As method
 		$optionsInstance = ['default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin'];
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);

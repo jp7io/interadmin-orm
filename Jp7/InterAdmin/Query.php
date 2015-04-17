@@ -102,7 +102,7 @@ class Query extends Query\Base {
 			if ($relationshipData['type'] == 'children') {
 				$joins[] = [$tableLeft, $type, "{$tableLeft}.id = {$tableRight}parent_id"];
 			} else {
-				$joins[] = [$tableLeft, $type, "{$tableLeft}.{$relationship} = {$tableRight}id"];
+				$joins[] = [$tableLeft, $type, "{$tableLeft}.{$relationship}_id = {$tableRight}id"];
 			}
 			
 			$tableLeft = $relationship;

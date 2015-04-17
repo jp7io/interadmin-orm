@@ -21,10 +21,15 @@ class HasMany {
 
 	public function getRelationshipData() {
 		$type = call_user_func([$this->className, 'type']);
-		$aliases = $type->getCamposAlias();
+		$aliases = $type->getCamposAlias();		
+		$alias = array_search($this->foreign_key, $aliases);
+		if (!$alias) {
+			throw new \InvalidArgumentException('Unknown alias: ' . $this->foreign_key);	
+		}
+				
 		$conditions = [
 			// 'cursos.sede = id'
-			array_search($this->foreign_key, $aliases) . ' = main.' . $this->local_key
+			$alias . ' = main.' . $this->local_key
 		];
 		if ($this->query) {
 			$where = $this->query->getOptionsArray()['where'];
