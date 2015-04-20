@@ -421,7 +421,10 @@ class InterAdminTipo extends InterAdminAbstract {
 						$alias = $campo;
 					}
 					$A[$campo]['nome_id'] = to_slug($alias, '_');
-				}			
+				}
+				if (strpos($campo, 'select_') === 0 && strpos($campo, 'select_multi_') !== 0) {
+					$A[$campo]['nome_id'] .= '_id';					
+				}
 			}
 			$this->_setMetadata('campos', $A);
 		}
@@ -474,12 +477,12 @@ class InterAdminTipo extends InterAdminAbstract {
 					continue;	
 				}
 				if (strpos($campo, 'select_') === 0 && strpos($campo, 'select_multi_') !== 0) {
+					$relationship = substr($array['nome_id'], 0, -3);
 					if (in_array($array['xtra'], InterAdminField::getSelectTipoXtras())) {
-						$relationships[$array['nome_id']] = 'InterAdminTipo';
+						$relationships[$relationship] = 'InterAdminTipo';
 					} else {
-						$relationships[$array['nome_id']] = $array['nome'];
+						$relationships[$relationship] = $array['nome'];
 					}
-					$array['nome_id'] .= '_id';
 				}
 				$aliases[$campo] = $array['nome_id'];
 			}
