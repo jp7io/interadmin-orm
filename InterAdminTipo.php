@@ -422,8 +422,18 @@ class InterAdminTipo extends InterAdminAbstract {
 					}
 					$A[$campo]['nome_id'] = to_slug($alias, '_');
 				}
-				if (strpos($campo, 'select_') === 0 && strpos($campo, 'select_multi_') !== 0) {
-					$A[$campo]['nome_id'] .= '_id';					
+				if (strpos($campo, 'select_') === 0) {
+					if (strpos($campo, 'select_multi_') === 0) {
+						$A[$campo]['nome_id'] .= '_ids';
+					} else {
+						$A[$campo]['nome_id'] .= '_id';
+					}
+				} elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
+					if (in_array($array['xtra'], InterAdminField::getSpecialMultiXtras())) {
+						$A[$campo]['nome_id'] .= '_ids';
+					} else {
+						$A[$campo]['nome_id'] .= '_id';
+					}
 				}
 			}
 			$this->_setMetadata('campos', $A);
@@ -476,14 +486,34 @@ class InterAdminTipo extends InterAdminAbstract {
 				if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
 					continue;	
 				}
-				if (strpos($campo, 'select_') === 0 && strpos($campo, 'select_multi_') !== 0) {
-					$relationship = substr($array['nome_id'], 0, -3);
-					if (in_array($array['xtra'], InterAdminField::getSelectTipoXtras())) {
-						$relationships[$relationship] = 'InterAdminTipo';
+				if (strpos($campo, 'select_') === 0) {
+					$multi = strpos($campo, 'select_multi_') === 0;
+					if ($multi) {
+						$relationship = substr($array['nome_id'], 0, -4);
 					} else {
-						$relationships[$relationship] = $array['nome'];
+						$relationship = substr($array['nome_id'], 0, -3);
+					}					
+					$relationships[$relationship] = [
+						'provider' => $array['nome'],
+						'type' => in_array($array['xtra'], InterAdminField::getSelectTipoXtras()),
+						'multi' => $multi,
+						'special' => false
+					];
+				} elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
+					$multi = in_array($array['xtra'], InterAdminField::getSpecialMultiXtras());				
+					if ($multi) {
+						$relationship = substr($array['nome_id'], 0, -4);
+					} else {
+						$relationship = substr($array['nome_id'], 0, -3);
 					}
+					$relationships[$relationship] = [
+						'provider' => null, // FIXME
+						'type' => in_array($array['xtra'], InterAdminField::getSpecialTipoXtras()),
+						'multi' => $multi,
+						'special' => true
+					];
 				}
+				
 				$aliases[$campo] = $array['nome_id'];
 			}
 					
@@ -778,9 +808,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		$relationships = $this->getRelationships();
 		
 		if (isset($relationships[$relationship])) {
+			$data = $relationships[$relationship];
 			return array(
 				'type' => 'select',
-				'tipo' => $relationships[$relationship],
+				'tipo' => $data['provider'],
 				'name' => $relationship,
 				'alias' => true
 			);

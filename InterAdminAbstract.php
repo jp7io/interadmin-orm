@@ -248,13 +248,16 @@ abstract class InterAdminAbstract implements Serializable {
 		if (strpos($field, 'date_') === 0) {
 			return new \Date($value);
 		}
+		/*
 		if (strpos($field, 'select_multi') === 0) {
 			//$isMulti = (strpos($field, 'select_multi') === 0);
 			$isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
 		} elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
 			$isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
 			$isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
-		} elseif (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
+		} else
+		*/
+		if (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
 			$class_name = $interAdminClass . 'FieldFile';
 			if (!class_exists($class_name)) {
 				$class_name = 'InterAdminFieldFile';
@@ -265,13 +268,13 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			return $value;
 		}
-		
+		/*
 		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
 		if ($object instanceof InterAdminAbstract) {
 			$tipo = $object->getCampoTipo($campo);
 		}
 		
-		//if ($isMulti) {
+		if ($isMulti) {
 			$value_arr = array_filter(explode(',', $value));
 			foreach ($value_arr as $key2 => $value2) {
 				if ($value2 && is_numeric($value2)) {
@@ -291,7 +294,6 @@ abstract class InterAdminAbstract implements Serializable {
 				}
 			}
 			$value = $value_arr;
-		/*
 		} elseif ($value && is_numeric($value)) {
 			if ($isTipo) {
 				$value = InterAdminTipo::getInstance($value, $options);

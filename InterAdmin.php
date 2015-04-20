@@ -74,12 +74,29 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			// relationship
 			$relationships = $this->getType()->getRelationships();
 			if (isset($relationships[$attributeName])) {
-				$type = $relationships[$attributeName];
-				if ($fk = $this->{$attributeName . '_id'}) {
-					if ($type === 'InterAdminTipo') {
+				$data = $relationships[$attributeName];
+				
+				if ($data['special']) {
+					throw new Exception('Not implemented: ' . $attributeName);	
+				}
+				
+				if ($data['multi']) {
+					if ($fks = $this->{$attributeName . '_ids'}) {
+						if ($data['type']) {
+							$related = [];
+							foreach (array_filter(explode(',', $fks)) as $fk) {
+								$related[] = InterAdminTipo::getInstance($fk);
+							}
+						} else {
+						 	$related = $data['provider']->records()
+						 		->findMany(array_filter(explode(',', $fks)));
+						}
+					}
+				} elseif ($fk = $this->{$attributeName . '_id'}) {
+					if ($data['type']) {
 						$related = InterAdminTipo::getInstance($fk);
 					} else {
-					 	$related = $type->records()->find($fk);
+					 	$related = $data['provider']->records()->find($fk);
 					}
 				}
 				return $related;
