@@ -295,6 +295,11 @@ abstract class Base {
 		return $this;
 	}
 	
+	public function groupByRaw($group) {
+		$this->options['group'] = implode(',', array_filter([$this->options['group'], $group]));
+		return $this;
+	}
+
 	public function orderBy($column, $direction = 'asc') {
 		if (str_contains($column, ' ') || str_contains($column, '(')) {
 			throw new BadMethodCallException('Use orderByRaw instead.');
