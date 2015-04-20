@@ -36,12 +36,15 @@ class FormRequest {
 		return $this->input;
 	}
 	
+	public function setInput($input) {
+		$this->input = $input;
+	}
+	
 	public function validator() {
 		if (is_null($this->validator)) {
 			$this->validator = \Validator::make(
 				$this->input(),
-				$this->model->getRules(),
-				[] // messages
+				$this->model->getRules()
 			);
 		}
 		return $this->validator;
