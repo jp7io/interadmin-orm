@@ -142,12 +142,9 @@ class InterSite {
 	public function init($host) {
 		global $jp7_app;
 		
-		// No caso do artisan, o $host estará vazio, mas entra em self::isAtLocalhost()
-		$host = explode(':', $host)[0];		
-
 		// Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
-		$host = strtolower($host);
-		
+		$host = strtolower(explode(':', $host)[0]);
+				
 		// This server is a main host
 		if (isset($this->servers[$host])) {
 			$this->server = $this->servers[$host];
@@ -248,7 +245,7 @@ class InterSite {
 			
 			// PHPUnit não tem $app
 			$base = ($app ? $app['path.base'] : getcwd());
-			return file_get_contents($base . '/interadmin/host');
+			return trim(file_get_contents($base . '/interadmin/host'));
 		}
 	}
 	
