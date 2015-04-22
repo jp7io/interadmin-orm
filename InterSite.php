@@ -64,14 +64,8 @@ class InterSite {
 	 *
 	 * @return bool
 	 */
-	public static function isAtLocalhost() {	
-		global $app;
-		// PHPUNIT has no $app
-		if (!$app || $app->runningInConsole()) {
-			// php artisan, @todo check what it returns in production
-			return true;
-		}
-		$host = explode(':', $_SERVER['HTTP_HOST'])[0];
+	public static function isAtLocalhost() {
+		$host = explode(':', self::getHost())[0];
 		if ($host == 'localhost') {
 			return true;
 		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
@@ -229,9 +223,8 @@ class InterSite {
 		}
 	}
 	
-	function start() {
-		$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-		
+	public function start() {
+		$host = self::getHost(); 
 		$this->init($host);
 		
 		switch ($this->hostType) {
@@ -245,6 +238,15 @@ class InterSite {
 		}
 		
 		self::setConfig($this);
+	}
+	
+	public static function getHost() {
+		if (!isset($_SERVER['HTTP_HOST'])) {
+			return $_SERVER['HTTP_HOST'];
+		} else {
+			global $app;
+			return file_get_contents($app['path.base'] . '/interadmin/host');
+		}
 	}
 	
 	public static function __set_state($array) {
