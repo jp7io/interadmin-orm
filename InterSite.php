@@ -68,7 +68,7 @@ class InterSite {
 		$host = explode(':', self::getHost())[0];
 		if ($host == 'localhost') {
 			return true;
-		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
+		} elseif (ends_with($host, '.dev')) {
 			return true;
 		}
 		return false;
@@ -241,11 +241,14 @@ class InterSite {
 	}
 	
 	public static function getHost() {
-		if (!isset($_SERVER['HTTP_HOST'])) {
+		if (isset($_SERVER['HTTP_HOST'])) {
 			return $_SERVER['HTTP_HOST'];
 		} else {
 			global $app;
-			return file_get_contents($app['path.base'] . '/interadmin/host');
+			
+			// PHPUnit não tem $app
+			$base = ($app ? $app['path.base'] : getcwd());
+			return file_get_contents($base . '/interadmin/host');
 		}
 	}
 	
