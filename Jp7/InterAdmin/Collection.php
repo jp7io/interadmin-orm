@@ -33,7 +33,11 @@ class Collection extends BaseCollection {
 	}
 	
 	public function split($parts) {
-		return $this->chunk(ceil(count($this) / $parts));
+		$size = ceil(count($this) / $parts);
+		if ($size > 0) {
+			return $this->chunk($size);
+		}
+		return $this;
 	}
 	
 	public function jsonList($column, $key) {
