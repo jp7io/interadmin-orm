@@ -143,6 +143,48 @@ class Jp7_InterAdmin_Util {
 		}
 	}
 	
+	public static function copy(InterAdminTipo $tipoObj, array $ids, InterAdminTipo $tipoDestino, $parent_id) {
+		global $use_id_string, $bind_children; // FIXME usado no intermail
+		global $s_user;
+		
+		$use_id_string = false;
+		$bind_children = false;
+		
+		$beforCopyEvent = InterAdmin_Event_BeforeCopy::getInstance();
+		$beforCopyEvent->setIdTipo($tipoObj->id_tipo);
+		$beforCopyEvent->notify();
+		
+		$registros = Jp7_InterAdmin_Util::export($tipoObj, $ids, $use_id_string);
+		
+		foreach ($registros as $registro) {
+			if ($id_tipo == $tipoDestino->id_tipo) {
+				$registro->varchar_key = 'Cópia de ' . $registro->varchar_key;
+			}
+			$registro->publish = '';
+		}
+		
+		$tipoDestino = new InterAdminTipo($tipoDestino->id_tipo);
+		if ($tipoDestino->getInterAdminsTableName() != $tipoObj->getInterAdminsTableName()) {
+			throw new Exception('Não é possível copiar para tipos com tabela customizada.');
+		}
+		
+		$oldLogUser = InterAdmin::setLogUser($s_user['login'] . ' - combo copy');
+		$returnIds = Jp7_InterAdmin_Util::import($registros, $tipoDestino->id_tipo, $parent_id, true, $use_id_string, $bind_children);
+		InterAdmin::setLogUser($oldLogUser);
+		
+		if (InterAdmin_Event_AfterCopy::getInstance()->hasObservers()) {
+			foreach ($returnIds as $returnId) {
+				$afterCopyEvent = InterAdmin_Event_AfterCopy::getInstance();
+				$afterCopyEvent->setIdTipo($tipoDestino->id_tipo);
+				$afterCopyEvent->setId($returnId['id']);
+				$afterCopyEvent->setCopyId($returnId['new_id']);
+				$afterCopyEvent->notify();
+			}
+		}
+		
+		return $returnIds;
+	}
+	
 	public static function syncTipos($model) {
 		$inheritedTipos = InterAdminTipo::findTiposByModel($model->id_tipo, array(
 			'class' => 'InterAdminTipo'
@@ -300,4 +342,6 @@ STR;
 		}
 		return $avisos;
 	}
+	
+	
 }
