@@ -157,7 +157,7 @@ class Jp7_InterAdmin_Util {
 		$registros = Jp7_InterAdmin_Util::export($tipoObj, $ids, $use_id_string);
 		
 		foreach ($registros as $registro) {
-			if ($id_tipo == $tipoDestino->id_tipo) {
+			if ($tipoDestino->id_tipo == $tipoDestino->id_tipo) {
 				$registro->varchar_key = 'Cópia de ' . $registro->varchar_key;
 			}
 			$registro->publish = '';
