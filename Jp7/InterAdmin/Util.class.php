@@ -90,24 +90,22 @@ class Jp7_InterAdmin_Util {
 	 * Imports records and their children with a new ID.
 	 * 
 	 * @param 	array	$records
-	 * @param 	int 	$id_tipo
-	 * @param 	int 	$parent_id 			defaults to 0
+	 * @param 	InterAdminTipo 	$tipoObj
+	 * @param 	InterAdmin 	$parent
 	 * @param 	bool 	$import_children 	defaults to TRUE
 	 * @param 	bool	$use_id_string		defaults to FALSE
 	 * @param 	bool 	$bind_children		Children 1 has a relationship with Children 2, when copying, this relationship needs to be recreated
 	 * @return 	void	
 	 */
-	public static function import(array $records, $id_tipo, $parent_id = 0, $import_children = true, $use_id_string = false, $bind_children = false) {
+	public static function import(array $records, InterAdminTipo $tipoObj, InterAdmin $parent = null, $import_children = true, $use_id_string = false, $bind_children = false) {
 		$returnIds = array();
 		foreach ($records as $record) {
 			$returnId = array('id' => $record->id);
 			unset($record->id);
 			
-			$tipo = InterAdminTipo::getInstance($id_tipo);
+			$record->setParent($parent);
+			$record->setTipo($tipoObj);
 			
-			$record->parent_id = $parent_id;
-			$record->setTipo($tipo);
-				
 			if ($use_id_string) {
 				self::_importAttributeFromIdString($record);
 			}
@@ -130,7 +128,7 @@ class Jp7_InterAdmin_Util {
 			foreach ($tipo_children as $child) {
 				unset($child->id);
 				
-				$child->parent_id = $record->id;
+				$child->setParent($record);
 				$child->setTipo($child_tipo);
 				
 				if ($use_id_string || $bind_children) {
@@ -143,12 +141,16 @@ class Jp7_InterAdmin_Util {
 		}
 	}
 	
-	public static function copy(InterAdminTipo $tipoObj, array $ids, InterAdminTipo $tipoDestino, $parent_id) {
+	public static function copy(InterAdminTipo $tipoObj, array $ids, InterAdminTipo $tipoDestino, InterAdmin $parent = null) {
 		global $use_id_string, $bind_children; // FIXME usado no intermail
 		global $s_user;
 		
 		$use_id_string = false;
 		$bind_children = false;
+				
+		if ($tipoDestino->getInterAdminsTableName() != $tipoObj->getInterAdminsTableName()) {
+			throw new Exception('Não é possível copiar para tipos com tabela customizada.');
+		}
 		
 		$beforCopyEvent = InterAdmin_Event_BeforeCopy::getInstance();
 		$beforCopyEvent->setIdTipo($tipoObj->id_tipo);
@@ -157,19 +159,14 @@ class Jp7_InterAdmin_Util {
 		$registros = Jp7_InterAdmin_Util::export($tipoObj, $ids, $use_id_string);
 		
 		foreach ($registros as $registro) {
-			if ($tipoDestino->id_tipo == $tipoDestino->id_tipo) {
+			if ($tipoObj->id_tipo == $tipoDestino->id_tipo) {
 				$registro->varchar_key = 'Cópia de ' . $registro->varchar_key;
 			}
 			$registro->publish = '';
 		}
-		
-		$tipoDestino = new InterAdminTipo($tipoDestino->id_tipo);
-		if ($tipoDestino->getInterAdminsTableName() != $tipoObj->getInterAdminsTableName()) {
-			throw new Exception('Não é possível copiar para tipos com tabela customizada.');
-		}
-		
+			
 		$oldLogUser = InterAdmin::setLogUser($s_user['login'] . ' - combo copy');
-		$returnIds = Jp7_InterAdmin_Util::import($registros, $tipoDestino->id_tipo, $parent_id, true, $use_id_string, $bind_children);
+		$returnIds = Jp7_InterAdmin_Util::import($registros, $tipoDestino, $parent, true, $use_id_string, $bind_children);
 		InterAdmin::setLogUser($oldLogUser);
 		
 		if (InterAdmin_Event_AfterCopy::getInstance()->hasObservers()) {
