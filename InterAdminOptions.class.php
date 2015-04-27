@@ -8,6 +8,7 @@ class InterAdminOptions {
 		$this->tipo = $tipo;
 		$this->options = array(
 			'fields' => array(),
+			'fields_alias' => true,
 			'where' => array()
 		);
 	}
