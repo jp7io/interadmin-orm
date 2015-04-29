@@ -238,6 +238,15 @@ abstract class Base {
 		return $this;
 	}
 	
+	/**
+	 * Aplica join na query
+	 * 
+	 * @param string $alias
+	 * @param string|InterAdminTipo $className
+	 * @param array $conditions
+	 * @param string $_joinType ex.: INNER, LEFT, RIGHT
+	 * @return \Jp7\Interadmin\Query\Base
+	 */
 	public function join($alias, $className, $conditions, $_joinType = 'INNER') {
 		$type = $this->_resolveType($className);
 		$joinOn = $this->_parseConditions($conditions, $type, $alias)[0];

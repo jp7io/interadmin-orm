@@ -57,6 +57,17 @@ function img_tag($img, $template = null, $options = array()) {
 	} else {
 		$url = $img;
 		$alt = isset($options['alt']) ? $options['alt'] : '';
+		
+		if ($url && $template) {
+			$templates = \Config::get('packages/intervention/imagecache/config.templates');
+			
+			if ($templates && isset($templates[$template])) {
+				$image = Image::make($url);
+				$data = $templates[$template]($image)->encode('data-url');
+				
+				return \HtmlObject\Image::create($data, $alt, $options);
+			}
+		}
 	}
 	if ($url) {
 		if ($template) {
