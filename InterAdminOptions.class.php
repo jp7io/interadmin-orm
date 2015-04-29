@@ -101,7 +101,7 @@ class InterAdminOptions {
 	}
 	
 	public function usePublishedFilters($filters = true) {
-		$this->options['use_published_filters'] = (bool) $debug;	
+		$this->options['use_published_filters'] = (bool) $filters;	
 		return $this;
 	}
 	
