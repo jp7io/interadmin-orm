@@ -5,14 +5,24 @@ namespace Jp7\Interadmin;
 trait Downloadable {
 	// For client side use
 	public function getUrl() {
-		return str_replace('../../upload', \URL::to('assets'), $this->url);
+		$absolute = \Config::get('app.url') . 'upload/';
+		
+		$localPrefix = '../../upload/';
+		// Fix absolute URL
+		$url = str_replace($absolute, $localPrefix, $this->url);
+		// SEO
+		$slug = to_slug($this->getText());
+		if ($slug && strpos($url, $localPrefix) === 0) {
+			$url = dirname($url) . '/' . $slug . '-' . basename($url);
+		}
+		// Replace relative URL by assets
+		return str_replace($localPrefix, '/assets/', $url);
 	}
 	
 	// Absolute client side URL
 	public function getAbsoluteUrl() {
-		$config = \InterSite::config();
-		return $config->url. $this->getUrl();
-	}	
+		return \URL::to($this->getUrl());
+	}
 	
 	// Server side file name
 	public function getFilename() {
@@ -20,9 +30,9 @@ trait Downloadable {
 		if (!empty($parsed['host'])) {
 			return false;
 		}
-
-		$path = $parsed['path']; // remove query string
-		return str_replace('../../', storage_path() . '/', $path);
+		// remove query string
+		$path = $parsed['path']; 
+		return str_replace('../../upload/', storage_path('upload/'), $path);
 	}
 	
 	/**

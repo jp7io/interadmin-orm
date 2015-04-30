@@ -52,37 +52,30 @@ function memoize(Closure $closure) {
 
 function img_tag($img, $template = null, $options = array()) {
 	if (is_object($img)) {
-		$url = img_resize_url($img, $template);
-		$alt = $img->text;
+		$url = $img->getUrl();
+		$alt = $img->getText();
 	} else {
 		$url = $img;
-		$alt = isset($options['alt']) ? $options['alt'] : '';
-		
-		if ($url && $template) {
-			$templates = \Config::get('packages/intervention/imagecache/config.templates');
-			
-			if ($templates && isset($templates[$template])) {
-				$image = Image::make($url);
-				$data = $templates[$template]($image)->encode('data-url');
-				
-				return \HtmlObject\Image::create($data, $alt, $options);
-			}
-		}
+		$alt = array_get($options, 'alt');
 	}
 	if ($url) {
 		if ($template) {
-			$options['class'] = trim(@$options['class'] . ' '  . $template);
+			$parsed = parse_url($url);
+			if (!empty($parsed['host'])) {
+				$url = copy_external_image($url);
+			}
+			
+			$url = str_replace('/assets/', '/imagecache/' . $template . '/', $url);
+			$options['class'] = trim(array_get($options, 'class') . ' '  . $template);
 		}
 		return \HtmlObject\Image::create(URL::to($url), $alt, $options);
 	}
 }
 
-function img_resize_url($img, $template = null) {
-	if ($img->getFilename() && !is_file($img->getFilename()) && InterSite::config()->isDevelopment()) {
-		$url = copy_production_file($img);
-	} else {
-		$url = $img->getUrl();
-	}	
+function img_resize_url($url, $template = null) {
+	if (is_object($url)) {
+		$url = $url->getUrl();
+	}
 	if ($template) {
 		$url = str_replace('/assets/', '/imagecache/' . $template . '/', $url);
 	}
@@ -99,6 +92,22 @@ function interadmin_data($record) {
 	}
 }
 
+function copy_external_image($url) {
+	$local = to_slug(dirname($url)) . '_' . basename($url);
+	$dir = storage_path('upload/_external');
+	
+	if (!is_file($dir . '/' . $local)) {
+		if ($file = @file_get_contents($url)) {
+			if (!is_dir($dir)) {
+				mkdir($dir);
+			}
+			file_put_contents($dir . '/' . $local, $file);
+		}
+	}
+	return '/assets/_external/' . $local;
+}
+
+/*
 function copy_production_file($img) {
 	$filename = $img->getFilename();
 	// FIXME temporario local
@@ -118,7 +127,7 @@ function copy_production_file($img) {
 		return URL::to('assets/placeholder.gif?' . $img->url);
 	}
 }
-
+*/
 function km($object, $search = '.*') {
 	$methods = get_class_methods($object);
 	$methods = array_filter($methods, function ($a) use ($search) {
