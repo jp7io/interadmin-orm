@@ -24,7 +24,7 @@ class FormRequest {
 	}
 	
 	public function redirect() {
-		return \Redirect::route($this->backRoute())
+		return \Redirect::to($this->backUrl())
 			->withInput()
 			->withErrors($this->validator());
 	}
@@ -50,16 +50,15 @@ class FormRequest {
 		return $this->validator;
 	}
 	
-	protected function backRoute() {
-		$route = \Route::getCurrentRoute()->getAction()['as'];
-		$parts = explode('.', $route);
+	protected function backUrl() {
+		$route = \Route::getCurrentRoute();
+		list($_, $action) = explode('@', $route->getAction()['controller']);
 
-		$action = array_pop($parts);
 		if ($action === 'store') {
-			array_push($parts, 'create');
+			return $this->model->getUrl('create');
 		} elseif ($action === 'update') {
-			array_push($parts, 'edit');
+			return $this->model->getUrl('edit');
 		}
-		return implode('.', $parts);
+		throw new \Exception('Unknown action.');
 	}
 }
