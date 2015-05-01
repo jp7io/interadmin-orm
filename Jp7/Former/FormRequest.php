@@ -51,9 +51,9 @@ class FormRequest {
 	}
 	
 	protected function backUrl() {
-		$route = \Route::getCurrentRoute();
-		list($_, $action) = explode('@', $route->getAction()['controller']);
-
+		$actionName = \Route::getCurrentRoute()->getActionName();
+		$action = explode('@', $actionName)[1];
+		
 		if ($action === 'store') {
 			return $this->model->getUrl('create');
 		} elseif ($action === 'update') {

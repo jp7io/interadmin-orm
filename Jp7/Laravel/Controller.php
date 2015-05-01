@@ -12,7 +12,9 @@ class Controller extends \Illuminate\Routing\Controller {
 	public function __construct() {
 		static::$current = $this;
 		
-		$this->action = explode('@', \Route::getCurrentRoute()->getActionName())[1];
+		if ($route = \Route::getCurrentRoute()) {
+			$this->action = explode('@', $route->getActionName())[1];
+		}
 	}
 
 	/* Temporary solution - Avoid using this as much as possible */
