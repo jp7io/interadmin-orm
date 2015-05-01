@@ -1025,7 +1025,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 		
 	public function getInterAdminsAdminAttributes() {
-		return array('id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+		return array('id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted', 'hits');
 	}
 		
 	public function getFillable() {
