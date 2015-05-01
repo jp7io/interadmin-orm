@@ -107,6 +107,19 @@ function copy_external_image($url) {
 	return '/assets/_external/' . $local;
 }
 
+function versioned_asset($extension) {
+	ob_start();
+	if ($extension == 'css') {
+		stylesheet_link_tag();
+	} elseif ($extension == 'js') {
+		javascript_include_tag();	
+	}
+	$html = ob_get_clean();	
+	$version = filemtime(base_path('.git'));
+	
+	return str_replace('.' . $extension, '.' . $extension . '?v=' . $version, $html);
+}
+
 /*
 function copy_production_file($img) {
 	$filename = $img->getFilename();
