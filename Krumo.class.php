@@ -968,7 +968,9 @@ if (typeof($) == 'undefined') {
 		//
 		$_recursion_marker = Krumo::_marker();
 		try {
-			$_r = ($_is_object)	? @$data->$_recursion_marker : @$data[$_recursion_marker];
+      if (!$data instanceof Closure) {
+  			$_r = ($_is_object)	? @$data->$_recursion_marker : @$data[$_recursion_marker];
+      }
 		} catch (Exception $e) {
 			// do nothing
 		}
