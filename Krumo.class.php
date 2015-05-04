@@ -610,11 +610,13 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		if ($hive =& Krumo::_hive($dummy)) {
 			foreach($hive as $i=>$bee){
 				if (is_object($bee)) {
-					try {
-						unset($hive[$i]->$_recursion_marker);
-					} catch (Exception $e) {
-						// do nothing
-					}
+          if (!$bee instanceof Closure) {
+  					try {
+  						unset($hive[$i]->$_recursion_marker);
+  					} catch (Exception $e) {
+  						// do nothing
+  					}
+          }
 				} elseif(is_array($bee)) {
 					unset($hive[$i][$_recursion_marker]);
 				}
