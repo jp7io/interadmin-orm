@@ -3,7 +3,7 @@
  * Class for handling collections of objects.
  *
  */
-class Jp7_Collections {
+class Jp7_CollectionUtil {
  	/**
 	 * Acts like a SELECT statement. Performs 'where', 'order', 'group' and 'limit'.
 	 * 

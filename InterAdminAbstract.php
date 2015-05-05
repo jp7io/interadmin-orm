@@ -400,7 +400,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 		if (!empty($options['debug'])) {
 			// $time = $debugger->getTime($options['debug']);
-			echo Jp7_Debugger::syntaxHighlightSql($sql);
+			echo SqlFormatter::format($sql);
 		}
 		$select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;		
 		
@@ -805,7 +805,7 @@ abstract class InterAdminAbstract implements Serializable {
 					if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
 						$multi_options = $options['select_multi_fields'][$alias];
 						if ($multi_options) {
-							Jp7_Collections::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
+							Jp7_CollectionUtil::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
 						}
 					}
 				}

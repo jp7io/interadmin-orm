@@ -251,10 +251,10 @@ class InterAdminTipo extends InterAdminAbstract {
 								$selects[] = $item->$property;
 							}
 						}
-						Jp7_Collections::eagerLoad($selects, $relationshipData['levels']);
+						Jp7_CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
 					}
 				} else {
-					Jp7_Collections::eagerLoad($records, $relationshipData['levels']);
+					Jp7_CollectionUtil::eagerLoad($records, $relationshipData['levels']);
 				}
 			}
 		}
