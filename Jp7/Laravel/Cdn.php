@@ -17,7 +17,7 @@ class Cdn {
 	
 	private static function replace($url) {
 		$config = \InterSite::config();
-		if ($config->cdn_domain) {
+		if (!empty($config->cdn_domain)) {
 			$url = str_replace(
 				$config->url,
 				'http://' . $config->cdn_domain . '/', 
