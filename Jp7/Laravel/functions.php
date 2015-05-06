@@ -22,7 +22,7 @@ function interadmin_data($record) {
 }
 
 function img_tag($img, $template = null, $options = array()) {
-	return ImgResize::tag($img, $template = null, $options);
+	return ImgResize::tag($img, $template, $options);
 }
 
 function _try($object) {
