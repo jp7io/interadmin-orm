@@ -5,32 +5,6 @@ use Blade, App, Input, Request, Cache;
 
 class Temp {
 	
-	/*
-	public static function initDataBase() {
-		global $db;
-		$config = \InterSite::config();
-	
-		/* DB Connection *-/
-		if (!$config->db) {
-			throw new Exception('No database. Make sure you call $config->start() on config.php.');
-		}
-		if (!$config->db->type) {
-			$config->db->type = 'mysql';
-		}
-		if (!function_exists('ADONewConnection')) {
-			include '../inc/3thparty/adodb/adodb.inc.php';
-		}
-		$dsn = jp7_formatDsn($config->db);
-		$db = ADONewConnection($dsn);
-	
-		if (!$db) {
-			$config->db->pass = '{pass}';
-			throw new Exception('Unable to connect to the database ' . jp7_formatDsn($config->db));
-		}
-		/* /DB Connection *-/
-	}
-	*/
-	
 	public static function extendBlade() {
 		Blade::extend(function($view, $compiler) {
 			// @include with partials/_partial instead of partials/partial			
@@ -56,8 +30,8 @@ class Temp {
 	
 	public static function extendWhoops() {
 		if (Request::ajax() || PHP_SAPI === 'cli') return;
-		if (App::bound("whoops")) {
-			$whoops = App::make("whoops");
+		if (App::bound('whoops')) {
+			$whoops = App::make('whoops');
 			
 			$whoops->pushHandler(function($exception, $exceptionInspector, $runInstance) {
 				?>
@@ -78,6 +52,10 @@ class Temp {
 	}
 	
 	public static function clearCache() {
+		if (!App::environment('local')) {
+			return;
+		}
+		// Atualiza classmap e routes com CMD+SHIFT+R ou no terminal
 		if (Request::server('HTTP_CACHE_CONTROL') === 'no-cache' || PHP_SAPI === 'cli') {
 			Cache::forget('Interadmin.routes');
 			Cache::forget('Interadmin.classMap');

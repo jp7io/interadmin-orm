@@ -209,7 +209,8 @@ class InterSite {
 				$this->$var = $value;
 			}
 			
-			$this->url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $this->server->host . '/' . Str::finish($this->server->path, '/');
+			$this->url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $this->server->host . '/' . $this->server->path;
+			$this->url = Str::finish($this->url, '/');
 			
 			foreach ($this->langs as $sigla => $lang) {
 				if ($lang->default) {
