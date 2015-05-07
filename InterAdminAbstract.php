@@ -899,8 +899,11 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	public function forceDelete() {
 		$pk = $this->_primary_key;
+		$db = $this->getDb();
 		
-		$this->getDb()->table($this->getTableName())
+		$table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
+		
+		$db->table($table)
 			->where($pk, $this->$pk)
 			->delete();
 	}
