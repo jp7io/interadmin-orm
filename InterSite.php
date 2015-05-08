@@ -9,10 +9,7 @@ use \Illuminate\Support\Str;
  * @package InterSite
  */
 class InterSite {
-	const PRODUCAO = 'Produção';
 	const QA = 'QA';
-	const DESENVOLVIMENTO = 'Desenvolvimento';
-	
 	const PRODUCTION = 'Produção';
 	const DEVELOPMENT = 'Desenvolvimento';
 	
@@ -65,22 +62,9 @@ class InterSite {
 	 * @return bool
 	 */
 	public static function isAtLocalhost() {
-		$host = explode(':', self::getHost())[0];
-		if ($host == 'localhost') {
-			return true;
-		} elseif (ends_with($host, '.dev')) {
-			return true;
-		}
-		return false;
+		return starts_with($_SERVER['REMOTE_ADDR'], '192.168.0');
 	}
 	
-	/**
-	 * @deprecated
-	 * @return bool
-	 */
-	public function isProducao() {
-		return $this->server->type === self::PRODUCAO;
-	}
 	/**
 	 * Checks if the server type is PRODUCAO.
 	 * @return bool
@@ -95,13 +79,7 @@ class InterSite {
 	public function isQa() {
 		return $this->server->type === self::QA;
 	}
-	/**
-	 * @deprecated
-	 * @return bool
-	 */
-	public function isDesenvolvimento() {
-		return $this->server->type === self::DESENVOLVIMENTO;
-	}
+	
 	/**
 	 * Checks if the server type is PRODUCAO.
 	 * @return bool
@@ -152,57 +130,45 @@ class InterSite {
 		$this->hostType = self::HOST_MAIN;
 		
 		// Not Found, searching aliases
-		while (!$this->server) {
-			foreach ($this->servers as $serverHost => $server) {
-				// InterAdmin Remote
+		if (!$this->server) {
+			foreach ($this->servers as $server) {
 				if ($jp7_app) {
+					// InterAdmin Remote
 					$remotes = $server->interadmin_remote;
 					if (in_array($host, $remotes) || in_array('www.' . $host, $remotes)) {
-						if ($server->vars['check_dns'] && !self::hasDnsRecord($server->host) && $server->alias_domains) {
-							$server->host = $server->alias_domains[0];
-						}
 						$this->server = $this->servers[$host] = $server;
 						$this->interadmin_remote = $host;
 						$this->hostType = self::HOST_REMOTE;
-						break 2;  // Exit foreach and while.
+						break;
 					}
-				}
+				}				
 				// Domínios Alternativos - Não redirecionam
 				if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
 					$this->server = $this->servers[$host] = $server;
 					$this->server->host = $host;
-					break 2;  // Exit foreach and while.
+					break;
 				}
 				// Aliases - Redirecionam
 				if (in_array($host, $server->aliases)) {
 					$this->server = $this->servers[$host] = $server;
 					$this->hostType = self::HOST_ALIAS;
-					break 2;  // Exit foreach and while.
+					break;
 				}
 			}
-			// Dev Local
-			if (self::isAtLocalhost()) {
-				if ($this->servers['localhost']) {
-					$this->server = $this->servers['localhost'];
-					$this->servers[$host] = $this->server;
-					$this->server->host = $host;
-				}
-			}
-			break;
+		}
+		
+		if (!$this->server && self::isAtLocalhost()) {
+			$this->server = $this->servers['localhost'];
+			$this->servers[$host] = $this->server;
+			$this->server->host = $host;
 		}
 		
 		if ($this->server) {
 			$this->db = clone $this->server->db;
-			// Exceção para funcionamento do InterAdmin Remote nos sites Express
-			/*
-			if ($this->db->host == 'mysql.jp7.com.br' && $this->hostType == self::HOST_REMOTE) {
-				$this->db->host = 'localhost';
-			}
-			*/
 			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
 				$this->db->host = $this->db->host_internal;
 			}
-
+			
 			$this->db->prefix = 'interadmin_' . $this->name_id;
 
 			foreach ((array) $this->server->vars as $var => $value) {
@@ -267,7 +233,7 @@ class InterSite {
 		return $code;
 	}
 	
-	/* @todo TEMP - Creating old globals */
+	/* Old globals */
 	/*
 	$oldtypes = array(
 		self::PRODUCAO => 'Principal',
@@ -309,20 +275,5 @@ class InterSite {
 		$GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
 	}
 	$GLOBALS['c_lang_default'] = $this->lang_default;
-	*/
-	/* TEMP - Creating old globals */
-
-		
-	/**
-	 * Cacheando verificação, porque chega a demorar 1 segundo
-	 */
-	public static function hasDnsRecord($domain) {
-		$cacheFile = sys_get_temp_dir() . '__dns_' . $domain;
-		if (is_file($cacheFile) && filemtime($cacheFile) > strtotime('-2 minute')) {
-			return file_get_contents($cacheFile);
-		} else {
-			$dns = dns_get_record($domain);
-			@file_put_contents($cacheFile, (bool) $dns);
-		}
-	}
+	*/	
 }
