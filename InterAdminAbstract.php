@@ -867,8 +867,7 @@ abstract class InterAdminAbstract implements Serializable {
 		if (is_array($fields) && in_array('*', $fields)) {
 			unset($fields[array_search('*', $fields)]);
 			
-			$adminFields = array_intersect($object->getAdminAttributes(), $object->getColumns());
-			$fields = array_merge($object->getAttributesNames(), $adminFields, $fields);
+			$fields = array_merge($object->getColumns(), $fields);
 		}
 	}
 	/**

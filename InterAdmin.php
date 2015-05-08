@@ -64,55 +64,61 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	/**
 	 * Magic get acessor.
 	 * 
-	 * @param string $attributeName
+	 * @param string $name
 	 * @return mixed
 	 */
-	public function &__get($attributeName) {
-		if (isset($this->attributes[$attributeName])) {
-			return $this->attributes[$attributeName];
+	public function &__get($name) {
+		if (isset($this->attributes[$name])) {
+			return $this->attributes[$name];
 		} elseif ($this->id) {
 			// relationship
 			$relationships = $this->getType()->getRelationships();
-			if (isset($relationships[$attributeName])) {
-				$data = $relationships[$attributeName];
-				
-				if ($data['special']) {
-					throw new Exception('Not implemented: ' . $attributeName);	
-				}
-				
-				if ($data['multi']) {
-					if ($fks = $this->{$attributeName . '_ids'}) {
-						if ($data['type']) {
-							$related = [];
-							foreach (array_filter(explode(',', $fks)) as $fk) {
-								$related[] = InterAdminTipo::getInstance($fk);
-							}
-						} else {
-						 	$related = $data['provider']->records()
-						 		->findMany(array_filter(explode(',', $fks)));
-						}
-					}
-				} elseif ($fk = $this->{$attributeName . '_id'}) {
-					if ($data['type']) {
-						$related = InterAdminTipo::getInstance($fk);
-					} else {
-					 	$related = $data['provider']->records()->find($fk);
-					}
-				}
-				return $related;
+			if (isset($relationships[$name])) {
+				$related = $this->_loadRelationship($relationships, $name);
+				return $related; // returned as reference
 			}
 			
 			// Lazy loading
-			$attributes = array_merge($this->getType()->getCamposAlias(), $this->getAdminAttributes());
-			if (in_array($attributeName, $attributes)) {
+			$attributes = $this->getColumns();
+			
+			if (in_array($name, $attributes) || in_array($name, $this->getType()->getCamposAlias())) {
 				if (class_exists('Debugbar')) {
-					Debugbar::warning('N+1 query: Attribute "' . $attributeName . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
+					Debugbar::warning('N+1 query: Attribute "' . $name . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
 				}
 				$this->loadAttributes($attributes);
-				return $this->attributes[$attributeName];
+				return $this->attributes[$name];
 			}
 		}
-		return $null; // Needs to be variable to be returned as reference
+		return $null; // returned as reference
+	}
+	
+	private function _loadRelationship($relationships, $name) {
+		$data = $relationships[$name];
+		
+		if ($data['special']) {
+			throw new Exception('Not implemented: ' . $name);	
+		}
+		
+		if ($data['multi']) {
+			if ($fks = $this->{$name . '_ids'}) {
+				if ($data['type']) {
+					$multi = [];
+					foreach (array_filter(explode(',', $fks)) as $fk) {
+						$multi[] = InterAdminTipo::getInstance($fk);
+					}
+					return $multi;
+				} else {
+				 	return $data['provider']->records()
+				 		->findMany(array_filter(explode(',', $fks)));
+				}
+			}
+		} elseif ($fk = $this->{$name . '_id'}) {
+			if ($data['type']) {
+				return InterAdminTipo::getInstance($fk);
+			} else {
+			 	return $data['provider']->records()->find($fk);
+			}
+		}
 	}
 	
 	public static function __callStatic($name, array $arguments) {

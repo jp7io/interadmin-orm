@@ -62,7 +62,10 @@ class InterSite {
 	 * @return bool
 	 */
 	public static function isAtLocalhost() {
-		return starts_with($_SERVER['REMOTE_ADDR'], '192.168.0');
+		if (empty($_SERVER['REMOTE_ADDR'])) {
+			return true;
+		}
+		return starts_with($_SERVER['REMOTE_ADDR'], '192.168.') || starts_with($_SERVER['REMOTE_ADDR'], '127.0.');
 	}
 	
 	/**
@@ -156,7 +159,7 @@ class InterSite {
 				}
 			}
 		}
-		
+		// Localhost
 		if (!$this->server && self::isAtLocalhost()) {
 			$this->server = $this->servers['localhost'];
 			$this->servers[$host] = $this->server;
@@ -164,6 +167,7 @@ class InterSite {
 		}
 		
 		if ($this->server) {
+			// Set variables that depend on the server
 			$this->db = clone $this->server->db;
 			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
 				$this->db->host = $this->db->host_internal;
@@ -175,7 +179,8 @@ class InterSite {
 				$this->$var = $value;
 			}
 			
-			$this->url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $this->server->host . '/' . $this->server->path;
+			$protocol = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '');
+			$this->url = $protocol . '://' . $this->server->host . '/' . $this->server->path;
 			$this->url = Str::finish($this->url, '/');
 			
 			foreach ($this->langs as $sigla => $lang) {
@@ -191,14 +196,13 @@ class InterSite {
 		$host = self::getHost(); 
 		$this->init($host);
 		
-		switch ($this->hostType) {
-			case self::HOST_ALIAS:
-				header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
-				header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
-				exit;
-			case !$this->server: {
-				throw new Exception('No settings for host: ' . $host);
-			}
+		if ($this->hostType === self::HOST_ALIAS) {
+			header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
+			header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
+			exit;
+		}
+		if (!$this->server) {
+			throw new Exception('No settings for host: ' . $host);
 		}
 		
 		self::setConfig($this);
