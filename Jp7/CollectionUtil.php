@@ -1,9 +1,11 @@
  <?php
+ 
+ namespace Jp7;
 /**
  * Class for handling collections of objects.
  *
  */
-class Jp7_CollectionUtil {
+class CollectionUtil {
  	
 	/**
 	 * Keys are strings.

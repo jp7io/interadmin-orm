@@ -1,6 +1,10 @@
 <?php
 
-class Jp7_InterAdmin_Util {
+namespace Jp7\Interadmin;
+
+use InterAdminTipo;
+
+class Util {
 	
 	public static function gerarClasseInterAdmin(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '') {
 		$prefixoClasse = constant(InterAdminTipo::getDefaultClass() . '::DEFAULT_NAMESPACE');

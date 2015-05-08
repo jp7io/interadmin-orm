@@ -2,6 +2,8 @@
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
 use Jp7\Interadmin\TipoCache;
+use Jp7\CollectionUtil;
+
 /**
  * Class which represents records on the table interadmin_{client name}.
  *
@@ -805,7 +807,7 @@ abstract class InterAdminAbstract implements Serializable {
 					if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
 						$multi_options = $options['select_multi_fields'][$alias];
 						if ($multi_options) {
-							Jp7_CollectionUtil::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
+							CollectionUtil::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
 						}
 					}
 				}

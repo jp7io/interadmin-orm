@@ -1,6 +1,8 @@
 <?php
 use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\TipoCache;
+use Jp7\Interadmin\Query;
+use Jp7\CollectionUtil;
 
 /**
  * JP7's PHP Functions 
@@ -251,10 +253,10 @@ class InterAdminTipo extends InterAdminAbstract {
 								$selects[] = $item->$property;
 							}
 						}
-						Jp7_CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
+						CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
 					}
 				} else {
-					Jp7_CollectionUtil::eagerLoad($records, $relationshipData['levels']);
+					CollectionUtil::eagerLoad($records, $relationshipData['levels']);
 				}
 			}
 		}
@@ -1094,6 +1096,6 @@ class InterAdminTipo extends InterAdminAbstract {
     }
 
     public function records() {
-    	return new \Jp7\Interadmin\Query($this);
+    	return new Query($this);
     }    
 }
