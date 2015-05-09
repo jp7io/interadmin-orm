@@ -224,7 +224,7 @@ abstract class Base {
 			$value = $value->__toString();
 		}
 		if (is_string($value)) {
-			$value = "'" . addslashes($value) . "'";
+			$value = \DB::connection()->getPdo()->quote($value);
 		}
 		if (is_null($value)) {
 			$value = 'NULL';
