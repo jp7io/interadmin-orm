@@ -1,6 +1,6 @@
- <?php
- 
- namespace Jp7;
+<?php
+namespace Jp7;
+
 /**
  * Class for handling collections of objects.
  *
