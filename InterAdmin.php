@@ -759,6 +759,9 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	    		if (starts_with($campo['tipo'], 'int_')) {
 	    			$rules[$alias][] = 'integer';
 	    		}
+	    		if (starts_with($campo['tipo'], 'date_')) {
+	    			$rules[$alias][] = 'date';
+	    		}	    		
     		}
     	}
     	return $rules;
