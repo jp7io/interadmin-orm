@@ -21,6 +21,11 @@ function interadmin_data($record) {
 	}
 }
 
+function error_controller($action) {
+	$request = Request::create('/error/' . $action, 'GET', array());
+	return Route::dispatch($request);
+}
+
 function img_tag($img, $template = null, $options = array()) {
 	return ImgResize::tag($img, $template, $options);
 }
