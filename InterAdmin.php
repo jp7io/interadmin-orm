@@ -79,12 +79,17 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 			}
 			
 			// Lazy loading
-			$attributes = $this->getColumns();
-			
-			if (in_array($name, $attributes) || in_array($name, $this->getType()->getCamposAlias())) {
+			$columns = $this->getColumns();
+			if (in_array($name, $columns) || in_array($name, $this->getAttributesAliases())) {
 				if (class_exists('Debugbar')) {
 					Debugbar::warning('N+1 query: Attribute "' . $name . '" was not loaded for ' . get_class($this) . ' - ID: ' . $this->id);
 				}
+				
+				$attributes = array_intersect($columns, array_merge(
+					$this->getAttributesNames(),
+					$this->getAdminAttributes()
+				));
+				
 				$this->loadAttributes($attributes);
 				return $this->attributes[$name];
 			}
