@@ -22,7 +22,7 @@ trait RecordTrait {
 
 		$breadcrumb = Route::uriToBreadcrumb($uri, function($type, $segment) use ($route) {
 			$slug = $route->getParameter(trim($segment, '{}'));
-			return $type->records()->find($slug);
+			return $type->records()->findOrFail($slug);
 		});
 		
 		if ($type = end($breadcrumb)) {
