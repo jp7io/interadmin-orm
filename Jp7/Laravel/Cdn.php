@@ -7,12 +7,12 @@ class Cdn {
 		return self::replace(asset($url));
 	}
 	
-	public static function css() {
-		return self::assetTag('css');
+	public static function css($url) {
+		return '<link href="' . self::asset($url) . '?v=' . self::getVersion() . '"  rel="stylesheet" type="text/css">';
 	}
 	
-	public static function js() {
-		return self::assetTag('js');
+	public static function js($url) {
+		return '<script src="' . self::asset($url) . '?v=' . self::getVersion() . '"></script>';
 	}
 	
 	private static function replace($url) {
@@ -26,25 +26,7 @@ class Cdn {
 		}
 		return $url;
 	}
-	
-	private static function assetTag($ext) {
-		ob_start();
-		if ($ext == 'css') {
-			stylesheet_link_tag();
-		} elseif ($ext == 'js') {
-			javascript_include_tag();	
-		}
-		$html = ob_get_clean();
 		
-		$html = str_replace(
-			'.' . $ext, 
-			'.' . $ext . '?v=' . self::getVersion(), 
-			$html
-		);
-		
-		return self::replace($html);
-	}
-	
 	private static function getVersion() {
 		// Using timestamp of the .git directory as version number
 		return filemtime(base_path('.git'));
