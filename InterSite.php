@@ -13,10 +13,6 @@ class InterSite {
 	const PRODUCTION = 'Produção';
 	const DEVELOPMENT = 'Desenvolvimento';
 	
-	const HOST_MAIN = 'main';
-	const HOST_ALIAS = 'alias';
-	const HOST_REMOTE = 'remote';
-	
 	/**
 	 * Array of servers for this site.
 	 * @var array
@@ -32,11 +28,6 @@ class InterSite {
 	 * @var object
 	 */
 	public $server;
-	/**
-	 * Current server type: 'main', 'alias' or 'remote'.
-	 * @var string
-	 */
-	public $hostType;
 	/**
 	 * Current Database.
 	 * @var object
@@ -130,31 +121,14 @@ class InterSite {
 		if (isset($this->servers[$host])) {
 			$this->server = $this->servers[$host];
 		}
-		$this->hostType = self::HOST_MAIN;
 		
 		// Not Found, searching aliases
 		if (!$this->server) {
 			foreach ($this->servers as $server) {
-				if ($jp7_app) {
-					// InterAdmin Remote
-					$remotes = $server->interadmin_remote;
-					if (in_array($host, $remotes) || in_array('www.' . $host, $remotes)) {
-						$this->server = $this->servers[$host] = $server;
-						$this->interadmin_remote = $host;
-						$this->hostType = self::HOST_REMOTE;
-						break;
-					}
-				}				
 				// Domínios Alternativos - Não redirecionam
 				if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
 					$this->server = $this->servers[$host] = $server;
 					$this->server->host = $host;
-					break;
-				}
-				// Aliases - Redirecionam
-				if (in_array($host, $server->aliases)) {
-					$this->server = $this->servers[$host] = $server;
-					$this->hostType = self::HOST_ALIAS;
 					break;
 				}
 			}
@@ -169,10 +143,6 @@ class InterSite {
 		if ($this->server) {
 			// Set variables that depend on the server
 			$this->db = clone $this->server->db;
-			if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
-				$this->db->host = $this->db->host_internal;
-			}
-			
 			$this->db->prefix = 'interadmin_' . $this->name_id;
 
 			foreach ((array) $this->server->vars as $var => $value) {
@@ -196,13 +166,10 @@ class InterSite {
 		$host = self::getHost(); 
 		$this->init($host);
 		
-		if ($this->hostType === self::HOST_ALIAS) {
-			header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
-			header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
-			exit;
-		}
 		if (!$this->server) {
-			throw new Exception('No settings for host: ' . $host);
+			header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
+			header('Location: http://' . $this->servers[0]->host . $_SERVER['REQUEST_URI']);
+			exit;
 		}
 		
 		self::setConfig($this);
