@@ -32,7 +32,7 @@ trait Downloadable {
 		}
 		// remove query string
 		$path = $parsed['path']; 
-		return str_replace('../../upload/', storage_path('upload/'), $path);
+		return str_replace('../../upload/', public_path('upload/'), $path);
 	}
 	
 	/**

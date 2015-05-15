@@ -36,7 +36,7 @@ class ImgResize {
 		}
 		
 		$local = to_slug(dirname($url)) . '_' . basename($url);
-		$dir = storage_path('upload/_external');
+		$dir = public_path('upload/_external');
 		
 		if (!is_file($dir . '/' . $local)) {
 			if ($file = @file_get_contents($url)) {
