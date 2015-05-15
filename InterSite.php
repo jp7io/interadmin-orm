@@ -167,8 +167,9 @@ class InterSite {
 		$this->init($host);
 		
 		if (!$this->server) {
+			$production = reset($this->servers);
 			header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
-			header('Location: http://' . $this->servers[0]->host . $_SERVER['REQUEST_URI']);
+			header('Location: http://' . $production->host . $_SERVER['REQUEST_URI']);
 			exit;
 		}
 		
