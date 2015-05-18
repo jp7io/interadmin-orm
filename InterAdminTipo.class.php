@@ -434,7 +434,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin 	First InterAdmin object found.
 	 */
 	public function findById($id, $options = array()) {
-		$options['where'][] = "id = " . intval($id);
+		$options['where'][] = "id = " . intval((string) $id);
+		
 		return $this->findFirst($options);
 	}
 	/**
