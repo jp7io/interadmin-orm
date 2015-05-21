@@ -14,8 +14,12 @@ class ImgResize {
 		}
 		if (empty($options['title'])) {
 			$options['title'] = is_object($img) ? $img->getText() : '';
+			$options['title'] = $options['title'] ?: basename($url);
 		}
-		return Image::create($url, $options['title'], $options);
+		$px = Cdn::asset('img/px.gif');
+		$alt = $options['title'];
+		
+		return Image::create($px, $alt, $options)->data_src($url);
 	}
 	
 	public static function url($url, $template = null) {
