@@ -111,8 +111,11 @@ class Settings {
 	}
 	
 	public static function clearCache() {
+		if (!\App::environment('local')) {
+			return;
+		}
 		// Atualiza classmap e routes com CMD+SHIFT+R ou no terminal
-		if (PHP_SAPI === 'cli' || (\Request::server('HTTP_CACHE_CONTROL') && \App::environment('local'))) {
+		if (PHP_SAPI === 'cli' || \Request::server('HTTP_CACHE_CONTROL')) {
 			\Cache::forget('Interadmin.routes');
 			\Cache::forget('Interadmin.classMap');
 		}
