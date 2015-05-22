@@ -4,6 +4,55 @@ namespace Jp7\Laravel;
 use Blade, App, Input, Request, Cache;
 
 class Temp {
+	public static function handleException($exception, $code) {
+		$mensagem = $exception->getMessage() . '<br>' .
+			'FILE: ' . $exception->getFile() . ':' . $exception->getLine() . '<br><hr>';
+		
+		$lines = explode(PHP_EOL, file_get_contents($exception->getFile()));
+		$mensagem .= PHP_EOL;
+		$line = $exception->getLine();
+		$offset = max($line - 10, 0);
+				
+		$lines[$line - 1] .= ' // <--';
+		$lines = ($offset > 0 ? '<?php///' . PHP_EOL : '') . implode(PHP_EOL, array_slice($lines, $offset, 20));
+		
+		$code = highlight_string($lines, true);
+		if ($offset > 0) {
+			$code = str_replace('&lt;?php</span><span style="color: #FF8000">///<br />', '', $code);
+		}
+		$mensagem .= $code;
+		
+		$mensagem .=
+			'<hr /><br>URL: http://' . @$_SERVER['HTTP_HOST'] . @$_SERVER['REQUEST_URI'] . '<br>' .
+			'REFERER: ' . @$_SERVER['HTTP_REFERER'] . '<br>' .
+			'IP CLIENTE: ' . @$_SERVER['REMOTE_ADDR'] . '<br>' .
+			'IP SERVIDOR: ' . @$_SERVER['SERVER_ADDR'] . '<br>' .
+			'USER_AGENT: ' . @$_SERVER['HTTP_USER_AGENT'] . '<br>' .
+			'<hr /><br>' . 
+			nl2br($exception->getTraceAsString()) .
+			'<hr /><br>';
+		
+		if (!empty($_POST)) {
+			$mensagem .= 'POST: <pre>' . print_r($_POST, true) . '</pre><br>';	
+		}
+		if (!empty($_GET)) {
+			$mensagem .= 'GET: <pre>' . print_r($_GET, true) . '</pre><br>';
+		}
+		if (!empty($_SESSION)) {
+			$mensagem .= 'SESSION: <pre>' . print_r($_SESSION, true) . '</pre><br>';
+		}
+		if (!empty($_COOKIE)) {
+			$mensagem .= 'COOKIE: <pre>' . print_r($_COOKIE, true) . '</pre><br>';
+		}
+		
+		$subject = '[ci][Site][Erro] ' . $exception->getMessage();
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+		
+		mail('debug@jp7.com.br', $subject, $mensagem, $headers);
+		
+	    return error_controller('error');
+	}
 	
 	public static function extendBlade() {
 		Blade::extend(function($view, $compiler) {
