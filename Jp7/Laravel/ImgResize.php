@@ -4,7 +4,18 @@ namespace Jp7\Laravel;
 
 use HtmlObject\Image;
 
-class ImgResize {
+class ImgResize extends Image {
+	
+	private static $lazy = false;
+	
+	public static function getLazy() {
+		return static::$lazy;
+	}
+	
+	public static function setLazy($lazy) {
+		static::$lazy = (bool) $lazy;
+	}
+	
 	public static function tag($img, $template = null, $options = array()) {
 		if (!$img) return;
 		
@@ -16,10 +27,13 @@ class ImgResize {
 			$options['title'] = is_object($img) ? $img->getText() : '';
 			$options['title'] = $options['title'] ?: basename($url);
 		}
-		$px = Cdn::asset('img/px.gif');
 		$alt = $options['title'];
 		
-		return Image::create($px, $alt, $options)->data_src($url);
+		if (static::$lazy) {
+			return self::create(Cdn::asset('img/px.gif'), $alt, $options)->data_src($url);
+		} else {			
+			return self::create($url, $alt, $options);
+		}
 	}
 	
 	public static function url($url, $template = null) {
@@ -51,6 +65,18 @@ class ImgResize {
 			}
 		}
 		return '/assets/_external/' . $local;
+	}
+	
+	public function __toString() {
+		$noscript = '';
+		if (static::$lazy) {
+			$attributes = $this->getAttributes();
+			$attributes['src'] = $attributes['data-src'];
+			unset($attributes['data-src']);
+			
+			$noscript = '<noscript>' . Image::create()->setAttributes($attributes) . '</noscript>';
+		}
+		return parent::__toString() . $noscript;
 	}
 
 }
