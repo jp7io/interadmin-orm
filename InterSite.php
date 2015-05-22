@@ -47,19 +47,6 @@ class InterSite {
 	protected static $instance = null;
 	
 	/**
-	 * Checks if it´s at a localhost or at the IPS 127.0.0.1 or 192.168.0.*. 
-	 * If the HTTP_HOST has a . (dot) like something.com, it will return false.
-	 *
-	 * @return bool
-	 */
-	public static function isAtLocalhost() {
-		if (empty($_SERVER['REMOTE_ADDR'])) {
-			return true;
-		}
-		return starts_with($_SERVER['REMOTE_ADDR'], '192.168.') || starts_with($_SERVER['REMOTE_ADDR'], '127.0.');
-	}
-	
-	/**
 	 * Checks if the server type is PRODUCAO.
 	 * @return bool
 	 */
@@ -133,12 +120,6 @@ class InterSite {
 				}
 			}
 		}
-		// Localhost
-		if (!$this->server && self::isAtLocalhost()) {
-			$this->server = $this->servers['localhost'];
-			$this->servers[$host] = $this->server;
-			$this->server->host = $host;
-		}
 		
 		if ($this->server) {
 			// Set variables that depend on the server
@@ -167,10 +148,17 @@ class InterSite {
 		$this->init($host);
 		
 		if (!$this->server) {
-			$production = reset($this->servers);
-			header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
-			header('Location: http://' . $production->host . $_SERVER['REQUEST_URI']);
-			exit;
+			$default = self::getDefaultHost();
+			if ($host != $default) {
+				$uri = 'http://' . self::getDefaultHost() . $_SERVER['REQUEST_URI'];
+				
+				header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
+				header('Location: ' . $uri . (str_contains($uri, '?') ? '&' : '?') . 'INTERSITE_REDIRECT');
+				exit;
+			} else {
+				throw new Exception('Settings not found on ./interadmin/config.php.' .
+					' Add a server or an alias_domain.');
+			}
 		}
 		
 		self::setConfig($this);
@@ -180,12 +168,22 @@ class InterSite {
 		if (isset($_SERVER['HTTP_HOST'])) {
 			return $_SERVER['HTTP_HOST'];
 		} else {
-			global $app;
-			
-			// PHPUnit não tem $app
-			$base = ($app ? $app['path.base'] : getcwd());
-			return trim(file_get_contents($base . '/interadmin/host'));
+			return self::getDefaultHost();	
 		}
+	}
+	
+	public static function getDefaultHost() {
+		global $app;
+		
+		// PHPUnit não tem $app
+		$base = ($app ? $app['path.base'] : getcwd());
+		$file = '/interadmin/host';
+		if (!is_file($base . $file)) {
+			throw new Exception('Settings not found on ".' . $file . 
+				'." Run: echo "example.com" > .' . $file);
+		}
+		
+		return trim(file_get_contents($base . $file));
 	}
 	
 	public static function __set_state($array) {
