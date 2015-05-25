@@ -25,5 +25,12 @@ class File extends Base {
 		
 		return $this->provider->getArquivos(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
 	}
-		
+	
+	public function build(array $attributes = array()) {
+		return $this->provider->deprecated_createArquivo($attributes);
+	}
+	
+	public function create(array $attributes = array()) {
+		return $this->build($attributes)->save();
+	}
 }

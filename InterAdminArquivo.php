@@ -173,6 +173,11 @@ class InterAdminArquivo extends InterAdminAbstract {
     function getAttributesCampos() {
 		return array();
     }
+    
+    public function getFillable() {
+    	return array('parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem');
+    }
+    
     function getAttributesNames() {
 		return array('id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted');
     }

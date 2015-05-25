@@ -361,8 +361,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		$arquivo->setParent($this);
 		$arquivo->setType($this->getType());
 		$arquivo->mostrar = 'S';
-		$arquivo->setAttributes($attributes);
-		return $arquivo;
+		
+		return $arquivo->fill($attributes);
 	}
 	/**
 	 * Retrieves the uploaded files of this record.
