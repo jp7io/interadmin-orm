@@ -577,6 +577,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		$siblingSlugs = $this->siblings()
 			->published(true)
 			->where('id_slug', 'REGEXP', '^' . $newSlug . '[0-9]*$')
+			->limit(1000) // Safety
 			->lists('id_slug');
 		
 		$i = 2;
