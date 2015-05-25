@@ -265,30 +265,30 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 
 	public function deprecated_distinct($column, $options = array()) {
-		return $this->_aggregate('DISTINCT', $column, $options);
+		return $this->deprecated_aggregate('DISTINCT', $column, $options);
 	}
 	
 	public function deprecated_max($column, $options = array()) {
-		$retorno = $this->_aggregate('MAX', $column, $options);
+		$retorno = $this->deprecated_aggregate('MAX', $column, $options);
 		return $retorno[0];
 	}
 	
 	public function deprecated_min($column, $options = array()) {
-		$retorno = $this->_aggregate('MIN', $column, $options);
+		$retorno = $this->deprecated_aggregate('MIN', $column, $options);
 		return $retorno[0];
 	}
 	
 	public function deprecated_sum($column, $options = array()) {
-		$retorno = $this->_aggregate('SUM', $column, $options);
+		$retorno = $this->deprecated_aggregate('SUM', $column, $options);
 		return $retorno[0];
 	}
 	
 	public function deprecated_avg($column, $options = array()) {
-		$retorno = $this->_aggregate('AVG', $column, $options);
+		$retorno = $this->deprecated_aggregate('AVG', $column, $options);
 		return $retorno[0];
 	}
 	
-	protected function _aggregate($function, $column, $options) {
+	public function deprecated_aggregate($function, $column, $options) {
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$options['fields'] = $function . '(' . $column . ') AS values';
@@ -583,7 +583,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->id_slug = to_slug($this->nome);
 		
 		// log
-		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
+		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' .
+			Request::ip() . chr(13) . $this->log;
 		
 		// Inheritance
 		$this->syncInheritance();

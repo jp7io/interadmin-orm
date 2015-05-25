@@ -549,7 +549,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		}
 		
 		// log
-		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . array_get($_SERVER, 'REMOTE_ADDR') . chr(13) . $this->log;
+		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . Request::ip() . chr(13) . $this->log;
 		// date_modify
 		$this->date_modify = date('c');
 		

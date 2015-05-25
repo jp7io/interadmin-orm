@@ -141,6 +141,61 @@ class Query extends Query\Base {
 		return $this->provider->count(InterAdmin::DEPRECATED_METHOD, $this->options);
 	}
 	
+	/**
+	 * Retrieve the minimum value of a given column.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function min($column)
+	{
+		return $this->aggregate(__FUNCTION__, array($column));
+	}
+
+	/**
+	 * Retrieve the maximum value of a given column.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function max($column)
+	{
+		return $this->aggregate(__FUNCTION__, array($column));
+	}
+
+	/**
+	 * Retrieve the sum of the values of a given column.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function sum($column)
+	{
+		$result = $this->aggregate(__FUNCTION__, array($column));
+
+		return $result ?: 0;
+	}
+
+	/**
+	 * Retrieve the average of the values of a given column.
+	 *
+	 * @param  string  $column
+	 * @return mixed
+	 */
+	public function avg($column)
+	{
+		return $this->aggregate(__FUNCTION__, array($column));
+	}
+	
+	protected function aggregate($function, $columns) {
+		$column = reset($columns);
+		$result = $this->provider->deprecated_aggregate($function, $column, $this->options);
+		
+		if ($result) {
+			return reset($result);
+		}
+	}
+	
 	public function find($id) {
 		if (func_num_args() != 1) throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 1.');
 		
