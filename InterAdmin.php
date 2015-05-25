@@ -529,27 +529,14 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 	 * @return void
 	 */
 	public function save() {
-		// id_slug
-		$columns = $this->getColumns();
-		
-		if (isset($this->varchar_key)) {
-			$alias_varchar_key = 'varchar_key';
-		} else {
-			$alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
-		}
-		if (isset($this->$alias_varchar_key)) {
-			/*
-			if (in_array('id_string', $columns)) {
-				$this->id_string = toId($this->$alias_varchar_key);
-			}
-			*/
-			if (in_array('id_slug', $columns)) {
-				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
-			}
+		if (empty($this->id_slug) && in_array('id_slug', $this->getColumns())) {
+			$this->id_slug = $this->generateSlug();
 		}
 		
 		// log
-		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . Request::ip() . chr(13) . $this->log;
+		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . Request::ip() . 
+			chr(13) . $this->log;
+		
 		// date_modify
 		$this->date_modify = date('c');
 		
@@ -565,28 +552,38 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface {
 		return parent::save();
 	}
 	
-	public function generateSlug($string) {
-		$newSlug = to_slug($string);
-		if (is_numeric($newSlug)) {
-			$newSlug = '--' . $newSlug;
+	public function generateSlug() {
+		if (isset($this->varchar_key)) {
+			$alias_varchar_key = 'varchar_key';
+		} else {
+			$alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
 		}
-		if ($this->id_slug === $newSlug) {
-			// Está igual, evitar query
-			return $newSlug; 
+		if (empty($this->$alias_varchar_key)) {
+			return;
 		}
-		$siblingSlugs = $this->siblings()
-			->published(true)
-			->where('id_slug', 'REGEXP', '^' . $newSlug . '[0-9]*$')
-			->limit(1000) // Safety
-			->lists('id_slug');
 		
-		$i = 2;
-		$newSlugCopy = $newSlug;
-		while (in_array($newSlug, $siblingSlugs)) {
-			$newSlug = $newSlugCopy . $i;
-			$i++;
+		$id_slug = to_slug($this->$alias_varchar_key);
+		if (is_numeric($id_slug)) {
+			$id_slug = '--' . $id_slug;
 		}
-		return $newSlug;
+		
+		$query = function() { 
+			return $this->siblings()->published(true);
+		};
+		
+		if ($query()->where('id_slug', $id_slug)->exists()) {
+			// Add an index if it already exists
+			$max = $query()
+				->where('id_slug', 'REGEXP', '^' . $id_slug . '[0-9]*$')
+				->max('id_slug');
+			
+			$next = preg_replace('~^' . $id_slug . '~', '', $max);
+			$next = max($next, 1) + 1;
+			
+			$id_slug = $id_slug . $next;
+		}
+		
+		return $id_slug;
 	}
 		
 	public function getAttributesNames() {
