@@ -730,7 +730,10 @@ class InterAdmin extends InterAdminAbstract {
 				$this->id_string = toId($this->$alias_varchar_key);
 			}
 			if (in_array('id_slug', $columns)) {
-				$this->id_slug = $this->generateSlug($this->$alias_varchar_key);
+				$this->getByAlias('id_slug');
+				if (empty($this->id_slug)) {
+					$this->id_slug = $this->generateSlug();
+				}
 			}
 		}
 		
@@ -748,35 +751,42 @@ class InterAdmin extends InterAdminAbstract {
 		return parent::save();
 	}
 
-	public function generateSlug($string) {
-		$this->getByAlias('id_slug');
-		$newSlug = toSlug($string);
-		if (is_numeric($newSlug)) {
-			$newSlug = '--' . $newSlug;
+	public function generateSlug() {
+		if (isset($this->varchar_key)) {
+			$alias_varchar_key = 'varchar_key';
+		} else {
+			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
 		}
-		if ($this->id_slug === $newSlug) {
-			// Está igual, evitar query
-			return $newSlug; 
+		if (empty($this->$alias_varchar_key)) {
+			return;
 		}
-		$where = array(
-			"id_slug REGEXP '^" . $newSlug . "[0-9]*$'"	
-		);
-		if ($this->id) {
-			$where[] = 'id <> ' . $this->id;
+			
+		$id_slug = toSlug($this->$alias_varchar_key);
+		if (is_numeric($id_slug)) {
+			$id_slug = '--' . $id_slug;
 		}
-		$siblingSlugs = $this->getTipo()->distinct('id_slug', array(
-			'where' => $where,
-			'use_published_filters' => true,
-			'order' => 'id'
-		));
 		
-		$i = 2;
-		$newSlugCopy = $newSlug;
-		while (in_array($newSlug, $siblingSlugs)) {
-			$newSlug = $newSlugCopy . $i;
-			$i++;
+		$exists = $this->getTipo()->findFirst([
+			'where' => ["id_slug = '" . addslashes($id_slug) . "'"],
+			'use_published_filters' => true
+		]);
+		if ($exists) {
+			// Add an index if it already exists
+			$max = $this->getTipo()->max('id_slug', [
+				'where' => [
+					"id_slug REGEXP '^" . addslashes($id_slug) . "[0-9]*$'",
+					($this->id ? 'id <> ' . $this->id : '1 = 1')
+				],
+				'use_published_filters' => true
+			]);
+				
+			$next = preg_replace('~^' . $id_slug . '~', '', $max);
+			$next = max($next, 1) + 1;
+			
+			$id_slug = $id_slug . $next;
 		}
-		return $newSlug;
+		
+		return $id_slug;
 	}
 	
 	public function getAttributesNames() {
