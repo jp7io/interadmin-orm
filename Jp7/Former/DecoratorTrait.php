@@ -5,6 +5,8 @@ namespace Jp7\Former;
 trait DecoratorTrait {
 	private $decorators = [];
 	
+	abstract public function __call($method, $arguments);	
+	
 	public function decorator() {
 		$decorator = new Decorator;
 		$this->decorators[] = $decorator;

@@ -58,5 +58,9 @@ class Collection extends BaseCollection {
 		}
 		return implode($glue, $items);
 	}
+	
+	public function keySort(\Closure $callback) {
+		uksort($this->items, $callback);
+	}
 
 }

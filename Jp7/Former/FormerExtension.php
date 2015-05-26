@@ -12,9 +12,11 @@ class FormerExtension {
 	use RowTrait, DecoratorTrait;
 	
 	private $model;
+	private $rules;
 	private $former;
 	
 	public function __construct(OriginalFormer $former) {
+		// Send missing validations to Debugbar
 		if ($errors = app()['session']->get('errors')) {
 			if (class_exists('Debugbar')) {
 				Debugbar::error($errors->all());
@@ -23,15 +25,18 @@ class FormerExtension {
 		
 		$this->former = $former;
 	}
-
+	
+	/**
+	 * Forward calls to Former and decorate fields
+	 */
 	public function __call($method, $arguments) {
 		$result = call_user_func_array([$this->former, $method], $arguments);
 
 		if ($result instanceof \Former\Traits\Field) {
 			$this->decorateField($result);
-
+			
 			if ($this->model) {
-				$this->decorateTypeField($result);
+				$this->decorateFieldInterAdmin($result);
 			}
 		}
 		return $result;
@@ -48,29 +53,35 @@ class FormerExtension {
 	public function populate($model) {
 		if ($model instanceof InterAdmin) {
 			$this->model = $model;	
+			$this->rules = $model->getRules();
 		}		
 		return $this->former->populate($model);
 	}
 	
+	/**
+	 * Add "rules" and "action" from InterAdmin
+	 */
 	public function open() {
 		$form = $this->former->open();
 		if ($this->model) {
-			$form->rules($this->model->getRules());
+			$form->rules($this->rules);
 			if ($this->model->getRoute('store')) {
 				$form->action($this->model->getUrl('store'));
 			}
 		}
 		return $form;
 	}
-
+	
 	public function close() {
 		$this->model = null;
 		
 		return $this->former->close();
 	}
 
-	private function decorateTypeField($field) {
-		// Settings from InterAdmin
+	/**
+	 * Set "label" and "options" from InterAdmin
+ 	 */
+	private function decorateFieldInterAdmin($field) {
 		if (!$alias = $field->getName()) {
 			return;
 		}
@@ -93,6 +104,13 @@ class FormerExtension {
 		// Populate options
 		if (starts_with($name, 'select_')) {
 			$this->populateOptions($field, $campo['nome']);
+		}
+		
+		if (isset($this->rules[$alias])) {
+			if (in_array('name_and_surname', $this->rules[$alias])) {
+				$field->pattern('\S+ +\S.*')
+					->title('Preencha nome e sobrenome');
+			}
 		}
 	}
 
