@@ -102,6 +102,7 @@ class Jp7_InterAdmin_Util {
 		foreach ($records as $record) {
 			$returnId = array('id' => $record->id);
 			unset($record->id);
+			unset($record->id_slug);
 			
 			$record->setParent($parent);
 			$record->setTipo($tipoObj);
@@ -127,6 +128,7 @@ class Jp7_InterAdmin_Util {
 			
 			foreach ($tipo_children as $child) {
 				unset($child->id);
+				unset($child->id_slug);
 				
 				$child->setParent($record);
 				$child->setTipo($child_tipo);
