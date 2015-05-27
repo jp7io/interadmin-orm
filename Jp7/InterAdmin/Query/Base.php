@@ -340,4 +340,15 @@ abstract class Base {
 		$this->options['with'] = func_get_args();
 		return $this;
 	}	
+	
+	public function paginate($perPage = null) {
+		$totalItems = $this->count();
+		
+		$page = \Paginator::getCurrentPage();
+		$items = $this->skip(($page - 1) * $perPage)
+			->take($perPage)
+			->all();
+		
+		return \Paginator::make($items->all(), $totalItems, $perPage);
+	}
 }
