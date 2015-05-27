@@ -2,7 +2,6 @@
 
 namespace Jp7\Laravel\Controller;
 
-use Jp7_InterAdmin_Exception as InterAdminException;
 use Route, InterAdminTipo, InterAdmin;
 
 trait RecordTrait {
@@ -28,7 +27,7 @@ trait RecordTrait {
 		if ($type = end($breadcrumb)) {
 			$parent = $type->getParent();
 			if ($parent instanceof InterAdmin && !$parent->hasChildrenTipo($type->id_tipo)) {
-				throw new InterAdminException('It seems this route has a'
+				throw new \Exception('It seems this route has a'
 					. ' special structure. You need to define a custom '
 					. 'setScope() to handle this.');
 			}
@@ -50,7 +49,7 @@ trait RecordTrait {
 
 	public function setType() {
 		if (!$this->scope) {
-			throw new InterAdminException('setScope() could not resolve the'
+			throw new \Exception('setScope() could not resolve the'
 				. ' type associated with this URI. You need to map it on routes.php.'
 				. ' You can also define a custom setScope() or setType()');
 		}
