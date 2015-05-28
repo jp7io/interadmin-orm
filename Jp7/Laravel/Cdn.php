@@ -11,8 +11,8 @@ class Cdn {
 		return '<link href="' . self::asset($url) . '?v=' . self::getVersion() . '"  rel="stylesheet" type="text/css">';
 	}
 	
-	public static function js($url) {
-		return '<script src="' . self::asset($url) . '?v=' . self::getVersion() . '"></script>';
+	public static function js($url, $attrs = "") {
+		return '<script src="' . self::asset($url) . '?v=' . self::getVersion() . '" ' . $attrs . '></script>';
 	}
 	
 	private static function replace($url) {
