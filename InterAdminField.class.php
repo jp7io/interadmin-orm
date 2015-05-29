@@ -247,7 +247,7 @@ class InterAdminField {
 				switch($xtra){
 					case "id": // ID
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
-						if ($id && !$s_user['sa']) $onkeypress .= " disabled=\"disabled\""; // Impede alteração
+						if ($id && !$s_user['admin']) $onkeypress .= " disabled=\"disabled\""; // Impede alteração
 						break;
 					case "id_email": // ID E-Mail
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
