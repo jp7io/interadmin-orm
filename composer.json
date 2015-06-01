@@ -1,0 +1,26 @@
+{
+	"name": "jp7internet/classes",
+	"description": "JP7 Classes",
+	"keywords": [],
+	"license": "proprietary",
+	"repositories" : [
+       
+    ],
+	"require": {
+		
+	},
+	"require-dev": {
+		
+	},
+	"autoload": {
+		
+	},
+	"scripts": {
+		
+	},
+	"config": {
+		"preferred-install": "dist",
+		"component-dir": "vendor/components-installed"
+	},
+	"minimum-stability": "stable"
+}
