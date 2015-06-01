@@ -13,8 +13,11 @@
 		
 	},
 	"autoload": {
-	   "psr-4": {
-            "Jp7\\": "Jp7/"
+		"classmap": [
+			"legacy",
+	   	],
+	   	"psr-4": {
+			"Jp7\\": "Jp7/"
         }
 	},
 	"scripts": {
