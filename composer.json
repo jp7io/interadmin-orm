@@ -13,7 +13,9 @@
 		
 	},
 	"autoload": {
-		
+	   "psr-4": {
+            "Jp7\\": "Jp7/"
+        }
 	},
 	"scripts": {
 		
@@ -22,5 +24,5 @@
 		"preferred-install": "dist",
 		"component-dir": "vendor/components-installed"
 	},
-	"minimum-stability": "stable"
+	"minimum-stability": "dev"
 }
