@@ -13,13 +13,16 @@ class Settings {
 		self::errorHandling();
 		self::checkConfig();
 		
-		spl_autoload_register([DynamicLoader::class, 'load']);
-
+		if (\Schema::hasTable('_tipos')) {
+			spl_autoload_register([DynamicLoader::class, 'load']);
+		}
+		
 		BladeExtension::apply();
+		self::testingEnv();
 		self::extendWhoops();
 		self::extendFormer();
 		self::extendView();
-		self::clearCache();			
+		self::clearInterAdminCache();			
 	}	
 		
 	public static function checkConfig() {
@@ -29,15 +32,21 @@ class Settings {
 		}
 	}
 	
+	public static function testingEnv() {
+		if (\App::environment('testing')) {
+			\Route::enableFilters();
+		}
+	}
+	
 	public static function errorHandling() {
 		if (PHP_SAPI !== 'cli') {
 			\App::error(function(\Exception $exception, $code) {
 				\Log::error($exception);
 				
-				if (\App::environment() != 'local') {
+				if (\App::environment('production')) {
 					ExceptionHandler::handle($exception);
 					return error_controller('error');
-				}	
+				}
 			});
 			
 			// POST em pagina que aceita GET
@@ -66,6 +75,9 @@ class Settings {
 	public static function extendFormer() {
 		\App::before(function($request) {
 			// Needed for tests
+			if (!\Request::hasSession()) {
+				\Request::setSession(\App::make('session.store'));
+			}
 			\Former::getFacadeRoot()->ids = [];
 		});	
 		
@@ -110,7 +122,7 @@ class Settings {
 		}
 	}
 	
-	public static function clearCache() {
+	public static function clearInterAdminCache() {
 		if (!\App::environment('local')) {
 			return;
 		}
