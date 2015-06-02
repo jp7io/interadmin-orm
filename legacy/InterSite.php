@@ -173,17 +173,11 @@ class InterSite {
 	}
 	
 	public static function getDefaultHost() {
-		global $app;
-		
-		// PHPUnit não tem $app
-		$base = ($app ? $app['path.base'] : getcwd());
-		$file = '/interadmin/host';
-		if (!is_file($base . $file)) {
-			throw new Exception('Settings not found on ".' . $file . 
-				'." Run: echo "example.com" > .' . $file);
+		if (!$host = getenv('INTERADMIN_HOST')) {
+			throw new Exception('Undefined environment variable: INTERADMIN_HOST.');
 		}
 		
-		return trim(file_get_contents($base . $file));
+		return $host;
 	}
 	
 	public static function __set_state($array) {
