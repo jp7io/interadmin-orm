@@ -34,7 +34,13 @@ class Settings {
 	
 	public static function testingEnv() {
 		if (\App::environment('testing')) {
+			// Filters are disabled by default
 			\Route::enableFilters();
+			
+			// Bug former with phpunit
+			if (!\Request::hasSession()) {
+				\Request::setSession(\App::make('session.store'));
+			}
 		}
 	}
 	
@@ -75,9 +81,6 @@ class Settings {
 	public static function extendFormer() {
 		\App::before(function($request) {
 			// Needed for tests
-			if (!\Request::hasSession()) {
-				\Request::setSession(\App::make('session.store'));
-			}
 			\Former::getFacadeRoot()->ids = [];
 		});	
 		
