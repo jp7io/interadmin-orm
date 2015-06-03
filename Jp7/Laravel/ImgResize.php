@@ -56,7 +56,7 @@ class ImgResize extends Image {
 		$local = to_slug(dirname($url)) . '_' . basename($url);
 		$dir = public_path('upload/_external');
 		
-		if (!is_file($dir . '/' . $local)) {
+		if (!is_file($dir . '/' . $local) && !\App::environment('testing')) {
 			if ($file = @file_get_contents($url)) {
 				if (!is_dir($dir)) {
 					mkdir($dir);
