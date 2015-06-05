@@ -347,6 +347,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
+		$id_tipo = (string) $id_tipo;
 		if (empty($this->_childrenTipos[$id_tipo])) {
 			if (!$options['db_prefix']) {
 				$options['db_prefix'] = $this->getTipo()->db_prefix;
