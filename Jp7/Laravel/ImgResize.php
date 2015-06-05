@@ -37,6 +37,10 @@ class ImgResize extends Image {
 	}
 	
 	public static function url($url, $template = null) {
+		if (\App::environment('testing')) {
+			return '/img/px.gif';
+		}
+		
 		if (is_object($url)) {
 			$url = $url->getUrl();
 		}
