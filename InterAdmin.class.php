@@ -68,9 +68,9 @@ class InterAdmin extends InterAdminAbstract {
 	public function __construct($id = '0', $options = array()) {
 		$id = (string) $id;
 		$this->id = is_numeric($id) ? $id : '0';
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		$this->table = ($options['table']) ? '_' . $options['table'] : '';
-		$this->_db = $options['db'];
+		$this->db_prefix = empty($options['db_prefix']) ? $GLOBALS['db_prefix'] : $options['db_prefix'];
+		$this->table = empty($options['table']) ? '' : '_' . $options['table'];
+		$this->_db = @$options['db'];
 		
 		if ($options['fields'] && $this->id) {
 			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
@@ -95,7 +95,7 @@ class InterAdmin extends InterAdminAbstract {
 			$options['default_class'] = 'InterAdmin';
 		}
 		// Classe não foi forçada, descobrir a classe do Tipo
-		if (!$options['class']) {
+		if (empty($options['class'])) {
 			if (!$tipo) {
 				$instance = new $options['default_class']($id, $optionsWithoutFields);
 				$tipo = $instance->getTipo();
@@ -103,7 +103,7 @@ class InterAdmin extends InterAdminAbstract {
 			$options['class'] = $tipo->class;
 		}
 		// Classe foi descoberta
-		if ($instance && $options['class'] == get_class($instance)) {
+		if (!empty($instance) && $options['class'] == get_class($instance)) {
 			// Classe do objeto temporário já está correta
 			$finalInstance = $instance;
 		} else {
@@ -117,7 +117,7 @@ class InterAdmin extends InterAdminAbstract {
 			$finalInstance->setDb($tipo->getDb());
 		}
 		// Fields		
-		if ($options['fields']) {
+		if (!empty($options['fields'])) {
 			$finalInstance->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 		return $finalInstance;
@@ -130,12 +130,12 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected function _findChild($nome_id) {
 		$children = $this->getTipo()->getInterAdminsChildren();
-		if (!$children[$nome_id]) {
+		if (empty($children[$nome_id])) {
 			$nome_id = explode('_', Jp7_Inflector::underscore($nome_id));
 			$nome_id[0] = Jp7_Inflector::plural($nome_id[0]);
 			$nome_id = Jp7_Inflector::camelize(implode('_', $nome_id));
 		}
-		if (!$children[$nome_id]) {
+		if (empty($children[$nome_id])) {
 			$nome_id = Jp7_Inflector::plural($nome_id);
 		}
 		return $children[$nome_id];
@@ -204,7 +204,7 @@ class InterAdmin extends InterAdminAbstract {
 		} elseif (strpos($methodName, 'create') === 0) {
 			$nome_id = substr($methodName, strlen('create')); 
 			if ($child = $this->_findChild($nome_id)) {
-				return $this->createChild($child['id_tipo'], (array) $args[0]);
+				return $this->createChild($child['id_tipo'], (array) @$args[0]);
 			}
 		// delete{ChildName}
 		} elseif (strpos($methodName, 'delete') === 0) {
@@ -349,7 +349,7 @@ class InterAdmin extends InterAdminAbstract {
 	public function getChildrenTipo($id_tipo, $options = array()) {
 		$id_tipo = (string) $id_tipo;
 		if (empty($this->_childrenTipos[$id_tipo])) {
-			if (!$options['db_prefix']) {
+			if (empty($options['db_prefix'])) {
 				$options['db_prefix'] = $this->getTipo()->db_prefix;
 			}
 			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdminTipo';

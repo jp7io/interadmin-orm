@@ -102,10 +102,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		// id_tipo must be a string, because in_array will not work with integers and an array of objects
 		$id_tipo = (string) $id_tipo;
 		$this->id_tipo = is_numeric($id_tipo) ? $id_tipo : '0';
-		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		$this->_db = $options['db'];
+		$this->db_prefix = empty($options['db_prefix']) ? $GLOBALS['db_prefix'] : $options['db_prefix'];
+		$this->_db = @$options['db'];
 		
-		if ($options['fields']) {
+		if (!empty($options['fields'])) {
 			$this->getFieldsValues($options['fields']);
 		}
 	}
@@ -135,7 +135,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (!$options['default_class']) {
 			$options['default_class'] = self::$_defaultClass;
 		}
-		if ($options['class']) {
+		if (!empty($options['class'])) {
 			// Classe foi forçada
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
@@ -146,7 +146,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$class_name = $instance->class_tipo;
 			// Classe não é customizada, retornar a própria classe temporária
 			if (!class_exists($class_name)) {
-				if ($options['fields']) {
+				if (!empty($options['fields'])) {
 					$instance->getFieldsValues($options['fields']);
 				}
 				return $instance;
@@ -163,7 +163,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			if (is_array($fields)) {
 				return $values;
 			} else {
-				return $values->$fields;
+				return @$values->$fields;
 			}
 		}
 		return parent::getFieldsValues($fields);
@@ -889,10 +889,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $table;
 	}	
 	protected function _setMetadata($varname, $value) {
-		self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
+		$db = $this->getDb();
+
+		self::$_metadata[$db->host . '/' . $db->database . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
 	}
 	protected function _getMetadata($varname) {
-		return self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname];
+		$db = $this->getDb();
+		
+		return @self::$_metadata[$db->host . '/' . $db->database . '/' . $this->db_prefix][$this->id_tipo][$varname];
 	}
 	/**
 	 * Returns metadata about the children tipos that the InterAdmins have.
@@ -1111,7 +1115,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->_whereArrayFix($options['where']); // FIXME
 		
 		$optionsInstance = array(
-			'class' => $options['class'],
+			'class' => @$options['class'],
 			'default_class' => static::DEFAULT_NAMESPACE . 'InterAdmin'
 		);
 		
@@ -1127,7 +1131,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
 		}
 		$options['from'] = $recordModel->getTableName() . " AS main";
-		$options['order'] = $this->getInterAdminsOrder($options['order']);
+		$options['order'] = $this->getInterAdminsOrder(@$options['order']);
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();

@@ -43,6 +43,7 @@ class Jp7_Inflector {
 	 * @return string
 	 */
 	public static function plural($word, $itens = null) {
+		$prefix = '';
 		if (is_null($itens)) {
 			$itens = 0;
 		} else {

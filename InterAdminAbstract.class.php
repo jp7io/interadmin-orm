@@ -163,7 +163,7 @@ abstract class InterAdminAbstract implements Serializable {
 			}
 			return (object) array_intersect_key($this->attributes, array_flip($fields));
 		} else {
-			return $this->attributes[$fields];
+			return @$this->attributes[$fields];
 		}
 	}
 	
@@ -226,7 +226,7 @@ abstract class InterAdminAbstract implements Serializable {
 		$aliases = array_flip($this->getAttributesAliases());
 		
 		foreach ($attributes as $key => $value) {
-			$key = ($aliases[$key]) ? $aliases[$key] : $key;
+			$key = isset($aliases[$key]) ? $aliases[$key] : $key;
 			switch (gettype($value)) {
 				case 'object':
 					$valuesToSave[$key] = (string) $value;
@@ -367,7 +367,7 @@ abstract class InterAdminAbstract implements Serializable {
 				foreach ($options['from'] as $key => $from) {
 					list($table, $alias) = explode(' AS ', $from);
 					if ($alias == 'main') {
-						if (!$options['skip_published_filters'] || !in_array('main', $options['skip_published_filters'])) {
+						if (!@$options['skip_published_filters'] || !in_array('main', $options['skip_published_filters'])) {
 							$filters = static::getPublishedFilters($table, 'main');
 						}						
 					} else {
@@ -380,7 +380,7 @@ abstract class InterAdminAbstract implements Serializable {
 			}
 			
 		    $joins = '';
-		    if ($options['joins']) {
+		    if (!empty($options['joins'])) {
 			    foreach ($options['joins'] as $alias => $join) {
 				    list($joinType, $tipo, $on) = $join;
 				    $table = $tipo->getInterAdminsTableName();
@@ -395,9 +395,9 @@ abstract class InterAdminAbstract implements Serializable {
 				" FROM " . implode(' LEFT JOIN ', $options['from']) .
 			    $joins .
 				" WHERE " . $filters . $clauses .
-				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+				(!empty($options['limit']) ? " LIMIT " . $options['limit'] : '');
 			// Debug
-			if ($debugger->debugSql || $options['debug']) {
+			if ($debugger->debugSql || !empty($options['debug'])) {
 				$debugger->startTime();
 			}
 			// Run SQL
@@ -410,11 +410,11 @@ abstract class InterAdminAbstract implements Serializable {
 				die(jp7_debug($erro, $sql));
 			}
 			
-			if ($debugger->debugSql || $options['debug']) {
+			if ($debugger->debugSql || !empty($options['debug'])) {
 				$time = $debugger->getTime($options['debug']);
 				$debugger->showSql($sql, $time, $options['debug']);
 			}
-			$select_multi_fields = $options['select_multi_fields'];			
+			$select_multi_fields = @$options['select_multi_fields'];			
 			/*
 			if ($cache) {
 				$rs = $cache->save($rs);
@@ -431,10 +431,10 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters) {
 		// Group by para wheres com children
-		if (!$options['group'] && strpos($options['fields'][0], 'DISTINCT') === false) {
+		if (empty($options['group']) && strpos(@$options['fields'][0], 'DISTINCT') === false) {
 			// strpos por Performance
 			if (
-				(strpos($options['where'] . ' ' . $options['order'], 'children_') !== false || strpos($options['where'] . ' ' . $options['order'], 'tags.') !== false) &&
+				(strpos($options['where'] . ' ' . @$options['order'], 'children_') !== false || strpos($options['where'] . ' ' . @$options['order'], 'tags.') !== false) &&
 				strpos($options['where'], 'EXISTS ') === false
 			) {
 				$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
@@ -449,9 +449,9 @@ abstract class InterAdminAbstract implements Serializable {
 			}
 		}
 		$clause = $options['where'] .
-			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
-			(($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
-			(($options['order']) ? " ORDER BY " . $options['order'] : '');
+			(!empty($options['group']) ? " GROUP BY " . $options['group'] : '') .
+			(!empty($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
+			(!empty($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
 		return $this->_resolveSql($clause, $options, $use_published_filters);
 	}
@@ -545,7 +545,7 @@ abstract class InterAdminAbstract implements Serializable {
 					list($table, $termo, $subtermo) = explode('.', $termo);
 				}
 				if ($table === 'main') {
-					$campo = ($aliases[$termo]) ? $aliases[$termo] : $termo;
+					$campo = isset($aliases[$termo]) ? $aliases[$termo] : $termo;
 				} else {
 					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
 					if ($table == 'tags') {
@@ -689,7 +689,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$fields[$join] = $this->_resolveSql($campo, $options, true) . ' AS `' . $table . $aggregateAlias . '`';
 			// Sem join
 			} else {
-				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
+				$nome = isset($aliases[$campo]) ? $aliases[$campo] : $campo;
 				if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
 					if (strpos($campo, 'file_') === 0) {
 						// necessário para quando o parametro fields está sem alias, mas o retorno está com alias
@@ -745,18 +745,18 @@ abstract class InterAdminAbstract implements Serializable {
 		$attributes = &$object->attributes;
 
 		foreach ($row as $key => $value) {
-			list($table, $field) = explode('.', $key);
+			@list($table, $field) = explode('.', $key);
 			if (!$field) {
 				$field = $table;
 				$table = 'main';
 			} 
 			if ($table == 'main') {
-				$alias = ($aliases[$field]) ? $aliases[$field] : $field;
-				$value = $this->_getByForeignKey($value, $field, $campos[$field], $object);
-				if (is_object($attributes[$alias])) {
+				$alias = isset($aliases[$field]) ? $aliases[$field] : $field;
+				$value = $this->_getByForeignKey($value, $field, @$campos[$field], $object);
+				if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
 					continue;
 				}
-				if ($options['select_multi_fields']) {
+				if (!empty($options['select_multi_fields'])) {
 					if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
 						$multi_options = $options['select_multi_fields'][$alias];
 						if ($multi_options) {
@@ -927,7 +927,7 @@ abstract class InterAdminAbstract implements Serializable {
 				" AND " . $alias . ".char_key <> ''" .
 				" AND " . $alias . ".deleted = ''".
 				" AND ";
-				if ($config->interadmin_preview && !$s_session['preview']) {
+				if ($config->interadmin_preview && empty($s_session['preview'])) {
 					$return .= "(" . $alias . ".publish <> '' OR " . $alias . ".parent_id > 0) AND ";	
 				} 
 			return $return;
@@ -947,7 +947,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return ADOConnection
 	 */
 	public function getDb() {
-		return ($this->_db) ? $this->_db : $GLOBALS['db'];
+		return empty($this->_db) ? $GLOBALS['db'] : $this->_db;
 	}
 	/**
 	 * Sets the database object.
