@@ -10,7 +10,8 @@ register_shutdown_function(function () {
     }
 });
 
-define('CACHE_ENABLED',
+define(
+    'CACHE_ENABLED',
     isset($_SERVER['HTTP_HOST']) &&
     $_SERVER['HTTP_HOST'] == CACHE_HOST &&
     strpos($_SERVER['REQUEST_URI'], '/assets') !== 0 &&
@@ -60,6 +61,16 @@ function error_controller($action)
     $request = Request::create('/error/'.$action, 'GET', array());
 
     return Route::dispatch($request);
+}
+
+function link_open($url, $attributes = array())
+{
+    return substr(link_to($url, '', $attributes), 0, -4);
+}
+
+function link_close()
+{
+    return '</a>';
 }
 
 function img_tag($img, $template = null, $options = array())
