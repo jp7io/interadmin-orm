@@ -2,16 +2,19 @@
 
 namespace Jp7;
 
-class RiskyArray implements \ArrayAccess {
+class RiskyArray implements \ArrayAccess
+{
     private $container = [];
-    
-    public function __construct(array $array = null) {
-    	if ($array) {
-        	$this->container = &$array;
+
+    public function __construct(array $array = null)
+    {
+        if ($array) {
+            $this->container = &$array;
         }
     }
-    
-    public function offsetSet($offset, $value) {
+
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->container[] = $value;
         } else {
@@ -19,15 +22,18 @@ class RiskyArray implements \ArrayAccess {
         }
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->container[$offset]);
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->container[$offset]);
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 }

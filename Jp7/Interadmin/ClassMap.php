@@ -2,70 +2,80 @@
 
 namespace Jp7\Interadmin;
 
-class ClassMap {
+class ClassMap
+{
+    private static $instance;
 
-	static private $instance;
+    private $classes;
+    private $classesTipos;
 
-	private $classes;
-	private $classesTipos;
+    private function __construct()
+    {
+        // singleton
+    }
 
-	private function __construct() {
-		// singleton
-	}
+    public static function getInstance()
+    {
+        // singleton
+        if (!self::$instance) {
+            self::$instance = \Cache::remember('Interadmin.classMap', 60, function () {
+                // cache instance
+                $instance = new self();
+                $instance->setClasses(self::loadMap('class'));
+                $instance->setClassesTipos(self::loadMap('class_tipo'));
+                // return cached instance
+                return $instance;
+            });
+        }
 
-	public static function getInstance() {
-		// singleton
-		if (!self::$instance) {
-			self::$instance = \Cache::remember('Interadmin.classMap', 60, function() {
-				// cache instance
-				$instance = new self();
-				$instance->setClasses(self::loadMap('class'));
-				$instance->setClassesTipos(self::loadMap('class_tipo'));
-				// return cached instance
-				return $instance;
-			});
-		}
-		return self::$instance;
-	}
+        return self::$instance;
+    }
 
-	private static function loadMap($attr) {
-		$tipos = \DB::table('_tipos')
-			->select($attr, 'id_tipo', 'inherited')
-			->where($attr, '<>', '')
-			->where('deleted_tipo', '=', '')
-			->where('mostrar', '<>', '')
-			->orderByRaw("inherited LIKE '%" . $attr. "%'")
-			->get();
-		
-		$arr = [];				
-		foreach ($tipos as $tipo) {
-			$arr[$tipo->id_tipo] = $tipo->$attr;
-		}
-		return $arr;
-	}
+    private static function loadMap($attr)
+    {
+        $tipos = \DB::table('_tipos')
+            ->select($attr, 'id_tipo', 'inherited')
+            ->where($attr, '<>', '')
+            ->where('deleted_tipo', '=', '')
+            ->where('mostrar', '<>', '')
+            ->orderByRaw("inherited LIKE '%".$attr."%'")
+            ->get();
 
-	public function setClasses(array $classes) {
-		$this->classes = $classes;
-	}
+        $arr = [];
+        foreach ($tipos as $tipo) {
+            $arr[$tipo->id_tipo] = $tipo->$attr;
+        }
 
-	public function setClassesTipos(array $classesTipos) {
-		$this->classesTipos = $classesTipos;
-	}
+        return $arr;
+    }
 
-	public function getClassIdTipo($class) {
-		return array_search($class, $this->classes);
-	}
+    public function setClasses(array $classes)
+    {
+        $this->classes = $classes;
+    }
 
-	public function getClassTipoIdTipo($classTipo) {
-		return array_search($classTipo, $this->classesTipos);
-	}
+    public function setClassesTipos(array $classesTipos)
+    {
+        $this->classesTipos = $classesTipos;
+    }
 
-	public function getClass($id_tipo) {
-		return isset($this->classes[$id_tipo]) ? $this->classes[$id_tipo] : null;
-	}
+    public function getClassIdTipo($class)
+    {
+        return array_search($class, $this->classes);
+    }
 
-	public function getClassTipo($id_tipo) {
-		return isset($this->classesTipos[$id_tipo]) ? $this->classesTipos[$id_tipo] : null;
-	}
+    public function getClassTipoIdTipo($classTipo)
+    {
+        return array_search($classTipo, $this->classesTipos);
+    }
 
+    public function getClass($id_tipo)
+    {
+        return isset($this->classes[$id_tipo]) ? $this->classes[$id_tipo] : null;
+    }
+
+    public function getClassTipo($id_tipo)
+    {
+        return isset($this->classesTipos[$id_tipo]) ? $this->classesTipos[$id_tipo] : null;
+    }
 }
