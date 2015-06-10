@@ -140,7 +140,7 @@ class Settings
             return;
         }
         // Atualiza classmap e routes com CMD+SHIFT+R ou no terminal
-        if (PHP_SAPI === 'cli' || \Request::server('HTTP_CACHE_CONTROL')) {
+        if (PHP_SAPI === 'cli' || \Request::server('HTTP_CACHE_CONTROL') === 'no-cache') {
             \Cache::forget('Interadmin.routes');
             \Cache::forget('Interadmin.classMap');
         }
