@@ -76,41 +76,50 @@ class Router extends \Illuminate\Routing\Router
     public function resource($name, $controller, array $options = array())
     {
         if (isset($options['id_tipo'])) {
+            if (is_numeric($options['id_tipo'])) {
+                $id_tipo = $options['id_tipo'];
+            } else {
+                $id_tipo = call_user_func([$options['id_tipo'], 'type'])->id_tipo;
+            }
+            
             // Saving routes for each id_tipo
             $groupRoute = str_replace('/', '.', $this->getLastGroupPrefix());
-            if (!array_key_exists($options['id_tipo'], $this->mapIdTipos)) {
-                $this->mapIdTipos[$options['id_tipo']] = ($groupRoute ? $groupRoute.'.' : '').$name;
+            if (!array_key_exists($id_tipo, $this->mapIdTipos)) {
+                $this->mapIdTipos[$id_tipo] = ($groupRoute ? $groupRoute . '.' : '') . $name;
             }
         }
         parent::resource($name, $controller, $options);
     }
 
-    public function type($name, $className_Or_IdTipo, $function = null)
+    public function type($name, $id_tipo, array $options = array(), $nestedFunction = null)
     {
-        if ($function) {
-            $this->group(['namespace' => studly_case($name), 'prefix' => $name], $function);
+        if ($nestedFunction) {
+            $this->group(['namespace' => studly_case($name), 'prefix' => $name], $nestedFunction);
         }
-        if (is_numeric($className_Or_IdTipo)) {
-            $type = InterAdminTipo::getInstance($className_Or_IdTipo);
+        
+        if ($name === '/') {
+            $controller = 'Index';
         } else {
-            $type = call_user_func([$className_Or_IdTipo, 'type']);
+            $controller = studly_case(str_replace('.', '\\ ', $name));
         }
-
-        $controller = studly_case(str_replace('.', '\\ ', $name)).'Controller';
-        $this->resource($name,  $controller, [
-            'id_tipo' => $type->id_tipo,
-            'only' => $type->getRouteActions(),
+        
+        $controller .= 'Controller';
+        
+        $this->resource($name, $controller, $options + [
+            'id_tipo' => $id_tipo,
+            'only'=> ['index', 'show']
         ]);
     }
 
     public function getRouteByIdTipo($id_tipo, $action = 'index')
     {
         if (!isset($this->mapIdTipos[$id_tipo])) {
-            throw new \Exception('There is no route registered for id_tipo: '.$id_tipo);
+            throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
         }
         $mappedRoute = $this->mapIdTipos[$id_tipo];
-
-        return $this->routes->getByName($mappedRoute.'.'.$action);
+        $routePrefix = ($mappedRoute != '/') ? $mappedRoute . '.' : '';
+        
+        return $this->routes->getByName($routePrefix . $action);
     }
 
     public function getIdTipoByRoute($route)
@@ -121,6 +130,7 @@ class Router extends \Illuminate\Routing\Router
     public function getTypeByRoute($routeName)
     {
         $id_tipo = $this->getIdTipoByRoute($routeName);
+        
         if (!$id_tipo) {
             return;
         }
