@@ -321,7 +321,9 @@ class InterSite {
 	 * @return void
 	 */
 	function __wakeup() {
-		$this->start(); // Backwards compatibility
+        if (self::$_wakeupEnabled) {
+		  $this->start(); // Backwards compatibility
+        }
 	}
 	
 	public static function __set_state($array) {
