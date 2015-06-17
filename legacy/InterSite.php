@@ -162,7 +162,8 @@ class InterSite
     {
         $host = self::getHost();
         $this->init($host);
-
+        
+        /*
         if (!$this->server) {
             $default = self::getDefaultHost();
             if ($host != $default) {
@@ -176,6 +177,7 @@ class InterSite
                     ' Add a server or an alias_domain.');
             }
         }
+        */
 
         self::setConfig($this);
     }
@@ -191,11 +193,7 @@ class InterSite
 
     public static function getDefaultHost()
     {
-        if (!$host = getenv('INTERADMIN_HOST')) {
-            throw new Exception('Undefined environment variable: INTERADMIN_HOST.');
-        }
-
-        return $host;
+        return getenv('INTERADMIN_HOST');
     }
 
     public static function __set_state($array)
