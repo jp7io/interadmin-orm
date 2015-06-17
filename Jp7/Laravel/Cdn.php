@@ -35,7 +35,7 @@ class Cdn
 
     private static function getVersion()
     {
-        // Using timestamp of the .git directory as version number
-        return filemtime(base_path('.git'));
+        // Using timestamp of the services.json as version number
+        return filemtime(storage_path('meta/services.json'));
     }
 }
