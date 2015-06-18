@@ -919,7 +919,7 @@ abstract class InterAdminAbstract implements Serializable
     public function delete()
     {
         $this->deleted = 'S';
-        $this->save();
+        return $this->save();
     }
     /**
      * Deletes this row from the table.
@@ -933,7 +933,7 @@ abstract class InterAdminAbstract implements Serializable
 
         $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
-        $db->table($table)
+        return $db->table($table)
             ->where($pk, $this->$pk)
             ->delete();
     }
