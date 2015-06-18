@@ -270,20 +270,30 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
      */
     public function getType($options = array())
     {
-        if (!$this->_tipo) {
-            if (!$id_tipo = $this->id_tipo) {
-                global $db;
-                $sql = 'SELECT id_tipo FROM '.$this->getTableName().' WHERE id = '.intval($this->id);
-                $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-                if ($row = $rs->FetchNextObj()) {
-                    $id_tipo = $row->id_tipo;
-                }
-            }
-            $this->setType(InterAdminTipo::getInstance($id_tipo, array(
-                'db' => $this->_db,
-                'class' => $options['class'],
-            )));
+        if ($this->_tipo) {
+            return $this->_tipo;
         }
+
+        $tipo = static::type();
+        if (!$tipo) {
+            if (empty($this->id_tipo)) {
+                $db = $this->getDb();
+                $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
+
+                $data = DB::table($table)
+                    ->select('id_tipo')
+                    ->where('id', $this->id)
+                    ->first();
+                    
+                $this->id_tipo = $data->id_tipo;
+            }
+            $tipo = InterAdminTipo::getInstance($this->id_tipo, array(
+                'db' => $this->_db,
+                'class' => empty($options['class']) ? null : $options['class'],
+            ));
+        }
+        
+        $this->setType($tipo);
 
         return $this->_tipo;
     }
@@ -655,11 +665,11 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
     }
     public function getTableName()
     {
-        if ($this->id_tipo) {
-            return $this->getType()->getInterAdminsTableName();
-        } else {
+        if (empty($this->id_tipo)) {
             // Compatibilidade, tenta encontrar na tabela global
-            return $this->getDb()->getTablePrefix().$this->table;
+            return $this->getDb()->getTablePrefix(). (isset($this->attributes['table']) ? $this->attributes['table'] : '');
+        } else {
+            return $this->getType()->getInterAdminsTableName();
         }
     }
     /**
