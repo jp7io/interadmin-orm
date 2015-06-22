@@ -28,7 +28,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public $table;
 	/**
-	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this recordÂ´s 'id_tipo'.
 	 * @var InterAdminTipo
 	 */
 	protected $_tipo;
@@ -84,7 +84,7 @@ class InterAdmin extends InterAdminAbstract {
 	 *
 	 * @param int $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class, default_class.
-	 * @param InterAdminTipo Set the record´s Tipo.
+	 * @param InterAdminTipo Set the recordÂ´s Tipo.
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
 	public static function getInstance($id, $options = array(), InterAdminTipo $tipo = null) {
@@ -94,7 +94,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$options['default_class']) {
 			$options['default_class'] = 'InterAdmin';
 		}
-		// Classe não foi forçada, descobrir a classe do Tipo
+		// Classe nÃ£o foi forÃ§ada, descobrir a classe do Tipo
 		if (empty($options['class'])) {
 			if (!$tipo) {
 				$instance = new $options['default_class']($id, $optionsWithoutFields);
@@ -104,10 +104,10 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// Classe foi descoberta
 		if (!empty($instance) && $options['class'] == get_class($instance)) {
-			// Classe do objeto temporário já está correta
+			// Classe do objeto temporÃ¡rio jÃ¡ estÃ¡ correta
 			$finalInstance = $instance;
 		} else {
-			// Classe é outra
+			// Classe Ã© outra
 			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
 			$finalInstance = new $class_name($id, $optionsWithoutFields);
 		}
@@ -215,7 +215,7 @@ class InterAdmin extends InterAdminAbstract {
 		} elseif ($child = $this->_findChild(ucfirst($methodName))) {
 			return $this->getChildrenTipo($child['id_tipo']);
 		}
-		// Default error when method doesn´t exist
+		// Default error when method doesnÂ´t exist
 		$message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
 		$children = $this->getTipo()->getInterAdminsChildren();
 		$patterns = array(
@@ -319,10 +319,10 @@ class InterAdmin extends InterAdminAbstract {
 	public function setParent(InterAdmin $parent = null) {
 		if (isset($parent)) {
 			if (!isset($parent->id)) {
-			$parent->id = 0; // Necessário para que a referência funcione
+			$parent->id = 0; // NecessÃ¡rio para que a referÃªncia funcione
 		}
 			if (!isset($parent->id_tipo)) {
-			$parent->id_tipo = 0; // Necessário para que a referência funcione
+			$parent->id_tipo = 0; // NecessÃ¡rio para que a referÃªncia funcione
 		}
 		}
 		$this->attributes['parent_id'] = &$parent->id;
@@ -361,7 +361,7 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->_childrenTipos[$id_tipo];
 	}
 	/**
-	 * Retrieves this record´s children for the given $id_tipo.
+	 * Retrieves this recordÂ´s children for the given $id_tipo.
 	 * 
 	 * @param int $id_tipo
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
@@ -680,10 +680,10 @@ class InterAdmin extends InterAdminAbstract {
 		}
 	}
 	/**
-	 * Returns this object´s varchar_key and all the fields marked as 'combo', if the field 
+	 * Returns this objectÂ´s varchar_key and all the fields marked as 'combo', if the field 
 	 * is an InterAdmin such as a select_key, its getStringValue() method is used.
 	 *
-	 * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
+	 * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - ParanÃ¡'.
 	 */
 	public function getStringValue() {
 		$campos = $this->getTipo()->getCampos();

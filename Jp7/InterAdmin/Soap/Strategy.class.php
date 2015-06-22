@@ -124,13 +124,13 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 		return $this->getContext()->getType($retorno);
 	}
 	/**
-	 * Helper da função _getCampoType
+	 * Helper da funÃ§Ã£o _getCampoType
 	 * 
 	 * @param InterAdminTipo $campoTipo
 	 * @param bool $isTipo
 	 * @param bool $isMulti
 	 * 
-	 * @return string Type para o WSDL a partir da classe que está no $campoTipo->class.
+	 * @return string Type para o WSDL a partir da classe que estÃ¡ no $campoTipo->class.
 	 */
 	protected function _getCampoTypeClass($campoTipo, $isTipo, $isMulti) {
 		if ($isTipo) {
@@ -156,7 +156,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
      */
      protected function _addElementFromWsdlAndChildTypes($arrayType, $childTypeName)
     {
-    	/* Código da ZEND - Não Alterar */
+    	/* CÃ³digo da ZEND - NÃ£o Alterar */
         if (!in_array($arrayType, $this->getContext()->getTypes())) {
             $dom = $this->getContext()->toDomDocument();
 

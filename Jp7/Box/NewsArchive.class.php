@@ -19,7 +19,7 @@ class Jp7_Box_NewsArchive extends Jp7_Box_BoxAbstract {
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
     protected function _getEditorTitle() {
-        return 'Histórico de Notícias';
+        return 'HistÃ³rico de NotÃ­cias';
     }
 
 }

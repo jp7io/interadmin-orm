@@ -1,7 +1,7 @@
 <?php
 
 /**
- * É usado para simular um parâmetro de cada método no WebService.
+ * Ã‰ usado para simular um parÃ¢metro de cada mÃ©todo no WebService.
  */
 class Jp7_InterAdmin_Soap_ReflectionParameter {
 	

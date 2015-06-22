@@ -151,7 +151,7 @@ class Jp7_InterAdmin_Util {
 		$bind_children = false;
 				
 		if ($tipoDestino->getInterAdminsTableName() != $tipoObj->getInterAdminsTableName()) {
-			throw new Exception('N„o È possÌvel copiar para tipos com tabela customizada.');
+			throw new Exception('N√£o √© poss√≠vel copiar para tipos com tabela customizada.');
 		}
 		
 		$beforCopyEvent = InterAdmin_Event_BeforeCopy::getInstance();
@@ -162,7 +162,7 @@ class Jp7_InterAdmin_Util {
 		
 		foreach ($registros as $registro) {
 			if ($tipoObj->id_tipo == $tipoDestino->id_tipo) {
-				$registro->varchar_key = 'CÛpia de ' . $registro->varchar_key;
+				$registro->varchar_key = 'C√≥pia de ' . $registro->varchar_key;
 			}
 			$registro->publish = '';
 		}
@@ -203,7 +203,7 @@ class Jp7_InterAdmin_Util {
 	}
 	
 	/**
-	 * Helper da funÁ„o _getCampoType
+	 * Helper da fun√ß√£o _getCampoType
 	 *
 	 * @param InterAdminTipo $campoTipo
 	 * @param bool $isTipo
@@ -332,12 +332,12 @@ STR;
 			$retorno = file_put_contents($arquivo, $conteudo);
 			@chmod($arquivo, 0777);
 			if ($retorno === false) {
-				$avisos['erro'][] = 'N„o foi possÌvel gravar arquivo: "' . $arquivo . '". Verifique permissıes no diretÛrio.';
+				$avisos['erro'][] = 'N√£o foi poss√≠vel gravar arquivo: "' . $arquivo . '". Verifique permiss√µes no diret√≥rio.';
 			} else {
 				$avisos['sucesso'][] = 'Arquivo "' . $arquivo . '" gerado.';
 			}
 		} else {
-			$avisos['erro'][] = 'Arquivo "' . $arquivo . '" j· existe.';
+			$avisos['erro'][] = 'Arquivo "' . $arquivo . '" j√° existe.';
 		}
 		return $avisos;
 	}

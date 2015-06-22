@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Usada para adicionar os métodos de cada Tipo no WebService.
+ * Usada para adicionar os mÃ©todos de cada Tipo no WebService.
  */
 class Jp7_InterAdmin_Soap_Reflection {
 	
@@ -28,7 +28,7 @@ class Jp7_InterAdmin_Soap_Reflection {
 			$methods = array_merge($methods, $reflection->reflectClass($className)->getMethods());
 		}
 		
-		// Reflection dinâmico para Jp7_InterAdmin_Soap_Generic
+		// Reflection dinÃ¢mico para Jp7_InterAdmin_Soap_Generic
 		foreach ($this->usuario->secoes as $secao) {
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGet($secao);
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetAll($secao);

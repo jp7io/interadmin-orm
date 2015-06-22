@@ -1,12 +1,12 @@
 <?php
-// Necessário para herdar métodos padrão
+// NecessÃ¡rio para herdar mÃ©todos padrÃ£o
 return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 
 class Jp7_OfficesController extends __Controller_Action {
 	
 	public function indexAction() {
 		$id = $this->_getParam('id');
-		// Irá cachear uma página diferente para cada registro
+		// IrÃ¡ cachear uma pÃ¡gina diferente para cada registro
 		Jp7_Cache_Output::getInstance()->start((string) $id);
 		
 		$officesTipo = self::getTipo();
@@ -23,7 +23,7 @@ class Jp7_OfficesController extends __Controller_Action {
 			}
 			self::setRecord($record);
 		} else {
-			// Introdução
+			// IntroduÃ§Ã£o
 			if ($introductionTipo = $officesTipo->getFirstChildByModel('Introduction')) {
 				$this->view->introductionItens = $introductionTipo->find(array(
 					'fields' => '*'

@@ -28,11 +28,11 @@ class Jp7_Inflector {
 		'/([r|z])$/' => '\1es', // Paz -> Pazes, Bar -> Bares
 		'/([i])l$/' => '\1s', // Barril -> Barris
 		'/([a|e|o|u])l$/' => '\1is', // Sal -> Sais
-		'/^(m)[e|Í]s$/i' => '\1eses', // MÍs -> Meses
-		'/^(c|p|escriv|alem|capel|capit)„o$/i' => '\1„es', // C„o -> C„es
-		'/^(m|irm|pag|gr|ch|benÁ|orf|sÛt|Ûrg)„o$/i' => '\1„os', // M„o -> M„os
-		'/„o$/' => '\1ıes', // Reuni„o -> Reuniıes
-		'/([^s])$/' => '\1s' // Plural padr„o
+		'/^(m)[e|√™]s$/i' => '\1eses', // M√™s -> Meses
+		'/^(c|p|escriv|alem|capel|capit)√£o$/i' => '\1√£es', // C√£o -> C√£es
+		'/^(m|irm|pag|gr|ch|ben√ß|orf|s√≥t|√≥rg)√£o$/i' => '\1√£os', // M√£o -> M√£os
+		'/√£o$/' => '\1√µes', // Reuni√£o -> Reuni√µes
+		'/([^s])$/' => '\1s' // Plural padr√£o
 	);
 	
 	/**

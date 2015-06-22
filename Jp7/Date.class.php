@@ -54,9 +54,9 @@ class Jp7_Date extends DateTime {
 	}
 	
 	/**
-	 * Retorna string da diferenÁa de tempo, ex: '3 dias atr·s'.
-	 * O valor È arredondado: 2 anos e 4 meses retorna '2 anos atr·s'.
-	 * DiferenÁas menores de 1 minuto retornam 'agora'.
+	 * Retorna string da diferen√ßa de tempo, ex: '3 dias atr√°s'.
+	 * O valor √© arredondado: 2 anos e 4 meses retorna '2 anos atr√°s'.
+	 * Diferen√ßas menores de 1 minuto retornam 'agora'.
 	 * 
 	 * Static: 		humanDiff($timeStamp = false)
 	 * Instance: 	humanDiff()
@@ -74,10 +74,10 @@ class Jp7_Date extends DateTime {
 				$ago = 'ago';
 				break;
 			default:
-				$units_names = array('anos' => 'ano', 'meses' => 'mÍs', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto');
+				$units_names = array('anos' => 'ano', 'meses' => 'm√™s', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto');
 				$now = 'agora';
 				$yesterday = 'ontem';
-				$ago = 'atr·s';
+				$ago = 'atr√°s';
 		}
 		if (isset($this) && $this instanceof self) {
 			$timeStamp = $this;
@@ -205,7 +205,7 @@ class Jp7_Date extends DateTime {
 	public function format($format) {
 		// Bug PHP para datas zeradas
 		if (parent::format('Y') === '-0001') {
-			// Switch usado para performance, default: È o tratamento completo do erro
+			// Switch usado para performance, default: √© o tratamento completo do erro
 			switch ($format) {
 				case 'd':
 					return '00';
@@ -221,7 +221,7 @@ class Jp7_Date extends DateTime {
 					$format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
 			}
 		}
-		// Tratamento de nomes para m˙ltiplas lÌnguas
+		// Tratamento de nomes para m√∫ltiplas l√≠nguas
 		if (strpos($format, 'D') !== false) {
 			$format = preg_replace('/(?<!\\\\)D/', addcslashes(jp7_date_week(intval($this->format('w')), true), 'A..z'), $format);
 		}
@@ -234,7 +234,7 @@ class Jp7_Date extends DateTime {
 		if (strpos($format, 'F') !== false) {
 			$format = preg_replace('/(?<!\\\\)F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
 		}
-		// Format padr„o
+		// Format padr√£o
 		return parent::format($format);		
 	}
 	
@@ -313,7 +313,7 @@ class Jp7_Date extends DateTime {
 		}
 		if ($diff->m) {
 			if ($iso == Jp7_Date::DURATION_HUMAN) {
-				$duration .= $diff->m . (($diff->m == 1) ? ' mÍs ' : ' meses ');
+				$duration .= $diff->m . (($diff->m == 1) ? ' m√™s ' : ' meses ');
 			} else {
 				$duration .= $diff->m . 'M';
 			}

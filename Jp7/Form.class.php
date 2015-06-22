@@ -29,7 +29,7 @@ class Jp7_Form extends Zend_Form {
 	 * @return Jp7_Mail
 	 */
 	public function createMail(InterAdmin $record, $options = array()) {
-		// ConfiguraÁ„o
+		// Configura√ß√£o
 		$config = Zend_Registry::get('config');
 		
 		$default = array(
@@ -57,14 +57,14 @@ class Jp7_Form extends Zend_Form {
 		$mail->setBodyHtml($html);
 		$mail->setBodyText($text);
 		
-		// Definindo destinat·rios somente se recipients estiver setado
+		// Definindo destinat√°rios somente se recipients estiver setado
 		if ($options['recipients'] !== false) {
 			if ($config->isProducao()) {
 				if (is_array($options['recipients']) && count($options['recipients'])) {
-					// Primeiro È To
+					// Primeiro √© To
 					$recipient = array_shift($options['recipients']);
 					$mail->addTo($recipient->email, $recipient->name);
-					// Restante È CC
+					// Restante √© CC
 					foreach ($options['recipients'] as $recipient) {
 						$mail->addCc($recipient->email, $recipient->name);
 					}
@@ -110,7 +110,7 @@ class Jp7_Form extends Zend_Form {
 	}
 	
 	/**
-	 * FIXME tempor·rio
+	 * FIXME tempor√°rio
 	 */
 	protected function _getMailLabel($field) {
 		if ($field['label']) {
@@ -123,7 +123,7 @@ class Jp7_Form extends Zend_Form {
 	}
 	
 	/**
-	 * FIXME tempor·rio
+	 * FIXME tempor√°rio
 	 */
 	protected function _getMailValue($record, $field) {
 		$value = $record->{$field['nome_id']};
@@ -205,7 +205,7 @@ class Jp7_Form extends Zend_Form {
 					$multiOptions[(string) $registro] = $registro->getStringValue();
 				}
 				$options['multiOptions'] = $multiOptions;
-				// Label n„o È o $campo['nome'] como nos outros elementos
+				// Label n√£o √© o $campo['nome'] como nos outros elementos
 				$options['label'] = $campo['label'] . $label_suffix;
 				
 				if ($suffixCampo == 'multi') {
@@ -228,7 +228,7 @@ class Jp7_Form extends Zend_Form {
 					$element = $this->createElement('datecombo', $name, $options);
 				} else {
 					$element = $this->createElement('date', $name, $options);
-					//$element->setAttrib('placeholder', 'Dia/MÍs/Ano' . ($temHora ? ' 00:00' : ''));
+					//$element->setAttrib('placeholder', 'Dia/M√™s/Ano' . ($temHora ? ' 00:00' : ''));
 				}
 				$element->addValidator(new Zend_Validate_Date('yyyy-MM-dd'));
 				break;
@@ -260,7 +260,7 @@ class Jp7_Form extends Zend_Form {
 			if ($value instanceof InterAdminAbstract) {
 				$values[$key] = (string) $value;
 			} elseif (is_array($value)) {
-				// ForÁa convers„o de objetos em string
+				// For√ßa convers√£o de objetos em string
 				$values[$key] = explode(',', implode(',', $value)); 
 			}
 		}

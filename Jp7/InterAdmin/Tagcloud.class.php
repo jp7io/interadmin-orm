@@ -57,7 +57,7 @@ class Jp7_InterAdmin_Tagcloud
 					// Linear
 					$weight = ($tag['hits'] - $min) / $diff;
 				} else {
-					// Logarítmo
+					// LogarÃ­tmo
 					$weight = (log($tag['hits']) - log($min)) / (log($max) - log($min));
 				}
 				// Final

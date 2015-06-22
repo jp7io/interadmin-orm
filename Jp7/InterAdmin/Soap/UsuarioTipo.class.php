@@ -5,11 +5,11 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo {
 	
 	public function __construct($options = array()) {
 		/**
-		 * @global Define o $id_tipo em que s„o gravados os usu·rios com acesso.
+		 * @global Define o $id_tipo em que s√£o gravados os usu√°rios com acesso.
 		 */
 		global $c_tipos_permissoes_xml_csv;
 		if (!$c_tipos_permissoes_xml_csv) {
-			throw new Exception('Vari·vel c_tipos_permissoes_xml_csv n„o est· definida.');
+			throw new Exception('Vari√°vel c_tipos_permissoes_xml_csv n√£o est√° definida.');
 		}
 		parent::__construct($c_tipos_permissoes_xml_csv, $options);
 	}
@@ -36,7 +36,7 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo {
 			'use_published_filters' => true
 		));
 		
-		//Verifica se IP È igual ou est· na faixa de ip cadastrados
+		//Verifica se IP √© igual ou est√° na faixa de ip cadastrados
 		$usuarioIp = $_SERVER['REMOTE_ADDR'];
 		
 		if ($ips) {

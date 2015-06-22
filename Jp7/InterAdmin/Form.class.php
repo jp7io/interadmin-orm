@@ -31,14 +31,14 @@ class Jp7_InterAdmin_Form extends InterAdminField {
 				$uploader->setBasePath('upload/');
 				
 				$record->$nome_id = '';
-				// Irá procurar por , essa classe só funciona se o campo for array
+				// IrÃ¡ procurar por , essa classe sÃ³ funciona se o campo for array
 				if ($url_temp = $uploader->save($key, 'temp_')) {
-					// Cria um objeto InterAdminArquivo, necessário porque é essa classe que tem o método addToArquivosBanco
+					// Cria um objeto InterAdminArquivo, necessÃ¡rio porque Ã© essa classe que tem o mÃ©todo addToArquivosBanco
 					$imagem = $record->createArquivo();
 					$imagem->url = $url_temp;
 					// Salva no banco de imagens tornando disponivel para busca no InterAdmin
 					$url_final = $imagem->addToArquivosBanco('upload/');
-					// Transforma em InterAdminFile, que é o tipo correto do campo 'foto' do objeto $record
+					// Transforma em InterAdminFile, que Ã© o tipo correto do campo 'foto' do objeto $record
 					$record->$nome_id = new InterAdminFieldFile($url_final);
 				}
 			}

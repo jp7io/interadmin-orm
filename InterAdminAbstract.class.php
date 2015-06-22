@@ -83,7 +83,7 @@ abstract class InterAdminAbstract implements Serializable {
 		return isset($this->attributes[$attributeName]);
 	}
 	/**
-	 * String value of this record¥s primary_key.
+	 * String value of this record¬¥s primary_key.
 	 * 
 	 * @return string String value of the primary_key property.
 	 */
@@ -183,7 +183,7 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $fields_values, true, $force_magic_quotes_gpc);
 		}
-		$this->_updated = true; // FIXME Hack tempor·rio
+		$this->_updated = true; // FIXME Hack tempor√°rio
 	}
 	/**
 	 * Updates all the attributes from the passed-in array and saves the record.
@@ -440,7 +440,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
 				preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 				foreach ($matches[1] as $match) {
-					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos n„o deve agrupar pelo pai
+					// Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos n√£o deve agrupar pelo pai
 					if ($match[0] != "'") {
 						$options['group'] = 'main.id';
 						break;
@@ -497,7 +497,7 @@ abstract class InterAdminAbstract implements Serializable {
 		
 				if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
 					$table = $existsMatches[2];
-					// TODO unificar lÛgica
+					// TODO unificar l√≥gica
 					if ($table == 'tags') {
 						$existsMatches[2] = 'SELECT id_tag FROM ' . $this->db_prefix . "_tags AS " . $table .
 						' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
@@ -646,7 +646,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinTipo = $options['joins'][$join][1];
 					} elseif (strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
 						$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
-						// Processamento dos campos do select_multi È feito depois
+						// Processamento dos campos do select_multi √© feito depois
 						$joinTipo = null;
 						$options['select_multi_fields'][$join] = array(
 							'fields' => $fields[$join],
@@ -677,7 +677,7 @@ abstract class InterAdminAbstract implements Serializable {
 					}
 					unset($fields[$join]);
 				}
-			// Com funÁ„o
+			// Com fun√ß√£o
 			} elseif (strpos($campo, '(') !== false || strpos($campo, 'CASE') !== false) {
 				if (strpos($campo, ' AS ') === false) {
 					$aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
@@ -692,7 +692,7 @@ abstract class InterAdminAbstract implements Serializable {
 				$nome = isset($aliases[$campo]) ? $aliases[$campo] : $campo;
 				if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
 					if (strpos($campo, 'file_') === 0) {
-						// necess·rio para quando o parametro fields est· sem alias, mas o retorno est· com alias
+						// necess√°rio para quando o parametro fields est√° sem alias, mas o retorno est√° com alias
 						$file_campo = array_search($campo, $aliases);
 					} else {
 						$file_campo = $campo;
@@ -809,7 +809,7 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 	}
 	/**
-	 * Sets this object¥s attributes with the given array keys and values.
+	 * Sets this object¬¥s attributes with the given array keys and values.
 	 * 
 	 * @param array $attributes
 	 * @return void
@@ -831,7 +831,7 @@ abstract class InterAdminAbstract implements Serializable {
 			$existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
 			$fields = array_intersect($fields, $existingFields);
 		}
-		// Esvaziando valores para forÁar atualizaÁ„o
+		// Esvaziando valores para for√ßar atualiza√ß√£o
 		foreach ($fields as $key) {
 			unset($this->attributes[$key]);
 		}
@@ -877,7 +877,7 @@ abstract class InterAdminAbstract implements Serializable {
 	
 	/**
 	 * @param array $where
-	 * FIXME tempor·rio para wheres que eram com string 
+	 * FIXME tempor√°rio para wheres que eram com string 
 	 */
 	protected function _whereArrayFix(&$where) {
 		if (is_string($where)) {

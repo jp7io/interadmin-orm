@@ -52,7 +52,7 @@ class Jp7_InterAdmin_JSTree {
 				continue;
 			}
 			$tree[] = $node;
-			// Aqui entra a recursão
+			// Aqui entra a recursÃ£o
 			$this->addTipo($node->children, $tipo, $nivel + 1);
 			if (count($node->children) == 0) {
 				unset($node->children); // Bug jsTree progressive_render

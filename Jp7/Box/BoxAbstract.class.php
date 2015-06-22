@@ -12,13 +12,13 @@ abstract class Jp7_Box_BoxAbstract {
 		}
 	}
 	/**
-	 * Prepara os dados que v„o ser utilizados na view do box mais tarde. 
-	 * Exemplo: Faz a busca das notÌcias que v„o ser exibidas e seta $this->news.
+	 * Prepara os dados que v√£o ser utilizados na view do box mais tarde. 
+	 * Exemplo: Faz a busca das not√≠cias que v√£o ser exibidas e seta $this->news.
 	 *
 	 * @return void
 	 */
 	public function prepareData() {
-		// Vazio por padr„o
+		// Vazio por padr√£o
 	}
 	
 	protected function _prepareDataImages() {
@@ -93,12 +93,12 @@ abstract class Jp7_Box_BoxAbstract {
 			<div class="group-label">Imagens</div>
 			<div class="group-fields">
 				<div class="field">
-					<label>Dimensıes:</label>
+					<label>Dimens√µes:</label>
 					<?php echo $this->numericField('imgWidth', 'Largura', '80'); ?> x
 					<?php echo $this->numericField('imgHeight', 'Altura', '60'); ?> px
 				</div>
 				<div class="field">
-					<label title="Se estiver marcado ir· recortar a imagem nas dimensıes exatas que foram informadas.">Recortar:</label>
+					<label title="Se estiver marcado ir√° recortar a imagem nas dimens√µes exatas que foram informadas.">Recortar:</label>
 					<?php echo $this->checkbox('imgCrop', true); ?>
 				</div>
 			</div>
@@ -177,7 +177,7 @@ abstract class Jp7_Box_BoxAbstract {
 		}
 		$options = array();
 		$this->_addTiposRecursively($options, $tree);
-		// Valores que n„o tem pai publicado
+		// Valores que n√£o tem pai publicado
 		if ($show_orphan) {
 			foreach ($tree as $key => $orphan_node) {
 				$this->_addTiposRecursively($options, $tree, $key);

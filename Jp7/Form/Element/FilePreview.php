@@ -33,8 +33,8 @@ class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
     }
 	
 	public function isValid($value, $context = null) {
-		// $value aqui é o valor vindo do $_POST
-		// o Zend_Form_Element_File ignora esse valor. Mas nós não vamos ignorá-lo.
+		// $value aqui Ã© o valor vindo do $_POST
+		// o Zend_Form_Element_File ignora esse valor. Mas nÃ³s nÃ£o vamos ignorÃ¡-lo.
 		$this->_post_value = $value;
 		return parent::isValid($value, $context);
 	}	 
@@ -60,7 +60,7 @@ class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
 		if ($this->_value && !$this->_value instanceof InterAdminFieldFile) {
 			// windows fix
 			$this->_value = str_replace('\\', '/', $this->_value);
-			// necessário por enquanto
+			// necessÃ¡rio por enquanto
 			$this->_value = jp7_replace_beginning('upload/', '../../upload/', $this->_value);
 			$className = $this->getFileClass();
 			$this->_value = new $className($this->_value);

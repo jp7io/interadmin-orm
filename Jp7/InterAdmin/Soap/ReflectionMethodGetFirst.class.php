@@ -1,7 +1,7 @@
 <?php
 
 /**
- * É usado para simular um método no WebService.
+ * Ã‰ usado para simular um mÃ©todo no WebService.
  */
 class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	
@@ -20,6 +20,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	}
 	
 	public function getDescription() {
-		return 'Retorna o primeiro registro da seção ' . $this->secao->nome . '.';
+		return 'Retorna o primeiro registro da seÃ§Ã£o ' . $this->secao->nome . '.';
 	}
 }

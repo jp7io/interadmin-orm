@@ -21,7 +21,7 @@ class Jp7_Box_Twitter extends Jp7_Box_BoxAbstract {    /**
 				<?php echo $this->checkbox('scrollbar'); ?>
 			</div>
 			<div class="field">
-				<label>Hor·rios:</label>
+				<label>Hor√°rios:</label>
 				<?php echo $this->checkbox('timestamp', true); ?>
 			</div>
 			<div class="field">

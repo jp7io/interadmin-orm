@@ -10,7 +10,7 @@ class Jp7_Bootstrap {
 		$debugger->setSafePoint(true);
 		
 		if (preg_match('/[^a-zA-Z0-9-,]/', $_COOKIE['PHPSESSID'])) {
-			unset($_COOKIE['PHPSESSID']); // Bug Zend_Session + Usuário com cookie errado
+			unset($_COOKIE['PHPSESSID']); // Bug Zend_Session + UsuÃ¡rio com cookie errado
 		}	
 		
 		Zend_Session::setOptions(array('throw_startup_exceptions' => error_reporting()));
@@ -44,7 +44,7 @@ class Jp7_Bootstrap {
 			$GLOBALS['s_user'] = &$GLOBALS['s_session']['user'];
 		}
 		
-		// Classes padrão
+		// Classes padrÃ£o
 		$prefix = ucfirst($config->name_id);
 		
 		if (InterAdminTipo::getDefaultClass() == 'InterAdminTipo' && class_exists($prefix . '_InterAdminTipo')) {
@@ -113,7 +113,7 @@ class Jp7_Bootstrap {
 		global $config;
 		
 		$frontController = Zend_Controller_Front::getInstance();
-		// Alterando o dispatcher para abrir o template caso o Controller não exista
+		// Alterando o dispatcher para abrir o template caso o Controller nÃ£o exista
 		$frontController->setDispatcher(new Jp7_Controller_Dispatcher());
 		// Alterando o router para que $this->url() funcione corretamente na View
 		$frontController->setRouter(new Jp7_Controller_Router());
@@ -131,12 +131,12 @@ class Jp7_Bootstrap {
 	
 	public static function initLanguage() {
 		/**
-		 * É utilizada pela InterAdmin para gerar URL com SEO, que é o padrão no MVC.
+		 * Ã‰ utilizada pela InterAdmin para gerar URL com SEO, que Ã© o padrÃ£o no MVC.
 		 * @var bool
 		 */
 		global $seo;
 		$seo = true;
-		// TODO Retirada de $lang das variáveis globais, alterando a InterAdmin
+		// TODO Retirada de $lang das variÃ¡veis globais, alterando a InterAdmin
 		global $lang;
 		
 		$config = Zend_Registry::get('config');
@@ -196,7 +196,7 @@ class Jp7_Bootstrap {
 		// Permite o uso de Helpers customizados da Jp7
 		$view->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
 		
-		// Adicionando JS e CSS padrão
+		// Adicionando JS e CSS padrÃ£o
 		$config = Zend_Registry::get('config');
 		$lang = Zend_Registry::get('lang');
 		
@@ -253,8 +253,8 @@ class Jp7_Bootstrap {
 			 Jp7_Cache_Output::getInstance()->end();
 		}
 		
-		//$GLOBALS['debugger']->getTime(true, 'Página inteira');
-		//echo memory_get_usage() . ' de Memória<br />';
-		//echo memory_get_peak_usage() . ' de pico de Memória<br />';
+		//$GLOBALS['debugger']->getTime(true, 'PÃ¡gina inteira');
+		//echo memory_get_usage() . ' de MemÃ³ria<br />';
+		//echo memory_get_peak_usage() . ' de pico de MemÃ³ria<br />';
 	}
 }

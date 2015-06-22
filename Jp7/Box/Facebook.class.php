@@ -29,11 +29,11 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 				<?php echo $this->checkbox('show_faces', true); ?>
 			</div>
 			<div class="field">
-				<label>Atualizações:</label>
+				<label>AtualizaÃ§Ãµes:</label>
 				<?php echo $this->checkbox('stream'); ?>
 			</div>
 			<div class="field">
-				<label>Cabeçalho:</label>
+				<label>CabeÃ§alho:</label>
 				<?php echo $this->checkbox('header'); ?>
 			</div>
 		</div>

@@ -62,7 +62,7 @@ class Jp7_View_Helper_FormDatecombo extends Zend_View_Helper_FormElement
 				$days
 			</select>
 			<select name="${name}[__m]" id="${id}__m" class="date-month"$disabled>
-				<option value="00">Mês</option>
+				<option value="00">MÃªs</option>
 				$months
 			</select>
 			<select name="${name}[__Y]" id="${id}__Y" class="date-year"$disabled>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Adiciona configurações comuns da JP7 e __call de métodos inexistentes para 
+ * Adiciona configuraÃ§Ãµes comuns da JP7 e __call de mÃ©todos inexistentes para 
  * templates ao Controller da Zend.
  * 
  * @category Jp7
@@ -52,7 +52,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			if ($siteSettings) {
 				$config = Zend_Registry::get('config');
 				$attributes = $siteSettings->attributes;
-				// Retirando atributos que não interessam ao config
+				// Retirando atributos que nÃ£o interessam ao config
 				unset($attributes['id_tipo']);
 				unset($attributes['id']);
 				unset($attributes['mostrar']);
@@ -68,7 +68,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 					$this->view->headLink()->removeStylesheet('css/main.css');
 					// @filemtime(jp7_absolute_path(APPLICATION_PATH . '/../interadmin/dynamic.css'));
 					$this->view->headLink()->appendStylesheet($config->template->template . '/css/main.css?clientePath=' . $config->name_id); // . '&update=' . $dynamicTime
-					// Necessário para mudar a ordem
+					// NecessÃ¡rio para mudar a ordem
 					$this->view->headLink()->appendStylesheet('css/main.css');
 				}
 			}
@@ -77,7 +77,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	
 	public function postDispatch() {
 		/**
-		 * @var InterSite $config Configuração geral do site, gerada pelo InterSite
+		 * @var InterSite $config ConfiguraÃ§Ã£o geral do site, gerada pelo InterSite
 		 */
 		$config = Zend_Registry::get('config');
 		/**
@@ -99,7 +99,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->tipo = $tipo; 
 		$this->view->record = $record;
 		
-		// Boxes editáveis pelo InterAdmin
+		// Boxes editÃ¡veis pelo InterAdmin
 		if ($tipo instanceof InterAdminTipo) {
 			$boxTipo = $tipo->getFirstChildByModel('Boxes');
 			if ($boxTipo) {
@@ -122,8 +122,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->_prepareMetas();
 	}
 	/**
-	 * Função responsável por montar o título da página.
-	 * Permite que se altere o título sem sobrescrever o método postDispatch().
+	 * FunÃ§Ã£o responsÃ¡vel por montar o tÃ­tulo da pÃ¡gina.
+	 * Permite que se altere o tÃ­tulo sem sobrescrever o mÃ©todo postDispatch().
 	 * @return string
 	 */
 	protected function _prepareTitle() {
@@ -131,7 +131,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		
 		$this->view->headTitle()->setSeparator(' | ');
 		
-		// Adiciona o nome do registro atual ao título
+		// Adiciona o nome do registro atual ao tÃ­tulo
 		if ($record) {
 			if ($titulo = $record->getFieldsValues('varchar_key')) {
 				$this->view->headTitle($titulo);
@@ -185,7 +185,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	}
 	
 	/**
-	 * Trata as actions que não tem a função definida e passa para o template
+	 * Trata as actions que nÃ£o tem a funÃ§Ã£o definida e passa para o template
 	 * se existir.
 	 * 
 	 * @param string $method
@@ -337,7 +337,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		);
 		
 		if ($lang->prefix) {
-			// Performance, não é necessário, mas diminui as queries
+			// Performance, nÃ£o Ã© necessÃ¡rio, mas diminui as queries
 			$options['fields'][] = 'nome' . $lang->prefix; 
 		}
 		

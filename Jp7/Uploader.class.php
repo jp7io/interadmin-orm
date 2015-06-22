@@ -87,14 +87,14 @@ class Jp7_Uploader {	protected $fieldName;
 			copy($tmp_name[$key], $finalDestination);
 		}
 		if (!is_file($finalDestination)) {
-			$msg = 'ImpossÌvel copiar arquivo "' . $tmp_name[$key] . '" para "' . $finalDestination . '".<br /> getcwd(): ' . getcwd();
+			$msg = 'Imposs√≠vel copiar arquivo "' . $tmp_name[$key] . '" para "' . $finalDestination . '".<br /> getcwd(): ' . getcwd();
 			if (!is_file($tmp_name[$key])) {
-				$msg .= '<br /> Arquivo ' . basename($tmp_name[$key]) . ' n„o existe.';
+				$msg .= '<br /> Arquivo ' . basename($tmp_name[$key]) . ' n√£o existe.';
 			}
 			if (!is_dir(dirname($finalDestination))) {
-				$msg .= '<br /> DiretÛrio ' . dirname($finalDestination) . ' n„o existe.';
+				$msg .= '<br /> Diret√≥rio ' . dirname($finalDestination) . ' n√£o existe.';
 			} elseif (!is_writable(dirname($finalDestination))) {
-				$msg .= '<br /> DiretÛrio ' . dirname($finalDestination) . ' n„o tem permiss„o de escrita.';
+				$msg .= '<br /> Diret√≥rio ' . dirname($finalDestination) . ' n√£o tem permiss√£o de escrita.';
 			}
 			throw new Exception($msg);
 		}

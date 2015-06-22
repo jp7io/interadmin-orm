@@ -21,7 +21,7 @@ class InterAdminField {
 	public static $php5_2_hack_className = 'InterAdminField';
 	
 	/**
-	 * Construtor p˙blico.
+	 * Construtor p√∫blico.
 	 * 
 	 * @param array 	$field 	Formato dos campos do InterAdminTipo [optional]
 	 * @return 
@@ -139,7 +139,7 @@ class InterAdminField {
 					'label' => $campo_array['label']
 				));
 				if ($xtra == 'X' && $readonly) {
-					$xtra = ''; // Com busca n„o tem readonly
+					$xtra = ''; // Com busca n√£o tem readonly
 					$campo_array['where'] .= ' AND id IN(' . ($valor ?: '0') . ')';
 				}
 				if ($xtra == 'X') {
@@ -179,7 +179,7 @@ class InterAdminField {
 					$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\" ajax_function=\"interadmin_combo_ajax(" . $campo_nome . ", 'search', 'callback')\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
 					"<option value=\"0\">Selecione ou Procure" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
 					"<option value=\"0\">--------------------</option>" .
-					"<option value=\"0\">MÌnimo de 3 caracteres para comeÁar a busca...</option>";
+					"<option value=\"0\">M√≠nimo de 3 caracteres para come√ßar a busca...</option>";
 					//interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
 					if ($valor) {
 						$tipoObj = new InterAdminTipo($campo_nome);
@@ -247,7 +247,7 @@ class InterAdminField {
 				switch($xtra){
 					case "id": // ID
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
-						if ($id && !$s_user['admin']) $onkeypress .= " disabled=\"disabled\""; // Impede alteraÁ„o
+						if ($id && !$s_user['admin']) $onkeypress .= " disabled=\"disabled\""; // Impede altera√ß√£o
 						break;
 					case "id_email": // ID E-Mail
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
@@ -255,7 +255,7 @@ class InterAdminField {
 					case "email": // E-Mail
 						$onkeypress=" xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.+',event)\"";
 						break;
-					case "num": // N˙mero
+					case "num": // N√∫mero
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()',event)\"";
 						break;
 					case "cpf": // CPF
@@ -293,7 +293,7 @@ class InterAdminField {
 				
 				if (!$campo_array['sem_creditos']) {
 					echo "<tr class=\"" . ($campo_array['nome_id'] ?  $campo_array['nome_id']  :  toId($campo_nome)) . "_text-tr\">".
-						"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">CrÈditos/Leg.:</th>".
+						"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">Cr√©ditos/Leg.:</th>".
 						"<td><input type=\"text\" name=\"".$campo."_text[]\" value=\"".$GLOBALS[$campo."_text"]."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file\" /></td>".
 					"</tr>\n";
 				}
@@ -308,7 +308,7 @@ class InterAdminField {
 								"<td>".jp7_app_createSelect_date($campo,(($xtra=="S"||(strpos($xtra,"datetime")===false&&$xtra))?"style=\"visibility:hidden\"":"").(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"").$readonly,false,$j,$readonly . (($obrigatorio) ? ' obligatory="yes" label="' . $campo_nome .  '"' : '' ) . (($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":""),$xtra, "", $valor)."</td>".
 								"<td width=\"99%\" align=\"right\">".
 									"<input class=\"botao_atualizar\" type=\"button\" value=\"Atualizar".((strpos($xtra,"calendar")===false)?" Data".(($xtra!="S")?" - Hora":""):"")."\"".$readonly." tabindex=\"-1\" onclick=\"refreshDate('".$campo."',".$j.",'','".$xtra."')".(($xtra=="calendar_datetime"||$xtra=="calendar_date")?";interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"")."\" />".
-									((strpos($xtra,"calendar")!==false)?"<input type=\"button\" class=\"botao_calendario\" id=\"".$campo."_calendar_".$j."\" value=\"Calend·rio\"".$readonly." tabindex=\"-1\" style=\"margin-left:10px\">":"").
+									((strpos($xtra,"calendar")!==false)?"<input type=\"button\" class=\"botao_calendario\" id=\"".$campo."_calendar_".$j."\" value=\"Calend√°rio\"".$readonly." tabindex=\"-1\" style=\"margin-left:10px\">":"").
 								"</td>".
 							"</tr>".
 						"</table>".
@@ -336,18 +336,18 @@ class InterAdminField {
 				if (file_exists($plugin_include)) {
 					include $plugin_include;
 				} else {
-					echo 'Include ' . $plugin_include . ' n„o encontrado.<br />';
+					echo 'Include ' . $plugin_include . ' n√£o encontrado.<br />';
 				}
 				if (function_exists($plugin_function)) {
 					echo $plugin_function($campo_array, $valor);
 				} else {
-					echo 'FunÁ„o ' . $plugin_function . ' n„o encontrada.<br />';
+					echo 'Fun√ß√£o ' . $plugin_function . ' n√£o encontrada.<br />';
 				}
 			} elseif (strpos($tipo_de_campo, 'special_') === 0 || strpos($tipo_de_campo, 'func_') === 0) {
 				if (is_callable($campo_nome)) {
 					echo call_user_func($campo_nome, $campo_array, $valor);
 				} else {
-					echo 'FunÁ„o ' . $campo_nome . ' n„o encontrada.<br />';
+					echo 'Fun√ß√£o ' . $campo_nome . ' n√£o encontrada.<br />';
 				}
 			}else{
 				if(!$readonly_hidden){
@@ -385,14 +385,14 @@ class InterAdminField {
 		return array('tipos_multi', 'tipos');
 	}
 	/**
-	 * Retorna os xtra dos campos do tipo special_ que armazenam m˙ltiplos registros.
+	 * Retorna os xtra dos campos do tipo special_ que armazenam m√∫ltiplos registros.
 	 * @return array
 	 */
 	public static function getSpecialMultiXtras() {
 		return array('registros_multi', 'tipos_multi');
 	}
 	/**
-	 * Retorna o valor do campo no header (cabeÁalho da listagem).
+	 * Retorna o valor do campo no header (cabe√ßalho da listagem).
 	 * 
 	 * @param array $campo
 	 * @return string
@@ -403,7 +403,7 @@ class InterAdminField {
 			if (is_callable($campo['nome'])) {
 				return call_user_func($campo['nome'], $campo, '', 'header');
 			} else {
-				echo 'FunÁ„o ' . $campo['nome'] . ' n„o encontrada.';
+				echo 'Fun√ß√£o ' . $campo['nome'] . ' n√£o encontrada.';
 			}
 		} elseif (strpos($key, 'select_') === 0) {
 			if ($campo['label']) {
@@ -420,14 +420,14 @@ class InterAdminField {
 		}
 	}
 	
-	// funÁ„o incompleta
+	// fun√ß√£o incompleta
 	public static function getCampoList($campo, $valor, $parte = 'list') {
 		$key = $campo['tipo'];
 		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
 			if (is_callable($campo['nome'])) {
 				return call_user_func($campo['nome'], $campo, $valor, $parte);
 			} else {
-				echo 'FunÁ„o ' . $campo['nome'] . ' n„o encontrada.';
+				echo 'Fun√ß√£o ' . $campo['nome'] . ' n√£o encontrada.';
 			}
 		} elseif (strpos($key, 'date_') === 0) {	
 			return jp7_date_format($valor, 'd/m/Y - H:i');
@@ -476,7 +476,7 @@ class InterAdminField {
 		ob_start();
 		foreach ($campos as $campo) {
 			if ($campo['form']) {
-				// Para usar o alias ao invÈs do nome do campo
+				// Para usar o alias ao inv√©s do nome do campo
 				$campo['tipo_de_campo'] = $campo['tipo'];
 				if ($record) {
 					$campo['value'] = $record->{$campo['nome_id']};
@@ -484,7 +484,7 @@ class InterAdminField {
 					$campo['value'] = null;
 				}
 				$campo['tipo'] = $campo['nome_id'];
-				// N„o prevÍ special
+				// N√£o prev√™ special
 				if (strpos($campo['tipo_de_campo'], 'select_') === 0) {
 					$campo['label'] = $translate->_($campo['label']);
 				} else {
@@ -501,7 +501,7 @@ class InterAdminField {
 		include_once ROOT_PATH . '/inc/7.app.lib.php';
 		include_once ROOT_PATH . '/inc/7.form.lib.php';
 		
-		// SÛ para CHAR - checkbox
+		// S√≥ para CHAR - checkbox
 		if (startsWith('char_', $campo['tipo_de_campo'])) {
 			if (!$record->id && $campo['xtra']) {
 				$campo['value'] = 'S';
@@ -547,7 +547,7 @@ class InterAdminField {
 	}
 	
 	public static function validate($record, $campo) {
-		// ValidaÁ„o do campo obrigatÛrio
+		// Valida√ß√£o do campo obrigat√≥rio
 		if ($campo['obrigatorio']) {
 			if (!startsWith('char_', $campo['tipo'])) {
 				if (!$record->{$campo['nome_id']}) {
@@ -556,10 +556,10 @@ class InterAdminField {
 				}
 			}
 		}
-		// ValidaÁ„o e-mail
+		// Valida√ß√£o e-mail
 		if (startsWith('varchar_', $campo['tipo']) && $campo['xtra'] == 'email') {
 			if (!filter_var($record->{$campo['nome_id']}, FILTER_VALIDATE_EMAIL)) {
-				throw new Exception('Valor inv·lido do campo ' . $campo['nome'] . '.');
+				throw new Exception('Valor inv√°lido do campo ' . $campo['nome'] . '.');
 			}
 		}
 	}

@@ -42,7 +42,7 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
      */
     public function isDispatchable(Zend_Controller_Request_Abstract $request) {
         $retornoOriginal = parent::isDispatchable($request);
-		// Necessário porque ZF não verifica se uma classe com o prefixo do módulo existe
+		// NecessÃ¡rio porque ZF nÃ£o verifica se uma classe com o prefixo do mÃ³dulo existe
 		if (!$retornoOriginal) {			
 			$className = $this->_getControllerClassWithModelPrefix($request);
 	        if (class_exists($className, false)) {

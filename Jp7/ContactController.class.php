@@ -1,5 +1,5 @@
 <?php
-// Necessário para herdar métodos padrão
+// NecessÃ¡rio para herdar mÃ©todos padrÃ£o
 return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 
 class Jp7_ContactController extends __Controller_Action {
@@ -10,14 +10,14 @@ class Jp7_ContactController extends __Controller_Action {
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.maskedinput-1.3.1.min.js');
 		
 		$contactTipo = self::getTipo();
-		// Introdução
+		// IntroduÃ§Ã£o
 		if ($introductionTipo = $contactTipo->getFirstChildByModel('Introduction')) {
 			$this->view->introductionItens = $introductionTipo->find(array(
 				'fields' => '*'
 			));
 		}
 		
-		// Formulário
+		// FormulÃ¡rio
 		$record = null;
 		
 		// Recebeu POST
@@ -27,7 +27,7 @@ class Jp7_ContactController extends __Controller_Action {
 				$record = $this->_createRecord($contactTipo);
 				$this->_validateAndSave($record);
 				
-				// Utilizado para preparar o email, não tem jeito melhor, por enquanto
+				// Utilizado para preparar o email, nÃ£o tem jeito melhor, por enquanto
 				try {
 					$this->_sendEmail($record);
 					$this->_redirect($contactTipo->getUrl() . '/ok');
@@ -77,7 +77,7 @@ class Jp7_ContactController extends __Controller_Action {
 		$recipients = $this->_getRecipients($contactTipo, $record);
 		
 		$formHelper = new Jp7_Form();
-		// E-mail normal para os destinatários do site
+		// E-mail normal para os destinatÃ¡rios do site
 		$mail = $formHelper->createMail($record, array(
 			'subject' => 'Site ' . $config->name . ' - ' . $contactTipo->nome,
 			'title' => $contactTipo->nome,
@@ -87,11 +87,11 @@ class Jp7_ContactController extends __Controller_Action {
 		$mail->send();
 		
 		if ($sendReply) {
-			// E-mail de resposta para o usuário
+			// E-mail de resposta para o usuÃ¡rio
 			$reply = $formHelper->createMail($record, array(
-				'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - ' . $contactTipo->nome,
+				'subject' => 'ConfirmaÃ§Ã£o de Recebimento - ' . $config->name . ' - ' . $contactTipo->nome,
 				'title' => $contactTipo->nome,
-				'recipients' => array($record), // Envia para o próprio usuário
+				'recipients' => array($record), // Envia para o prÃ³prio usuÃ¡rio
 				'message' => 
 					'Agradecemos o seu contato.<br />' .
 					'Por favor, aguarde nosso retorno em breve.<br /><br />',

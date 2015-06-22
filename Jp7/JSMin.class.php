@@ -5,7 +5,7 @@ class Jp7_JSMin extends JSMin {
         $cache_file = $cache_dir . '/' . $cache_filename;
         
 		foreach ($files as $key => $file) {
-        	// Descobrindo localização como se fosse client side
+        	// Descobrindo localizaÃ§Ã£o como se fosse client side
         	if (startsWith('/', $file)) {
         		// /_default/js/interdyn.js
         		$files[$key] = $_SERVER['DOCUMENT_ROOT'] . $file;
@@ -20,7 +20,7 @@ class Jp7_JSMin extends JSMin {
         if ($cache_mtime === false) {
             $build_cache = true;
         } else {
-        	// Somente verifica os timestamp localmente, para não atrapalhar desenvolvimento
+        	// Somente verifica os timestamp localmente, para nÃ£o atrapalhar desenvolvimento
         	if (strpos($_SERVER['HTTP_HOST'], '.') === false) {
 	            foreach ($files as $key => $file) {
 	            	if (startsWith('http://', $file)) {

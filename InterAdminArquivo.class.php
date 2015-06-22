@@ -24,7 +24,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 */
 	public $db_prefix;
 	/**
-	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this recordÂ´s 'id_tipo'.
 	 * @var InterAdminTipo
 	 */
 	protected $_tipo;
@@ -159,17 +159,17 @@ class InterAdminArquivo extends InterAdminAbstract {
 			@chmod(dirname($newurl), 0777);
 		}
 		
-		// Movendo arquivo temporário
+		// Movendo arquivo temporÃ¡rio
 		if (!@rename($this->url, $newurl)) {
-			$msg = 'Impossível renomear arquivo "' . $this->url . '" para "' . $newurl . '".<br /> getcwd(): ' . getcwd();
+			$msg = 'ImpossÃ­vel renomear arquivo "' . $this->url . '" para "' . $newurl . '".<br /> getcwd(): ' . getcwd();
 			if (!is_file($this->url)) {
-				$msg .= '<br /> Arquivo ' . basename($this->url) . ' não existe.';
+				$msg .= '<br /> Arquivo ' . basename($this->url) . ' nÃ£o existe.';
 			}
 			if (!is_dir(dirname($this->url))) {
-				$msg .= '<br /> Diretório ' . dirname($this->url) . ' não existe.';
+				$msg .= '<br /> DiretÃ³rio ' . dirname($this->url) . ' nÃ£o existe.';
 			}
 			if (!is_dir(dirname($newurl))) {
-				$msg .= '<br /> Diretório ' . dirname($newurl) . ' não existe.';
+				$msg .= '<br /> DiretÃ³rio ' . dirname($newurl) . ' nÃ£o existe.';
 			}
 			throw new Exception($msg);
 		}

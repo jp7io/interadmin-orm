@@ -39,7 +39,7 @@ class Jp7_Cache_Data {
 	}
 	
 	/**
-	 * Verifica se o log do InterAdmin foi alterado. E limpa o cache se necess·rio.
+	 * Verifica se o log do InterAdmin foi alterado. E limpa o cache se necess√°rio.
 	 * 
 	 * @return bool 
 	 */
@@ -49,12 +49,12 @@ class Jp7_Cache_Data {
 		$cache_time = @filemtime($this->getFilename());
 		if ($lifetime) {
 			if ($cache_time && ($cache_time > (time() - $lifetime))) {
-				return true; // Est· v·lido
+				return true; // Est√° v√°lido
 			}
 		} else {
-			// VerificaÁ„o do log
+			// Verifica√ß√£o do log
 			$log_time = @filemtime(self::$_logdir . 'interadmin.log');
-			// Outro dia È atualizado o cache
+			// Outro dia √© atualizado o cache
 			if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) {
 				return true; // TRUE = Cache is ok, no need to refresh
 			}

@@ -20,8 +20,8 @@ class Jp7_Box_FacebookComments extends Jp7_Box_BoxAbstract {    /**
 				</select>
 			</div>
 			<div class="field">
-				<label>Nº de Posts:</label>
-				<?php echo $this->numericField('num_posts', 'Nº de Posts', '10'); ?>
+				<label>NÂº de Posts:</label>
+				<?php echo $this->numericField('num_posts', 'NÂº de Posts', '10'); ?>
 			</div>
 			<div class="field">
 				<label>Largura:</label>

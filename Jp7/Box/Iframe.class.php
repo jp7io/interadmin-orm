@@ -24,8 +24,8 @@ class Jp7_Box_Iframe extends Jp7_Box_BoxAbstract {    /**
 			</div>
 			
 			<div class="field">
-				<label>Título:</label>
-				<input type="text" class="textbox" obligatory="no" label="Título" placeholder="Nenhum" value="<?php echo $this->params->title; ?>" 
+				<label>TÃ­tulo:</label>
+				<input type="text" class="textbox" obligatory="no" label="TÃ­tulo" placeholder="Nenhum" value="<?php echo $this->params->title; ?>" 
 					name="<?php echo $this->id_box; ?>[title][]" />
 			</div>
 		</div>

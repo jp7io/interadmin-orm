@@ -15,7 +15,7 @@ class Jp7_Deprecated {
 	public static function jp7_db_update($table, $table_id_name, $table_id_value, $fields) {
 		global $db;
 		$fields_arr=explode(",",$fields);
-		// Vari·veis
+		// Vari√°veis
 		foreach($fields_arr as $field){
 			$fields_arr_db[]=(strpos($field,"_")===0)?substr($field,1):$field;
 		}
@@ -443,20 +443,20 @@ class Jp7_Deprecated {
 		if(!$html)$S = str_replace("$","$$",$S);
 		$S=str_replace(chr(13),"<br/>",$S);
 		$S=str_replace("<br>","<br/>",$S);
-		$S=preg_replace("([·‡„‚‰™])","a",$S);
-		$S=preg_replace("([ÈËÍÎ&])","e",$S);
-		$S=preg_replace("([ÌÏÓÔ])","i",$S);
-		$S=preg_replace("([ÛÚıÙˆ∫])","o",$S);
-		$S=preg_replace("([˙˘˚¸])","u",$S);
-		$S=preg_replace("([Á])","c",$S);
-		$S=preg_replace("([Ò])","n",$S);
-		$S=preg_replace("([¡¿√¬ƒ])","A",$S);
-		$S=preg_replace("([…» À&])","E",$S);
-		$S=preg_replace("([ÕÃŒœ])","I",$S);
-		$S=preg_replace("([”“’‘÷])","O",$S);
-		$S=preg_replace("([⁄Ÿ€‹])","U",$S);
-		$S=preg_replace("([«])","C",$S);
-		$S=preg_replace("([—])","N",$S);
+		$S=preg_replace("([√°√†√£√¢√§¬™])","a",$S);
+		$S=preg_replace("([√©√®√™√´&])","e",$S);
+		$S=preg_replace("([√≠√¨√Æ√Ø])","i",$S);
+		$S=preg_replace("([√≥√≤√µ√¥√∂¬∫])","o",$S);
+		$S=preg_replace("([√∫√π√ª√º])","u",$S);
+		$S=preg_replace("([√ß])","c",$S);
+		$S=preg_replace("([√±])","n",$S);
+		$S=preg_replace("([√Å√Ä√É√Ç√Ñ])","A",$S);
+		$S=preg_replace("([√â√à√ä√ã&])","E",$S);
+		$S=preg_replace("([√ç√å√é√è])","I",$S);
+		$S=preg_replace("([√ì√í√ï√î√ñ])","O",$S);
+		$S=preg_replace("([√ö√ô√õ√ú])","U",$S);
+		$S=preg_replace("([√á])","C",$S);
+		$S=preg_replace("([√ë])","N",$S);
 		return $S;
 	}
 	
@@ -582,7 +582,7 @@ class Jp7_Deprecated {
 	 * @param mixed $var_prefix Prefix used to get values from global variables, the default value is "". e.g. For the field name "varchar_1" and the global variable "pre_varchar_1", the prefix should be "pre_". If it is passed as an array, the values from this array will be used instead of globals.
 	 * @param bool $var_check If <tt>FALSE</tt> prepares the data for empty and null values before updating, the default value is <tt>TRUE</tt>.
 	 * @global ADOConnection
-	 * @return int When updating: $table_id_value on success or 0 on error. When inserting: the inserted record¥s ID.
+	 * @return int When updating: $table_id_value on success or 0 on error. When inserting: the inserted record¬¥s ID.
 	 * @author JP, Cristiano
 	 * @version (2007/12/17)
 	 */
@@ -608,10 +608,10 @@ class Jp7_Deprecated {
 					//se for definido valor ou campo for inteiro
 					if (($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0) {
 						$sql .= ((!$j)?" ":",")."".$table_field_name."=".toBase($table_field_value,$force_magic_quotes_gpc);
-						//se n„o for definido valor e for mysql salva branco
+						//se n√£o for definido valor e for mysql salva branco
 					} elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")) {
 						$sql .= ((!$j)?" ":",")."".$table_field_name."=''";
-						//se n„o for definido valor e for != de mysql
+						//se n√£o for definido valor e for != de mysql
 					} else {
 						$sql .= ((!$j)?" ":",")."".$table_field_name."=NULL";
 					}
@@ -634,10 +634,10 @@ class Jp7_Deprecated {
 				//se for definido valor
 				if (($table_field_value !== "" && !is_null($table_field_value)) || strpos($table_field_name, "int_") === 0) {
 					$valores .= toBase($table_field_value,$force_magic_quotes_gpc) . (($i == $table_columns_num) ? ")" : ",\n");
-					//se n„o for definido valor e for mysql salva branco
+					//se n√£o for definido valor e for mysql salva branco
 				} elseif (($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
 					$valores .= "''". (($i == $table_columns_num) ? ")" : ",\n");
-					//se n„o for definido valor e for != de mysql
+					//se n√£o for definido valor e for != de mysql
 				} else {
 					$valores .= "NULL" . (($i==$table_columns_num) ? ")" : ",\n");
 				}

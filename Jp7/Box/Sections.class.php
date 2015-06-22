@@ -21,7 +21,7 @@ class Jp7_Box_Sections extends Jp7_Box_BoxAbstract {
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
     protected function _getEditorTitle() {
-        return 'Seções';
+        return 'SeÃ§Ãµes';
     }
 	
 	/**
@@ -32,14 +32,14 @@ class Jp7_Box_Sections extends Jp7_Box_BoxAbstract {
 		?>
 		<div class="fields">
 			<div class="field">
-				<label>Título:</label>
-				<input type="text" class="textbox" label="Título" placeholder="Automático" 
+				<label>TÃ­tulo:</label>
+				<input type="text" class="textbox" label="TÃ­tulo" placeholder="AutomÃ¡tico" 
 					name="<?php echo $this->id_box; ?>[title][]"
 					value="<?php echo $this->params->title; ?>"	/>
 			</div>
 			<div class="field obligatory">
-				<label>Seção Pai:</label>
-				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box; ?>[section][]">
+				<label>SeÃ§Ã£o Pai:</label>
+				<select class="selectbox" obligatory="yes" label="SeÃ§Ã£o" name="<?php echo $this->id_box; ?>[section][]">
 					<?php
 					$tipos = InterAdminTipo::findTipos(array(
 						'where' => array(

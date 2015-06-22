@@ -62,7 +62,7 @@ class Jp7_Box_Manager {
 	);
 	
 	/**
-	 * @var bool Define se È uma p·gina de registro (com ID), ou p·gina de Tipo. O que permite variaÁıes nos boxes.
+	 * @var bool Define se √© uma p√°gina de registro (com ID), ou p√°gina de Tipo. O que permite varia√ß√µes nos boxes.
 	 */
 	private static $recordMode = false;
 	
@@ -101,8 +101,8 @@ class Jp7_Box_Manager {
 	/**
 	 * Procura arquivos numa pasta e adiciona usando set().
 	 * 
-	 * @param string $classesPath	EndereÁo do diretÛrio de classes, ex: ../classes.
-	 * @param string $boxesPath		EndereÁo do diretÛrio de boxes, ex: Cliente/Box.
+	 * @param string $classesPath	Endere√ßo do diret√≥rio de classes, ex: ../classes.
+	 * @param string $boxesPath		Endere√ßo do diret√≥rio de boxes, ex: Cliente/Box.
 	 * @return void
 	 */
 	public static function setFromFiles($classesPath, $boxesPath) {

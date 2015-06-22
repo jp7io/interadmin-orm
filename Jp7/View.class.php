@@ -21,7 +21,7 @@ class Jp7_View extends Zend_View {
     	
     	$erros = self::$_errorsLog[$filename];
     	if ($erros && $erros[reset(explode('?', $_SERVER['REQUEST_URI']))] > strtotime('-5 minutes')) {
-    		echo 'Em manutenÁ„o.';
+    		echo 'Em manuten√ß√£o.';
     	} else {
     		self::addCurrentFile($filename);
 	    	
@@ -66,7 +66,7 @@ class Jp7_View extends Zend_View {
 		self::$_errorsLog[$filename][$semQuery] = time();
 		
 		file_put_contents($viewsLog, serialize(self::$_errorsLog));
-		// Como È impossÌvel continuar o processamento apÛs um fatal error, ir· recarregar a p·gina
+		// Como √© imposs√≠vel continuar o processamento ap√≥s um fatal error, ir√° recarregar a p√°gina
 		header('Location: ' . $_SERVER['REQUEST_URI']);
 		exit;
 	}

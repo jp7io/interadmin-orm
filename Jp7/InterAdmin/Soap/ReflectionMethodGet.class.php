@@ -1,7 +1,7 @@
 <?php
 
 /**
- * É usado para simular um método no WebService.
+ * Ã‰ usado para simular um mÃ©todo no WebService.
  */
 class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	
@@ -43,7 +43,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	}
 	
 	public function getDescription() {
-		return 'Retorna os registros publicados e não deletados da seção ' . $this->secao->nome . '.';
+		return 'Retorna os registros publicados e nÃ£o deletados da seÃ§Ã£o ' . $this->secao->nome . '.';
 	}
 	
 	protected function _getClassName() {

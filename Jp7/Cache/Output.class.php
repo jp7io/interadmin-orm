@@ -18,9 +18,9 @@
 	protected static $_className = __CLASS__;
 	protected static $placeholderEnabled = false;	
 	 /**
-	  * Retorna uma instância configurada do Jp7_Cache_Page.
+	  * Retorna uma instÃ¢ncia configurada do Jp7_Cache_Page.
 	  * 
-	  * @todo Ver como irá funcionar com o Preview do InterAdmin 
+	  * @todo Ver como irÃ¡ funcionar com o Preview do InterAdmin 
 	  * @param array $frontOptions
 	  * @param array $backOptions
 	  * @return Jp7_Cache_Output
@@ -46,7 +46,7 @@
 				'cache_dir' => self::$_cachedir
 			);
 			$frontOptions = $frontOptions + $frontDefault;
-			// Necessário pela falta do PHP 5.3 e late static bind
+			// NecessÃ¡rio pela falta do PHP 5.3 e late static bind
 			self::$_cachedir = $backDefault['cache_dir'];
 			self::$_className = $frontOptions['class_name'];
 			
@@ -69,7 +69,7 @@
 	 /**
 	  * Inicia o cache.
 	  * 
-	  * @param mixed $_ Valores que se alteram na página e que portanto geram outra versão de cache.
+	  * @param mixed $_ Valores que se alteram na pÃ¡gina e que portanto geram outra versÃ£o de cache.
 	  * @see Zend/Cache/Frontend/Zend_Cache_Frontend_Page#start()
 	  */	 
 	 public function start(/* Dynamic args*/)
@@ -84,7 +84,7 @@
 	 	// Verifica se o log foi alterado
 	 	$logTime = $this->_checkLog($id);
 
-	 	// Desabilita o cache individual da página pelo $_GET
+	 	// Desabilita o cache individual da pÃ¡gina pelo $_GET
 	 	if (isset($_GET['nocache_force'])) {
 	 		$this->remove($id);
 	 	}
@@ -160,7 +160,7 @@
 	}
 	 
 	/**
-	 * Gera marcador para página cacheada
+	 * Gera marcador para pÃ¡gina cacheada
 	 * 
 	 * @param string $name
 	 * @param mixed $vars [optional]
@@ -171,7 +171,7 @@
 	}
 	
 	/**
-	 * Substitui o marcador por conteúdo real.
+	 * Substitui o marcador por conteÃºdo real.
 	 * 
 	 * @param string $filecontent
 	 * @return string
@@ -229,9 +229,9 @@
 	}
 
 	/**
-	 * Verifica se o log do InterAdmin foi alterado. E limpa o cache se necessário.
+	 * Verifica se o log do InterAdmin foi alterado. E limpa o cache se necessÃ¡rio.
 	 * 
-	 * @return int Retorna a data de alteração do arquivo de log. 
+	 * @return int Retorna a data de alteraÃ§Ã£o do arquivo de log. 
 	 */
 	protected function _checkLog($id)
 	{
@@ -242,11 +242,11 @@
 		
 		$cache_time = $metas['mtime'];
 		
-		// Verificação do log
+		// VerificaÃ§Ã£o do log
 	 	$log_time = @filemtime(self::$_logdir . 'interadmin.log');
 		
 		$antesDelay = time() - $log_time < self::$_delay;
-		// Outro dia é atualizado o cache
+		// Outro dia Ã© atualizado o cache
 		$expiradoOuOutroDia = ($log_time >= $cache_time) || date('d', $cache_time) != date('d');
 		
 	 	if ($expiradoOuOutroDia && !$antesDelay) {
@@ -256,10 +256,10 @@
 	}
 	
 	/**
-	 * Exibe informações para debug em um overlay no topo da página.
+	 * Exibe informaÃ§Ãµes para debug em um overlay no topo da pÃ¡gina.
 	 * 
 	 * @param string $id ID do cache.
-	 * @param int $logTime Timestamp da última alteração do log.
+	 * @param int $logTime Timestamp da Ãºltima alteraÃ§Ã£o do log.
 	 */
 	protected function _showDebug($id, $logTime)
 	{
@@ -291,7 +291,7 @@
 			} else {
 				$urlNoCache = substr($_SERVER['REQUEST_URI'], 0, $pos) . '?nocache_force=true&' . substr($_SERVER['REQUEST_URI'], $pos + 1);
 			}
-            $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta página?\')) window.location = \'' . $urlNoCache . '\'"';
+            $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta pÃ¡gina?\')) window.location = \'' . $urlNoCache . '\'"';
 	 		
 	 		echo '<div style="' . $css . 'left:0px;" title="' . $title . '" ' . $event . '>CACHE</div>';
 	 		echo '<div style="' . $css . 'right:0px;" title="' . $title . '" ' . $event . '>CACHE</div>';

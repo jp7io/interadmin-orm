@@ -1,5 +1,5 @@
 <?php
-// Necessário para herdar métodos padrão
+// NecessÃ¡rio para herdar mÃ©todos padrÃ£o
 return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 
 class Jp7_NewsController extends __Controller_Action {
@@ -9,7 +9,7 @@ class Jp7_NewsController extends __Controller_Action {
 		$newsTipo = self::getTipo();
 		
 		if ($id) {
-			// Irá cachear uma página diferente para cada registro
+			// IrÃ¡ cachear uma pÃ¡gina diferente para cada registro
 			Jp7_Cache_Output::getInstance()->start((string) $id);
 			
 			$record = $newsTipo->findById($id,array(
@@ -30,7 +30,7 @@ class Jp7_NewsController extends __Controller_Action {
 		} else {
 			$archive = $this->_getParam('archive');
 			
-			// Irá cachear uma página diferente para cada registro
+			// IrÃ¡ cachear uma pÃ¡gina diferente para cada registro
 			Jp7_Cache_Output::getInstance()->start($archive . $this->_getParam('p_page'));
 			
 			$options = array(
@@ -54,7 +54,7 @@ class Jp7_NewsController extends __Controller_Action {
 			}  else {
 				$pagination = new Pagination(array(
 					'records' => $newsTipo->count($options),
-					'next_char' => 'Próxima',
+					'next_char' => 'PrÃ³xima',
 					'back_char' => 'Anterior',
 					'show_first_and_last' => true 
 				));
@@ -62,7 +62,7 @@ class Jp7_NewsController extends __Controller_Action {
 			
 			$this->view->introductionItens = array();
 			if (!$this->view->archive && $pagination->page == 1) {
-				// Introdução na primeira página (Menos em página de Arquivo Mensal)
+				// IntroduÃ§Ã£o na primeira pÃ¡gina (Menos em pÃ¡gina de Arquivo Mensal)
 				if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
 					$this->view->introductionItens = $introductionTipo->find(array(
 						'fields' => '*'

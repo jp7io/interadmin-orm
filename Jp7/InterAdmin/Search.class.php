@@ -126,7 +126,7 @@ class Jp7_InterAdmin_Search {
 		$short_words = array('de', 'do', 'da', 'ao', 'em', 'no', 'na');
 						
 		$where = array();
-		// Trata as aspas como uma palavra só
+		// Trata as aspas como uma palavra sÃ³
 		preg_match_all('/-?"(?:\\\\.|[^\\\\"])*"|[^" ]+/', $search, $matches);
 		$words = $matches[0];
 		
@@ -181,7 +181,7 @@ class Jp7_InterAdmin_Search {
 					$regex = $this->regexDiacritics($regex);
 					$regex = str_replace('*', '[[:alnum:]]*', $regex);
 					//$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . $regex . ")([^a-zA-Z]|$)') * " . $weight;
-					// [[:<:]] é igual \b - Início e fim de uma palavra
+					// [[:<:]] Ã© igual \b - InÃ­cio e fim de uma palavra
 					$match .= " + (" . reset($textColumns) . " REGEXP '[[:<:]]" . $regex . "[[:>:]]') * " . $weight;
 				}
 			}
@@ -244,7 +244,7 @@ class Jp7_InterAdmin_Search {
 		return $sql;
 	}
 	/**
-	 * SQL de permissões dos tipos.
+	 * SQL de permissÃµes dos tipos.
 	 * @return string
 	 */
 	public function getTipoFilter() {
@@ -275,13 +275,13 @@ class Jp7_InterAdmin_Search {
 	}
 	
 	public function regexDiacritics($word) {
-		$word = str_replace('a', '[áàãâäªa]', $word);
-		$word = str_replace('e','[éèêë&e]', $word);
-		$word = str_replace('i','[íìîïi]', $word);
-		$word = str_replace('o','[óòõôöºo]', $word);
-		$word = str_replace('u','[úùûüu]', $word);
-		$word = str_replace('c','[çc]', $word);
-		$word = str_replace('n','[ñn]', $word);
+		$word = str_replace('a', '[Ã¡Ã Ã£Ã¢Ã¤Âªa]', $word);
+		$word = str_replace('e','[Ã©Ã¨ÃªÃ«&e]', $word);
+		$word = str_replace('i','[Ã­Ã¬Ã®Ã¯i]', $word);
+		$word = str_replace('o','[Ã³Ã²ÃµÃ´Ã¶Âºo]', $word);
+		$word = str_replace('u','[ÃºÃ¹Ã»Ã¼u]', $word);
+		$word = str_replace('c','[Ã§c]', $word);
+		$word = str_replace('n','[Ã±n]', $word);
 		return $word;
 	}
 }

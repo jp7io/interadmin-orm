@@ -5,7 +5,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	public $hasOwnPage = true;
 	
 	/**
-	 * $id_tipo n„o È inteiro
+	 * $id_tipo n√£o √© inteiro
 	 * @return 
 	 */
 	public function __construct() {
@@ -25,7 +25,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			'where' => array("admin <> ''")
 		));
 		if (!$child) {
-			// Tenta criar o tipo filho caso ele n„o exista
+			// Tenta criar o tipo filho caso ele n√£o exista
 			$sistemaTipo = InterAdminTipo::findFirstTipo(array(
 				'where' => array(
 					"nome = 'Sistema'",
@@ -55,7 +55,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	}
 	
 	/**
-	 * Trigger executado apÛs inserir um tipo com esse modelo.
+	 * Trigger executado ap√≥s inserir um tipo com esse modelo.
 	 * 
 	 * @param InterAdminTipo $tipo
 	 * @return void
@@ -75,7 +75,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		}
 		if (!$tipo->getFirstChildByModel('Introduction')) {
 			$introduction = $tipo->createChild('Introduction');
-			$introduction->nome = 'IntroduÁ„o';
+			$introduction->nome = 'Introdu√ß√£o';
 			$introduction->ordem = -60;
 	        $introduction->save();
 		}
@@ -87,7 +87,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		}
 		if ($tipo->model_id_tipo !== 'Videos' && !$tipo->getFirstChildByModel('ContentVideos')) {
 			$videos = $tipo->createChild('ContentVideos');
-			$videos->nome = 'VÌdeos';
+			$videos->nome = 'V√≠deos';
 			$videos->ordem = -40;
 	        $videos->save();
 		}
@@ -105,7 +105,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		}
 		if (!$tipo->getFirstChildByModel('Settings')) {
 			$settings = $tipo->createChild('Settings');
-			$settings->nome = 'ConfiguraÁıes';
+			$settings->nome = 'Configura√ß√µes';
 			$settings->ordem = -10;
 	        $settings->save();
 		}
@@ -136,12 +136,12 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 			<div class="group-label">Imagens</div>
 			<div class="group-fields">
 				<div class="field">
-					<label>Dimensıes:</label>
+					<label>Dimens√µes:</label>
 					<?php echo $box->numericField('imgWidth', 'Largura', $default_width); ?> x
 					<?php echo $box->numericField('imgHeight', 'Altura', $default_height); ?> px
 				</div>
 				<div class="field">
-					<label title="Se estiver marcado ir· recortar a imagem nas dimensıes exatas que foram informadas.">Recortar:</label>
+					<label title="Se estiver marcado ir√° recortar a imagem nas dimens√µes exatas que foram informadas.">Recortar:</label>
 					<?php echo $box->checkbox('imgCrop'); ?>
 				</div>
 				<?php if ($lightbox) { ?>

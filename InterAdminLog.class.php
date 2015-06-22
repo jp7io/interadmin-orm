@@ -28,7 +28,7 @@ class InterAdminLog extends InterAdminAbstract {
 	 */
 	public $db_prefix;
 	/**
-	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this recordÂ´s 'id_tipo'.
 	 * @var InterAdminTipo
 	 */
 	protected $_tipo;
@@ -191,6 +191,6 @@ class InterAdminLog extends InterAdminAbstract {
 	}
 	
 	public static function getPublishedFilters($table, $alias) {
-		// Não precisa
+		// NÃ£o precisa
 	}	
 }

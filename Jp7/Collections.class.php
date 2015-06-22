@@ -220,7 +220,7 @@ class Jp7_Collections {
 	 * @param 	string	$separator		
 	 * @param 	array	$array					Array of objects.
 	 * @param 	string 	$propertyName 			[optional] Defaults to 'nome'.
-	 * @param 	bool 	$discardEmptyValues		If TRUE empty values won´t be imploded.
+	 * @param 	bool 	$discardEmptyValues		If TRUE empty values wonÂ´t be imploded.
 	 * @return 	string 	Values of $propertyName imploded using $separator.
 	 */
 	public static function implode($separator, $array, $propertyName = 'nome', $discardEmptyValues = true) {

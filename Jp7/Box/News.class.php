@@ -10,7 +10,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 		if ($newsTipo) {
 			$options = array(
 				'fields' => array('title', 'image', 'date_publish'),
-				'fields_alias' => true, // Não dá para garantir que está true por padrão
+				'fields_alias' => true, // NÃ£o dÃ¡ para garantir que estÃ¡ true por padrÃ£o
 				'limit' => $this->params->limit
 			);
 			if ($this->params->featured) {
@@ -30,7 +30,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
     protected function _getEditorTitle() {
-        return 'Notícias';
+        return 'NotÃ­cias';
     }
 	
 	protected function _getEditorFields() {
@@ -47,8 +47,8 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
 						<?php if (count($config->langs) > 1) { ?>
 							<img src="/_default/img/icons/<?php echo $key; ?>.png" style="vertical-align:middle;" />
 						<?php } ?>
-					Título:</label>
-					<input type="text" class="textbox" label="Título" placeholder="Automático" 
+					TÃ­tulo:</label>
+					<input type="text" class="textbox" label="TÃ­tulo" placeholder="AutomÃ¡tico" 
 						name="<?php echo $this->id_box; ?>[title<?php echo $sufix; ?>][]"
 						value="<?php echo $this->params->{'title' . $sufix}; ?>"	/>
 				</div>

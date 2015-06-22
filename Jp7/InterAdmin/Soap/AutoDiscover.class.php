@@ -36,7 +36,7 @@ class Jp7_InterAdmin_Soap_AutoDiscover extends Zend_Soap_AutoDiscover {
      */
     protected function _addFunctionToWsdl($function, $wsdl, $port, $binding)
     {
-    	/* FIXME CODIGO DA ZEND: NAO ALTERAR, NAO HAVIA COMO EXTENDER SOMENTE UMA PARTE DA FUNÇÃO */
+    	/* FIXME CODIGO DA ZEND: NAO ALTERAR, NAO HAVIA COMO EXTENDER SOMENTE UMA PARTE DA FUNÃ‡ÃƒO */
         $uri = $this->getUri();
 
         // We only support one prototype: the one with the maximum number of arguments
@@ -66,7 +66,7 @@ class Jp7_InterAdmin_Soap_AutoDiscover extends Zend_Soap_AutoDiscover {
                 );
                 if ($param->isOptional()) {
                     $sequenceElement['nillable'] = 'true';
-					$sequenceElement['minOccurs'] = '0'; /* FIXME APENAS ESSA LINHA É CODIGO DA JP7 */
+					$sequenceElement['minOccurs'] = '0'; /* FIXME APENAS ESSA LINHA Ã‰ CODIGO DA JP7 */
                 }
                 $sequence[] = $sequenceElement;
             }

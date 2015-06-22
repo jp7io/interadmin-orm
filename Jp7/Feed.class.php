@@ -3,7 +3,7 @@
 class Jp7_Feed extends Zend_Feed_Writer_Feed {
 	
 	/**
-	 * Datetime do ˙ltimo registro inserido, que servir· como ˙ltima modificaÁ„o
+	 * Datetime do √∫ltimo registro inserido, que servir√° como √∫ltima modifica√ß√£o
 	 * no feed.
 	 * 
 	 * @var timestamp $lastModified
@@ -13,7 +13,7 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed {
 	/**
 	 * Analisa objetos InterAdmin para criar uma entrada
 	 * @param array $interAdmins [optional] InterAdmin[]
-	 * @param array $helpers [optional] Regras que ajudam ou forÁam a leitura 
+	 * @param array $helpers [optional] Regras que ajudam ou for√ßam a leitura 
 	 * de atributos do objeto InterAdmin.
 	 * 
 	 * @example Defaults: array(
@@ -87,7 +87,7 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed {
 					$this->lastDateModified = $dateModified;
 				}
 			} else {
-				throw new Jp7_Feed_Exception('Um objeto ou mais n„o È uma inst‚ncia de InterAdmin.');
+				throw new Jp7_Feed_Exception('Um objeto ou mais n√£o √© uma inst√¢ncia de InterAdmin.');
 			}
 		}
 	}

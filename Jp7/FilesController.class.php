@@ -1,5 +1,5 @@
 <?php
-// Necessário para herdar métodos padrão
+// NecessÃ¡rio para herdar mÃ©todos padrÃ£o
 return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 
 class Jp7_FilesController extends __Controller_Action {
@@ -13,7 +13,7 @@ class Jp7_FilesController extends __Controller_Action {
 			'fields' => array('name', 'file')
 		));
 			
-		// Introdução
+		// IntroduÃ§Ã£o
 		if ($introductionTipo = $filesTipo->getFirstChildByModel('Introduction')) {
 			$this->view->introductionItens = $introductionTipo->find(array(
 				'fields' => '*'

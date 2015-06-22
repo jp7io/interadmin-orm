@@ -23,7 +23,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin {
         } elseif (in_array('login', $aliases)) {
         	$campos[] = 'login';
         } else {
-        	throw new Exception('Campo usuario n„o existe no tipo Usu·rios.');
+        	throw new Exception('Campo usuario n√£o existe no tipo Usu√°rios.');
         }       
         if (in_array('mfa', $aliases)) {
         	$campos[] = 'mfa';
@@ -183,7 +183,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin {
 	
     public function sendToken() {
     	if (!$this->email) {
-    		throw new Exception('Usu·rio sem e-mail cadastrado.');
+    		throw new Exception('Usu√°rio sem e-mail cadastrado.');
     	}
     	
     	$secret = '';

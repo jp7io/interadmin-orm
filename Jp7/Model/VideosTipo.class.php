@@ -4,8 +4,8 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 	
 	public $attributes = array(
 		'id_tipo' => 'Videos',
-		'nome' => 'VÌdeos',
-		'campos' => 'varchar_key{,}TÌtulo{,}{,}{,}{,}S{,}0{,}{,}2{,}{,}{,}{,}{,}{,}{,}title{;}varchar_1{,}VÌdeo{,}EndereÁo do vÌdeo no YouTube ou Vimeo. Ex: http://www.youtube.com/watch?v=123ab456{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}video{;}file_1{,}Thumb{,}Caso n„o seja cadastrada, ser· usada a imagem do YouTube para preview do vÌdeo.{,}{,}{,}{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}thumb{;}varchar_2{,}DuraÁ„o{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}duration{;}text_1{,}DescriÁ„o{,}{,}5{,}{,}S{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}summary{;}int_key{,}Ordem{,}{,}{,}{,}S{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
+		'nome' => 'V√≠deos',
+		'campos' => 'varchar_key{,}T√≠tulo{,}{,}{,}{,}S{,}0{,}{,}2{,}{,}{,}{,}{,}{,}{,}title{;}varchar_1{,}V√≠deo{,}Endere√ßo do v√≠deo no YouTube ou Vimeo. Ex: http://www.youtube.com/watch?v=123ab456{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}video{;}file_1{,}Thumb{,}Caso n√£o seja cadastrada, ser√° usada a imagem do YouTube para preview do v√≠deo.{,}{,}{,}{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}thumb{;}varchar_2{,}Dura√ß√£o{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}duration{;}text_1{,}Descri√ß√£o{,}{,}5{,}{,}S{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}summary{;}int_key{,}Ordem{,}{,}{,}{,}S{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
 		'children' => '',
 		'arquivos_ajuda' => '',
 		'arquivos' => '',
@@ -18,7 +18,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 		'layout' => Jp7_Box_Manager::COL_2_LEFT,
 		'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
 		'editar' => 'S',
-		'texto' => 'Cadastro de vÌdeos do YouTube e Vimeo.',
+		'texto' => 'Cadastro de v√≠deos do YouTube e Vimeo.',
 		'disparo' => 'Jp7_Model_VideosTipo::checkThumb',
 		'icone' => 'film'
 	);
@@ -33,10 +33,10 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 		<div class="fields">
 			<?php if (Jp7_Box_Manager::getRecordMode()) { ?>
 				<div class="group">
-					<div class="group-label">VÌdeo</div>
+					<div class="group-label">V√≠deo</div>
 					<div class="group-fields">
 						<div class="field">
-							<label>Dimensıes:</label>
+							<label>Dimens√µes:</label>
 							<?php echo $box->numericField('videoWidth', 'Largura', '620'); ?> x
 							<?php echo $box->numericField('videoHeight', 'Altura', '380'); ?> px
 						</div>
@@ -86,7 +86,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 	}
 	
 	protected static function _updateThumb($registro) {
-		// Salvando thumb caso esteja vazio e seja um vÌdeo do YouTube ou Vimeo
+		// Salvando thumb caso esteja vazio e seja um v√≠deo do YouTube ou Vimeo
 		if (Jp7_YouTube::matchUrl($registro->video)) {
 			$registro->updateAttributes(array(
 				'thumb' => Jp7_YouTube::getThumbnail($registro->video)
@@ -99,7 +99,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 	}
 	
 	protected static function _updateTitle($registro) {
-		// Salvando thumb caso esteja vazio e seja um vÌdeo do YouTube ou Vimeo
+		// Salvando thumb caso esteja vazio e seja um v√≠deo do YouTube ou Vimeo
 		if (Jp7_YouTube::matchUrl($registro->video)) {
 			$registro->updateAttributes(array(
 				'title' => Jp7_YouTube::getTitle($registro->video)
@@ -108,7 +108,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract {
 	}
 	
 	protected static function _updateDuration($registro) {
-		// Salvando thumb caso esteja vazio e seja um vÌdeo do YouTube ou Vimeo
+		// Salvando thumb caso esteja vazio e seja um v√≠deo do YouTube ou Vimeo
 		if (Jp7_YouTube::matchUrl($registro->video)) {
 			$registro->updateAttributes(array(
 				'duration' => Jp7_YouTube::getDuration($registro->video)

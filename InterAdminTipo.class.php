@@ -78,7 +78,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				return ($match[1]) ? reset($retorno) : $retorno;
 			}
 		}
-		// Default error when method doesn¥t exist
+		// Default error when method doesn¬¥t exist
 		die(jp7_debug('Call to undefined method ' . get_class($this) . '->' . $method . '()'));
 	}
 
@@ -136,15 +136,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['default_class'] = self::$_defaultClass;
 		}
 		if (!empty($options['class'])) {
-			// Classe foi forÁada
+			// Classe foi for√ßada
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
-			// Classe n„o foi forÁada, cria uma inst‚ncia tempor·ria para acessar o DB e verificar a classe correta
+			// Classe n√£o foi for√ßada, cria uma inst√¢ncia tempor√°ria para acessar o DB e verificar a classe correta
 			$instance = new $options['default_class']($id_tipo, array_merge($options, array(
 				'fields' => array('model_id_tipo', 'class_tipo')
 			)));
 			$class_name = $instance->class_tipo;
-			// Classe n„o È customizada, retornar a prÛpria classe tempor·ria
+			// Classe n√£o √© customizada, retornar a pr√≥pria classe tempor√°ria
 			if (!class_exists($class_name)) {
 				if (!empty($options['fields'])) {
 					$instance->getFieldsValues($options['fields']);
@@ -277,7 +277,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		// Necess·rio enquanto algumas tabelas ainda tem esse campo numÈrico
+		// Necess√°rio enquanto algumas tabelas ainda tem esse campo num√©rico
 		$options['where'][] = "model_id_tipo != '0'"; 
 		return $this->getChildren($options);
 	}
@@ -380,12 +380,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function count($options = array()) {
 		if ($options['group'] == 'id') {
 			// O COUNT() precisa trazer a contagem total em 1 linha
-			// Caso exista GROUP BY id, ele traria em v·rias linhas
-			// Esse È um tratamento especial apenas para o ID
+			// Caso exista GROUP BY id, ele traria em v√°rias linhas
+			// Esse √© um tratamento especial apenas para o ID
 			$options['fields'] = array('COUNT(DISTINCT id) AS count_id');
 			unset($options['group']);
 		} elseif ($options['group']) {
-			// Se houver GROUP BY com outro campo, retornar· a contagem errada
+			// Se houver GROUP BY com outro campo, retornar√° a contagem errada
 			throw new Exception("GROUP BY is not supported when using count().");
 		} else {
 			$options['fields'] = array('COUNT(id) AS count_id');
@@ -592,7 +592,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 	}	
 	/**
-	 * Returns this object¥s nome and all the fields marked as 'combo', if the field 
+	 * Returns this object¬¥s nome and all the fields marked as 'combo', if the field 
 	 * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
 	 *
 	 * @return string For the tipo 'City' with the field 'state' marked as 'combo' it would return: 'City - State'.
@@ -1064,7 +1064,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	public static function findTiposByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
 		if ($model_id_tipo != '0') {
-			// Devido ‡ mudanÁa de int para string do campo model_id_tipo, essa linha È necess·ria
+			// Devido √† mudan√ßa de int para string do campo model_id_tipo, essa linha √© necess√°ria
 			$options['where'][] = "model_id_tipo != '0'";
 		}
 		return self::findTipos($options); 

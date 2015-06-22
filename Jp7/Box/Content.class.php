@@ -28,7 +28,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
      * @see Jp7_Box_BoxAbstract::_getEditorTitle()
      */
     protected function _getEditorTitle() {
-        return 'Conteúdo';
+        return 'ConteÃºdo';
     }
 	
 	/**
@@ -46,15 +46,15 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract {    /**
 				?>
 				<div class="field">
 					<label>
-						<?php if (count($config->langs) > 1) { ?>							<img src="/_default/img/icons/<?php echo $key; ?>.png" style="vertical-align:middle;" />						<?php } ?>					Título:</label>
-					<input type="text" class="textbox" label="Título" placeholder="Automático" 
+						<?php if (count($config->langs) > 1) { ?>							<img src="/_default/img/icons/<?php echo $key; ?>.png" style="vertical-align:middle;" />						<?php } ?>					TÃ­tulo:</label>
+					<input type="text" class="textbox" label="TÃ­tulo" placeholder="AutomÃ¡tico" 
 						name="<?php echo $this->id_box; ?>[title<?php echo $sufix; ?>][]"
 						value="<?php echo $this->params->{'title' . $sufix}; ?>"	/>
 				</div>
 			<?php } ?>
 			<div class="field obligatory">
-				<label>Seção:</label>
-				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box; ?>[section][]">
+				<label>SeÃ§Ã£o:</label>
+				<select class="selectbox" obligatory="yes" label="SeÃ§Ã£o" name="<?php echo $this->id_box; ?>[section][]">
 					<?php
 					$tipos = InterAdminTipo::findTipos(array(
 						'fields' => array('nome'),

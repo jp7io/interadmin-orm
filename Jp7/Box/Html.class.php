@@ -8,8 +8,8 @@ class Jp7_Box_Html extends Jp7_Box_BoxAbstract {	/**
 		?>
 		<div class="fields">
 			<div class="field">
-				<label>Título:</label>
-				<input type="text" class="textbox" label="Título" placeholder="Automático" 
+				<label>TÃ­tulo:</label>
+				<input type="text" class="textbox" label="TÃ­tulo" placeholder="AutomÃ¡tico" 
 					name="<?php echo $this->id_box; ?>[title][]"
 					value="<?php echo $this->params->title; ?>"	/>
 			</div>

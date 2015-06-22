@@ -1,7 +1,7 @@
 <?php
 
 /**
- * … usado para simular um mÈtodo no WebService.
+ * √â usado para simular um m√©todo no WebService.
  */
 class Jp7_InterAdmin_Soap_ReflectionMethodGetAll extends Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	
@@ -13,6 +13,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetAll extends Jp7_InterAdmin_Soap_Ref
 	}
 	
 	public function getDescription() {
-		return 'Retorna todos os registros da seÁ„o ' . $this->secao->nome . ', incluindo os registros deletados e os n„o publicados.';
+		return 'Retorna todos os registros da se√ß√£o ' . $this->secao->nome . ', incluindo os registros deletados e os n√£o publicados.';
 	}
 }

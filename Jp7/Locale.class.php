@@ -14,12 +14,12 @@ class Jp7_Locale
 	 */
 	public $lang = '';
 	/**
-	 * String que È adicionada ao prefixo das tabelas no banco de dados. Fica vazio na lÌngua padr„o.
+	 * String que √© adicionada ao prefixo das tabelas no banco de dados. Fica vazio na l√≠ngua padr√£o.
 	 * @var string  
 	 */
 	public $prefix = '';
 	/**
-	 * Path a ser adicionado ‡ URL do site para se abrir com esse idioma. Fica vazio na lÌngua padr„o.
+	 * Path a ser adicionado √† URL do site para se abrir com esse idioma. Fica vazio na l√≠ngua padr√£o.
 	 * @var string  
 	 */
 	public $path = '';
@@ -29,7 +29,7 @@ class Jp7_Locale
 	}
 	
 	/**
-	 * Construtor p˙blico.
+	 * Construtor p√∫blico.
 	 * 
 	 * @param string $language 	pt-br, en, etc...
 	 * @return 

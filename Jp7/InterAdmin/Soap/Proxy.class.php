@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Soap_Proxy {
 	/**
-	 * FunÁ„o que age como proxy entre a chamada e o mÈtodo real.
+	 * Fun√ß√£o que age como proxy entre a chamada e o m√©todo real.
 	 * 
 	 * @param string $methodName
 	 * @param array $args
@@ -11,7 +11,7 @@ class Jp7_InterAdmin_Soap_Proxy {
 	public function __call($methodName, $args) {
 		try {
 		
-			// Formatando os par‚metros
+			// Formatando os par√¢metros
 			$params = (array) $args[0];
 			foreach ($params as $key => $param) {
 				if ($param instanceof Jp7_InterAdmin_Soap_Options) {
@@ -30,12 +30,12 @@ class Jp7_InterAdmin_Soap_Proxy {
 					}
 				}
 				
-				// GenÈrico
+				// Gen√©rico
 				if (strpos($methodName, 'get') === 0) {
 					$generic = new Jp7_InterAdmin_Soap_Generic();
 					
 					$options = reset($params);
-					// Por padr„o sÛ pega os publicados
+					// Por padr√£o s√≥ pega os publicados
 					$options['use_published_filters'] = true;
 					$options['fields_alias'] = true;
 					

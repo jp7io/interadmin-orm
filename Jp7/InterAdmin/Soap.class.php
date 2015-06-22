@@ -66,7 +66,7 @@ STR;
 			// Relacionamentos
 			if ($value instanceof InterAdminAbstract) {
 				$record->attributes[$key2] = $value->attributes;
-			// Formato de data, não pode ser 0000-00-00
+			// Formato de data, nÃ£o pode ser 0000-00-00
 			} elseif ($value instanceof Jp7_Date) {
 				if ($value->isValid()) {
 					$record->attributes[$key2] = $value->format('c');
@@ -87,7 +87,7 @@ STR;
 	public static function createWsdlServer() {
 		global $config;
 		$server = new Jp7_InterAdmin_Soap_AutoDiscover('Jp7_InterAdmin_Soap_Strategy', $config->url);
-		// Usuario possui as seções liberadas
+		// Usuario possui as seÃ§Ãµes liberadas
 		$server->setOperationBodyStyle(array('use' => 'literal'));
 		$server->setBindingStyle(array('style' => 'document'));
 		return $server;
@@ -170,7 +170,7 @@ STR;
 			}
 		}
 		
-		// Funções
+		// FunÃ§Ãµes
 		$functions = array();
 		
 		$portType = $dom->getElementsByTagName('portType')->item(0);
@@ -181,7 +181,7 @@ STR;
 				'description' => utf8_decode($operation->getElementsByTagName('documentation')->item(0)->textContent),
 				'params' => array()
 			);
-			// Parâmetros
+			// ParÃ¢metros
 			$params = $elements[$operation->getAttribute('name')]->getElementsByTagName('element');
 			foreach ($params as $param) {
 				$function['params'][] = array(

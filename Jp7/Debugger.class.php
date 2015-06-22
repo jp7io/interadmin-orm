@@ -243,7 +243,7 @@ class Jp7_Debugger {
 		return '<strong style="color:red">'. str_pad($caption, 12, ' ', STR_PAD_LEFT) . ':</strong> ';
 	}
 	/**
-	 * Lança exceções em caso de erro de SQL, ao invés de utilizar a função jp7_debug(). 
+	 * LanÃ§a exceÃ§Ãµes em caso de erro de SQL, ao invÃ©s de utilizar a funÃ§Ã£o jp7_debug(). 
 	 * 
 	 * @param 	bool 	$bool
 	 * @return 	void

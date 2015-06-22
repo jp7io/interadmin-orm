@@ -16,7 +16,7 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 		'tabela' => '',
 		'layout' => 4,
 		'layout_registros' => 4,
-		'texto' => 'Contém as mensagens recebidas através do formulário de contato.' 
+		'texto' => 'ContÃ©m as mensagens recebidas atravÃ©s do formulÃ¡rio de contato.' 
 	);
 	
 	public function createChildren(InterAdminTipo $tipo) {
@@ -24,7 +24,7 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract {
 		
 		if (!$tipo->getFirstChildByModel('ContactRecipients')) {
 			$recipients = $tipo->createChild('ContactRecipients');
-			$recipients->nome = 'Destinatários';
+			$recipients->nome = 'DestinatÃ¡rios';
 			$recipients->ordem = -5;
 	        $recipients->save();
 		}
