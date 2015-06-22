@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2008 Guy Van den Broeck <guy@guyvdb.eu>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,25 +21,26 @@
 /**
  * Alternative representation of a set of changes, by the index
  * ranges that are changed.
- * 
+ *
  * @ingroup DifferenceEngine
  */
-class Jp7_Diff_RangeDifference {
+class Jp7_Diff_RangeDifference
+{
+    public $leftstart;
+    public $leftend;
+    public $leftlength;
 
-	public $leftstart;
-	public $leftend;
-	public $leftlength;
+    public $rightstart;
+    public $rightend;
+    public $rightlength;
 
-	public $rightstart;
-	public $rightend;
-	public $rightlength;
-
-	function __construct($leftstart, $leftend, $rightstart, $rightend){
-		$this->leftstart = $leftstart;
-		$this->leftend = $leftend;
-		$this->leftlength = $leftend - $leftstart;
-		$this->rightstart = $rightstart;
-		$this->rightend = $rightend;
-		$this->rightlength = $rightend - $rightstart;
-	}
+    public function __construct($leftstart, $leftend, $rightstart, $rightend)
+    {
+        $this->leftstart = $leftstart;
+        $this->leftend = $leftend;
+        $this->leftlength = $leftend - $leftstart;
+        $this->rightstart = $rightstart;
+        $this->rightend = $rightend;
+        $this->rightlength = $rightend - $rightstart;
+    }
 }
