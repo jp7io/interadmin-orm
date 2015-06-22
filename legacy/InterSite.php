@@ -106,96 +106,47 @@ class InterSite
     {
         self::$instance = $instance;
     }
-
-    /**
-     * Initializes the variables for the given host.
-     *
-     * @param string $host
-     */
-    public function init($host)
+        
+    public function setServer($server)
     {
-        global $jp7_app;
+        $this->server = $server;
+        
+        // Set variables that depend on the server
+        $this->db = clone $this->server->db;
+        $this->db->prefix = 'interadmin_'.$this->name_id;
 
-        // Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
-        $host = strtolower(explode(':', $host)[0]);
-
-        // This server is a main host
-        if (isset($this->servers[$host])) {
-            $this->server = $this->servers[$host];
+        foreach ((array) $this->server->vars as $var => $value) {
+            $this->$var = $value;
         }
 
-        // Not Found, searching aliases
-        if (!$this->server) {
-            foreach ($this->servers as $server) {
-                // Domínios Alternativos - Não redirecionam
-                if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
-                    $this->server = $this->servers[$host] = $server;
-                    $this->server->host = $host;
-                    break;
-                }
-            }
-        }
+        $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
+        $this->url = $protocol.'://'.$this->server->host.'/'.$this->server->path;
+        $this->url = Str::finish($this->url, '/');
 
-        if ($this->server) {
-            // Set variables that depend on the server
-            $this->db = clone $this->server->db;
-            $this->db->prefix = 'interadmin_'.$this->name_id;
-
-            foreach ((array) $this->server->vars as $var => $value) {
-                $this->$var = $value;
-            }
-
-            $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
-            $this->url = $protocol.'://'.$this->server->host.'/'.$this->server->path;
-            $this->url = Str::finish($this->url, '/');
-
-            foreach ($this->langs as $sigla => $lang) {
-                if ($lang->default) {
-                    $this->lang_default = $sigla;
-                    break;
-                }
+        foreach ($this->langs as $sigla => $lang) {
+            if ($lang->default) {
+                $this->lang_default = $sigla;
+                break;
             }
         }
     }
-
+    
     public function start()
     {
         $host = self::getHost();
-        $this->init($host);
         
-        /*
-        if (!$this->server) {
-            $default = self::getDefaultHost();
-            if ($host != $default) {
-                $uri = 'http://'.self::getDefaultHost().$_SERVER['REQUEST_URI'];
-
-                header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
-                header('Location: '.$uri.(str_contains($uri, '?') ? '&' : '?').'INTERSITE_REDIRECT');
-                exit;
-            } else {
-                throw new Exception('Settings not found on ./interadmin/config.php.'.
-                    ' Add a server or an alias_domain.');
-            }
+        if (isset($this->servers[$host])) {
+            $this->setServer($this->servers[$host]);
         }
-        */
-
+        
         self::setConfig($this);
     }
 
     public static function getHost()
     {
-        if (isset($_SERVER['HTTP_HOST'])) {
-            return $_SERVER['HTTP_HOST'];
-        } else {
-            return self::getDefaultHost();
-        }
-    }
-
-    public static function getDefaultHost()
-    {
         return getenv('INTERADMIN_HOST');
     }
-
+    
     public static function __set_state($array)
     {
         $instance = new self();
