@@ -136,7 +136,7 @@ class Settings
 
     public static function clearInterAdminCache()
     {
-        if (!\App::environment('local', 'testing')) {
+        if (!\App::environment('local')) {
             return;
         }
         // Atualiza classmap e routes com CMD+SHIFT+R ou no terminal
