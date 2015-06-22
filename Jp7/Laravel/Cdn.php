@@ -22,14 +22,11 @@ class Cdn
     private static function replace($url)
     {
         $config = \InterSite::config();
+        
         if (!empty($config->cdn_domain)) {
-            $url = str_replace(
-                $config->url,
-                'http://'.$config->cdn_domain.'/',
-                $url
-            );
+            $url = str_replace(url(), 'http://'.$config->cdn_domain, $url);
         }
-
+        
         return $url;
     }
 
