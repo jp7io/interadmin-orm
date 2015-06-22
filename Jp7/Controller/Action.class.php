@@ -114,7 +114,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->_prepareTitle();
 		$this->view->headTitle($config->lang->title);
 		// Metas
-		$this->view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=ISO-8859-1');
+		$this->view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=' . $config->charset);
 		foreach ($metas as $key => $value) {
 			$this->view->headMeta()->appendName($key, $value);
 		}

@@ -98,6 +98,9 @@ class Jp7_Bootstrap {
 		}
 		$dsn = jp7_formatDsn($config->db);
 		$db = ADONewConnection($dsn);
+		if ($config->charset == 'UTF-8') {
+			$db->execute("set names 'utf8'"); 
+		}
 		
 		if (!$db) {
 			$config->db->pass = '{pass}';

@@ -68,7 +68,12 @@ class InterSite {
 	 * @var string
 	 */
 	public $lang_default = 'pt-br';
-	
+	/**
+	 * Default charset.
+	 * @var string
+	 */
+	public $charset = 'ISO-8859-1';
+
 	protected static $instance = null;
 		
 	/**
