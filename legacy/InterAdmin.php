@@ -4,12 +4,12 @@ use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\ClassMap;
 use Jp7\Interadmin\Query;
 use Jp7\Interadmin\Relation\HasMany;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
-class InterAdmin extends InterAdminAbstract implements ArrayableInterface
+class InterAdmin extends InterAdminAbstract implements Arrayable
 {
     /**
      * To be used temporarily with deprecated methods.
@@ -77,7 +77,28 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
     {
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
-        } elseif ($this->id) {
+        }
+     
+        // returned as reference
+        $result = $this->_lazyLoadAttribute($name);
+
+        return $result;
+    }
+    
+    /**
+     * Magic isset acessor.
+     *
+     * @param string $attributeName
+     *
+     * @return bool
+     */
+    public function __isset($attributeName)
+    {
+        return isset($this->attributes[$attributeName]) || $this->_lazyLoadAttribute($attributeName);
+    }
+    
+    private function _lazyLoadAttribute($name) {
+        if ($this->id) {
             // relationship
             $relationships = $this->getType()->getRelationships();
             if (isset($relationships[$name])) {
@@ -103,10 +124,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
                 return $this->attributes[$name];
             }
         }
-
-        return $null; // returned as reference
     }
-
+        
     private function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];

@@ -46,7 +46,7 @@ function to_slug($string, $separator = '-')
     $string = str_replace('®', '', $string);
     $string = str_replace('&', 'e', $string);
 
-    return Str::slug($string, $separator);
+    return str_slug($string, $separator);
 }
 
 function interadmin_data($record)
@@ -121,17 +121,7 @@ function jp7_debug($msg)
 }
 
 // Laravel 5 functions
-function collect($arr)
+function collect($arr = null)
 {
     return new \Jp7\Interadmin\Collection($arr);
-}
-
-// OVERRIDE LARAVEL FUNCTIONS
-function snake_case($value, $delimiter = '_')
-{
-    if (ctype_lower($value)) {
-        return $value;
-    }
-
-    return strtolower(preg_replace('/(.)(?=[A-Z])/', '$1'.$delimiter, $value));
 }
