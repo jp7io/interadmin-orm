@@ -1,98 +1,94 @@
 <?php
+
 /**
- * Chunk
- * 
+ * Chunk.
+ *
  * Reads a large file in as chunks for easier parsing.
- * 
+ *
  * The chunks returned are whole <$this->options['element']/>s found within file.
- * 
+ *
  * Each call to read() returns the whole element including start and end tags.
- * 
+ *
  * Tested with a 1.8MB file, extracted 500 elements in 0.11s
  * (with no work done, just extracting the elements)
- * 
+ *
  * Usage:
  * <code>
  *   // initialize the object
  *   $file = new Chunk('chunk-test.xml', array('element' => 'Chunk'));
- *   
+ *
  *   // loop through the file until all lines are read
  *   while ($xml = $file->read()) {
  *     // do whatever you want with the string
  *     $o = simplexml_load_string($xml);
  *   }
  * </code>
- * 
- * @package default
+ *
  * @author Dom Hastings
  */
-class Jp7_Xml_Chunk {
-  /**
-   * options
+class Jp7_Xml_Chunk
+{
+    /**
+   * options.
    *
    * @var array Contains all major options
-   * @access public
    */
   public $options = array(
     'path' => './',       // string The path to check for $file in
     'element' => '',      // string The XML element to return
-    'chunkSize' => 512    // integer The amount of bytes to retrieve in each chunk
+    'chunkSize' => 512,    // integer The amount of bytes to retrieve in each chunk
   );
 
   /**
-   * file
+   * file.
    *
    * @var string The filename being read
-   * @access public
    */
   public $file = '';
   /**
-   * pointer
+   * pointer.
    *
-   * @var integer The current position the file is being read from
-   * @access public
+   * @var int The current position the file is being read from
    */
   public $pointer = 0;
 
   /**
-   * handle
+   * handle.
    *
    * @var resource The fopen() resource
-   * @access private
    */
   private $handle = null;
   /**
-   * reading
+   * reading.
    *
-   * @var boolean Whether the script is currently reading the file
-   * @access private
+   * @var bool Whether the script is currently reading the file
    */
   private $reading = false;
   /**
-   * readBuffer
-   * 
+   * readBuffer.
+   *
    * @var string Used to make sure start tags aren't missed
-   * @access private
    */
   private $readBuffer = '';
 
   /**
-   * __construct
-   * 
+   * __construct.
+   *
    * Builds the Chunk object
    *
    * @param string $file The filename to work with
    * @param array $options The options with which to parse the file
+   *
    * @author Dom Hastings
-   * @access public
    */
-  public function __construct($file, $options = array()) {
-    // merge the options together
+  public function __construct($file, $options = array())
+  {
+      // merge the options together
     $this->options = array_merge($this->options, (is_array($options) ? $options : array()));
 
     // check that the path ends with a /
     if (substr($this->options['path'], -1) != '/') {
-      $this->options['path'] .= '/';
+        $this->options['path'] .= '/';
     }
 
     // normalize the filename
@@ -103,7 +99,7 @@ class Jp7_Xml_Chunk {
 
     // check it's valid
     if ($this->options['chunkSize'] < 64) {
-      $this->options['chunkSize'] = 512;
+        $this->options['chunkSize'] = 512;
     }
 
     // set the filename
@@ -111,7 +107,7 @@ class Jp7_Xml_Chunk {
 
     // check the file exists
     if (!file_exists($this->file)) {
-      throw new Exception('Cannot load file: '.$this->file);
+        throw new Exception('Cannot load file: '.$this->file);
     }
 
     // open the file
@@ -119,41 +115,40 @@ class Jp7_Xml_Chunk {
 
     // check the file opened successfully
     if (!$this->handle) {
-      throw new Exception('Error opening file for reading');
+        throw new Exception('Error opening file for reading');
     }
   }
 
   /**
-   * __destruct
-   * 
+   * __destruct.
+   *
    * Cleans up
    *
-   * @return void
    * @author Dom Hastings
-   * @access public
    */
-  public function __destruct() {
-    // close the file resource
+  public function __destruct()
+  {
+      // close the file resource
     fclose($this->handle);
   }
 
   /**
-   * read
-   * 
+   * read.
+   *
    * Reads the first available occurence of the XML element $this->options['element']
    *
    * @return string The XML string from $this->file
+   *
    * @author Dom Hastings
-   * @access public
    */
-  public function read() {
-    // check we have an element specified
+  public function read()
+  {
+      // check we have an element specified
     if (!empty($this->options['element'])) {
-      // trim it
+        // trim it
       $element = trim($this->options['element']);
-
     } else {
-      $element = '';
+        $element = '';
     }
 
     // initialize the buffer
@@ -161,14 +156,14 @@ class Jp7_Xml_Chunk {
 
     // if the element is empty
     if (empty($element)) {
-      // let the script know we're reading
+        // let the script know we're reading
       $this->reading = true;
 
       // read in the whole doc, cos we don't know what's wanted
       while ($this->reading) {
-        $buffer .= fread($this->handle, $this->options['chunkSize']);
+          $buffer .= fread($this->handle, $this->options['chunkSize']);
 
-        $this->reading = (!feof($this->handle));
+          $this->reading = (!feof($this->handle));
       }
 
       // return it all
@@ -176,9 +171,9 @@ class Jp7_Xml_Chunk {
 
     // we must be looking for a specific element
     } else {
-      // set up the strings to find
+        // set up the strings to find
       $open = '<'.$element.'>';
-      $close = '</'.$element.'>';
+        $close = '</'.$element.'>';
 
       // let the script know we're reading
       $this->reading = true;
@@ -194,7 +189,7 @@ class Jp7_Xml_Chunk {
 
       // start reading
       while ($this->reading && !feof($this->handle)) {
-        // store the chunk in a temporary variable
+          // store the chunk in a temporary variable
         $tmp = fread($this->handle, $this->options['chunkSize']);
 
         // update the global buffer
@@ -205,12 +200,12 @@ class Jp7_Xml_Chunk {
 
         // if it wasn't in the new buffer
         if (!$checkOpen && !($store)) {
-          // check the full buffer (in case it was only half in this buffer)
+            // check the full buffer (in case it was only half in this buffer)
           $checkOpen = strpos($this->readBuffer, $open);
 
           // if it was in there
           if ($checkOpen) {
-            // set it to the remainder
+              // set it to the remainder
             $checkOpen = $checkOpen % $this->options['chunkSize'];
           }
         }
@@ -220,26 +215,26 @@ class Jp7_Xml_Chunk {
 
         // if it wasn't in the new buffer
         if (!$checkClose && ($store)) {
-          // check the full buffer (in case it was only half in this buffer)
+            // check the full buffer (in case it was only half in this buffer)
           $checkClose = strpos($this->readBuffer, $close);
 
           // if it was in there
           if ($checkClose) {
-            // set it to the remainder plus the length of the close string itself
+              // set it to the remainder plus the length of the close string itself
             $checkClose = ($checkClose + strlen($close)) % $this->options['chunkSize'];
           }
 
         // if it was
         } elseif ($checkClose) {
-          // add the length of the close string itself
+            // add the length of the close string itself
           $checkClose += strlen($close);
         }
 
         // if we've found the opening string and we're not already reading another element
         if ($checkOpen !== false && !($store)) {
-          // if we're found the end element too
+            // if we're found the end element too
           if ($checkClose !== false) {
-            // append the string only between the start and end element
+              // append the string only between the start and end element
             $buffer .= substr($tmp, $checkOpen, ($checkClose - $checkOpen));
 
             // update the pointer
@@ -247,9 +242,8 @@ class Jp7_Xml_Chunk {
 
             // let the script know we're done
             $this->reading = false;
-
           } else {
-            // append the data we know to be part of this element
+              // append the data we know to be part of this element
             $buffer .= substr($tmp, $checkOpen);
 
             // update the pointer
@@ -261,7 +255,7 @@ class Jp7_Xml_Chunk {
 
         // if we've found the closing element
         } elseif ($checkClose !== false) {
-          // update the buffer with the data upto and including the close tag
+            // update the buffer with the data upto and including the close tag
           $buffer .= substr($tmp, 0, $checkClose);
 
           // update the pointer
@@ -272,7 +266,7 @@ class Jp7_Xml_Chunk {
 
         // if we've found the closing element, but half in the previous chunk
         } elseif ($store) {
-          // update the buffer
+            // update the buffer
           $buffer .= $tmp;
 
           // and the pointer

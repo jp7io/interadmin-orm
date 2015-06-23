@@ -1,18 +1,20 @@
 <?php
 
 /**
- * … usado para simular um mÈtodo no WebService.
+ * √â usado para simular um m√©todo no WebService.
  */
-class Jp7_InterAdmin_Soap_ReflectionMethodGetAll extends Jp7_InterAdmin_Soap_ReflectionMethodGet {
-	
-	/**
-	 * @return string 
-	 */
-	public function getName() {
-		return 'getAll' . $this->_getClassName();
-	}
-	
-	public function getDescription() {
-		return 'Retorna todos os registros da seÁ„o ' . $this->secao->nome . ', incluindo os registros deletados e os n„o publicados.';
-	}
+class Jp7_InterAdmin_Soap_ReflectionMethodGetAll extends Jp7_InterAdmin_Soap_ReflectionMethodGet
+{
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'getAll'.$this->_getClassName();
+    }
+
+    public function getDescription()
+    {
+        return 'Retorna todos os registros da se√ß√£o '.$this->secao->nome.', incluindo os registros deletados e os n√£o publicados.';
+    }
 }

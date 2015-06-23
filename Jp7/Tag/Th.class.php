@@ -1,5 +1,5 @@
 <?php
 
-class Jp7_Tag_Th extends Jp7_Tag {
-	
+class Jp7_Tag_Th extends Jp7_Tag
+{
 }

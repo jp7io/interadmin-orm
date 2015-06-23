@@ -1,48 +1,59 @@
 <?php
 
-class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
+class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract
+{
+    /**
      * @see Jp7_Box_BoxAbstract::_getEditorFields()
      */
-    protected function _getEditorFields() {
-    	ob_start();
-		?>
+    protected function _getEditorFields()
+    {
+        ob_start();
+        ?>
 		<div class="fields">
 			<div class="field obligatory">
 				<label>URL:</label>
-				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : 'http://www.facebook.com/platform'; ?>" 
-					name="<?php echo $this->id_box; ?>[href][]" />
+				<input type="text" class="textbox" obligatory="yes" label="Href" value="<?php echo $this->params->href ? $this->params->href : 'http://www.facebook.com/platform';
+        ?>"
+					name="<?php echo $this->id_box;
+        ?>[href][]" />
 			</div>
 			<div class="field">
 				<label>Cores:</label>
-				<select class="selectbox" obligatory="yes" label="Cores" name="<?php echo $this->id_box; ?>[colorscheme][]">
+				<select class="selectbox" obligatory="yes" label="Cores" name="<?php echo $this->id_box;
+        ?>[colorscheme][]">
 					<?php
-					$options = array(
-						(object) array('value' => 'light', 'text' => 'Claras / Light'),
-						(object) array('value' => 'dark', 'text' => 'Escuras / Dark')
-					);
-					?>
-					<?php echo $this->options($options, $this->params->colorscheme ? $this->params->colorscheme : 'light'); ?>					
+                    $options = array(
+                        (object) array('value' => 'light', 'text' => 'Claras / Light'),
+                        (object) array('value' => 'dark', 'text' => 'Escuras / Dark'),
+                    );
+        ?>
+					<?php echo $this->options($options, $this->params->colorscheme ? $this->params->colorscheme : 'light');
+        ?>
 				</select>
 			</div>
 			<div class="field">
 				<label>Faces:</label>
-				<?php echo $this->checkbox('show_faces', true); ?>
+				<?php echo $this->checkbox('show_faces', true);
+        ?>
 			</div>
 			<div class="field">
-				<label>Atualizações:</label>
-				<?php echo $this->checkbox('stream'); ?>
+				<label>AtualizaÃ§Ãµes:</label>
+				<?php echo $this->checkbox('stream');
+        ?>
 			</div>
 			<div class="field">
-				<label>Cabeçalho:</label>
-				<?php echo $this->checkbox('header'); ?>
+				<label>CabeÃ§alho:</label>
+				<?php echo $this->checkbox('header');
+        ?>
 			</div>
 		</div>
 		<?php
-		return ob_get_clean();
+        return ob_get_clean();
     }
-	
-	public function getEditorStyle() {
-		return "
+
+    public function getEditorStyle()
+    {
+        return "
 .box-{$this->id_box} {
 	background: #3b5997;
 	color: white;
@@ -51,8 +62,9 @@ class Jp7_Box_Facebook extends Jp7_Box_BoxAbstract {    /**
 	color: white;
 }
 ";
-	}
-	protected function _getEditorTitle() {
-		return 'Facebook Like Box';
-	}
+    }
+    protected function _getEditorTitle()
+    {
+        return 'Facebook Like Box';
+    }
 }

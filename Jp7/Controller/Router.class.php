@@ -1,7 +1,7 @@
 <?php
 
-class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
-	
+class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite
+{
     /**
      * Generates a URL path that can be used in URL creation, redirection, etc.
      *
@@ -17,45 +17,49 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
      *
      * Encode tells to url encode resulting path parts.
      *
-     * @param  array $userParams Options passed by a user used to override parameters
-     * @param  mixed $name The name of a Route to use
-     * @param  bool $reset Whether to reset to the route defaults ignoring URL params
-     * @param  bool $encode Tells to encode URL parts on output
+     * @param array $userParams Options passed by a user used to override parameters
+     * @param mixed $name       The name of a Route to use
+     * @param bool  $reset      Whether to reset to the route defaults ignoring URL params
+     * @param bool  $encode     Tells to encode URL parts on output
+     *
      * @throws Zend_Controller_Router_Exception
+     *
      * @return string Resulting URL path
      */
-    public function assemble($userParams, $name = null, $reset = false, $encode = true){
-    	 $config = Zend_Registry::get('config');
-		 $lang = Zend_Registry::get('lang');
-		 
-		 $frontController = Zend_Controller_Front::getInstance();
-		 $current = $frontController->getRequest()->getParams();
-		 
-		 $extraParams = array_diff_key($userParams, $current);
-		 $userParams = $userParams + $current;
-		 
-		 $url = array();
-		 foreach ($extraParams as $key => $value) {
-			$url[] = $value;
-			$url[] = $key;
-		 }
-		 if ($userParams['action'] != 'index' || $url) {
-		 	$url[] = $userParams['action'];
-		 }
-		 if ($userParams['controller'] != 'index' || $url) {
-		 	$url[] = $userParams['controller'];
-		 }
-		 if ($userParams['module'] != $frontController->getDefaultModule()) {
-			 $url[] = $userParams['module'];
-		 }
-		 if ($userParams['lang'] != $config->lang_default) {
-		 	$url[] = $userParams['lang'];
-		 }
-		 if ($config->server->path) {
-		 	$url[] = $config->server->path;
-		 }
-		 krsort($url);
-		 $url = '/' . implode('/', $url);
-		 return $url;
-	}
+    public function assemble($userParams, $name = null, $reset = false, $encode = true)
+    {
+        $config = Zend_Registry::get('config');
+        $lang = Zend_Registry::get('lang');
+
+        $frontController = Zend_Controller_Front::getInstance();
+        $current = $frontController->getRequest()->getParams();
+
+        $extraParams = array_diff_key($userParams, $current);
+        $userParams = $userParams + $current;
+
+        $url = array();
+        foreach ($extraParams as $key => $value) {
+            $url[] = $value;
+            $url[] = $key;
+        }
+        if ($userParams['action'] != 'index' || $url) {
+            $url[] = $userParams['action'];
+        }
+        if ($userParams['controller'] != 'index' || $url) {
+            $url[] = $userParams['controller'];
+        }
+        if ($userParams['module'] != $frontController->getDefaultModule()) {
+            $url[] = $userParams['module'];
+        }
+        if ($userParams['lang'] != $config->lang_default) {
+            $url[] = $userParams['lang'];
+        }
+        if ($config->server->path) {
+            $url[] = $config->server->path;
+        }
+        krsort($url);
+        $url = '/'.implode('/', $url);
+
+        return $url;
+    }
 }
