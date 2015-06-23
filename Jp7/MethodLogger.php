@@ -2,26 +2,20 @@
 
 namespace Jp7;
 
-class MethodLogger
+class MethodLogger extends MethodForwarder
 {
-    protected $target;
     protected $log = [];
-
-    public function __construct($target)
-    {
-        $this->target = $target;
-    }
-
+    
     public function __call($method, $arguments)
     {
         $this->log[] = [
             'method' => $method,
             'arguments' => $arguments,
         ];
-
-        return call_user_func_array([$this->target, $method], $arguments);
+        
+        return parent::__call($method, $arguments);
     }
-
+    
     public function _getLog()
     {
         return $this->log;
