@@ -591,15 +591,14 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     public function isPublished()
     {
         global $s_session;
-        $config = InterSite::config();
-
+        
         $this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
 
         return (
             strtotime($this->date_publish) <= InterAdmin::getTimestamp() &&
             (strtotime($this->date_expire) >= InterAdmin::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
             $this->char_key &&
-            ($this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
+            ($this->publish || config('interadmin.preview') || $s_session['preview']) &&
             !$this->deleted
         );
     }

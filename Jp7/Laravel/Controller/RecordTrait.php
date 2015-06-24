@@ -2,7 +2,7 @@
 
 namespace Jp7\Laravel\Controller;
 
-use Jp7\Laravel5\RouterFacade as r;
+use Jp7\Laravel5\RouterFacade as Router;
 use InterAdmin;
 
 trait RecordTrait
@@ -23,7 +23,7 @@ trait RecordTrait
     {
         $uri = $this->_getResourceUri($route);
 
-        $breadcrumb = r::uriToBreadcrumb($uri, function ($type, $segment) use ($route) {
+        $breadcrumb = Router::uriToBreadcrumb($uri, function ($type, $segment) use ($route) {
             $slug = $route->getParameter(trim($segment, '{}'));
 
             return $type->records()->findOrFail($slug);

@@ -92,7 +92,7 @@ class Router extends MethodForwarder
         $mappedRoute = $this->map[$id_tipo];
         $routePrefix = ($mappedRoute != '/') ? $mappedRoute . '.' : '';
         
-        return $this->routes->getByName($routePrefix . $action);
+        return $this->target->getRoutes()->getByName($routePrefix . $action);
     }
 
     public function getIdTipoByRoute($route)
@@ -108,7 +108,7 @@ class Router extends MethodForwarder
             return;
         }
 
-        return InterAdminTipo::getInstance($id_tipo);
+        return \InterAdminTipo::getInstance($id_tipo);
     }
     
     public function getMapIdTipos()
