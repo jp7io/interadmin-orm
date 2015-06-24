@@ -69,7 +69,7 @@ class Jp7_InterAdmin_JSTree
     {
         $node = (object) array(
             'data' => array(
-                'title' => utf8_encode($nome_lang),
+                'title' => htmlspecialchars($nome_lang),
             ),
             'attr' => array(
                 'id' => $tipo->id_tipo,
@@ -105,10 +105,10 @@ class Jp7_InterAdmin_JSTree
     {
         $node = (object) array(
             'data' => array(
-                'title' => Jp7_Utf8::encode($label),
+                'title' => htmlspecialchars($label),
             ),
             'metadata' => array(
-                'callback' => utf8_encode($callback),
+                'callback' => htmlspecialchars($callback),
             ),
         );
         if ($icone) {
