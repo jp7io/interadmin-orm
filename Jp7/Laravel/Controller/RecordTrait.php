@@ -19,6 +19,11 @@ trait RecordTrait
         $this->beforeFilter('@setRecord', ['only' => ['show', 'edit', 'update', 'destroy']]);
     }
 
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
     public function setScope($route)
     {
         $uri = $this->_getResourceUri($route);

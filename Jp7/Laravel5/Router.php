@@ -51,13 +51,15 @@ class Router extends MethodForwarder
         $groupRoute = str_replace('/', '.', trim($this->getLastGroupPrefix(), '/'));
         if (!array_key_exists($id_tipo, $this->map)) {
             $this->map[$id_tipo] = ($groupRoute ? $groupRoute . '.' : '') . $slug;
+            return true; // map entry set
         }
+        return false; // already existed route for this type
     }
     
     public function createDynamicRoutes($section, $currentPath = [])
     {
         $isRoot = $section->isRoot();
-
+        
         if ($subsections = $section->getChildrenMenu()) {
             $closure = function () use ($subsections, $currentPath) {
                 foreach ($subsections as $subsection) {
@@ -68,19 +70,21 @@ class Router extends MethodForwarder
             if ($isRoot) {
                 $closure();
             } else {
-                $namespace = $section->getStudly();
-                $prefix = $section->getSlug();
-                
-                Route::group(compact('namespace', 'prefix'), $closure);
+                Route::group([
+                    'namespace' => $section->getStudly(),
+                    'prefix' => $section->getSlug()
+                ], $closure);
             }
         }
         if (!$isRoot) {
             $slug = $section->getSlug();
-            $this->addIdTipo($section->id_tipo, $slug);
-            
-            Route::resource($slug, $section->getControllerBasename(), [
-                'only' => $section->getRouteActions()
-            ]);
+        
+            if ($this->addIdTipo($section->id_tipo, $slug)) {
+                // won't override type route
+                Route::resource($slug, $section->getControllerBasename(), [
+                    'only' => $section->getRouteActions()
+                ]);
+            }
         }
     }
     
@@ -102,9 +106,7 @@ class Router extends MethodForwarder
 
     public function getTypeByRoute($routeName)
     {
-        $id_tipo = $this->getIdTipoByRoute($routeName);
-        
-        if (!$id_tipo) {
+        if (!$id_tipo = $this->getIdTipoByRoute($routeName)) {
             return;
         }
 
