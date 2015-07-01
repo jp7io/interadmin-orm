@@ -7,79 +7,106 @@ use HtmlObject\Image;
 class ImgResize extends Image
 {
     private static $lazy = false;
-
+    private static $seo = false;
+    
     public static function getLazy()
     {
         return static::$lazy;
     }
 
-    public static function setLazy($lazy)
+    public static function setLazy($status)
     {
-        static::$lazy = (bool) $lazy;
+        static::$lazy = (bool) $status;
+    }
+    
+    public static function getSeo()
+    {
+        return static::$seo;
     }
 
+    public static function setSeo($status)
+    {
+        static::$seo = (bool) $status;
+    }
+    
     public static function tag($img, $template = null, $options = array())
     {
-        if (!$img) {
-            return;
-        }
-
-        $url = self::url($img, $template);
         if ($template) {
+            // Preppend template to classes
             $options['class'] = trim(array_get($options, 'class').' '.$template);
         }
         if (empty($options['title'])) {
-            $options['title'] = is_object($img) ? $img->getText() : '';
-            $options['title'] = $options['title'] ?: basename($url);
+            $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
+        
         $alt = $options['title'];
-
+        $url = self::url($img, $template, $alt);
+        
         if (static::$lazy) {
-            return self::create(Cdn::asset('img/px.gif'), $alt, $options)->data_src($url);
+            $px = Cdn::asset('img/px.gif');
+            return self::create($px, $alt, $options)->data_src($url);
         } else {
             return self::create($url, $alt, $options);
         }
     }
 
-    public static function url($url, $template = null)
+    public static function url($url, $template = null, $text = '')
     {
         if (\App::environment('testing')) {
             return '/img/px.gif';
         }
-
+        
         if (is_object($url)) {
-            $url = $url->getUrl();
+            $img = $url;
+            $url = $img->getUrl();
         }
+        $isExternal = self::isExternal($url);
+        
+        if (static::$seo && !$isExternal) {
+            $url = self::seoReplace($url, $text);
+        }
+        
         if ($template) {
-            $url = self::resolveExternal($url);
-            $url = str_replace('/assets/', '/imagecache/'.$template.'/', $url);
+            if ($isExternal) {
+                $url = self::downloadExternal($url);
+            }
+            $url = str_replace('/upload/', '/imagecache/'.$template.'/', $url);
         }
 
         return Cdn::asset($url);
     }
+    
+    // SEO depends on RewriteModule
+    // Should only be applied to local images
+    private static function seoReplace($url, $text)
+    {
+        if ($slug = to_slug($text)) {
+            $url = dirname($url).'/'.$slug.'-'.basename($url);
+        }
+        return $url;
+    }
+    
+    private static function isExternal($url)
+    {
+        return !empty(parse_url($url)['host']);
+    }
 
     // External images are downloaded locally to resize them
-    private static function resolveExternal($url)
+    private static function downloadExternal($url)
     {
-        if (empty(parse_url($url)['host'])) {
-            return $url;
-        }
-
         $local = to_slug(dirname($url)).'_'.basename($url);
         $dir = public_path('upload/_external');
-
-        if (!is_file($dir.'/'.$local) && !\App::environment('testing')) {
+        
+        if (!is_file($dir.'/'.$local)) {
             if ($file = @file_get_contents($url)) {
-                if (!is_dir($dir)) {
-                    mkdir($dir);
-                }
                 file_put_contents($dir.'/'.$local, $file);
             }
         }
-
-        return '/assets/_external/'.$local;
+        
+        return '/upload/_external/'.$local;
     }
-
+    
+    // Add <noscript> tags if needed
     public function __toString()
     {
         $noscript = '';

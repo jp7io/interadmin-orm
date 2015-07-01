@@ -7,39 +7,43 @@ trait Downloadable
     // For client side use
     public function getUrl()
     {
-        $absolute = \Config::get('app.url').'upload/';
-
-        $localPrefix = '../../upload/';
-        // Fix absolute URL
-        $url = str_replace($absolute, $localPrefix, $this->url);
-        // SEO
-        $slug = to_slug($this->getText());
-        if ($slug && strpos($url, $localPrefix) === 0) {
-            $url = dirname($url).'/'.$slug.'-'.basename($url);
-        }
-        // Replace relative URL by assets
-        return str_replace($localPrefix, '/assets/', $url);
+        $config = config('interadmin.upload');
+        // ../../upload => /upload
+        return str_replace($config['backend_url'], $config['relative_url'], $this->url);
     }
-
+    
     // Absolute client side URL
     public function getAbsoluteUrl()
     {
-        return \URL::to($this->getUrl());
+        $config = config('interadmin.upload');
+        // ../../upload => www.example.com/upload
+        return str_replace($config['backend_url'], $config['absolute_url'], $this->url);
     }
 
     // Server side file name
     public function getFilename()
     {
-        $parsed = parse_url($this->url);
-        if (!empty($parsed['host'])) {
-            return false;
+        if ($this->isExternal()) {
+            throw new \Exception('Cant get filename of external image.');
         }
-        // remove query string
-        $path = $parsed['path'];
-
-        return str_replace('../../upload/', public_path('upload/'), $path);
+        
+        $config = config('interadmin.upload');
+        $url = $this->removeQueryString();
+        
+        return str_replace($config['backend_url'], $config['absolute_path'], $url);
     }
-
+    
+    public function removeQueryString()
+    {
+        $parsed = parse_url($this->url);
+        return $parsed['path'];
+    }
+    
+    public function isExternal()
+    {
+        return !empty(parse_url($this->url)['host']);
+    }
+    
     /**
      * Returns the extension of this file.
      *
@@ -47,7 +51,7 @@ trait Downloadable
      */
     public function getExtension()
     {
-        return pathinfo($this->getFilename(), PATHINFO_EXTENSION);
+        return pathinfo($this->removeQueryString(), PATHINFO_EXTENSION);
     }
 
     public function getSize()
