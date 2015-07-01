@@ -75,10 +75,10 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function &__get($name)
     {
-        if (isset($this->attributes[$name])) {
+        if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         }
-     
+        
         // returned as reference
         $result = $this->_lazyLoadAttribute($name);
 
@@ -94,10 +94,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function __isset($attributeName)
     {
-        return isset($this->attributes[$attributeName]) || $this->_lazyLoadAttribute($attributeName);
+        return array_key_exists($attributeName, $this->attributes) || $this->_lazyLoadAttribute($attributeName);
     }
     
-    private function _lazyLoadAttribute($name) {
+    private function _lazyLoadAttribute($name)
+    {
         if ($this->id) {
             // relationship
             $relationships = $this->getType()->getRelationships();
@@ -111,7 +112,12 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             $columns = $this->getColumns();
             if (in_array($name, $columns) || in_array($name, $this->getAttributesAliases())) {
                 if (class_exists('Debugbar')) {
-                    Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '.get_class($this).' - ID: '.$this->id);
+                    $caller = debug_backtrace(false, 2)[1];
+                    
+                    Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
+                        .get_class($this)
+                        .' - ID: '.$this->id
+                        .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
                 }
 
                 $attributes = array_intersect($columns, array_merge(
