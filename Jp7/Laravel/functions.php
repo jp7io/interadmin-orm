@@ -1,5 +1,7 @@
 <?php
-
+/*
+LARAVEL 4
+*/
 register_shutdown_function(function () {
     // Avoid CDN cache of assets with errors
     if (error_get_last() && !headers_sent() && isset($_SERVER['SERVER_PROTOCOL'])) {

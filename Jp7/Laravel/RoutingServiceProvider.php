@@ -1,5 +1,7 @@
 <?php
-
+/*
+LARAVEL 4
+*/
 namespace Jp7\Laravel;
 
 // CODE COPIED FROM LARAVEL TO CHANGE THE NAMESPACE TO JP7

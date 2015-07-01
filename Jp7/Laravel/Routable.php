@@ -1,5 +1,7 @@
 <?php
-
+/*
+LARAVEL 4
+*/
 namespace Jp7\Laravel;
 
 trait Routable

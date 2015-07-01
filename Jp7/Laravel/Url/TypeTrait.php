@@ -1,5 +1,7 @@
 <?php
-
+/*
+LARAVEL 4
+*/
 namespace Jp7\Laravel\Url;
 
 use Jp7\InterAdmin\ClassMap;
