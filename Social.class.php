@@ -174,7 +174,7 @@ class Social
         }
 
         /*
-         * Por form, que tem um bug de resize no firefox, ou por script JS que usa a função add_this e abre sempre em nova janela
+         * Por form, que tem um bug de resize no firefox, ou por script JS que usa a funÃ§Ã£o add_this e abre sempre em nova janela
         $html .= '<script type="text/javascript">' . "\n";
         $html .= 'function sets(val) {' . "\n";
         $html .= 'elt = document.getElementById(\'bookmarkingMys\');' . "\n";
@@ -268,7 +268,7 @@ class Social
     /* Send to a friend */
 
     /* Embedeed */
-    public function displayEmbedded($title = 'Clique aqui', $url = false, $type = 'link', $label = 'Endereço:', $divId = 'embedded')
+    public function displayEmbedded($title = 'Clique aqui', $url = false, $type = 'link', $label = 'EndereÃ§o:', $divId = 'embedded')
     {
         if (!$url) {
             $url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
