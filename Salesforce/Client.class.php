@@ -130,8 +130,7 @@ class Salesforce_Client extends SforceEnterpriseClient {
 	public function createConnection($wsdl, $proxy = null, $options = array()) {
 		$this->wsdl = $wsdl;
 		
-		$soapClientArray = $options + array (
-			'encoding' => 'ISO-8859-1',
+		$soapClientArray = $options + array(
 			'trace' => 1,
 			'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP
 		);

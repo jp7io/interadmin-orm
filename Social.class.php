@@ -207,8 +207,8 @@ class Social
                     $url = $customUrl[$key];
                 }
 
-                $value['url'] = str_replace('%url%', urlencode(utf8_encode($url)), $value['url']);
-                $value['url'] = str_replace('%title%', urlencode(utf8_encode($title)), $value['url']);
+                $value['url'] = str_replace('%url%', urlencode($url), $value['url']);
+                $value['url'] = str_replace('%title%', urlencode($title), $value['url']);
                 $html .= '<li class="at15t at15t_'.$key.'"><a href="'.$value['url'].'" id="social_'.$key.'" target="'.$target.'">'.$value['title'].'</a></li>'."\n";
             } else {
                 #$html .= '<li><a href="javascript:sets(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";

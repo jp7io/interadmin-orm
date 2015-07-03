@@ -30,7 +30,7 @@ class Jp7_Diff_Xml
             if ($allowShortTag && $contents === '') {
                 $out .= ' />';
             } else {
-                $out .= '>'.isospecialchars($contents)."</$element>";
+                $out .= '>'.htmlspecialchars($contents)."</$element>";
             }
         }
 

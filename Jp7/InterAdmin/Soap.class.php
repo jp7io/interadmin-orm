@@ -118,7 +118,7 @@ STR;
     public static function createSoapServer($wsdl)
     {
         $server = new Zend_Soap_Server($wsdl);
-        $server->setEncoding('ISO-8859-1');
+        $server->setEncoding('UTF-8');
         $server->registerFaultException('Jp7_InterAdmin_Soap_Exception');
         $server->setClassmap(array(
             'Options' => 'Jp7_InterAdmin_Soap_Options',

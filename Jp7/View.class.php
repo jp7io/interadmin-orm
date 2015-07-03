@@ -10,7 +10,7 @@ class Jp7_View extends Zend_View
         parent::__construct($config);
 
         $this->doctype('XHTML1_STRICT');
-        $this->setEncoding('ISO-8859-1');
+        $this->setEncoding('UTF-8');
         // Permite o uso de Helpers customizados da Jp7
         $this->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
     }

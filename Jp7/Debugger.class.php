@@ -227,7 +227,7 @@ class Jp7_Debugger
         if (class_exists('Jp7_InterAdmin_Soap') && Jp7_InterAdmin_Soap::isSoapRequest()) {
             $S .= $this->_getBacktraceLabel('HTTP_SOAPACTION').print_r($_SERVER['HTTP_SOAPACTION'], true);
             $S .= $this->_getBacktraceLabel('CONTENT_TYPE').print_r($_SERVER['CONTENT_TYPE'], true);
-            $S .= $this->_getBacktraceLabel('PHP INPUT').isospecialchars(print_r(file_get_contents('php://input'), true));
+            $S .= $this->_getBacktraceLabel('PHP INPUT').htmlspecialchars(print_r(file_get_contents('php://input'), true));
         }
 
         return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">'.$S.'</pre>';

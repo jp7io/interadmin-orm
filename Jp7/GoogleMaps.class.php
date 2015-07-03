@@ -8,7 +8,7 @@ class Jp7_GoogleMaps
     public static function getLatLngByEndereco($endereco = '')
     {
         if ($endereco) {
-            $url = self::URL_WEBSERVICE.'?address='.urlencode(utf8_encode($endereco)).'&sensor=false';
+            $url = self::URL_WEBSERVICE.'?address='.urlencode($endereco).'&sensor=false';
             $xmlFile = @file_get_contents($url);
 
             if (!$xmlFile) {

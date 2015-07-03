@@ -132,7 +132,7 @@ class InterAdminArquivo extends InterAdminAbstract
      */
     public function getText()
     {
-        return isospecialchars($this->getFieldsValues('legenda'));
+        return htmlspecialchars($this->getFieldsValues('legenda'));
     }
     /**
      * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
