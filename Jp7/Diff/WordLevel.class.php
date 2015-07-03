@@ -37,7 +37,7 @@ class Jp7_Diff_WordLevel extends Jp7_Diff_Mapped
                 $words[] = "\n";
                 $stripped[] = "\n";
             }
-            if (strlen($line) > self::MAX_LINE_LENGTH) {
+            if (mb_strlen($line) > self::MAX_LINE_LENGTH) {
                 $words[] = $line;
                 $stripped[] = $line;
             } else {

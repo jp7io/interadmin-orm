@@ -47,8 +47,8 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
             'date_created' => 'date_publish', // Timestamp value
         ), $helpers);
 
-        if (substr($helpers['id'], 0, 5) == 'this.') {
-            $methodId = 'get'.ucfirst(strtolower(ltrim($helpers['id'], 'this.')));
+        if (mb_substr($helpers['id'], 0, 5) == 'this.') {
+            $methodId = 'get'.ucfirst(mb_strtolower(ltrim($helpers['id'], 'this.')));
         }
 
         foreach ($interAdmins as $entryData) {

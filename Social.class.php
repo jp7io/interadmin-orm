@@ -276,9 +276,9 @@ class Social
 
         $html = '<div id="'.$divId.'">'."\n";
         if ($label) {
-            $html .= '<label for="embeddedUrl'.ucfirst(strtolower($key)).'">'.$label.'</label>'."\n";
+            $html .= '<label for="embeddedUrl'.ucfirst(mb_strtolower($key)).'">'.$label.'</label>'."\n";
         }
-        $html .= '<textarea id="embeddedUrl'.ucfirst(strtolower($key)).'" readonly="readonly" onclick="javascript:document.getElementById(\'embeddedUrl'.ucfirst(strtolower($key)).'\').focus();document.getElementById(\'embeddedUrl'.ucfirst(strtolower($key)).'\').select();">'."\n";
+        $html .= '<textarea id="embeddedUrl'.ucfirst(mb_strtolower($key)).'" readonly="readonly" onclick="javascript:document.getElementById(\'embeddedUrl'.ucfirst(mb_strtolower($key)).'\').focus();document.getElementById(\'embeddedUrl'.ucfirst(mb_strtolower($key)).'\').select();">'."\n";
         /*if ($type == 'link') {
             $html .= '<a href="' . $url . '" target="_blank">' . $title . '</a>';
         } else {

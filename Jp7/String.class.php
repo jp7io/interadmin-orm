@@ -28,7 +28,7 @@ class String
 
     public function sub($start, $end)
     {
-        return new self(substr($this->str, $start, $end));
+        return new self(mb_substr($this->str, $start, $end));
     }
 
     public function ljust($pad_length, $pad_str = ' ')
@@ -43,7 +43,7 @@ class String
 
     public function length()
     {
-        return strlen($this->str);
+        return mb_strlen($this->str);
     }
 
     public function __toString()

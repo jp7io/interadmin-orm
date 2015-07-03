@@ -39,7 +39,7 @@ class Jp7_Captcha
         $code = '';
         $i = 0;
         while ($i < $characters) {
-            $code .= substr($possible, mt_rand(0, strlen($possible) - 1), 1);
+            $code .= mb_substr($possible, mt_rand(0, mb_strlen($possible) - 1), 1);
             $i++;
         }
 

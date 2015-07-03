@@ -87,7 +87,7 @@ class Jp7_Xml_Chunk
     $this->options = array_merge($this->options, (is_array($options) ? $options : array()));
 
     // check that the path ends with a /
-    if (substr($this->options['path'], -1) != '/') {
+    if (mb_substr($this->options['path'], -1) != '/') {
         $this->options['path'] .= '/';
     }
 
@@ -221,13 +221,13 @@ class Jp7_Xml_Chunk
           // if it was in there
           if ($checkClose) {
               // set it to the remainder plus the length of the close string itself
-            $checkClose = ($checkClose + strlen($close)) % $this->options['chunkSize'];
+            $checkClose = ($checkClose + mb_strlen($close)) % $this->options['chunkSize'];
           }
 
         // if it was
         } elseif ($checkClose) {
             // add the length of the close string itself
-          $checkClose += strlen($close);
+          $checkClose += mb_strlen($close);
         }
 
         // if we've found the opening string and we're not already reading another element
@@ -235,7 +235,7 @@ class Jp7_Xml_Chunk
             // if we're found the end element too
           if ($checkClose !== false) {
               // append the string only between the start and end element
-            $buffer .= substr($tmp, $checkOpen, ($checkClose - $checkOpen));
+            $buffer .= mb_substr($tmp, $checkOpen, ($checkClose - $checkOpen));
 
             // update the pointer
             $this->pointer += $checkClose;
@@ -244,7 +244,7 @@ class Jp7_Xml_Chunk
             $this->reading = false;
           } else {
               // append the data we know to be part of this element
-            $buffer .= substr($tmp, $checkOpen);
+            $buffer .= mb_substr($tmp, $checkOpen);
 
             // update the pointer
             $this->pointer += $this->options['chunkSize'];
@@ -256,7 +256,7 @@ class Jp7_Xml_Chunk
         // if we've found the closing element
         } elseif ($checkClose !== false) {
             // update the buffer with the data upto and including the close tag
-          $buffer .= substr($tmp, 0, $checkClose);
+          $buffer .= mb_substr($tmp, 0, $checkClose);
 
           // update the pointer
           $this->pointer += $checkClose;

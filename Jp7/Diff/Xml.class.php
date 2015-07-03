@@ -521,17 +521,17 @@ class Jp7_Diff_Xml
             $value = trim($option);
             if ($value == '') {
                 continue;
-            } elseif (substr($value, 0, 1) == '*' && substr($value, 1, 1) != '*') {
+            } elseif (mb_substr($value, 0, 1) == '*' && mb_substr($value, 1, 1) != '*') {
                 // A new group is starting ...
-                    $value = trim(substr($value, 1));
+                    $value = trim(mb_substr($value, 1));
                 if ($optgroup) {
                     $options .= self::closeElement('optgroup');
                 }
                 $options .= self::openElement('optgroup', array('label' => $value));
                 $optgroup = true;
-            } elseif (substr($value, 0, 2) == '**') {
+            } elseif (mb_substr($value, 0, 2) == '**') {
                 // groupmember
-                    $value = trim(substr($value, 2));
+                    $value = trim(mb_substr($value, 2));
                 $options .= self::option($value, $value, $selected === $value);
             } else {
                 // groupless reason list

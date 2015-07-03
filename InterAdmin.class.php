@@ -189,13 +189,13 @@ class InterAdmin extends InterAdminAbstract
         if (strpos($methodName, 'get') === 0) {
             // getFirst{ChildName}
             if (strpos($methodName, 'getFirst') === 0) {
-                $nome_id = substr($methodName, strlen('getFirst'));
+                $nome_id = mb_substr($methodName, mb_strlen('getFirst'));
                 if ($child = $this->_findChild($nome_id)) {
                     return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
                 }
             // get{ChildName}ById
-            } elseif (substr($methodName, -4) == 'ById') {
-                $nome_id = substr($methodName, strlen('get'), -strlen('ById'));
+            } elseif (mb_substr($methodName, -4) == 'ById') {
+                $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('ById'));
                 if ($child = $this->_findChild($nome_id)) {
                     $options = (array) $args[1];
                     $options['where'][] = 'id = '.intval($args[0]);
@@ -203,8 +203,8 @@ class InterAdmin extends InterAdminAbstract
                     return $this->getFirstChild($child['id_tipo'], $options);
                 }
             // get{ChildName}ByIdString
-            } elseif (substr($methodName, -10) == 'ByIdString') {
-                $nome_id = substr($methodName, strlen('get'), -strlen('ByStringId'));
+            } elseif (mb_substr($methodName, -10) == 'ByIdString') {
+                $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('ByStringId'));
                 if ($child = $this->_findChild($nome_id)) {
                     $options = (array) $args[1];
                     $options['where'][] = "id_string = '".$args[0]."'";
@@ -212,27 +212,27 @@ class InterAdmin extends InterAdminAbstract
                     return $this->getFirstChild($child['id_tipo'], $options);
                 }
             // get{ChildName}Count
-            } elseif (substr($methodName, -5) == 'Count') {
-                $nome_id = substr($methodName, strlen('get'), -strlen('Count'));
+            } elseif (mb_substr($methodName, -5) == 'Count') {
+                $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('Count'));
                 if ($child = $this->_findChild($nome_id)) {
                     return $this->getChildrenCount($child['id_tipo'], (array) $args[0]);
                 }
             // get{ChildName}
             } else {
-                $nome_id = substr($methodName, strlen('get'));
+                $nome_id = mb_substr($methodName, mb_strlen('get'));
                 if ($child = $this->_findChild($nome_id)) {
                     return $this->getChildren($child['id_tipo'], (array) $args[0]);
                 }
             }
         // create{ChildName}
         } elseif (strpos($methodName, 'create') === 0) {
-            $nome_id = substr($methodName, strlen('create'));
+            $nome_id = mb_substr($methodName, mb_strlen('create'));
             if ($child = $this->_findChild($nome_id)) {
                 return $this->createChild($child['id_tipo'], (array) @$args[0]);
             }
         // delete{ChildName}
         } elseif (strpos($methodName, 'delete') === 0) {
-            $nome_id = substr($methodName, strlen('delete'));
+            $nome_id = mb_substr($methodName, mb_strlen('delete'));
             if ($child = $this->_findChild($nome_id)) {
                 return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
             }

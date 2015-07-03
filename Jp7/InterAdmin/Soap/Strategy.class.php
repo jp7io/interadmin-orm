@@ -20,7 +20,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
     {
         if (!in_array($type, $this->getContext()->getTypes())) {
             $isDynamicClass = Jp7_InterAdmin_Soap::isDynamicClass($type);
-            if (substr($type, strlen($type) - 2) == '[]' || ($type != 'Options' && !$isDynamicClass && !is_subclass_of($type, 'InterAdminAbstract'))) {
+            if (mb_substr($type, mb_strlen($type) - 2) == '[]' || ($type != 'Options' && !$isDynamicClass && !is_subclass_of($type, 'InterAdminAbstract'))) {
                 try {
                     return parent::addComplexType($type);
                 } catch (Zend_Soap_Wsdl_Exception $e) {

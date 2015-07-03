@@ -32,7 +32,7 @@ class Jp7_Image
             $method = 'get';
         }
         if ($method) {
-            $property = strtolower(substr($name, 3, 1)).substr($name, 4);
+            $property = mb_strtolower(mb_substr($name, 3, 1)).mb_substr($name, 4);
             if ($method == 'set') {
                 $this->$property = $arguments[0];
             } else {
@@ -85,7 +85,7 @@ class Jp7_Image
     {
         $this->createTempFiles();
         // Parser/Replace no command para compatibilidade Linux/Windows
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        if (mb_strtoupper(mb_substr(PHP_OS, 0, 3)) !== 'WIN') {
             $command = str_replace('(', '\(', $command);
             $command = str_replace(')', '\)', $command);
         }

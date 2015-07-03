@@ -157,7 +157,7 @@ class Jp7_Diff_Engine
      */
     public function _line_hash($line)
     {
-        if (strlen($line) > self::MAX_XREF_LENGTH) {
+        if (mb_strlen($line) > self::MAX_XREF_LENGTH) {
             return md5($line);
         } else {
             return $line;

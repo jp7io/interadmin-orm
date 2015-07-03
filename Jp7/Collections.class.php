@@ -51,7 +51,7 @@ class Jp7_Collections
         foreach ($array as $item) {
             $hash = ':';
             foreach ($keys as $key) {
-                $hash .= strtolower(jp7_normalize($item->$key));
+                $hash .= mb_strtolower(jp7_normalize($item->$key));
             }
             if (!$hashExistente[$hash]) {
                 $novaArray[] = $item;
@@ -161,8 +161,8 @@ class Jp7_Collections
             $parts = explode(' ', trim($keys[$i]));
             $dir = array_pop($parts);
 
-            if (strtolower($dir) == 'asc' || strtolower($dir) == 'desc') {
-                $t = $dirMap[strtolower($dir)];
+            if (mb_strtolower($dir) == 'asc' || mb_strtolower($dir) == 'desc') {
+                $t = $dirMap[mb_strtolower($dir)];
             } else {
                 $parts[] = $dir;
                 $t = $dirMap['asc'];
@@ -284,9 +284,9 @@ class Jp7_Collections
     public static function prefixToArray($multiarray, $prefix)
     {
         $newarray = array();
-        $preflen = strlen($prefix) + 1;
+        $preflen = mb_strlen($prefix) + 1;
         foreach ($multiarray as $name => $array) {
-            $namekey = substr($name, $preflen);
+            $namekey = mb_substr($name, $preflen);
             if (strpos($name, $prefix.'_') === 0) {
                 foreach ($array as $key => $value) {
                     $newarray[$key][$namekey] = $value;

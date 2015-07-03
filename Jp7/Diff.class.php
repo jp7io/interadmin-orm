@@ -219,7 +219,7 @@ class _HWLDF_WordAccumulator
             }
             if ($word[0] == "\n") {
                 $this->_flushLine($tag);
-                $word = substr($word, 1);
+                $word = mb_substr($word, 1);
             }
             assert(!strstr($word, "\n"));
             $this->_group .= $word;

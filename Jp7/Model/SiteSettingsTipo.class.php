@@ -51,7 +51,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
                 if (self::$_dados['css_template']) {
                     // Conversão temporária, retirando prefixo css_, TODO retirar código depois
                     foreach (self::$_dados as $key => $value) {
-                        self::$_dados[substr($key, 4)] = $value;
+                        self::$_dados[mb_substr($key, 4)] = $value;
                         unset(self::$_dados[$key]);
                     }
                 }
@@ -202,7 +202,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
                     }
                     foreach ($_POST as $key => $values) {
                         if (startsWith('css_', $key) && !endsWith('_xtra', $key)) {
-                            $special_1[substr($key, 4)] = $values[0];
+                            $special_1[mb_substr($key, 4)] = $values[0];
                         }
                     }
                     $registro->updateAttributes(array(

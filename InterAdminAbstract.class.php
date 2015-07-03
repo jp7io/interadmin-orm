@@ -500,25 +500,25 @@ abstract class InterAdminAbstract implements Serializable
         while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
             list($termo, $pos) = $matches[1];
             // Resolvendo true e false para char
-            if (strtolower($termo) == 'true' || strtolower($termo) == 'false') {
+            if (mb_strtolower($termo) == 'true' || mb_strtolower($termo) == 'false') {
                 $negativas = array('', '!');
-                if (strtolower($termo) == 'false') {
+                if (mb_strtolower($termo) == 'false') {
                     $negativas = array_reverse($negativas);
                 }
-                $inicio = substr($clause, 0, $pos + strlen($termo));
+                $inicio = mb_substr($clause, 0, $pos + mb_strlen($termo));
                 $inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)'.$termo.'$/i', '$1'.$negativas[0]."=$3''", $inicio, 1, $count);
                 if (!$count) {
                     $inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)'.$termo.'/i', '$1'.$negativas[1]."=$2''", $inicio, 1);
                 }
-                $clause = $inicioRep.substr($clause, $pos + strlen($termo));
-                $offset = strlen($inicioRep);
+                $clause = $inicioRep.mb_substr($clause, $pos + mb_strlen($termo));
+                $offset = mb_strlen($inicioRep);
                 continue;
             }
 
             // Joins com EXISTS
             if ($termo == 'EXISTS') {
-                $inicio = substr($clause, 0, $pos + strlen($termo));
-                $existsClause = substr($clause, $pos + strlen($termo));
+                $inicio = mb_substr($clause, 0, $pos + mb_strlen($termo));
+                $existsClause = mb_substr($clause, $pos + mb_strlen($termo));
 
                 if (preg_match('/^([\( ]+)('.$keyword.')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
                     $table = $existsMatches[2];
@@ -527,7 +527,7 @@ abstract class InterAdminAbstract implements Serializable
                         $existsMatches[2] = 'SELECT id_tag FROM '.$this->db_prefix.'_tags AS '.$table.
                         ' WHERE '.$table.'.parent_id = main.id'.(($existsMatches[4]) ? ' AND ' : '');
                     } elseif (strpos($table, 'children_') === 0) {
-                        $joinNome = Jp7_Inflector::camelize(substr($table, 9));
+                        $joinNome = Jp7_Inflector::camelize(mb_substr($table, 9));
                         $childrenArr = $this->getInterAdminsChildren();
                         if (!$childrenArr[$joinNome]) {
                             throw new Exception('The field "'.$table.'" cannot be used as a join on $options.'.
@@ -555,8 +555,8 @@ abstract class InterAdminAbstract implements Serializable
                     }
 
                     $inicioRep = $inicio.$existsMatches[1].$existsMatches[2].$existsMatches[3];
-                    $clause = $inicioRep.substr($clause, strlen($inicio.$existsMatches[0]));
-                    $offset = strlen($inicioRep);
+                    $clause = $inicioRep.mb_substr($clause, mb_strlen($inicio.$existsMatches[0]));
+                    $offset = mb_strlen($inicioRep);
 
                     $ignoreJoinsUntil = $offset;
                     continue;
@@ -564,7 +564,7 @@ abstract class InterAdminAbstract implements Serializable
             }
 
             if ($termo[0] != "'" && !is_numeric($termo) && !in_array($termo, $reserved)) {
-                $len = strlen($termo);
+                $len = mb_strlen($termo);
                 $table = 'main';
                 if (strpos($termo, '.') !== false) {
                     list($table, $termo, $subtermo) = explode('.', $termo);
@@ -582,7 +582,7 @@ abstract class InterAdminAbstract implements Serializable
                         $joinAliases = array();
                         // Joins com children
                     } elseif (strpos($table, 'children_') === 0) {
-                        $joinNome = Jp7_Inflector::camelize(substr($table, 9));
+                        $joinNome = Jp7_Inflector::camelize(mb_substr($table, 9));
                         $childrenArr = $this->getInterAdminsChildren();
                         if (!$childrenArr[$joinNome]) {
                             throw new Exception('The field "'.$table.'" cannot be used as a join on $options.');
@@ -633,7 +633,7 @@ abstract class InterAdminAbstract implements Serializable
                 $termo = $table.'.'.$campo;
                 $clause = substr_replace($clause, $termo, $pos, $len);
             }
-            $offset = $pos + strlen($termo);
+            $offset = $pos + mb_strlen($termo);
         }
 
         return $clause;
@@ -708,7 +708,7 @@ abstract class InterAdminAbstract implements Serializable
             // Com função
             } elseif (strpos($campo, '(') !== false || strpos($campo, 'CASE') !== false) {
                 if (strpos($campo, ' AS ') === false) {
-                    $aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
+                    $aggregateAlias = trim(mb_strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
                 } else {
                     $parts = explode(' AS ', $campo);
                     $aggregateAlias = array_pop($parts);
@@ -947,13 +947,13 @@ abstract class InterAdminAbstract implements Serializable
     {
         global $db, $config, $s_session;
         // Tipos
-        if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
+        if (strpos($table, '_tipos') === (mb_strlen($table) - mb_strlen('_tipos'))) {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
         // Tags
-        } elseif (strpos($table, '_tags') === (strlen($table) - strlen('_tags'))) {
+        } elseif (strpos($table, '_tags') === (mb_strlen($table) - mb_strlen('_tags'))) {
             // do nothing
         // Arquivos
-        } elseif (strpos($table, '_arquivos') === (strlen($table) - strlen('_arquivos'))) {
+        } elseif (strpos($table, '_arquivos') === (mb_strlen($table) - mb_strlen('_arquivos'))) {
             return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
         // Registros
         } else {

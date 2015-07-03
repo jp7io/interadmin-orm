@@ -43,13 +43,13 @@ class Jp7_InterAdmin_Soap_Proxy
                     $options['fields_alias'] = true;
 
                     if (strpos($methodName, 'getFirst') === 0) {
-                        $className = substr($methodName, strlen('getFirst'));
+                        $className = mb_substr($methodName, mb_strlen('getFirst'));
                         $result = $generic->getFirst($className, $options);
                     } elseif (strpos($methodName, 'getAll') === 0) {
-                        $className = substr($methodName, strlen('getAll'));
+                        $className = mb_substr($methodName, mb_strlen('getAll'));
                         $result = $generic->getAll($className, $options);
                     } else {
-                        $className = substr($methodName, strlen('get'));
+                        $className = mb_substr($methodName, mb_strlen('get'));
                         $result = $generic->get($className, $options);
                     }
                 }

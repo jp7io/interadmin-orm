@@ -24,7 +24,7 @@ class Jp7_Deprecated
         $fields_arr = explode(',', $fields);
         // Variáveis
         foreach ($fields_arr as $field) {
-            $fields_arr_db[] = (strpos($field, '_') === 0) ? substr($field, 1) : $field;
+            $fields_arr_db[] = (strpos($field, '_') === 0) ? mb_substr($field, 1) : $field;
         }
         foreach ($fields_arr_db as $field_db) {
             eval("global \$".$field_db.';');
@@ -35,7 +35,7 @@ class Jp7_Deprecated
         if ($row = (array) $rs->FetchNextObj()) {
             foreach ($fields_arr as $field) {
                 if (strpos($field, '_') === 0) {
-                    $field = substr($field, 1);
+                    $field = mb_substr($field, 1);
                     eval("\$".$field.'.="'.$row[$field].'";');
                 }
             }
@@ -110,9 +110,9 @@ class Jp7_Deprecated
             // Com Alias
             foreach ($out[1] as $key => $value) {
                 $alias = $out[2][$key];
-                if (strpos($value, '_tipos') === (strlen($value) - strlen('_tipos'))) {
+                if (strpos($value, '_tipos') === (mb_strlen($value) - mb_strlen('_tipos'))) {
                     $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND ('.$alias.".deleted_tipo='' OR ".$alias.'.deleted_tipo IS NULL) AND ', $sql_where);
-                } elseif (strpos($value, '_tags') === (strlen($value) - strlen('_tags'))) {
+                } elseif (strpos($value, '_tags') === (mb_strlen($value) - mb_strlen('_tags'))) {
                     // do nothing
                 } elseif (strpos($value, $db_prefix.$lang->prefix.'_arquivos') !== false || strpos($value, $db_prefix.'_arquivos') !== false) {
                     $sql_where = str_replace('WHERE ', 'WHERE '.$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.'.deleted IS NULL) AND ', $sql_where);
@@ -451,9 +451,9 @@ class Jp7_Deprecated
     public static function jp7_flash($src, $w, $h, $alt = '', $id = '', $xtra = '', $parameters = '')
     {
         $pos1 = strpos($src, '?');
-        $ext = ($pos1) ? substr($src, 0, $pos1) : $src;
+        $ext = ($pos1) ? mb_substr($src, 0, $pos1) : $src;
         $pos1 = strrpos($ext, '.') + 1;
-        $ext = substr($ext, $pos1);
+        $ext = mb_substr($ext, $pos1);
         if ($ext == 'swf') {
             if (!$parameters) {
                 $parameters = array(wmode => 'transparent');
@@ -614,7 +614,7 @@ class Jp7_Deprecated
                 if ($hideProtectedVars) {
                     foreach ($value as $valueKey => $valueValue) {
                         if (strpos($valueKey, chr(0).chr(42).chr(0)) === 0) {
-                            $array[$key][substr($valueKey, 2).':protected'] = '*PROTECTED*';
+                            $array[$key][mb_substr($valueKey, 2).':protected'] = '*PROTECTED*';
                             unset($array[$key][$valueKey]); // Retira os valores protected
                         }
                     }

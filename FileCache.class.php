@@ -144,7 +144,7 @@ class FileCache
         */
 
         // Checking if there is enough content to cache
-        if (strlen($file_content) > 100) {
+        if (mb_strlen($file_content) > 100) {
             // Creating directories
             $dir_arr = explode('/', $this->fileName);
             array_pop($dir_arr);
@@ -242,7 +242,7 @@ class FileCache
         }
 
         // Falha de segurança. Passou com conteúdo inválido. Investigar depois.
-        if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || strlen($fileName) > 200) {
+        if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || mb_strlen($fileName) > 200) {
             return false;
         }
         $fileName .= '.cache';

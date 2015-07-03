@@ -153,13 +153,13 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard
     {
         $segments = (array) $unformatted;
         foreach ($segments as $key => $segment) {
-            $segment = str_replace($this->getWordDelimiter(), ' ', strtolower($segment));
+            $segment = str_replace($this->getWordDelimiter(), ' ', mb_strtolower($segment));
             //$segment        = preg_replace('/[^a-z0-9 ]/', '', $segment);
             $segments[$key] = str_replace(' ', '', ucwords($segment));
         }
 
         $formatted = implode('_', $segments);
 
-        return strtolower(substr($formatted, 0, 1)).substr($formatted, 1).'Action';
+        return mb_strtolower(mb_substr($formatted, 0, 1)).mb_substr($formatted, 1).'Action';
     }
 }

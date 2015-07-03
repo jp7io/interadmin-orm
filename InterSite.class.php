@@ -196,7 +196,7 @@ class InterSite
         global $jp7_app;
 
         // Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
-        $host = strtolower($host);
+        $host = mb_strtolower($host);
 
         // This server is a main host
         $this->server = $this->servers[$host];

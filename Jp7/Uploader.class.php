@@ -75,7 +75,7 @@ class Jp7_Uploader
         }
 
         // Copy
-        $extension = strtolower(preg_replace('/(.*)(\.[^\.]*)$/', '\2', $name[$key]));
+        $extension = mb_strtolower(preg_replace('/(.*)(\.[^\.]*)$/', '\2', $name[$key]));
         if ($extension == '.jpeg') {
             $extension = '.jpg';
         }

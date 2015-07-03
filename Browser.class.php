@@ -89,7 +89,7 @@ class Browser
         $this->mo = ($this->browser == 'mo');
         $version = '';
         while (!$this->v) {
-            $c = substr($useragent, $i++, 1);
+            $c = mb_substr($useragent, $i++, 1);
             if (is_numeric($c) || $c == '.' || $c == ' ') {
                 $version .= "$c";
             } else {
@@ -133,7 +133,7 @@ class Browser
                 'google',
             );
             for ($i = 0; $i < count($robots); $i++) {
-                if (strpos(strtolower($useragent), $robots[$i]) !== false) {
+                if (strpos(mb_strtolower($useragent), $robots[$i]) !== false) {
                     $this->robot = $robots[$i];
                     $this->browser = 'robot';
                     break;

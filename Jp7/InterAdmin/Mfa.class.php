@@ -71,7 +71,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
 
     public function hasSecret()
     {
-        return $this->mfa_secret && ($this->mfa !== 'google' || strlen($this->mfa_secret) == 16);
+        return $this->mfa_secret && ($this->mfa !== 'google' || mb_strlen($this->mfa_secret) == 16);
     }
 
     public function isEnabled()
@@ -227,11 +227,11 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
     public function maskEmail()
     {
         list($username, $domain) = explode('@', $this->email);
-        $showchars = min(array(3, strlen($username)));
-        $username = substr($username, 0, $showchars).str_repeat('*', strlen($username) - $showchars);
+        $showchars = min(array(3, mb_strlen($username)));
+        $username = mb_substr($username, 0, $showchars).str_repeat('*', mb_strlen($username) - $showchars);
 
         $parts = explode('.', $domain);
-        $parts[0] = substr($parts[0], 0, 1).str_repeat('*', strlen($parts[0]) - 1);
+        $parts[0] = mb_substr($parts[0], 0, 1).str_repeat('*', mb_strlen($parts[0]) - 1);
         $domain = implode('.', $parts);
 
         return $username.'@'.$domain;
@@ -251,7 +251,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
             self::$issuer = $c_interadmin_app_title.' - '.$config->name;
 
             if ($config->server->type != InterSite::PRODUCAO) {
-                self::$issuer .= ' ('.strtoupper($config->server->type == 'Desenvolvimento' ? 'Dev' : '').')';
+                self::$issuer .= ' ('.mb_strtoupper($config->server->type == 'Desenvolvimento' ? 'Dev' : '').')';
             }
         }
 

@@ -128,12 +128,12 @@ class Pagination
         }
         $this->query_string = preg_replace('([&]?go_url='.$_GET['go_url'].')', '', $this->query_string); // Retira a GO Url da Query String
         if ($this->query_string[0] == '&') {
-            $this->query_string = substr($this->query_string, 1); // Limpa & que sobrou no começo da string
+            $this->query_string = mb_substr($this->query_string, 1); // Limpa & que sobrou no começo da string
         }
         $this->parameters = $parameters;
         $this->request_uri = (is_null($request_uri)) ? preg_replace('/[?](.*)/', '', $_SERVER['REQUEST_URI']) : $request_uri;
 
-        //$this->query_string=substr($this->query_string,1);
+        //$this->query_string=mb_substr($this->query_string,1);
 
         foreach ($_POST as $key => $value) {
             if ($key != 'p_page') {

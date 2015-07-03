@@ -389,7 +389,7 @@ class Jp7_Date extends DateTime
         }
 
         if ($iso == self::DURATION_LOWERISO) {
-            $duration = strtolower($duration);
+            $duration = mb_strtolower($duration);
         }
 
         return $duration;

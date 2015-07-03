@@ -165,7 +165,7 @@ class Jp7_InterAdmin_Search
             } elseif ($isQuoted) {
                 $where[] = 'CONCAT('.implode(',', $textColumns).") LIKE '%".$word."%'";
             }
-            if (strlen($word) < 2 || in_array($word, $short_words)) {
+            if (mb_strlen($word) < 2 || in_array($word, $short_words)) {
                 unset($words[$key]);
             }
         }
@@ -182,7 +182,7 @@ class Jp7_InterAdmin_Search
                     $plural[] = Jp7_Inflector::plural($word);
                 }
                 $plural = array_unique($plural);
-                if (strlen($word) > 4) {
+                if (mb_strlen($word) > 4) {
                     $like = array();
                     foreach ($plural as $word) {
                         $like[] = reset($textColumns)." LIKE '%".str_replace('*', '%', $word)."%'";

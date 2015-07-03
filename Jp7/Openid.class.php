@@ -203,7 +203,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
 
         if (empty($root)) {
             $root = Zend_OpenId::selfUrl();
-            if ($root[strlen($root) - 1] != '/') {
+            if ($root[mb_strlen($root) - 1] != '/') {
                 $root = dirname($root);
             }
         }
@@ -309,7 +309,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
             /* Ignore query part in openid.return_to */
             $pos = strpos($params['openid_return_to'], '?');
             if ($pos === false ||
-                SUBSTR($params['openid_return_to'], 0, $pos) != Zend_OpenId::selfUrl()) {
+                mb_substr($params['openid_return_to'], 0, $pos) != Zend_OpenId::selfUrl()) {
                 $this->_setError("Wrong openid.return_to '".
                     $params['openid_return_to']."' != '".Zend_OpenId::selfUrl()."'");
 
@@ -429,11 +429,11 @@ class Jp7_Openid extends Zend_OpenId_Consumer
             $params2 = array();
             foreach ($params as $key => $val) {
                 if (strpos($key, 'openid_ns_') === 0) {
-                    $key = 'openid.ns.'.substr($key, strlen('openid_ns_'));
+                    $key = 'openid.ns.'.mb_substr($key, mb_strlen('openid_ns_'));
                 } elseif (strpos($key, 'openid_sreg_') === 0) {
-                    $key = 'openid.sreg.'.substr($key, strlen('openid_sreg_'));
+                    $key = 'openid.sreg.'.mb_substr($key, mb_strlen('openid_sreg_'));
                 } elseif (strpos($key, 'openid_') === 0) {
-                    $key = 'openid.'.substr($key, strlen('openid_'));
+                    $key = 'openid.'.mb_substr($key, mb_strlen('openid_'));
                 }
                 $params2[$key] = $val;
             }

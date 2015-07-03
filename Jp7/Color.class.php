@@ -34,9 +34,9 @@ class Color
         $color = str_replace('#', '', $hex);
 
         // Make sure it's 6 digits
-        if (strlen($color) === 3) {
+        if (mb_strlen($color) === 3) {
             $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
-        } elseif (strlen($color) != 6) {
+        } elseif (mb_strlen($color) != 6) {
             throw new Exception('HEX color needs to be 6 or 3 digits long');
         }
 
@@ -164,9 +164,9 @@ class Color
         $b = dechex($b);
 
         // Make sure we get 2 digits for decimals
-        $r = (strlen(''.$r) === 1) ? '0'.$r : $r;
-        $g = (strlen(''.$g) === 1) ? '0'.$g : $g;
-        $b = (strlen(''.$b) === 1) ? '0'.$b : $b;
+        $r = (mb_strlen(''.$r) === 1) ? '0'.$r : $r;
+        $g = (mb_strlen(''.$g) === 1) ? '0'.$g : $g;
+        $b = (mb_strlen(''.$b) === 1) ? '0'.$b : $b;
 
         return $r.$g.$b;
     }
@@ -539,9 +539,9 @@ class Color
         $color = str_replace('#', '', $hex);
 
         // Make sure it's 6 digits
-        if (strlen($color) == 3) {
+        if (mb_strlen($color) == 3) {
             $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
-        } elseif (strlen($color) != 6) {
+        } elseif (mb_strlen($color) != 6) {
             throw new Exception('HEX color needs to be 6 or 3 digits long');
         }
 

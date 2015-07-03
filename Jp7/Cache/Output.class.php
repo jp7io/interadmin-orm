@@ -230,7 +230,7 @@
         ));
 
          if ($data) {
-             if (count($data) == 1 && is_string($data[0]) && strlen($data[0]) < 100) {
+             if (count($data) == 1 && is_string($data[0]) && mb_strlen($data[0]) < 100) {
                  $id .= '_'.toId($data[0]);
              } else {
                  $id .= '_'.md5(serialize($data));
@@ -302,7 +302,7 @@
             if ($pos === false) {
                 $urlNoCache = $_SERVER['REQUEST_URI'].'?nocache_force=true';
             } else {
-                $urlNoCache = substr($_SERVER['REQUEST_URI'], 0, $pos).'?nocache_force=true&'.substr($_SERVER['REQUEST_URI'], $pos + 1);
+                $urlNoCache = mb_substr($_SERVER['REQUEST_URI'], 0, $pos).'?nocache_force=true&'.mb_substr($_SERVER['REQUEST_URI'], $pos + 1);
             }
             $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta página?\')) window.location = \''.$urlNoCache.'\'"';
 
