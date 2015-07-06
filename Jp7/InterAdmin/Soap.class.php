@@ -204,7 +204,7 @@ STR;
         foreach ($operations as $operation) {
             $function = array(
                 'name' => $operation->getAttribute('name'),
-                'description' => utf8_decode($operation->getElementsByTagName('documentation')->item(0)->textContent),
+                'description' => $operation->getElementsByTagName('documentation')->item(0)->textContent,
                 'params' => array(),
             );
             // Parâmetros

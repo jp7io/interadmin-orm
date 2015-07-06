@@ -462,7 +462,7 @@ abstract class InterAdminAbstract implements Serializable
                 strpos($options['where'], 'EXISTS ') === false
             ) {
                 $quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
-                preg_match_all('/('.$quoted.'|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'].$options['order'], $matches);
+                preg_match_all('/('.$quoted.'|tags\.|children_[a-zA-Z0-9_.]+)/u', $options['where'].$options['order'], $matches);
                 foreach ($matches[1] as $match) {
                     // Filter, DISTINCT para o count((), children_ porque se estiver agrupando pelos filhos não deve agrupar pelo pai
                     if ($match[0] != "'") {
@@ -497,8 +497,9 @@ abstract class InterAdminAbstract implements Serializable
         $offset = 0;
         $ignoreJoinsUntil = -1;
 
-        while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+        while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/u', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
             list($termo, $pos) = $matches[1];
+            
             // Resolvendo true e false para char
             if (mb_strtolower($termo) == 'true' || mb_strtolower($termo) == 'false') {
                 $negativas = array('', '!');
@@ -506,12 +507,12 @@ abstract class InterAdminAbstract implements Serializable
                     $negativas = array_reverse($negativas);
                 }
                 $inicio = mb_substr($clause, 0, $pos + mb_strlen($termo));
-                $inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)'.$termo.'$/i', '$1'.$negativas[0]."=$3''", $inicio, 1, $count);
+                $inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)'.$termo.'$/iu', '$1'.$negativas[0]."=$3''", $inicio, 1, $count);
                 if (!$count) {
-                    $inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)'.$termo.'/i', '$1'.$negativas[1]."=$2''", $inicio, 1);
+                    $inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)'.$termo.'/iu', '$1'.$negativas[1]."=$2''", $inicio, 1);
                 }
                 $clause = $inicioRep.mb_substr($clause, $pos + mb_strlen($termo));
-                $offset = mb_strlen($inicioRep);
+                $offset = strlen($inicioRep); // nao usar mb_strlen, bug PREG_OFFSET_CAPTURE
                 continue;
             }
 
@@ -520,7 +521,7 @@ abstract class InterAdminAbstract implements Serializable
                 $inicio = mb_substr($clause, 0, $pos + mb_strlen($termo));
                 $existsClause = mb_substr($clause, $pos + mb_strlen($termo));
 
-                if (preg_match('/^([\( ]+)('.$keyword.')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
+                if (preg_match('/^([\( ]+)('.$keyword.')([ ]+)(WHERE)?/u', $existsClause, $existsMatches)) {
                     $table = $existsMatches[2];
                     // TODO unificar lógica
                     if ($table == 'tags') {
@@ -556,7 +557,7 @@ abstract class InterAdminAbstract implements Serializable
 
                     $inicioRep = $inicio.$existsMatches[1].$existsMatches[2].$existsMatches[3];
                     $clause = $inicioRep.mb_substr($clause, mb_strlen($inicio.$existsMatches[0]));
-                    $offset = mb_strlen($inicioRep);
+                    $offset = strlen($inicioRep); // nao usar mb_strlen, bug PREG_OFFSET_CAPTURE
 
                     $ignoreJoinsUntil = $offset;
                     continue;
@@ -633,7 +634,7 @@ abstract class InterAdminAbstract implements Serializable
                 $termo = $table.'.'.$campo;
                 $clause = substr_replace($clause, $termo, $pos, $len);
             }
-            $offset = $pos + mb_strlen($termo);
+            $offset = $pos + strlen($termo); // nao usar mb_strlen, bug PREG_OFFSET_CAPTURE
         }
 
         return $clause;
@@ -708,7 +709,7 @@ abstract class InterAdminAbstract implements Serializable
             // Com função
             } elseif (strpos($campo, '(') !== false || strpos($campo, 'CASE') !== false) {
                 if (strpos($campo, ' AS ') === false) {
-                    $aggregateAlias = trim(mb_strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
+                    $aggregateAlias = trim(mb_strtolower(preg_replace('/[^[:alnum:]]/u', '_', $campo)), '_');
                 } else {
                     $parts = explode(' AS ', $campo);
                     $aggregateAlias = array_pop($parts);

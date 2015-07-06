@@ -599,7 +599,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		<?php if (@$d['file']) {
     ?>
 		<span class="krumo-call" style="white-space:nowrap;">
-			Called from <code><?php echo $d['file']?></code>,
+			• Called from <code><?php echo $d['file']?></code>,
 				line <code><?php echo $d['line']?></code></span>
 		<?php
 
@@ -1213,7 +1213,7 @@ if (typeof($) == 'undefined') {
     private static function getStringValue($data)
     {
         if (self::$useToString && (method_exists($data, '__toString') || $data instanceof SimpleXMLElement) && !$data instanceof Zend_Form_Element) {
-            return '</strong> ('.htmlspecialchars(jp7_string_left($data, 100)).')<strong>';
+            return '</strong> ('.htmlspecialchars(jp7_string_left($data, 100), ENT_COMPAT | ENT_SUBSTITUTE).')<strong>';
         }
     }
 
@@ -1411,7 +1411,7 @@ if (typeof($) == 'undefined') {
 			(<em class="krumo-type">String,
 				<strong class="krumo-string-length"><?php
                     echo strlen($data) ?> characters</strong> </em>)
-			<strong class="krumo-string"><?php echo htmlspecialchars($_, ENT_COMPAT);
+			<strong class="krumo-string"><?php echo htmlspecialchars($_, ENT_COMPAT | ENT_SUBSTITUTE);
         ?></strong>
 
 			<?php
@@ -1435,7 +1435,7 @@ if (typeof($) == 'undefined') {
 		<ul class="krumo-node">
 
 			<li class="krumo-child">
-				<div class="krumo-preview"><?php echo str_replace("\n", '<br />', htmlspecialchars($data, ENT_COMPAT));
+				<div class="krumo-preview"><?php echo str_replace("\n", '<br />', htmlspecialchars($data, ENT_COMPAT | ENT_SUBSTITUTE));
     ?></div>
 			</li>
 
