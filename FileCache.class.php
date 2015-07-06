@@ -91,7 +91,7 @@ class FileCache
             // Retirando query string e $c_path
             $this->fileName = self::getFileName($_SERVER['REQUEST_URI'], $storeId, $this->cachePath);
             if (!$this->fileName) {
-                return; // Falha de segurança.
+                return; // Falha de seguranâˆšÃŸa.
             }
         }
 
@@ -99,11 +99,11 @@ class FileCache
         $this->partial = $partial;
         $this->setDelay($c_cache_delay);
 
-        // Retrieving/creating cache - Está cacheada
+        // Retrieving/creating cache - EstâˆšÂ° cacheada
         if ($this->checkLog($lifetime) && !$nocache_force) {
             $this->getCache();
         } else {
-            $this->startCache(); // Não está cacheada, cachear agora
+            $this->startCache(); // NâˆšÂ£o estâˆšÂ° cacheada, cachear agora
         }
     }
     /**
@@ -138,7 +138,7 @@ class FileCache
 
         $file_content = ob_get_clean();
 
-        /* Comentando, estava gerando resultados diferentes entre conteudo cacheado ou não
+        /* Comentando, estava gerando resultados diferentes entre conteudo cacheado ou nâˆšÂ£o
         $file_content = str_replace(chr(9), '', $file_content);
         $file_content = str_replace(chr(13), '', $file_content);
         */
@@ -202,7 +202,7 @@ class FileCache
                 $title = implode('&#013;', $title);
 
                 $urlNoCache = preg_replace('/^([^&]*)([&]?)([^&]*)$/', '$1?$3$2nocache_force=true', str_replace('?', '&', $_SERVER['REQUEST_URI']));
-                $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta página?\')) window.location = \''.$urlNoCache.'\'"';
+                $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta pâˆšÂ°gina?\')) window.location = \''.$urlNoCache.'\'"';
 
                 echo '<div style="'.$css.'left:0px;" title="'.$title.'" '.$event.'>CACHE</div>';
                 echo '<div style="'.$css.'right:0px;" title="'.$title.'" '.$event.'>CACHE</div>';
@@ -240,9 +240,9 @@ class FileCache
         } elseif (strpos($fileName, '.') === false) {
             $fileName .= (($fileName) ? '/' : '').'index';
         }
-
-        // Falha de segurança. Passou com conteúdo inválido. Investigar depois.
-        if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || mb_strlen($fileName) > 200) {
+        
+        // Falha de seguranÃ§a. Passou com conteÃºdo invÃ¡lido. Investigar depois.
+        if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || strlen($fileName) > 200) {
             return false;
         }
         $fileName .= '.cache';
@@ -273,7 +273,7 @@ class FileCache
             if ($cache_time && time() - $log_time < $this->delay) {
                 return true;
             }
-            // Outro dia é atualizado o cache
+            // Outro dia âˆšÂ© atualizado o cache
             if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) {
                 return true;
             }
