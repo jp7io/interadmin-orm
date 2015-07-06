@@ -126,30 +126,6 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
     }
 
     /**
-     * @see Zend_Feed_Writer_Feed_FeedAbstract::setDescription()
-     */
-    public function setDescription($description)
-    {
-        parent::setDescription(Jp7_Utf8::encode($description));
-    }
-
-    /**
-     * @see Zend_Feed_Writer_Feed_FeedAbstract::setTitle()
-     */
-    public function setTitle($title)
-    {
-        parent::setTitle(Jp7_Utf8::encode($title));
-    }
-
-    /**
-     * @see Zend_Feed_Writer_Feed_FeedAbstract::setCopyright()
-     */
-    public function setCopyright($copyright)
-    {
-        parent::setCopyright(Jp7_Utf8::encode($copyright));
-    }
-
-    /**
      * @see Zend_Feed_Writer_Feed::createEntry()
      */
     public function createEntry()

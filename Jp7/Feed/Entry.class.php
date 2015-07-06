@@ -3,14 +3,6 @@
 class Jp7_Feed_Entry extends Zend_Feed_Writer_Entry
 {
     /**
-     * @see Zend_Feed_Writer_Entry::setContent()
-     */
-    public function setContent($content)
-    {
-        parent::setContent(Jp7_Utf8::encode($content));
-    }
-
-    /**
      * @see Zend_Feed_Writer_Entry::setDateCreated()
      */
     public function setDateCreated($date)
@@ -32,21 +24,5 @@ class Jp7_Feed_Entry extends Zend_Feed_Writer_Entry
         } else {
             parent::setDateModified($date);
         }
-    }
-
-    /**
-     * @see Zend_Feed_Writer_Entry::setDescription()
-     */
-    public function setDescription($description)
-    {
-        parent::setDescription(Jp7_Utf8::encode($description));
-    }
-
-    /**
-     * @see Zend_Feed_Writer_Entry::setTitle()
-     */
-    public function setTitle($title)
-    {
-        parent::setTitle(Jp7_Utf8::encode($title));
     }
 }

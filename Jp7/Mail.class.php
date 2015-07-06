@@ -2,6 +2,8 @@
 
 class Jp7_Mail extends Zend_Mail
 {
+    protected $_charset = 'utf-8';
+    
     /*
      * Parses an e-mail string and passes it to the given Zend_Mail method.
      *

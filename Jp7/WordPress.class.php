@@ -8,6 +8,7 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract
     {
         $dsn = jp7_formatDsn($dbData);
         $this->_db = ADONewConnection($dsn);
+        $this->_db->execute("set names 'utf8'");
     }
 
     public function getFirstBlog($options = array())
