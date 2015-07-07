@@ -104,14 +104,17 @@ function memoize(Closure $closure)
     return $cache;
 }
 
-function km($object, $search = '.*')
+function dm($object, $search = '.*')
 {
-    $methods = get_class_methods($object);
-    $methods = array_filter($methods, function ($a) use ($search) {
-        return preg_match('/'.$search.'/i', $a);
-    });
-
-    kd(['methods' => $methods, 'object' => $object], KRUMO_EXPAND_ALL);
+    $methods = [];
+    if (is_object($object)) {
+        $methods = get_class_methods($object);
+        $methods = array_filter($methods, function ($a) use ($search) {
+            return preg_match('/'.$search.'/i', $a);
+        });
+    }
+    
+    dd(compact('methods', 'object'));
 }
 
 // INTERADMIN COMPATIBILITY FUNCTIONS
