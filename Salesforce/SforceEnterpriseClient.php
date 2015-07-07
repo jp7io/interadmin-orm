@@ -69,6 +69,7 @@ class SforceEnterpriseClient extends SforceBaseClient {
     foreach ($sObjects as &$sObject) {
       $sObject = new SoapVar($sObject, SOAP_ENC_OBJECT, $type, $this->namespace);
     }
+    $arg = new stdClass;
     $arg->sObjects = $sObjects;
     return parent::_update($arg);
   }
