@@ -590,6 +590,9 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
      */
     public function save()
     {
+        if (empty($this->attributes['id_tipo'])) {
+            throw new Exception('Saving a record without id_tipo.');
+        }
         if (empty($this->id_slug) && in_array('id_slug', $this->getColumns())) {
             $this->id_slug = $this->generateSlug();
         }
