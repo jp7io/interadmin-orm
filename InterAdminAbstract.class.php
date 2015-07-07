@@ -217,7 +217,7 @@ abstract class InterAdminAbstract implements Serializable
      */
     public function save()
     {
-        $this->_update($this->attributes);
+        return $this->_update($this->attributes);
     }
     /**
      * Increments a numeric attribute.
@@ -272,6 +272,7 @@ abstract class InterAdminAbstract implements Serializable
                 or die(jp7_debug('Error while inserting data into `'.$this->getTableName().'` '.$db->ErrorMsg(), print_r($valuesToSave, true)));
             $this->$pk = $db->Insert_ID();
         }
+        return $this;
     }
     /**
      * Gets an object by its key, which may be its 'id' or 'id_tipo', and then returns it.
