@@ -17,27 +17,28 @@ class Collection extends \Former\Form\Fields\Select
     public function options($list, $selected = null, $valuesAsKeys = false)
     {
         if ($list instanceof \Jp7\Interadmin\Query\Base) {
-            $list = $list->all();
+            throw new \Exception('Usar ->lists(x,id)');
         }
-        if ($list instanceof \Illuminate\Support\Collection) {
-            $collection = $list;
-            $list = [];
-
-            foreach ($collection as $item) {
-                $list[$item->id] = $item->getName();
+        if ($list instanceof \Jp7\Interadmin\Collection) {
+            if ($list->first() instanceof \InterAdminAbstract) {
+                throw new \Exception('Usar ->lists(x,id)');
             }
         }
         $this->options = $list;
-
+        
         if (!is_null($selected)) {
             $this->value = $selected;
         }
-
+        
         return $this;
     }
 
     public function render()
     {
+        if ($this->options instanceof \Illuminate\Support\Collection) {
+            $this->options = $this->options->all();
+        }
+        
         $this->options = ['' => $this->blank] + $this->options;
         parent::options($this->options);
 
