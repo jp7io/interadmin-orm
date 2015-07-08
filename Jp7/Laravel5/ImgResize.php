@@ -46,16 +46,18 @@ class ImgResize extends Image
     public static function tag($img, $templates = [], $options = [])
     {
         $templates = (array) $templates;
+        $mainTemplate = $templates ? $templates[0] : null;
+        
         if (count($templates) === 1) {
             // Preppend template to classes for CSS use
-            $options['class'] = trim(array_get($options, 'class').' '.$templates[0]);
+            $options['class'] = trim(array_get($options, 'class').' '.$mainTemplate);
         }
         if (empty($options['title'])) {
             $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
         
         $alt = $options['title'];
-        $url = self::url($img, $templates[0], $alt);
+        $url = self::url($img, $mainTemplate, $alt);
         
         $obj = self::create($url, $alt, $options);
         
@@ -128,9 +130,10 @@ class ImgResize extends Image
     }
     
     // Add <noscript> tags if needed
-    public function __toString()
+    public function render()
     {
         $noscript = '';
+        
         if (static::$lazy) {
             $attributes = $this->getAttributes();
             $attributes['src'] = $attributes['data-src'];
@@ -139,7 +142,7 @@ class ImgResize extends Image
             
             $noscript = '<noscript>'.Image::create()->setAttributes($attributes).'</noscript>';
         }
-
-        return parent::__toString().$noscript;
+        
+        return parent::render().$noscript;
     }
 }
