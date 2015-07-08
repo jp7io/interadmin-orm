@@ -267,7 +267,7 @@ class Query extends Query\Base
             'fields' => array_filter([$column, $key]),
         ) + $this->options);
 
-        return array_pluck($array, $column, $key);
+        return collect(array_pluck($array, $column, $key));
     }
 
     /**
@@ -281,15 +281,7 @@ class Query extends Query\Base
 
         return $items->jsonList($column, $key);
     }
-
-    /**
-     * Just like lists, but returns a collection.
-     */
-    public function collect($column)
-    {
-        return new Collection($this->lists($column));
-    }
-
+    
     public function findOrFail($id)
     {
         $result = $this->find($id);
