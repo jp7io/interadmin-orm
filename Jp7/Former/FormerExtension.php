@@ -48,7 +48,7 @@ class FormerExtension
         return $result;
     }
 
-    public function __get($property)
+    public function &__get($property)
     {
         return $this->former->$property;
     }

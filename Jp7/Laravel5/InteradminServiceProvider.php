@@ -20,15 +20,11 @@ class InteradminServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->bootOrm();
-        
         BladeExtension::apply();
-        // self::bootTestingEnv();
         
-        $this->extendFormer();
+        $this->bootOrm();
         $this->extendView();
-        
-        //self::clearInterAdminCache();
+        // self::bootTestingEnv();
     }
     
     /**
@@ -38,9 +34,7 @@ class InteradminServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        \App::singleton(Router::class, function ($app) {
-            return new Router($app['router']);
-        });
+        
     }
     
     private function bootOrm()
@@ -51,6 +45,16 @@ class InteradminServiceProvider extends ServiceProvider
             spl_autoload_register([DynamicLoader::class, 'load']);
         }
     }
+    
+    private function extendView()
+    {
+        \View::composer('*', function ($view) {
+            $parts = explode('.', $view->getName());
+            array_pop($parts);
+            \View::share('viewPath', implode('.', $parts));
+        });
+    }
+    
     /*
     private function bootTestingEnv()
     {
@@ -65,45 +69,15 @@ class InteradminServiceProvider extends ServiceProvider
         }
     }
     */
+    /*
     private function extendFormer()
     {
-        /*
+        
         \App::before(function ($request) {
             // Needed for tests
             \Former::getFacadeRoot()->ids = [];
         });
-        */
         
-        if (!class_exists('Former')) {
-            return;
-        }
-       
-        \Former::framework('TwitterBootstrap3');
-        \Former::setOption('default_form_type', 'vertical');
-
-        if ($dispatcher = \App::make('former.dispatcher')) {
-            $dispatcher->addRepository('Jp7\\Former\\Fields\\');
-        }
     }
-
-    private function extendView()
-    {
-        \View::composer('*', function ($view) {
-            $parts = explode('.', $view->getName());
-            array_pop($parts);
-            \View::share('viewPath', implode('.', $parts));
-        });
-    }
-    /*
-    private static function clearInterAdminCache()
-    {
-        if (!\App::environment('local')) {
-            return;
-        }
-        // Atualiza classmap e routes com CMD+SHIFT+R ou no terminal
-        if (PHP_SAPI === 'cli' || \Request::server('HTTP_CACHE_CONTROL') === 'no-cache') {
-            \Cache::forget('Interadmin.routes');
-            \Cache::forget('Interadmin.classMap');
-        }
-    }*/
+    */
 }
