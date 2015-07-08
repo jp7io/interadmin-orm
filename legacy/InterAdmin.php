@@ -81,7 +81,15 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         
         // returned as reference
         $result = $this->_lazyLoadAttribute($name);
-
+        
+        // Mutators
+        if (!$result) {
+            $mutator = 'get' . ucfirst($name) . 'Attribute';
+            if (method_exists($this, $mutator)) {
+                $result = $this->$mutator();
+            }
+        }
+        
         return $result;
     }
     
@@ -94,7 +102,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function __isset($attributeName)
     {
-        return array_key_exists($attributeName, $this->attributes) || $this->_lazyLoadAttribute($attributeName);
+        if (array_key_exists($attributeName, $this->attributes) || $this->_lazyLoadAttribute($attributeName)) {
+            return true;
+        }
+        
+        return method_exists($this, 'get' . ucfirst($attributeName) . 'Attribute');
     }
     
     private function _lazyLoadAttribute($name)
