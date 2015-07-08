@@ -4,6 +4,13 @@ namespace Jp7\Laravel5;
 
 use HtmlObject\Image;
 
+/*
+Dynamic resize of images: imagecache/<template>/0001.jpg
+Download external images to resize them the best way possible
+Lazy loading images: data-src="...""
+... with fallback for non-js users: <noscript>
+Better SEO on the URL: 0001.jpg => some-text-0001.jpg
+*/
 class ImgResize extends Image
 {
     private static $lazy = false;
@@ -29,32 +36,46 @@ class ImgResize extends Image
         static::$seo = (bool) $status;
     }
     
-    public static function tag($img, $template = null, $options = array())
+    /**
+     * Generates image tag. Can create lazy loading images with "data-src".
+     *
+     * @param string|Downloadable   $img        URL or Downloadable object
+     * @param string|array          $templates  Multiple templates become "srcset"
+     * @param array                 $options    HTML options such as title, or class.
+     */
+    public static function tag($img, $templates = [], $options = [])
     {
-        if ($template) {
-            // Preppend template to classes
-            $options['class'] = trim(array_get($options, 'class').' '.$template);
+        $templates = (array) $templates;
+        if (count($templates) === 1) {
+            // Preppend template to classes for CSS use
+            $options['class'] = trim(array_get($options, 'class').' '.$templates[0]);
         }
         if (empty($options['title'])) {
             $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
         
         $alt = $options['title'];
-        $url = self::url($img, $template, $alt);
+        $url = self::url($img, $templates[0], $alt);
+        
+        $obj = self::create($url, $alt, $options);
         
         if (static::$lazy) {
-            $px = Cdn::asset('img/px.gif');
-            return self::create($px, $alt, $options)->data_src($url);
-        } else {
-            return self::create($url, $alt, $options);
+            $obj->src(false)->data_src($url);
         }
+        if (count($templates) > 1) {
+            // TODO
+        }
+        
+        return (string) $obj;
     }
 
-    public static function url($url, $template = null, $text = '')
+    public static function url($url, $template = null, $title = '')
     {
         if (\App::environment('testing')) {
             return '/img/px.gif';
         }
+        // local test:
+        // $url = '/upload/mediabox/00202271.jpg';
         
         if (is_object($url)) {
             $img = $url;
@@ -63,7 +84,7 @@ class ImgResize extends Image
         $isExternal = self::isExternal($url);
         
         if (static::$seo && !$isExternal) {
-            $url = self::seoReplace($url, $text);
+            $url = self::seoReplace($url, $title);
         }
         
         if ($template) {
@@ -78,9 +99,9 @@ class ImgResize extends Image
     
     // SEO depends on RewriteModule
     // Should only be applied to local images
-    private static function seoReplace($url, $text)
+    private static function seoReplace($url, $title)
     {
-        if ($slug = to_slug($text)) {
+        if ($slug = to_slug($title)) {
             $url = dirname($url).'/'.$slug.'-'.basename($url);
         }
         return $url;
@@ -114,7 +135,8 @@ class ImgResize extends Image
             $attributes = $this->getAttributes();
             $attributes['src'] = $attributes['data-src'];
             unset($attributes['data-src']);
-
+            unset($attributes['srcset']);
+            
             $noscript = '<noscript>'.Image::create()->setAttributes($attributes).'</noscript>';
         }
 
