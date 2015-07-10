@@ -114,7 +114,7 @@ if (!function_exists('interadmin_data')) {
     }
 
     // Laravel 5 functions
-    function collect($arr = null)
+    function jp7_collect($arr = null)
     {
         return new \Jp7\Interadmin\Collection($arr);
     }

@@ -267,7 +267,7 @@ class Query extends Query\Base
             'fields' => array_filter([$column, $key]),
         ) + $this->options);
 
-        return collect(array_pluck($array, $column, $key));
+        return jp7_collect(array_pluck($array, $column, $key));
     }
 
     /**
