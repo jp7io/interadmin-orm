@@ -313,7 +313,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
         $tipo = static::type();
         if (!$tipo) {
-            if (empty($this->id_tipo)) {
+            if (empty($this->attributes['id_tipo'])) {
                 $db = $this->getDb();
                 $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
@@ -701,7 +701,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
     public function getTableName()
     {
-        if (empty($this->id_tipo)) {
+        if (empty($this->attributes['id_tipo'])) {
             // Compatibilidade, tenta encontrar na tabela global
             return $this->getDb()->getTablePrefix(). (isset($this->attributes['table']) ? $this->attributes['table'] : '');
         } else {
