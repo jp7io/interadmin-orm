@@ -626,7 +626,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function save()
     {
-        if (empty($this->id_slug) && in_array('id_slug', $this->getColumns())) {
+        if (empty($this->attributes['id_slug']) && in_array('id_slug', $this->getColumns())) {
             $this->id_slug = $this->generateSlug();
         }
 
