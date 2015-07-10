@@ -650,7 +650,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
     public function generateSlug()
     {
-        if (isset($this->varchar_key)) {
+        if (isset($this->attributes['varchar_key'])) {
             $alias_varchar_key = 'varchar_key';
         } else {
             $alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
