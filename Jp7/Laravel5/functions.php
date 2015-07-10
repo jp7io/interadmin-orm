@@ -1,20 +1,13 @@
 <?php
 
-register_shutdown_function(function () {
-    // Avoid CDN cache of assets with errors
-    if (error_get_last() && !headers_sent() && isset($_SERVER['SERVER_PROTOCOL'])) {
-        header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
-        header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1
-        header('Pragma: no-cache'); // HTTP 1.0
-        header('Expires: 0'); // Proxies
-    }
-});
+if (function_exists('interadmin_data')) {
+    return;
+}
 
 define(
     'CACHE_ENABLED',
     isset($_SERVER['HTTP_HOST']) &&
     $_SERVER['HTTP_HOST'] == CACHE_HOST &&
-    strpos($_SERVER['REQUEST_URI'], '/assets') !== 0 &&
     strpos($_SERVER['REQUEST_URI'], '/imagecache') !== 0 &&
     strpos($_SERVER['REQUEST_URI'], '/_debugbar') !== 0
 );
