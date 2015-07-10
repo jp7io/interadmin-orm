@@ -311,9 +311,13 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             return $this->_tipo;
         }
 
+        if (empty($this->attributes['id_tipo'])) {
+            $this->id_tipo = 0;
+        }
+        
         $tipo = static::type();
-        if (!$tipo) {
-            if (empty($this->attributes['id_tipo'])) {
+        if (!$tipo || $this->id_tipo != $tipo->id_tipo) {
+            if (!$this->id_tipo) {
                 $db = $this->getDb();
                 $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
