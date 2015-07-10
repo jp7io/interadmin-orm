@@ -61,9 +61,9 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @param int $id This record's 'id'.
      */
-    public function __construct($id = 0)
+    public function __construct(array $attributes = [])
     {
-        $this->id = $id;
+        $this->attributes = $attributes;
     }
 
     /**
@@ -227,7 +227,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             }
         }
 
-        $instance = new $class_name($id);
+        $instance = new $class_name(['id' => $id]);
         $instance->setType($tipo);
         $instance->setDb($tipo->getDb());
 
@@ -545,7 +545,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
         foreach ($tags as $tag) {
             $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'_tags (parent_id, id, id_tipo) VALUES
-				('.$this->id.','.
+                ('.$this->id.','.
                 (($tag instanceof InterAdmin) ? $tag->id : 0).','.
                 (($tag instanceof InterAdmin) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
             $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
@@ -655,7 +655,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         } else {
             $alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
         }
-        if (empty($this->$alias_varchar_key)) {
+        if (empty($this->attributes[$alias_varchar_key])) {
             return;
         }
 
@@ -728,7 +728,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     /**
      * Sets $log_user and returns the old value.
      *
-     * @see 	InterAdmin::$log_user
+     * @see     InterAdmin::$log_user
      *
      * @param object $log_user
      *

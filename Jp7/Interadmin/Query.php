@@ -22,7 +22,7 @@ class Query extends Query\Base
     {
         if (is_null($this->model)) {
             if ($classname = $this->provider->class) {
-                $this->model = new $classname(0);
+                $this->model = new $classname;
                 $this->model->setType($this->provider);
             }
         }
