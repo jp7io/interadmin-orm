@@ -63,7 +63,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function __construct(array $attributes = [])
     {
-        $this->attributes = $attributes;
+        $this->attributes = $attributes + ['id' => 0];
     }
 
     /**
