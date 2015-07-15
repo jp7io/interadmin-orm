@@ -10,7 +10,7 @@ class HttpCacheExtension extends HttpCache
 {
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (!config('httpcache.enabled') || $this->matchesBlacklist($request)) {
+        if ($this->matchesBlacklist($request)) {
             return $this->pass($request, $catch);
         }
         
@@ -18,7 +18,11 @@ class HttpCacheExtension extends HttpCache
             return $this->invalidate($request, $catch);
         }
         
-        $response = parent::handle($request, $type, $catch);
+        if (!config('httpcache.enabled')) {
+            $response = $this->pass($request, $catch);
+        } else {
+            $response = parent::handle($request, $type, $catch);
+        }
         
         if ($response instanceof \Illuminate\Http\Response) {
             if (str_contains($response->getContent(), 'method="POST"')) {
