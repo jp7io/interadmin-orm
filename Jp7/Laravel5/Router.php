@@ -12,10 +12,15 @@ class Router extends MethodForwarder
      * @var array [id_tipo => route.name]
      */
     protected $map = [];
+    protected $cachefile = 'bootstrap/cache/routemap.cache';
     
     public function __construct($target)
     {
-        $this->map = Cache::get('Interadmin.routeMap') ?: [];
+        $this->cachefile = base_path($this->cachefile);
+        
+        if (is_file($this->cachefile)) {
+            $this->map = unserialize(file_get_contents($this->cachefile));
+        }
         
         parent::__construct($target);
     }
@@ -175,11 +180,11 @@ class Router extends MethodForwarder
     public function clearCache()
     {
         $this->map = [];
-        Cache::forget('Interadmin.routeMap');
+        $this->saveCache();
     }
     
     public function saveCache()
     {
-        Cache::forever('Interadmin.routeMap', $this->map);
+        file_put_contents($this->cachefile, serialize($this->map));
     }
 }
