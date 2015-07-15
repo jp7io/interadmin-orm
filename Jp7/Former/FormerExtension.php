@@ -130,7 +130,7 @@ class FormerExtension
 
     private function populateOptions($field, $campoType)
     {
-        if ($field->getType() === 'collection') {
+        if ($field->getType() === 'select') {
             $options = [];
             foreach ($campoType->records()->all() as $record) {
                 $options[$record->id] = $record->getName();
