@@ -68,7 +68,7 @@ class ImgResize extends Image
             // TODO
         }
         
-        return (string) $obj;
+        return $obj;
     }
 
     public static function url($url, $template = null, $title = '')
