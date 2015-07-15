@@ -4,6 +4,7 @@ namespace Jp7\Laravel5;
 
 use Jp7\MethodForwarder;
 use Route;
+use Cache;
 
 class Router extends MethodForwarder
 {
@@ -11,6 +12,13 @@ class Router extends MethodForwarder
      * @var array [id_tipo => route.name]
      */
     protected $map = [];
+    
+    public function __construct($target)
+    {
+        $this->map = Cache::get('Interadmin.routeMap') ?: [];
+        
+        parent::__construct($target);
+    }
     
     public function resource($name, $controller, array $options = array())
     {
@@ -162,5 +170,16 @@ class Router extends MethodForwarder
         }
 
         return $breadcrumb;
+    }
+    
+    public function clearCache()
+    {
+        $this->map = [];
+        Cache::forget('Interadmin.routeMap');
+    }
+    
+    public function saveCache()
+    {
+        Cache::forever('Interadmin.routeMap', $this->map);
     }
 }
