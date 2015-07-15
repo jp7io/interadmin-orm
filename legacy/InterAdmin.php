@@ -325,7 +325,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                     ->select('id_tipo')
                     ->where('id', $this->id)
                     ->first();
-                    
+
+                if (!$data || !$data->id_tipo) {
+                    throw new Exception('Could not find id_tipo for record with id: ' . $this->id);
+                }
+
                 $this->id_tipo = $data->id_tipo;
             }
             $tipo = InterAdminTipo::getInstance($this->id_tipo, array(
