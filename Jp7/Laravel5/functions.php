@@ -1,16 +1,6 @@
 <?php
 
 if (!function_exists('interadmin_data')) {
-    define(
-        'CACHE_ENABLED',
-        isset($_SERVER['HTTP_HOST']) &&
-        $_SERVER['HTTP_HOST'] == CACHE_HOST &&
-        strpos($_SERVER['REQUEST_URI'], '/imagecache') !== 0 &&
-        strpos($_SERVER['REQUEST_URI'], '/_debugbar') !== 0
-    );
-    // AJAX is not cached, this avoids loading wrong content
-    define('CACHE_SALT', isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? $_SERVER['HTTP_X_REQUESTED_WITH'] : '');
-
     // Check site mobile
     function is_mobile()
     {

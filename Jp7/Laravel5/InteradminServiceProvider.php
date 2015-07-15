@@ -23,7 +23,7 @@ class InteradminServiceProvider extends ServiceProvider
         BladeExtension::apply();
         
         $this->bootOrm();
-        $this->extendView();
+        $this->shareViewPath();
         // self::bootTestingEnv();
     }
     
@@ -46,7 +46,7 @@ class InteradminServiceProvider extends ServiceProvider
         }
     }
     
-    private function extendView()
+    private function shareViewPath()
     {
         \View::composer('*', function ($view) {
             $parts = explode('.', $view->getName());
@@ -72,12 +72,10 @@ class InteradminServiceProvider extends ServiceProvider
     /*
     private function extendFormer()
     {
-        
         \App::before(function ($request) {
             // Needed for tests
             \Former::getFacadeRoot()->ids = [];
-        });
-        
+        });   
     }
     */
 }
