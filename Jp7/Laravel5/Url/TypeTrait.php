@@ -2,7 +2,7 @@
 
 namespace Jp7\Laravel5\Url;
 
-use Jp7\InterAdmin\ClassMap;
+use Jp7\Interadmin\ClassMap;
 use Jp7\Laravel5\RouterFacade as Router;
 use BadMethodCallException;
 use URL;

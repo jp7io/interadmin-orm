@@ -4,7 +4,7 @@ LARAVEL 4
 */
 namespace Jp7\Laravel\Url;
 
-use Jp7\InterAdmin\ClassMap;
+use Jp7\Interadmin\ClassMap;
 use BadMethodCallException;
 use Route;
 use URL;
