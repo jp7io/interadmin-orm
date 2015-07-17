@@ -6,17 +6,17 @@ class Cdn
 {
     public static function asset($url)
     {
-        return self::replace(asset($url));
+        return self::replace(asset($url)) .'?v='.self::getVersion();
     }
 
     public static function css($url)
     {
-        return '<link href="'.self::asset($url).'?v='.self::getVersion().'"  rel="stylesheet" type="text/css">';
+        return '<link href="'.self::asset($url).'"  rel="stylesheet" type="text/css">';
     }
 
     public static function js($url)
     {
-        return '<script src="'.self::asset($url).'?v='.self::getVersion().'"></script>';
+        return '<script src="'.self::asset($url).'"></script>';
     }
 
     private static function replace($url)
