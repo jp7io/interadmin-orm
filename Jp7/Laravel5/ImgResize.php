@@ -62,7 +62,8 @@ class ImgResize extends Image
         $obj = self::create($url, $alt, $options);
         
         if (static::$lazy) {
-            $obj->src(false)->data_src($url);
+            $obj->src(self::transparentGif())
+                ->data_src($url);
         }
         if (count($templates) > 1) {
             // TODO
@@ -107,6 +108,11 @@ class ImgResize extends Image
             $url = dirname($url).'/'.$slug.'-'.basename($url);
         }
         return $url;
+    }
+    
+    public static function transparentGif()
+    {
+        return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
     }
     
     private static function isExternal($url)
