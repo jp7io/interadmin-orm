@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin\Query;
 
 use Illuminate\Database\Query\Expression;
+use Illuminate\Pagination\LengthAwarePaginator;
 use InterAdminTipo;
 use InterAdminAbstract;
 use BadMethodCallException;
@@ -407,15 +408,19 @@ abstract class Base
         return $this;
     }
 
-    public function paginate($perPage = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
         $totalItems = $this->count();
 
-        $page = \Paginator::getCurrentPage();
+        $page = LengthAwarePaginator::resolveCurrentPage($pageName) ?: 1;
+        
         $items = $this->skip(($page - 1) * $perPage)
             ->take($perPage)
             ->all();
 
-        return \Paginator::make($items->all(), $totalItems, $perPage);
+        return new LengthAwarePaginator($items->all(), $totalItems, $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
     }
 }
