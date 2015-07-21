@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Laravel5;
+namespace Jp7\Laravel;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -13,7 +13,7 @@ class RouterServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Used by Jp7\Laravel5\RouterFacade
+        // Used by Jp7\Laravel\RouterFacade
         \App::singleton(Router::class, function ($app) {
             return new Router($app['router']);
         });

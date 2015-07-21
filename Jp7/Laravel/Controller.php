@@ -1,7 +1,5 @@
 <?php
-/*
-LARAVEL 4
-*/
+
 namespace Jp7\Laravel;
 
 use Illuminate\Routing\Controller as BaseController;

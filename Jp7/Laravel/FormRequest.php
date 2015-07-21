@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Laravel5;
+namespace Jp7\Laravel;
 
 use App\Http\Requests\Request;
 

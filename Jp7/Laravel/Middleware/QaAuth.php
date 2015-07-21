@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Laravel5\Middleware;
+namespace Jp7\Laravel\Middleware;
 
 use Closure;
 

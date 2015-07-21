@@ -1,12 +1,10 @@
 <?php
-/*
-LARAVEL 4
-*/
+
 namespace Jp7\Laravel\Url;
 
 use Jp7\Interadmin\ClassMap;
+use Jp7\Laravel\RouterFacade as Router;
 use BadMethodCallException;
-use Route;
 use URL;
 use InterAdmin;
 
@@ -38,7 +36,7 @@ trait TypeTrait
                 ', action: '.$action.'. Called on '.get_class($this));
         }
 
-        $variables = Route::getVariablesFromRoute($route);
+        $variables = Router::getVariablesFromRoute($route);
 
         if (count($parameters) != count($variables)) {
             throw new BadMethodCallException('Route "'.$route->getUri().'" has '.count($variables).
@@ -52,8 +50,8 @@ trait TypeTrait
                 return $p;
             }
         }, $parameters);
-
-        return URL::route(null, $parameters, true, $route);
+        
+        return URL::route($route->getName(), $parameters);
     }
 
     public function getRoute($action = 'index')
@@ -63,7 +61,7 @@ trait TypeTrait
             throw new BadMethodCallException('Invalid action "'.$action.'", valid actions: '.implode(', ', $validActions));
         }
 
-        return Route::getRouteByIdTipo($this->id_tipo, $action);
+        return Router::getRouteByIdTipo($this->id_tipo, $action);
     }
 
     public function getRouteActions()

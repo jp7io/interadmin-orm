@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Laravel5;
+namespace Jp7\Laravel;
 
 use Illuminate\Support\ServiceProvider;
 use Jp7\Interadmin\DynamicLoader;

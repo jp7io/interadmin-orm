@@ -2,7 +2,7 @@
 
 namespace Jp7\Laravel\Controller;
 
-use Jp7\Laravel5\RouterFacade as Router;
+use Jp7\Laravel\RouterFacade as Router;
 use InterAdmin;
 
 trait RecordTrait
