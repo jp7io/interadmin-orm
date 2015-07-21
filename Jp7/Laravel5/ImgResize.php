@@ -62,12 +62,12 @@ class ImgResize extends Image
         }
         
         $alt = $options['title'];
-        $url = self::url($img, $mainTemplate, $alt);
+        $url = static::url($img, $mainTemplate, $alt);
         
-        $obj = self::create($url, $alt, $options);
+        $obj = static::create($url, $alt, $options);
         
         if (static::$lazy) {
-            $obj->src(self::transparentGif())
+            $obj->src(static::transparentGif())
                 ->data_src($url);
         }
         if (count($templates) > 1) {
@@ -86,15 +86,15 @@ class ImgResize extends Image
             $img = $url;
             $url = $img->getUrl();
         }
-        $isExternal = self::isExternal($url);
+        $isExternal = static::isExternal($url);
         
         if (static::$seo && !$isExternal) {
-            $url = self::seoReplace($url, $title);
+            $url = static::seoReplace($url, $title);
         }
         
         if ($template) {
             if ($isExternal) {
-                $url = self::downloadExternal($url);
+                $url = static::downloadExternal($url);
             }
             $url = str_replace('/upload/', '/imagecache/'.$template.'/', $url);
         }
@@ -102,12 +102,20 @@ class ImgResize extends Image
         return Cdn::asset($url);
     }
     
+    public static function bg($url, $template = null, $title = '')
+    {
+        return 'background-image: url(\'' . static::url($url, $template, $title) . '\')';
+    }
+    
     // SEO depends on RewriteModule
     // Should only be applied to local images
     private static function seoReplace($url, $title)
     {
-        if ($slug = to_slug($title)) {
-            $url = dirname($url).'/'.$slug.'-'.basename($url);
+        $basename = basename($url);
+        if (preg_match('/^\d{6,8}\./', $basename)) {
+            if ($slug = to_slug($title)) {
+                $url = dirname($url).'/'.$slug.'-'.$basename;
+            }
         }
         return $url;
     }
