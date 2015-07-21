@@ -15,7 +15,7 @@ class Select extends \Former\Form\Fields\Select
             }
         }
         
-        $this->options = array();
+        $this->children = array();
         return parent::options($list, $selected, $valuesAsKeys);
     }
     
