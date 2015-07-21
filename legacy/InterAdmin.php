@@ -634,14 +634,10 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function save()
     {
-<<<<<<< HEAD
         if (empty($this->attributes['id_tipo'])) {
             throw new Exception('Saving a record without id_tipo.');
         }
-        if (empty($this->id_slug) && in_array('id_slug', $this->getColumns())) {
-=======
         if (empty($this->attributes['id_slug']) && in_array('id_slug', $this->getColumns())) {
->>>>>>> laravel5
             $this->id_slug = $this->generateSlug();
         }
 
