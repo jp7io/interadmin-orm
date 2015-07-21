@@ -3,6 +3,7 @@
 namespace Jp7\Laravel5;
 
 use HtmlObject\Image;
+use Jp7\Interadmin\Downloadable;
 
 /*
 Dynamic resize of images: imagecache/<template>/0001.jpg
@@ -45,6 +46,10 @@ class ImgResize extends Image
      */
     public static function tag($img, $templates = [], $options = [])
     {
+        if (!is_string($img) && !is_object($img)) {
+            throw new \InvalidArgumentException('$img should be a string or use Downloadable trait');
+        }
+        
         $templates = (array) $templates;
         $mainTemplate = $templates ? $templates[0] : null;
         
@@ -74,9 +79,6 @@ class ImgResize extends Image
 
     public static function url($url, $template = null, $title = '')
     {
-        if (\App::environment('testing')) {
-            return '/img/px.gif';
-        }
         // local test:
         // $url = '/upload/mediabox/00202271.jpg';
         
