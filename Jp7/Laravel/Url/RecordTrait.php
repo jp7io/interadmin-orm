@@ -3,8 +3,8 @@
 namespace Jp7\Laravel\Url;
 
 use BadMethodCallException;
-use Route;
 use URL;
+use Jp7\Laravel\RouterFacade as Router;
 
 trait RecordTrait
 {
@@ -25,7 +25,7 @@ trait RecordTrait
                  ', action: '.$action.'. Called on '.get_class($this));
         }
 
-        $variables = Route::getVariablesFromRoute($route);
+        $variables = Router::getVariablesFromRoute($route);
         $hasSlug = in_array($action, array('show', 'edit', 'update', 'destroy'));
 
         if ($hasSlug) {
@@ -47,8 +47,8 @@ trait RecordTrait
             throw new BadMethodCallException('Route "'.$route->getUri().'" has '.count($variables).
                     ' parameters, but received '.count($parameters).'. Called on '.get_class($this));
         }
-
-        return URL::route(null, $parameters, true, $route);
+        
+        return URL::route($route->getName(), $parameters);
     }
 
     public function getRoute($action = 'index')

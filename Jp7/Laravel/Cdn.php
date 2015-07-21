@@ -4,27 +4,28 @@ namespace Jp7\Laravel;
 
 class Cdn
 {
-    public static function asset($url)
+    public static function asset($url, $version = false)
     {
-        return self::replace(asset($url));
+        return self::replace(asset($url)).
+            ($version ? '?v='.self::getVersion() : '');
     }
 
     public static function css($url)
     {
-        return '<link href="'.self::asset($url).'?v='.self::getVersion().'"  rel="stylesheet" type="text/css">';
+        return '<link href="'.self::asset($url, true).'"  rel="stylesheet" type="text/css">';
     }
 
     public static function js($url)
     {
-        return '<script src="'.self::asset($url).'?v='.self::getVersion().'"></script>';
+        return '<script src="'.self::asset($url, true).'"></script>';
     }
 
     private static function replace($url)
     {
-        $config = \InterSite::config();
+        $domain = config('app.cdn');
         
-        if (!empty($config->cdn_domain)) {
-            $url = str_replace(url(), 'http://'.$config->cdn_domain, $url);
+        if ($domain) {
+            $url = str_replace(url(), 'http://'.$domain, $url);
         }
         
         return $url;
@@ -32,7 +33,7 @@ class Cdn
 
     private static function getVersion()
     {
-        // Using timestamp of the services.json as version number
-        return filemtime(storage_path('meta/services.json'));
+        // Using timestamp of the git folder as version number
+        return filemtime(base_path('.git'));
     }
 }

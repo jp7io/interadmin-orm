@@ -2,99 +2,41 @@
 
 namespace Jp7\Laravel;
 
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
-use Jp7\MethodLogger;
+use Jp7\MethodForwarder;
+use Route;
 use Cache;
-use InterAdminTipo;
 
-class Router extends \Illuminate\Routing\Router
+class Router extends MethodForwarder
 {
-    protected $mapIdTipos = [];
-    protected $logger;
-
-    public function __construct(Dispatcher $events, Container $container = null)
+    /**
+     * @var array [id_tipo => route.name]
+     */
+    protected $map = [];
+    protected $cachefile = 'bootstrap/cache/routemap.cache';
+    
+    public function __construct($target)
     {
-        $this->logger = new MethodLogger($this);
-
-        return parent::__construct($events, $container);
-    }
-
-    public function createDynamicRoutes($section, $currentPath = [])
-    {
-        if (Cache::has('Interadmin.routes')) {
-            $this->logger->_replay(Cache::get('Interadmin.routes'));
-
-            return;
+        $this->cachefile = base_path($this->cachefile);
+        
+        if (is_file($this->cachefile)) {
+            $this->map = unserialize(file_get_contents($this->cachefile));
         }
-
-        // run routes without cache
-        $this->_createDynamicRoutes($section, $currentPath);
-
-        // save cache after running all routes
-        Cache::put('Interadmin.routes', $this->logger->_getLog(), 60);
+        
+        parent::__construct($target);
     }
-
-    protected function _createDynamicRoutes($section, $currentPath = [])
-    {
-        $isRoot = $section->isRoot();
-
-        if ($subsections = $section->getChildrenMenu()) {
-            if (!$isRoot) {
-                $this->logger->updateGroupStack([
-                    'namespace' => $section->getStudly(),
-                    'prefix' => $section->getSlug(),
-                ]);
-            }
-            foreach ($subsections as $subsection) {
-                $this->_createDynamicRoutes($subsection, $currentPath, false);
-            }
-            if (!$isRoot) {
-                $this->logger->popGroupStack();
-            }
-        }
-        if (!$isRoot) {
-            $this->logger->resource($section->getSlug(), $section->getControllerBasename(), [
-                'only' => $section->getRouteActions(),
-                'id_tipo' => $section->id_tipo,
-            ]);
-        }
-    }
-
-    public function updateGroupStack(array $attributes)
-    {
-        // Make it public for cache
-        return parent::updateGroupStack($attributes);
-    }
-
-    public function popGroupStack()
-    {
-        // Make it public for cache
-        array_pop($this->groupStack);
-    }
-
+    
     public function resource($name, $controller, array $options = array())
     {
         if (isset($options['id_tipo'])) {
-            if (is_numeric($options['id_tipo'])) {
-                $id_tipo = $options['id_tipo'];
-            } else {
-                $id_tipo = call_user_func([$options['id_tipo'], 'type'])->id_tipo;
-            }
-            
-            // Saving routes for each id_tipo
-            $groupRoute = str_replace('/', '.', $this->getLastGroupPrefix());
-            if (!array_key_exists($id_tipo, $this->mapIdTipos)) {
-                $this->mapIdTipos[$id_tipo] = ($groupRoute ? $groupRoute . '.' : '') . $name;
-            }
+            $this->addIdTipo($options['id_tipo'], $name);
         }
-        parent::resource($name, $controller, $options);
+        return parent::resource($name, $controller, $options);
     }
-
+    
     public function type($name, $id_tipo, array $options = array(), $nestedFunction = null)
     {
         if ($nestedFunction) {
-            $this->group(['namespace' => studly_case($name), 'prefix' => $name], $nestedFunction);
+            Route::group(['namespace' => studly_case($name), 'prefix' => $name], $nestedFunction);
         }
         
         if ($name === '/') {
@@ -105,44 +47,90 @@ class Router extends \Illuminate\Routing\Router
         
         $controller .= 'Controller';
         
-        $this->resource($name, $controller, $options + [
-            'id_tipo' => $id_tipo,
+        $this->addIdTipo($id_tipo, $name);
+        
+        Route::resource($name, $controller, $options + [
             'only'=> ['index', 'show']
         ]);
     }
-
+    
+    private function addIdTipo($id_tipo, $slug)
+    {
+        if (!is_numeric($id_tipo)) {
+            $id_tipo = call_user_func([$id_tipo, 'type'])->id_tipo;
+        }
+        
+        // Saving routes for each id_tipo
+        $groupRoute = str_replace('/', '.', trim($this->getLastGroupPrefix(), '/'));
+        if (!array_key_exists($id_tipo, $this->map)) {
+            $this->map[$id_tipo] = ($groupRoute ? $groupRoute . '.' : '') . $slug;
+            return true; // map entry set
+        }
+        return false; // already existed route for this type
+    }
+    
+    public function createDynamicRoutes($section, $currentPath = [])
+    {
+        $isRoot = $section->isRoot();
+        
+        if ($subsections = $section->getChildrenMenu()) {
+            $closure = function () use ($subsections, $currentPath) {
+                foreach ($subsections as $subsection) {
+                    $this->createDynamicRoutes($subsection, $currentPath, false);
+                }
+            };
+            
+            if ($isRoot) {
+                $closure();
+            } else {
+                Route::group([
+                    'namespace' => $section->getStudly(),
+                    'prefix' => $section->getSlug()
+                ], $closure);
+            }
+        }
+        if (!$isRoot) {
+            $slug = $section->getSlug();
+        
+            if ($this->addIdTipo($section->id_tipo, $slug)) {
+                // won't override type route
+                Route::resource($slug, $section->getControllerBasename(), [
+                    'only' => $section->getRouteActions()
+                ]);
+            }
+        }
+    }
+    
     public function getRouteByIdTipo($id_tipo, $action = 'index')
     {
-        if (!isset($this->mapIdTipos[$id_tipo])) {
+        if (!isset($this->map[$id_tipo])) {
             throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
         }
-        $mappedRoute = $this->mapIdTipos[$id_tipo];
+        $mappedRoute = $this->map[$id_tipo];
         $routePrefix = ($mappedRoute != '/') ? $mappedRoute . '.' : '';
         
-        return $this->routes->getByName($routePrefix . $action);
+        return $this->target->getRoutes()->getByName($routePrefix . $action);
     }
 
     public function getIdTipoByRoute($route)
     {
-        return array_search($route, $this->mapIdTipos);
+        return array_search($route, $this->map);
     }
 
     public function getTypeByRoute($routeName)
     {
-        $id_tipo = $this->getIdTipoByRoute($routeName);
-        
-        if (!$id_tipo) {
+        if (!$id_tipo = $this->getIdTipoByRoute($routeName)) {
             return;
         }
 
-        return InterAdminTipo::getInstance($id_tipo);
+        return \InterAdminTipo::getInstance($id_tipo);
     }
-
+    
     public function getMapIdTipos()
     {
-        return $this->mapIdTipos;
+        return $this->map;
     }
-
+    
     public function getVariablesFromRoute($route)
     {
         $matches = array();
@@ -150,7 +138,13 @@ class Router extends \Illuminate\Routing\Router
 
         return $matches[1] ?: array();
     }
-
+    
+    /**
+     * Map URI to breadcrumb of objects
+     *
+     * @param string $uri
+     * @param Closure $resolveParameter
+     */
     public function uriToBreadcrumb($uri, $resolveParameter)
     {
         $breadcrumb = [];
@@ -182,39 +176,15 @@ class Router extends \Illuminate\Routing\Router
 
         return $breadcrumb;
     }
-
-    /*
-    protected function _checkTemplate($section) {
-        $dynamic = false;
-        if (!class_exists($section->getControllerName())) {
-            $dynamic = true;
-
-            $templateController = '';
-            if ($section->template) {
-                $templateController = $this->_pathToNamespace($section->template) . 'Controller';
-            }
-
-            $namespace = $section->getNamespace();
-            $namespaceCode = $namespace ? 'namespace ' . $namespace . ';' : '';
-
-            if ($templateController && class_exists($templateController)) {
-                eval($namespaceCode . "class {$section->getControllerBasename()} extends \\$templateController { }");
-            } else {
-                eval($namespaceCode . "class {$section->getControllerBasename()} extends \\BaseController { public function index() { }}");
-            }
-        }
-        return $dynamic;
+    
+    public function clearCache()
+    {
+        $this->map = [];
+        $this->saveCache();
     }
-
-    protected function _pathToNamespace($string) {
-        if (starts_with($string, '/')) {
-            // lasa está começando com /templates - Corrigir assim que possivel
-            $string = substr($string, 1);
-        }
-
-        $parts = explode('/', $string);
-        $parts = array_map('studly_case', $parts);
-        return implode('\\', $parts) . 'Controller';
+    
+    public function saveCache()
+    {
+        file_put_contents($this->cachefile, serialize($this->map));
     }
-    */
 }

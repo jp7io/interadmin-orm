@@ -8,21 +8,18 @@ class BladeExtension
 {
     public static function apply()
     {
-        Blade::extend(function ($view, $compiler) {
-            // @include with partials/_partial instead of partials/partial
+        // @include('partials/partial')
+        // include 'partials/_partial.blade.php', instead of 'partials/partial.blade.php'
+        Blade::extend(function ($view) {
             $pattern = '/(?<!\w)(\s*)@include\(([^,\)]+)/';
-
-            return preg_replace($pattern, '$1@include(\Jp7\Laravel\BladeExtension::inc($2)', $view);
+            
+            return preg_replace($pattern, '$1@include(' . self::class . '::inc($2)', $view);
         });
-
-        Blade::extend(function ($view, $compiler) {
-             $pattern = $compiler->createMatcher('ia');
-
-             return preg_replace($pattern, '$1<?php echo interadmin_data$2; ?>', $view);
+        
+        // @ia($model)
+        Blade::directive('ia', function ($expression) {
+            return "<?php echo interadmin_data{$expression}; ?>";
         });
-
-        Blade::setEscapedContentTags('{{', '}}');
-        Blade::setContentTags('{!!', '!!}');
     }
 
     public static function inc($file)

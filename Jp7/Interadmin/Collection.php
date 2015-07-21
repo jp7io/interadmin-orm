@@ -32,6 +32,7 @@ class Collection extends BaseCollection
      */
     public function collect($value, $key = null)
     {
+        dd('replace it with lists()');
         return new self(array_pluck($this->items, $value, $key));
     }
 
@@ -61,11 +62,11 @@ class Collection extends BaseCollection
     public function humanImplode($column, $glue, $lastGlue)
     {
         if ($items = $this->lists($column)) {
-            $last = implode($lastGlue, array_splice($items, -2));
-            array_push($items, $last);
+            $last = $items->splice(-2)->implode($lastGlue);
+            $items->push($last);
         }
 
-        return implode($glue, $items);
+        return $items->implode($glue);
     }
 
     public function keySort(\Closure $callback)

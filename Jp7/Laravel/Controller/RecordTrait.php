@@ -2,7 +2,7 @@
 
 namespace Jp7\Laravel\Controller;
 
-use Route;
+use Jp7\Laravel\RouterFacade as Router;
 use InterAdmin;
 
 trait RecordTrait
@@ -19,11 +19,16 @@ trait RecordTrait
         $this->beforeFilter('@setRecord', ['only' => ['show', 'edit', 'update', 'destroy']]);
     }
 
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
     public function setScope($route)
     {
         $uri = $this->_getResourceUri($route);
 
-        $breadcrumb = Route::uriToBreadcrumb($uri, function ($type, $segment) use ($route) {
+        $breadcrumb = Router::uriToBreadcrumb($uri, function ($type, $segment) use ($route) {
             $slug = $route->getParameter(trim($segment, '{}'));
 
             return $type->records()->findOrFail($slug);

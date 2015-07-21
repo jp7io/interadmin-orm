@@ -37,4 +37,27 @@ class TypelessQuery extends Query
     {
         throw new BadMethodCallException('Not implemented.');
     }
+
+    public function delete()
+    {
+        $records = $this->all();
+        foreach ($records as $record) {
+            $record->delete();
+        }
+
+        return count($records);
+    }
+
+    /**
+     * Remove permanently from the database.
+     */
+    public function forceDelete()
+    {
+        $records = $this->all();
+        foreach ($records as $record) {
+            $record->forceDelete();
+        }
+
+        return count($records);
+    }
 }

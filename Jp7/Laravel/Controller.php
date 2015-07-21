@@ -2,7 +2,9 @@
 
 namespace Jp7\Laravel;
 
-class Controller extends \Illuminate\Routing\Controller
+use Illuminate\Routing\Controller as BaseController;
+
+class Controller extends BaseController
 {
     protected static $current = null;
 

@@ -48,7 +48,7 @@ class FormerExtension
         return $result;
     }
 
-    public function __get($property)
+    public function &__get($property)
     {
         return $this->former->$property;
     }
@@ -130,8 +130,12 @@ class FormerExtension
 
     private function populateOptions($field, $campoType)
     {
-        if ($field->getType() === 'collection') {
-            $field->options($campoType->records());
+        if ($field->getType() === 'select') {
+            $options = [];
+            foreach ($campoType->records()->all() as $record) {
+                $options[$record->id] = $record->getName();
+            }
+            $field->options($options);
         } elseif ($field->getType() === 'radios') {
             $radios = [];
             foreach ($campoType->records()->all() as $record) {

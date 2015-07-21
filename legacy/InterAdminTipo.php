@@ -3,6 +3,7 @@
 use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\TipoCache;
 use Jp7\Interadmin\Query;
+use Jp7\Interadmin\ClassMap;
 use Jp7\CollectionUtil;
 
 /**
@@ -114,7 +115,7 @@ class InterAdminTipo extends InterAdminAbstract
             $classTipo = $options['class'];
         } else {
             // Classe não foi forçada, verificar classMap
-            $cm = \Jp7\InterAdmin\ClassMap::getInstance();
+            $cm = ClassMap::getInstance();
             $classTipo = $cm->getClassTipo($id_tipo);
             if (!$classTipo) {
                 $classTipo = isset($options['default_class']) ? $options['default_class'] : self::$_defaultClass;

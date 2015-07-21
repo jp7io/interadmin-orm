@@ -18,7 +18,10 @@
 	   	],
 	   	"psr-4": {
 			"Jp7\\": "Jp7/"
-        }
+        },
+        "files": [
+            "Jp7/Laravel5/functions.php"
+        ]
 	},
 	"scripts": {
 		

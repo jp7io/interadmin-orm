@@ -4,12 +4,12 @@ use Jp7\Interadmin\Collection;
 use Jp7\Interadmin\ClassMap;
 use Jp7\Interadmin\Query;
 use Jp7\Interadmin\Relation\HasMany;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
-class InterAdmin extends InterAdminAbstract implements ArrayableInterface
+class InterAdmin extends InterAdminAbstract implements Arrayable
 {
     /**
      * To be used temporarily with deprecated methods.
@@ -61,9 +61,9 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
      *
      * @param int $id This record's 'id'.
      */
-    public function __construct($id = 0)
+    public function __construct(array $attributes = [])
     {
-        $this->id = $id;
+        $this->attributes = $attributes + ['id' => 0];
     }
 
     /**
@@ -75,9 +75,43 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
      */
     public function &__get($name)
     {
-        if (isset($this->attributes[$name])) {
+        if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
-        } elseif ($this->id) {
+        }
+        
+        // returned as reference
+        $result = $this->_lazyLoadAttribute($name);
+        
+        // Mutators
+        if (!$result) {
+            $mutator = 'get' . ucfirst($name) . 'Attribute';
+            if (method_exists($this, $mutator)) {
+                $result = $this->$mutator();
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Magic isset acessor.
+     *
+     * @param string $attributeName
+     *
+     * @return bool
+     */
+    public function __isset($attributeName)
+    {
+        if (array_key_exists($attributeName, $this->attributes) || $this->_lazyLoadAttribute($attributeName)) {
+            return true;
+        }
+        
+        return method_exists($this, 'get' . ucfirst($attributeName) . 'Attribute');
+    }
+    
+    private function _lazyLoadAttribute($name)
+    {
+        if ($this->id) {
             // relationship
             $relationships = $this->getType()->getRelationships();
             if (isset($relationships[$name])) {
@@ -90,7 +124,12 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
             $columns = $this->getColumns();
             if (in_array($name, $columns) || in_array($name, $this->getAttributesAliases())) {
                 if (class_exists('Debugbar')) {
-                    Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '.get_class($this).' - ID: '.$this->id);
+                    $caller = debug_backtrace(false, 2)[1];
+                    
+                    Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
+                        .get_class($this)
+                        .' - ID: '.$this->id
+                        .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
                 }
 
                 $attributes = array_intersect($columns, array_merge(
@@ -103,10 +142,8 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
                 return $this->attributes[$name];
             }
         }
-
-        return $null; // returned as reference
     }
-
+        
     private function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];
@@ -190,7 +227,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
             }
         }
 
-        $instance = new $class_name($id);
+        $instance = new $class_name(['id' => $id]);
         $instance->setType($tipo);
         $instance->setDb($tipo->getDb());
 
@@ -274,9 +311,13 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
             return $this->_tipo;
         }
 
+        if (empty($this->attributes['id_tipo'])) {
+            $this->id_tipo = 0;
+        }
+        
         $tipo = static::type();
-        if (!$tipo) {
-            if (empty($this->id_tipo)) {
+        if (!$tipo || $this->id_tipo != $tipo->id_tipo) {
+            if (!$this->id_tipo) {
                 $db = $this->getDb();
                 $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
@@ -284,7 +325,11 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
                     ->select('id_tipo')
                     ->where('id', $this->id)
                     ->first();
-                    
+
+                if (!$data || !$data->id_tipo) {
+                    throw new Exception('Could not find id_tipo for record with id: ' . $this->id);
+                }
+
                 $this->id_tipo = $data->id_tipo;
             }
             $tipo = InterAdminTipo::getInstance($this->id_tipo, array(
@@ -508,7 +553,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
 
         foreach ($tags as $tag) {
             $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'_tags (parent_id, id, id_tipo) VALUES
-				('.$this->id.','.
+                ('.$this->id.','.
                 (($tag instanceof InterAdmin) ? $tag->id : 0).','.
                 (($tag instanceof InterAdmin) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
             $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
@@ -572,15 +617,14 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
     public function isPublished()
     {
         global $s_session;
-        $config = InterSite::config();
-
+        
         $this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
 
         return (
             strtotime($this->date_publish) <= InterAdmin::getTimestamp() &&
             (strtotime($this->date_expire) >= InterAdmin::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
             $this->char_key &&
-            ($this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
+            ($this->publish || config('interadmin.preview') || $s_session['preview']) &&
             !$this->deleted
         );
     }
@@ -590,10 +634,14 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
      */
     public function save()
     {
+<<<<<<< HEAD
         if (empty($this->attributes['id_tipo'])) {
             throw new Exception('Saving a record without id_tipo.');
         }
         if (empty($this->id_slug) && in_array('id_slug', $this->getColumns())) {
+=======
+        if (empty($this->attributes['id_slug']) && in_array('id_slug', $this->getColumns())) {
+>>>>>>> laravel5
             $this->id_slug = $this->generateSlug();
         }
 
@@ -617,12 +665,12 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
 
     public function generateSlug()
     {
-        if (isset($this->varchar_key)) {
+        if (isset($this->attributes['varchar_key'])) {
             $alias_varchar_key = 'varchar_key';
         } else {
             $alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
         }
-        if (empty($this->$alias_varchar_key)) {
+        if (empty($this->attributes[$alias_varchar_key])) {
             return;
         }
 
@@ -668,7 +716,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
     }
     public function getTableName()
     {
-        if (empty($this->id_tipo)) {
+        if (empty($this->attributes['id_tipo'])) {
             // Compatibilidade, tenta encontrar na tabela global
             return $this->getDb()->getTablePrefix(). (isset($this->attributes['table']) ? $this->attributes['table'] : '');
         } else {
@@ -695,7 +743,7 @@ class InterAdmin extends InterAdminAbstract implements ArrayableInterface
     /**
      * Sets $log_user and returns the old value.
      *
-     * @see 	InterAdmin::$log_user
+     * @see     InterAdmin::$log_user
      *
      * @param object $log_user
      *

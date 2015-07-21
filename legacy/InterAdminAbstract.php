@@ -994,9 +994,8 @@ abstract class InterAdminAbstract implements Serializable
 
     public static function getPublishedFilters($table, $alias)
     {
-        global $db, $s_session;
-        $config = InterSite::config();
-
+        global $s_session;
+        
         // Tipos
         if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
@@ -1013,7 +1012,7 @@ abstract class InterAdminAbstract implements Serializable
                 ' AND '.$alias.".char_key <> ''".
                 ' AND '.$alias.".deleted = ''".
                 ' AND ';
-            if ($config->interadmin_preview && !$s_session['preview']) {
+            if (config('interadmin.preview') && !$s_session['preview']) {
                 $return .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';
             }
 

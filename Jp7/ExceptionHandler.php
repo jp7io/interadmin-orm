@@ -6,14 +6,12 @@ class ExceptionHandler
 {
     public static function handle($exception)
     {
-        $config = \InterSite::config();
-
         $mensagem = self::getMessage($exception);
 
-        $subject = '['.$config->name_id.'][Site][Erro] '.$exception->getMessage();
+        $subject = '['.config('app.name').'][Site][Erro] '.$exception->getMessage();
         $headers  = 'MIME-Version: 1.0'."\r\n";
         $headers .= 'Content-type: text/html; charset=iso-8859-1'."\r\n";
-
+        
         mail('debug@jp7.com.br', $subject, $mensagem, $headers);
 
         return error_controller('error');
