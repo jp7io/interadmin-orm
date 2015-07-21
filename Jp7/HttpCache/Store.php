@@ -9,7 +9,8 @@ class Store extends BaseStore
     // Separate AJAX cache from normal cache
     protected function generateCacheKey(Request $request)
     {
-        return 'md'.hash('sha256', $request->getUri() . '#' . $request->ajax());
+        if ($request->isXmlHttpRequest()) {
+            return 'md'.hash('sha256', $request->getUri() . '#' . $request->isXmlHttpRequest());
+        }
     }
-    
 }
