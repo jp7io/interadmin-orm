@@ -111,10 +111,12 @@ class ImgResize extends Image
     // Should only be applied to local images
     private static function seoReplace($url, $title)
     {
-        $basename = basename($url);
-        if (preg_match('/^\d{6,8}\./', $basename)) {
-            if ($slug = to_slug($title)) {
-                $url = dirname($url).'/'.$slug.'-'.$basename;
+        if (starts_with($url, '/upload')) {
+            $basename = basename($url);
+            if (preg_match('/^\d{6,8}\./', $basename)) {
+                if ($slug = to_slug($title)) {
+                    $url = dirname($url).'/'.$slug.'-'.$basename;
+                }
             }
         }
         return $url;
