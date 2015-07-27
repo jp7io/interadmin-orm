@@ -155,12 +155,9 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
     {
         global $jp7_app;
 
-        $key = 0;
-        if ($jp7_app) {
-            $key = $jp7_app;
-        }
-
-        return unserialize($_COOKIE['mfa'][$this->getCliente()][$key]);
+        $cookieKey = $jp7_app ? $jp7_app : 0;
+        
+        return unserialize($_COOKIE['mfa'][$this->getCliente()][$cookieKey]);
     }
 
     private function getCliente()
@@ -176,7 +173,9 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
     public function saveCookie($last_code)
     {
         global $jp7_app;
-
+        
+        $cookieKey = $jp7_app ? $jp7_app : 0;
+        
         $mfaToken = $this->addMfaToken($last_code);
 
         $cookie = array(
@@ -184,7 +183,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
             'timestamp' => md5($mfaToken->date_publish->getTimestamp()),
         );
 
-        setcookie('mfa['.$this->getCliente().']['.$jp7_app.']', serialize($cookie), strtotime('+15 days'), '/');
+        setcookie('mfa['.$this->getCliente().']['.$cookieKey.']', serialize($cookie), strtotime('+15 days'), '/');
     }
 
     public function saveSession()
@@ -220,7 +219,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
         $message .= '<br><br>';
         $message .= 'Obrigado por solicitar o seu token de acesso.';
         $message .= '</div>';
-
+        
         jp7_mail($this->email, $issuer.' Token', $message, 'From: '.$issuer." <no-reply@jp7.com.br>\r\n");
     }
 
