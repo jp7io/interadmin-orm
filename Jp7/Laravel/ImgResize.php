@@ -135,7 +135,7 @@ class ImgResize extends Image
     // External images are downloaded locally to resize them
     private static function downloadExternal($url)
     {
-        $local = to_slug(dirname($url)).'_'.basename($url);
+        $local = to_slug(dirname($url)).'_'.to_slug(basename($url));
         $dir = public_path('upload/_external');
         
         if (!is_file($dir.'/'.$local)) {
