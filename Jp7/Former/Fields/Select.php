@@ -7,12 +7,7 @@ class Select extends \Former\Form\Fields\Select
     public function options($list, $selected = null, $valuesAsKeys = false)
     {
         if ($list instanceof \Jp7\Interadmin\Query\Base) {
-            throw new \Exception('Usar ->lists(x,id)');
-        }
-        if ($list instanceof \Jp7\Interadmin\Collection) {
-            if ($list->first() instanceof \InterAdminAbstract) {
-                throw new \Exception('Usar ->lists(x,id)');
-            }
+            throw new \Exception('Use ->lists(attr_name,id)');
         }
         
         $this->children = array();
@@ -22,7 +17,7 @@ class Select extends \Former\Form\Fields\Select
     public function render()
     {
         // Use "Selecione" as default placeholder
-        if (!$this->placeholder) {
+        if (!$this->getPlaceholder()) {
             $this->placeholder('Selecione');
         }
         // Remove "disabled" from placeholder <option>
