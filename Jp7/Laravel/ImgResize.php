@@ -2,7 +2,6 @@
 
 namespace Jp7\Laravel;
 
-use HtmlObject\Image;
 use Jp7\Interadmin\Downloadable;
 
 /*
@@ -12,7 +11,7 @@ Lazy loading images: data-src="...""
 ... with fallback for non-js users: <noscript>
 Better SEO on the URL: 0001.jpg => some-text-0001.jpg
 */
-class ImgResize extends Image
+class ImgResize
 {
     private static $lazy = false;
     private static $seo = false;
@@ -41,47 +40,45 @@ class ImgResize extends Image
      * Generates image tag. Can create lazy loading images with "data-src".
      *
      * @param string|Downloadable   $img        URL or Downloadable object
-     * @param string|array          $templates  Multiple templates become "srcset"
+     * @param string|array          $template   Name of the template, or prefix for "srcset"
      * @param array                 $options    HTML options such as title, or class.
      */
-    public static function tag($img, $templates = [], $options = [])
+    public static function tag($img, $template = null, $options = [])
     {
         if (!is_string($img) && !is_object($img)) {
             throw new \InvalidArgumentException('$img should be a string or use Downloadable trait');
         }
-        
-        $templates = (array) $templates;
-        $mainTemplate = $templates ? $templates[0] : null;
-        
-        if (count($templates) === 1) {
-            // Preppend template to classes for CSS use
-            $options['class'] = trim(array_get($options, 'class').' '.$mainTemplate);
-        }
         if (empty($options['title'])) {
             $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
-        
         $alt = $options['title'];
-        $url = static::url($img, $mainTemplate, $alt);
         
-        $obj = static::create($url, $alt, $options);
-        
-        if (static::$lazy) {
-            $obj->src(static::transparentGif())
-                ->data_src($url);
+        if (str_contains($template, '-')) {
+            // Normal image with src=""
+            // Preppend template to classes for CSS use
+            $options['class'] = trim(array_get($options, 'class').' '.$template);
+            
+            $url = static::url($img, $template, $alt);
+            $element = ImgResizeElement::create($url, $alt, $options);
+            
+            if (static::$lazy) {
+                $element->src(static::blankGif())
+                    ->data_src($url)
+                    ->setLazy(true);
+            }
+        } else {
+            // Image with srcset=""
+            $srcset = static::srcset($img, $template);
+            $element = ImgResizeElement::create(null, $alt, $options)
+                ->srcset($srcset);
         }
-        if (count($templates) > 1) {
-            // TODO
-        }
         
-        return $obj;
+        return $element;
     }
 
     public static function url($url, $template = null, $title = '')
     {
-        // local test:
-        // $url = '/upload/mediabox/00202271.jpg';
-        
+        // local test: $url = '/upload/mediabox/00202271.jpg';
         if (is_object($url)) {
             $img = $url;
             $url = $img->getUrl();
@@ -102,9 +99,33 @@ class ImgResize extends Image
         return Cdn::asset($url);
     }
     
+    public static function srcset($img, $prefix)
+    {
+        $all = array_keys(config('imagecache.templates'));
+        // If prefix is "wide"
+        // Filters all templates starting with "wide-"
+        $templates = array_filter($all, function ($x) use ($prefix) {
+            return starts_with($x, $prefix . '-');
+        });
+        
+        $srcs = [];
+        foreach ($templates as $template) {
+            $parts = explode('-', $template);
+            $width = end($parts);
+            $srcs[] = static::url($img, $template) . " ${width}w";
+        }
+        
+        return implode(', ', $srcs);
+    }
+    
     public static function bg($url, $template = null, $title = '')
     {
         return 'background-image: url(\'' . static::url($url, $template, $title) . '\')';
+    }
+    
+    public static function blankGif()
+    {
+        return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
     }
     
     // SEO depends on RewriteModule
@@ -121,12 +142,7 @@ class ImgResize extends Image
         }
         return $url;
     }
-    
-    public static function transparentGif()
-    {
-        return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
-    }
-    
+   
     private static function isExternal($url)
     {
         return !empty(parse_url($url)['host']);
@@ -145,22 +161,5 @@ class ImgResize extends Image
         }
         
         return '/upload/_external/'.$local;
-    }
-    
-    // Add <noscript> tags if needed
-    public function render()
-    {
-        $noscript = '';
-        
-        if (static::$lazy) {
-            $attributes = $this->getAttributes();
-            $attributes['src'] = $attributes['data-src'];
-            unset($attributes['data-src']);
-            unset($attributes['srcset']);
-            
-            $noscript = '<noscript>'.Image::create()->setAttributes($attributes).'</noscript>';
-        }
-        
-        return parent::render().$noscript;
     }
 }
