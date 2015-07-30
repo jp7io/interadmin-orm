@@ -21,13 +21,10 @@ class Cdn
     }
 
     private static function replace($url)
-    {
-        $domain = config('app.cdn');
-        
-        if ($domain) {
-            $url = str_replace(url(), 'http://'.$domain, $url);
+    { 
+        if ($domain = config('cdn.url')) {
+            $url = replace_prefix(config('app.url'), $domain, $url);
         }
-        
         return $url;
     }
 
