@@ -93,7 +93,10 @@ class ImgResize
             if ($isExternal) {
                 $url = static::downloadExternal($url);
             }
-            $url = str_replace('/upload/', '/imagecache/'.$template.'/', $url);
+            
+            $uploadPath = config('interadmin.upload.url') . '/upload/';
+            $cachePath = config('app.url') . '/imagecache/' .$template.'/';
+            $url = replace_prefix($uploadPath, $cachePath, $url);
         }
 
         return Cdn::asset($url);
@@ -145,7 +148,11 @@ class ImgResize
    
     private static function isExternal($url)
     {
-        return !empty(parse_url($url)['host']);
+        $parsed = parse_url($url);
+        $scheme = isset($parsed['scheme']) ? $parsed['scheme'] : '';
+        $host = isset($parsed['host']) ? $parsed['host'] : '';
+
+        return config('interadmin.upload.url') !== $scheme.'://'.$host;
     }
 
     // External images are downloaded locally to resize them

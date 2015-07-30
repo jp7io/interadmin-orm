@@ -4,20 +4,24 @@ namespace Jp7\Interadmin;
 
 trait Downloadable
 {
+    // Client side URL without hostname and protocol
+    public function getPath()
+    {
+        $backend_path = $this->config('backend_path');
+        $path = $this->config('path');
+
+        // ../../upload => /upload
+        return replace_prefix($backend_path, $path, $this->url);
+    }
+    
     // For client side use
     public function getUrl()
     {
-        $config = config('interadmin.upload');
-        // ../../upload => /upload
-        return str_replace($config['backend_url'], $config['relative_url'], $this->url);
-    }
-    
-    // Absolute client side URL
-    public function getAbsoluteUrl()
-    {
-        $config = config('interadmin.upload');
+        $backend_path = $this->config('backend_path');
+        $url = $this->config('url');
+
         // ../../upload => www.example.com/upload
-        return str_replace($config['backend_url'], $config['absolute_url'], $this->url);
+        return replace_prefix($backend_path, $url, $this->url);
     }
 
     // Server side file name
@@ -26,11 +30,12 @@ trait Downloadable
         if ($this->isExternal()) {
             throw new \Exception('Cant get filename of external image.');
         }
-        
-        $config = config('interadmin.upload');
+
+        $backend_path = $this->config('backend_path');
+        $dir = $this->config('dir');
         $url = $this->removeQueryString();
         
-        return str_replace($config['backend_url'], $config['absolute_path'], $url);
+        return replace_prefix($backend_path, $dir, $url);
     }
     
     public function removeQueryString()
@@ -57,5 +62,10 @@ trait Downloadable
     public function getSize()
     {
         return human_filesize($this->getFilename());
+    }
+
+    private function config($key)
+    {
+        return config('interadmin.upload.' . $key);
     }
 }
