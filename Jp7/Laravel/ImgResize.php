@@ -53,7 +53,7 @@ class ImgResize
         }
         $alt = $options['title'];
         
-        if (str_contains($template, '-')) {
+        if (is_null($template) || str_contains($template, '-')) {
             // Normal image with src=""
             // Preppend template to classes for CSS use
             $options['class'] = trim(array_get($options, 'class').' '.$template);
