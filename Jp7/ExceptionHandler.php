@@ -7,14 +7,12 @@ class ExceptionHandler
     public static function handle($exception)
     {
         $mensagem = self::getMessage($exception);
-
-        $subject = '['.config('app.name').'][Site][Erro] '.$exception->getMessage();
+        
+        $subject = '['.$_SERVER['HTTP_HOST'].'][Erro] '.$exception->getMessage();
         $headers  = 'MIME-Version: 1.0'."\r\n";
         $headers .= 'Content-type: text/html; charset=iso-8859-1'."\r\n";
         
         mail('debug@jp7.com.br', $subject, $mensagem, $headers);
-
-        return error_controller('error');
     }
 
     public static function getMessage($exception)
