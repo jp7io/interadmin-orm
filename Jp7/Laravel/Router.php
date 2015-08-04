@@ -3,8 +3,10 @@
 namespace Jp7\Laravel;
 
 use Jp7\MethodForwarder;
+use Jp7\Interadmin\ClassMap;
 use Route;
 use Cache;
+use Closure;
 
 class Router extends MethodForwarder
 {
@@ -13,6 +15,10 @@ class Router extends MethodForwarder
      */
     protected $map = [];
     protected $cachefile = 'bootstrap/cache/routemap.cache';
+    
+    ////
+    //// Cache
+    ////
     
     public function __construct($target)
     {
@@ -25,39 +31,27 @@ class Router extends MethodForwarder
         parent::__construct($target);
     }
     
-    public function resource($name, $controller, array $options = array())
+    public function clearCache()
     {
-        if (isset($options['id_tipo'])) {
-            $this->addIdTipo($options['id_tipo'], $name);
-        }
-        return parent::resource($name, $controller, $options);
+        $this->map = [];
+        $this->saveCache();
     }
     
-    public function type($name, $id_tipo, array $options = array(), $nestedFunction = null)
+    public function saveCache()
     {
-        if ($nestedFunction) {
-            Route::group(['namespace' => studly_case($name), 'prefix' => $name], $nestedFunction);
-        }
-        
-        if ($name === '/') {
-            $controller = 'Index';
-        } else {
-            $controller = studly_case(str_replace('.', '\\ ', $name));
-        }
-        
-        $controller .= 'Controller';
-        
-        $this->addIdTipo($id_tipo, $name);
-        
-        Route::resource($name, $controller, $options + [
-            'only'=> ['index', 'show']
-        ]);
+        file_put_contents($this->cachefile, serialize($this->map));
     }
     
+    ////
+    //// Map functions
+    ////
+     
     private function addIdTipo($id_tipo, $slug)
     {
         if (!is_numeric($id_tipo)) {
-            $id_tipo = call_user_func([$id_tipo, 'type'])->id_tipo;
+            // Class => id_tipo
+            $cm = ClassMap::getInstance();
+            $id_tipo = $cm->getClassIdTipo($id_tipo);
         }
         
         // Saving routes for each id_tipo
@@ -68,6 +62,80 @@ class Router extends MethodForwarder
         }
         return false; // already existed route for this type
     }
+    
+    public function getRouteByIdTipo($id_tipo, $action = 'index')
+    {
+        if (!isset($this->map[$id_tipo])) {
+            throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
+        }
+        $mappedRoute = $this->map[$id_tipo];
+        $routePrefix = ($mappedRoute != '/') ? $mappedRoute . '.' : '';
+        
+        return $this->target->getRoutes()->getByName($routePrefix . $action);
+    }
+
+    public function getIdTipoByRoute($route)
+    {
+        return array_search($route, $this->map);
+    }
+
+    public function getTypeByRoute($routeName)
+    {
+        if (!$id_tipo = $this->getIdTipoByRoute($routeName)) {
+            return;
+        }
+
+        return \InterAdminTipo::getInstance($id_tipo);
+    }
+    
+    public function getMapIdTipos()
+    {
+        return $this->map;
+    }
+    
+    ////
+    //// Route override
+    ////
+    
+    //public function resource($name, $controller = null, array $options = array())
+    public function resource($name, array $options = array())
+    {
+        /*
+        if (is_array($controller) && empty($options)) {
+            $options = $controller;
+            $controller = null;
+        }
+        */
+        if (empty($options['only'])) {
+            $options['only'] = ['index', 'show'];
+        }
+        if (isset($options['id_tipo'])) {
+            $this->addIdTipo($options['id_tipo'], $name);
+        }
+        //if (is_null($controller)) {
+        if ($name === '/') {
+            $controller = 'Index';
+        } else {
+            $parts = explode('.', $name);
+            $parts = array_map('studly_case', $parts);
+            $controller = implode('\\', $parts);
+        }
+        $controller .= 'Controller';
+        //}
+        return parent::resource($name, $controller, $options);
+    }
+    
+    public function group(array $attributes, Closure $callback)
+    {
+        if (!empty($attributes['prefix']) && empty($attributes['namespace'])) {
+            $attributes['namespace'] = studly_case($attributes['prefix']);
+        }
+        return parent::group($attributes, $callback);
+    }
+    
+    ////
+    //// Dynamic routes
+    ////
     
     public function createDynamicRoutes($section, $currentPath = [])
     {
@@ -101,36 +169,10 @@ class Router extends MethodForwarder
         }
     }
     
-    public function getRouteByIdTipo($id_tipo, $action = 'index')
-    {
-        if (!isset($this->map[$id_tipo])) {
-            throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
-        }
-        $mappedRoute = $this->map[$id_tipo];
-        $routePrefix = ($mappedRoute != '/') ? $mappedRoute . '.' : '';
+    ////
+    //// Helpers
+    ////
         
-        return $this->target->getRoutes()->getByName($routePrefix . $action);
-    }
-
-    public function getIdTipoByRoute($route)
-    {
-        return array_search($route, $this->map);
-    }
-
-    public function getTypeByRoute($routeName)
-    {
-        if (!$id_tipo = $this->getIdTipoByRoute($routeName)) {
-            return;
-        }
-
-        return \InterAdminTipo::getInstance($id_tipo);
-    }
-    
-    public function getMapIdTipos()
-    {
-        return $this->map;
-    }
-    
     public function getVariablesFromRoute($route)
     {
         $matches = array();
@@ -175,16 +217,5 @@ class Router extends MethodForwarder
         }
 
         return $breadcrumb;
-    }
-    
-    public function clearCache()
-    {
-        $this->map = [];
-        $this->saveCache();
-    }
-    
-    public function saveCache()
-    {
-        file_put_contents($this->cachefile, serialize($this->map));
     }
 }
