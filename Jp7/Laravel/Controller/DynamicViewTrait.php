@@ -2,11 +2,10 @@
 
 namespace Jp7\Laravel\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use View;
-use Response;
 use stdClass;
 use Exception;
-use Config;
 
 trait DynamicViewTrait
 {
@@ -40,19 +39,18 @@ trait DynamicViewTrait
      */
     public function callAction($method, $parameters)
     {
-        $response = call_user_func_array(array($this, $method), $parameters);
+        $content = call_user_func_array(array($this, $method), $parameters);
 
-        if (!is_null($response)) {
-            return $response;
-        }
         if ($method == 'show' && !$this->record) {
             throw new Exception('Show action without record. You need to set $this->record inside your controller.');
         }
-
-        return $this->makeView();
+        if ($content instanceof Response) {
+            return $content;
+        }
+        return $this->response($content);
     }
 
-    public function makeView()
+    protected function view()
     {
         $viewName = $this->_getViewName($this->action);
         $data = (array) $this->_view;
@@ -63,6 +61,14 @@ trait DynamicViewTrait
         }
 
         return $view;
+    }
+
+    protected function response($content)
+    {
+        if (is_null($content)) {
+            $content = $this->view();
+        }
+        return response($content);
     }
 
     /**
@@ -98,7 +104,7 @@ trait DynamicViewTrait
     {
         $filename = str_replace('.', '/', $route);
 
-        foreach (Config::get('view.paths') as $viewPath) {
+        foreach (config('view.paths') as $viewPath) {
             if (file_exists($viewPath.'/'.$filename.'.blade.php')) {
                 return true;
             }
