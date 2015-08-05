@@ -30,7 +30,7 @@ class Jp7_InterAdmin_Upload
         return $url->setPath($config->name_id . '/' . $path);
     }
 
-    public static function addImageTemplate($path, $template = 'original')
+    public static function useImageTemplate($path, $template = 'original')
     {
         return str_replace('upload/', 'imagecache/' . $template . '/', $path);
     }
@@ -44,13 +44,11 @@ class Jp7_InterAdmin_Upload
      */
     public static function url($path = '../../', $template = 'original')
     {
-        if (starts_with($path, '../../')) {
-            $path = mb_substr($path, 6);// Remove '../../'
-        }
+        $path = str_replace('../../', '', $path); // Remove '../../'
 
-        $path = self::addImageTemplate($path, $template);
+        $path = self::useImageTemplate($path, $template);
 
-        if (!starts_with($path, 'http://')) {
+        if (!startsWith('http://', $url)) {
             if (self::hasExternalUpload()) {
                 $url = self::uploadUrl($path);
             } else {
