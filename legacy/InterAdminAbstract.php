@@ -4,12 +4,15 @@ use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
 use Jp7\Interadmin\TipoCache;
 use Jp7\CollectionUtil;
+use Jp7\TryMethod;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
 abstract class InterAdminAbstract implements Serializable
 {
+    use TryMethod;
+    
     const DEFAULT_FIELDS_ALIAS = false;
     const DEFAULT_NAMESPACE = '';
     const DEFAULT_FIELDS = '*';
