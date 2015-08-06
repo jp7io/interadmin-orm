@@ -17,7 +17,9 @@ class Jp7_InterAdmin_Upload
         global $config;
         $url = Url::createFromUrl($config->upload['url']);
         $url->setScheme('http');
+        list($path, $query) = explode('?', $path);
         $url->setPath($path);
+        $url->setQuery($query);
         return $url;
     }
 
