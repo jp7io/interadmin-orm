@@ -4,6 +4,10 @@ use League\Url\Url;
 
 class Jp7_InterAdmin_Upload
 {
+    public static function isImage($path)
+    {
+        return preg_match("/^.*\.(jpg|jpeg|png|gif).*(?)$/i", $path);
+    }
 
     // Has upload[url] set on config (S3 or Local)
     public static function hasExternalUpload()
@@ -37,6 +41,17 @@ class Jp7_InterAdmin_Upload
         return str_replace('upload/', 'imagecache/' . $template . '/', $path);
     }
 
+    public static function storagePath($path, $template = 'original')
+    {
+        $path = str_replace('../../', '', $path); // Remove '../../'
+        
+        if (self::isImage($path)) {
+            $path = self::useImageTemplate($path, $template);
+        }
+
+        return $path;
+    }
+
     /**
      * Altera o endereço para que aponte para a url do cliente.
      *
@@ -46,9 +61,7 @@ class Jp7_InterAdmin_Upload
      */
     public static function url($path = '../../', $template = 'original')
     {
-        $path = str_replace('../../', '', $path); // Remove '../../'
-
-        $path = self::useImageTemplate($path, $template);
+        $path = self::storagePath($path, $template);
 
         if (!startsWith('http://', $url)) {
             if (self::hasExternalUpload()) {
