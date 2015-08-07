@@ -6,17 +6,17 @@ class Jp7_InterAdmin_Upload
 {
     public static function isImage($path)
     {
-        return preg_match("/^.*\.(jpg|jpeg|png|gif).*(?)$/i", $path);
+        return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $path);
     }
 
     // Has upload[url] set on config (S3 or Local)
-    public static function hasExternalUpload()
+    public static function hasExternalStorage()
     {
         global $config;
         return $config->upload && $config->upload['url'];
     }
 
-    public static function uploadUrl($path)
+    public static function storageUrl($path)
     {
         global $config;
         $url = Url::createFromUrl($config->upload['url']);
@@ -27,7 +27,7 @@ class Jp7_InterAdmin_Upload
         return $url;
     }
 
-    // No upload[url] setting
+    // No upload[url] setting / Legacy
     public static function defaultUrl($path)
     {
         global $config;
@@ -38,12 +38,12 @@ class Jp7_InterAdmin_Upload
 
     public static function useImageTemplate($path, $template = 'original')
     {
-        return str_replace('upload/', 'imagecache/' . $template . '/', $path);
+        return jp7_replace_beginning('upload/', 'imagecache/' . $template . '/', $path);
     }
 
     public static function storagePath($path, $template = 'original')
     {
-        $path = str_replace('../../', '', $path); // Remove '../../'
+        $path = jp7_replace_beginning('../../', '', $path); // Remove '../../'
         
         if (self::isImage($path)) {
             $path = self::useImageTemplate($path, $template);
@@ -61,18 +61,20 @@ class Jp7_InterAdmin_Upload
      */
     public static function url($path = '../../', $template = 'original')
     {
-        $path = self::storagePath($path, $template);
-
-        if (!startsWith('http://', $url)) {
-            if (self::hasExternalUpload()) {
-                $url = self::uploadUrl($path);
-            } else {
-                $url = self::defaultUrl($path);
-            }
-        } else { // Absolute URL => Wont change
-            $url = Url::createFromUrl($path);
+        if (!startsWith('../../', $path)) {
+            // Not an upload path => Wont change
+            return $path;
         }
 
+        $path = self::storagePath($path, $template);
+
+        if (self::hasExternalStorage()) {
+            $url = self::storageUrl($path);
+        } else {
+            // legacy
+            $url = self::defaultUrl($path);
+        }
+        
         return $url->__toString();
     }
 }
