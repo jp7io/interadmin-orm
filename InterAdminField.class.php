@@ -471,11 +471,11 @@ class InterAdminField
             $url_size = '';
             if (!in_array($ext, array('gif', 'jpg', 'jpeg', 'png', '---'))) {
                 // Size
-                // if ($c_remote) {
+                if ($c_remote) {
                     $url_size = '<span class="filesize" presrc="'.$url.'"></span>';
-                // } else {
-                //     $url_size = interadmin_filesize(str_replace('../../', $c_cliente_physical_path, $valor));
-                // }
+                } else {
+                    $url_size = interadmin_filesize(str_replace('../../', '', $valor));
+                }
             }
             ?>
 			<div style="width:100%;cursor:pointer;color:#fff;font-size:9px" onclick="interadmin_arquivos_banco_preview('<?php echo $url ?>')">
