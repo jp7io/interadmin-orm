@@ -3,6 +3,7 @@
 namespace Jp7\Laravel;
 
 use Jp7\Interadmin\Downloadable;
+use Storage;
 
 /*
 Dynamic resize of images: imagecache/<template>/0001.jpg
@@ -158,15 +159,31 @@ class ImgResize
     // External images are downloaded locally to resize them
     private static function downloadExternal($url)
     {
-        $local = to_slug(dirname($url)).'_'.to_slug(basename($url));
-        $dir = public_path('upload/_external');
+        $local = static::urlToFilename($url);
+        $filePath = '/upload/_external/' . $local;
         
-        if (!is_file($dir.'/'.$local)) {
+        if (!Storage::has($filePath)) {
             if ($file = @file_get_contents($url)) {
-                file_put_contents($dir.'/'.$local, $file);
+                Storage::put($filePath, $file);
             }
         }
         
-        return '/upload/_external/'.$local;
+        return config('interadmin.upload.url') . $filePath;
+    }
+
+    private static function urlToFilename($url)
+    {
+        $parsed = parse_url($url);
+
+        $filename = [];
+        $filename[] = $parsed['host'];
+        $filename[] = dirname($parsed['path']);
+        $filename[] = basename($parsed['path']);
+
+        $filename = array_map(function($x) {
+            return preg_replace('/[^a-z0-9_.-]/ui', '', $x);
+        }, $filename);
+
+        return implode('_', $filename);
     }
 }
