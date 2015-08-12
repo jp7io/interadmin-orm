@@ -13,13 +13,13 @@ class Jp7_InterAdmin_Upload
     public static function hasExternalStorage()
     {
         global $config;
-        return $config->upload && $config->upload['url'];
+        return $config->storage && $config->storage['host'];
     }
 
     public static function storageUrl($path)
     {
         global $config;
-        $url = Url::createFromUrl($config->upload['url']);
+        $url = Url::createFromUrl($config->storage['host']);
         $url->setScheme('http');
         list($path, $query) = explode('?', $path);
         $url->setPath($path);
