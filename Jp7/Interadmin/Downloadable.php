@@ -4,6 +4,11 @@ namespace Jp7\Interadmin;
 
 trait Downloadable
 {
+    public function isImage()
+    {
+        return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $this->url);
+    }
+
     // Client side URL without hostname and protocol
     public function getPath()
     {
@@ -15,13 +20,19 @@ trait Downloadable
     }
     
     // For client side use
-    public function getUrl()
+    public function getUrl($template = 'original')
     {
         $backend_path = $this->config('backend_path');
         $url = $this->config('url');
 
         // ../../upload => www.example.com/upload
-        return replace_prefix($backend_path, $url, $this->url);
+        $url = replace_prefix($backend_path, $url, $this->url);
+
+        if ($this->isImage()) {
+            $url = \Jp7\Laravel\ImgResize::addTemplate($url, $template);
+        }
+
+        return $url;
     }
 
     // Server side file name

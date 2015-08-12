@@ -77,30 +77,33 @@ class ImgResize
         return $element;
     }
 
-    public static function url($url, $template = null, $title = '')
+    public static function url($url, $template = 'original', $title = '')
     {
         // local test: $url = '/upload/mediabox/00202271.jpg';
         if (is_object($url)) {
             $img = $url;
-            $url = $img->getUrl();
+            $url = $img->getUrl($template);
         }
-        $isExternal = static::isExternal($url);
-        
-        if (static::$seo && !$isExternal) {
+      
+        /*
+        if (static::$seo && !static::isExternal($url)) {
             $url = static::seoReplace($url, $title);
         }
-        
-        if ($template) {
-            if ($isExternal) {
-                $url = static::downloadExternal($url);
-            }
-            
-            $uploadPath = config('interadmin.upload.url') . '/upload/';
-            $cachePath = config('interadmin.upload.url') . '/imagecache/' .$template.'/';
-            $url = replace_prefix($uploadPath, $cachePath, $url);
-        }
+        */
 
         return Cdn::asset($url);
+    }
+
+    public static function addTemplate($url, $template)
+    {
+        /*
+        if (static::isExternal($url)) {
+            $url = static::downloadExternal($url);
+        }
+        */
+        $uploadPath = config('interadmin.upload.url') . '/upload/';
+        $cachePath = config('interadmin.upload.url') . '/imagecache/' .$template.'/';
+        return replace_prefix($uploadPath, $cachePath, $url);
     }
     
     public static function srcset($img, $prefix)
@@ -153,7 +156,9 @@ class ImgResize
         $scheme = isset($parsed['scheme']) ? $parsed['scheme'] : '';
         $host = isset($parsed['host']) ? $parsed['host'] : '';
 
-        return config('interadmin.upload.url') !== $scheme.'://'.$host;
+        $baseUrl = $scheme.'://'.$host;
+
+        return ($baseUrl !== config('interadmin.upload.url') && $baseUrl !== config('app.url')) ;
     }
 
     // External images are downloaded locally to resize them

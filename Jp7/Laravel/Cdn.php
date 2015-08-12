@@ -21,9 +21,10 @@ class Cdn
     }
 
     private static function replace($url)
-    { 
+    {
         if ($domain = config('cdn.url')) {
             $url = replace_prefix(config('app.url'), $domain, $url);
+            $url = replace_prefix(config('interadmin.upload.url'), $domain, $url);
         }
         return $url;
     }
