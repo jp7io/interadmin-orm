@@ -96,7 +96,7 @@ class ImgResize
             }
             
             $uploadPath = config('interadmin.upload.url') . '/upload/';
-            $cachePath = config('app.url') . '/imagecache/' .$template.'/';
+            $cachePath = config('interadmin.upload.url') . '/imagecache/' .$template.'/';
             $url = replace_prefix($uploadPath, $cachePath, $url);
         }
 
