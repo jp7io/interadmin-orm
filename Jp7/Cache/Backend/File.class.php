@@ -8,10 +8,10 @@ class Jp7_Cache_Backend_File extends Zend_Cache_Backend_File
     public function __construct(array $options = array())
     {
         $options += array(
-            'cache_file_umask' => 0777,
+            'cache_file_perm' => 0777,
             'file_name_prefix' => 'zf',
             'hashed_directory_level' => 1,
-            'hashed_directory_umask' => 0777,
+            'hashed_directory_perm' => 0777,
         );
 
         parent::__construct($options);

@@ -201,7 +201,7 @@ class Jp7_Bootstrap
             $view->getScriptPaths()
         ));
         // Permite o uso de Helpers customizados da Jp7
-        $view->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
+        $view->addHelperPath(jp7_package_path('classes') . '/Jp7/View/Helper', 'Jp7_View_Helper');
 
         // Adicionando JS e CSS padrão
         $config = Zend_Registry::get('config');
