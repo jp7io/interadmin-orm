@@ -40,13 +40,9 @@ trait DynamicViewTrait
     public function callAction($method, $parameters)
     {
         $content = call_user_func_array(array($this, $method), $parameters);
-
-        if ($method == 'show' && !$this->record) {
-            throw new Exception('Show action without record. You need to set $this->record inside your controller.');
-        }
         if ($content instanceof Response) {
             return $content;
-        }
+        }       
         return $this->response($content);
     }
 
