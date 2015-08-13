@@ -1,28 +1,41 @@
 {
-	"name": "jp7internet/classes",
-	"description": "Jp7 Classes",
-	"keywords": [],
-	"license": "proprietary",
-	"repositories" : [
-       
-    ],
-	"require": {
-		"zendframework/zendframework1": "1.12.0"
-	},
-	"require-dev": {
-		
-	},
-	"autoload": {
-		"classmap": [
-			"."
-	   	]
-	},
-	"scripts": {
-		
-	},
-	"config": {
-		"preferred-install": "dist",
-		"component-dir": "vendor/components-installed"
-	},
-	"minimum-stability": "dev"
+  "name": "jp7internet/classes",
+  "description": "Jp7 Classes",
+  "keywords": [],
+  "license": "proprietary",
+  "repositories" : [
+     
+  ],
+  "require": {
+    "zendframework/zendframework1": "1.12.0"
+  },
+  "require-dev": {
+    
+  },
+  "autoload": {
+    "classmap": [
+      "Auth",
+      "Cron",
+      "Google",
+      "InlineStyle",
+      "Jp7",
+      "legacy",
+      "PagSeguroLibrary",
+      "PHPExcel",
+      "Salesforce",
+      "Services",
+      "Symfony",
+      "TijsVerkoyen",
+      "Whoops",
+      "WideImage"
+    ]
+  },
+  "scripts": {
+    
+  },
+  "config": {
+    "preferred-install": "dist",
+    "component-dir": "vendor/components-installed"
+  },
+  "minimum-stability": "dev"
 }
