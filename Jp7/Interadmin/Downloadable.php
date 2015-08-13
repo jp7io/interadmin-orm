@@ -23,7 +23,7 @@ trait Downloadable
     public function getUrl($template = 'original')
     {
         $backend_path = $this->config('backend_path');
-        $url = $this->config('url');
+        $url = 'http://'.$this->config('host');
 
         // ../../upload => www.example.com/upload
         $url = replace_prefix($backend_path, $url, $this->url);
@@ -77,6 +77,6 @@ trait Downloadable
 
     private function config($key)
     {
-        return config('interadmin.upload.' . $key);
+        return config('interadmin.storage.' . $key);
     }
 }

@@ -23,8 +23,10 @@ class Cdn
     private static function replace($url)
     {
         if ($domain = config('cdn.url')) {
+            $storageUrl = 'http://'.config('interadmin.storage.host');
+
             $url = replace_prefix(config('app.url'), $domain, $url);
-            $url = replace_prefix(config('interadmin.upload.url'), $domain, $url);
+            $url = replace_prefix($storageUrl, $domain, $url);
         }
         return $url;
     }

@@ -101,8 +101,8 @@ class ImgResize
             $url = static::downloadExternal($url);
         }
         */
-        $uploadPath = config('interadmin.upload.url') . '/upload/';
-        $cachePath = config('interadmin.upload.url') . '/imagecache/' .$template.'/';
+        $uploadPath = self::storageUrl() . '/upload/';
+        $cachePath = self::storageUrl() . '/imagecache/' .$template.'/';
         return replace_prefix($uploadPath, $cachePath, $url);
     }
     
@@ -158,7 +158,7 @@ class ImgResize
 
         $baseUrl = $scheme.'://'.$host;
 
-        return ($baseUrl !== config('interadmin.upload.url') && $baseUrl !== config('app.url')) ;
+        return ($baseUrl !== self::storageUrl() && $baseUrl !== config('app.url')) ;
     }
 
     // External images are downloaded locally to resize them
@@ -173,7 +173,7 @@ class ImgResize
             }
         }
         
-        return config('interadmin.upload.url') . $filePath;
+        return self::storageUrl() . $filePath;
     }
 
     private static function urlToFilename($url)
@@ -190,5 +190,10 @@ class ImgResize
         }, $filename);
 
         return implode('_', $filename);
+    }
+
+    private static function storageUrl()
+    {
+        return 'http://'.config('interadmin.storage.host');
     }
 }
