@@ -15,7 +15,6 @@
   },
   "autoload": {
     "classmap": [
-      "Auth",
       "Cron",
       "InlineStyle",
       "Jp7",
