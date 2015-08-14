@@ -164,7 +164,7 @@ class Jp7_Debugger
 
     public function syntaxHighlightSql($sql, $style = '')
     {
-        return '<div class="debug_sql" style="'.$style.'">'.$sql.'</div>';
+        return '<div class="debug_sql" style="'.$style.'">'.SqlFormatter::format($sql).'</div>';
     }
 
     /**
