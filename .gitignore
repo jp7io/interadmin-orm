@@ -5,6 +5,5 @@ Thumbs.db
 .project
 .phpintel
 *.lady
-Zend
 /nbproject
 vendor
