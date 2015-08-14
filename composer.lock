@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "62cc05b18a17390b624d25d8c6818ff5",
+    "hash": "df628db9cd6ba96fb0c7617d3da13ab8",
     "packages": [
         {
             "name": "adodb/adodb-php",
@@ -470,40 +470,6 @@
             "time": "2015-05-01 07:00:55"
         },
         {
-            "name": "spekkionu/wideimage",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spekkionu/wideimage.git",
-                "reference": "a97e1d417cdb67c8ddc3ff4935e71bb3499a3e6b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spekkionu/wideimage/zipball/a97e1d417cdb67c8ddc3ff4935e71bb3499a3e6b",
-                "reference": "a97e1d417cdb67c8ddc3ff4935e71bb3499a3e6b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-gd": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "WideImage": "",
-                    "WideImage_": "WideImage/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0",
-                "LGPL-2.1"
-            ],
-            "description": "An open-source PHP library for image manipulation",
-            "homepage": "http://wideimage.sourceforge.net",
-            "abandoned": "intervention/image",
-            "time": "2015-03-02 07:45:15"
-        },
-        {
             "name": "werkint/jsmin",
             "version": "1.0.0",
             "source": {
@@ -674,9 +640,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "spekkionu/wideimage": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
