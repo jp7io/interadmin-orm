@@ -16,7 +16,6 @@
     "classmap": [
       "Auth",
       "Cron",
-      "Google",
       "InlineStyle",
       "Jp7",
       "legacy",
