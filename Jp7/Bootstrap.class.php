@@ -97,9 +97,6 @@ class Jp7_Bootstrap
         if (!$config->db->type) {
             $config->db->type = 'mysql';
         }
-        if (!function_exists('ADONewConnection')) {
-            include ROOT_PATH.'/inc/3thparty/adodb/adodb.inc.php';
-        }
         $dsn = jp7_formatDsn($config->db);
         $db = ADONewConnection($dsn);
         if ($config->charset == 'UTF-8') {
