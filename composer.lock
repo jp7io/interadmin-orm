@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7b8e593a512ebc1b8182c6cacfa539ef",
+    "hash": "62cc05b18a17390b624d25d8c6818ff5",
     "packages": [
         {
             "name": "adodb/adodb-php",
@@ -235,16 +235,16 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "dev-master",
+            "version": "v5.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "549a9a82664aa31952c2c1c46ac5f7b8c5ab6d16"
+                "reference": "140dd18acb6be297fbd9870f8dda9d9d0a17c460"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/549a9a82664aa31952c2c1c46ac5f7b8c5ab6d16",
-                "reference": "549a9a82664aa31952c2c1c46ac5f7b8c5ab6d16",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/140dd18acb6be297fbd9870f8dda9d9d0a17c460",
+                "reference": "140dd18acb6be297fbd9870f8dda9d9d0a17c460",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +253,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.2-dev"
+                    "dev-master": "5.1-dev"
                 }
             },
             "autoload": {
@@ -273,37 +273,37 @@
             ],
             "description": "The Illuminate Contracts package.",
             "homepage": "http://laravel.com",
-            "time": "2015-08-01 01:46:57"
+            "time": "2015-07-14 01:36:14"
         },
         {
             "name": "illuminate/support",
-            "version": "dev-master",
+            "version": "v5.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "cb959a05055f2144fe7d9642e671a2b2494183ff"
+                "reference": "2ba8a22a554aee9a412baa2e16e4387262d6d57c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/cb959a05055f2144fe7d9642e671a2b2494183ff",
-                "reference": "cb959a05055f2144fe7d9642e671a2b2494183ff",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/2ba8a22a554aee9a412baa2e16e4387262d6d57c",
+                "reference": "2ba8a22a554aee9a412baa2e16e4387262d6d57c",
                 "shasum": ""
             },
             "require": {
                 "danielstjules/stringy": "~1.8",
                 "doctrine/inflector": "~1.0",
                 "ext-mbstring": "*",
-                "illuminate/contracts": "5.2.*",
+                "illuminate/contracts": "5.1.*",
                 "php": ">=5.5.9"
             },
             "suggest": {
                 "jeremeamia/superclosure": "Required to be able to serialize closures (~2.0).",
-                "symfony/var-dumper": "Required to use the dd function (3.0.*)."
+                "symfony/var-dumper": "Required to use the dd function (2.7.*)."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.2-dev"
+                    "dev-master": "5.1-dev"
                 }
             },
             "autoload": {
@@ -326,7 +326,7 @@
             ],
             "description": "The Illuminate Support package.",
             "homepage": "http://laravel.com",
-            "time": "2015-08-06 13:15:15"
+            "time": "2015-07-20 16:31:36"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -673,11 +673,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {
         "spekkionu/wideimage": 20
     },
-    "prefer-stable": true,
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
