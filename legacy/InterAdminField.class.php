@@ -524,8 +524,8 @@ class InterAdminField
 
     public static function _campoHtml($campo)
     {
-        include_once ROOT_PATH.'/inc/7.app.lib.php';
-        include_once ROOT_PATH.'/inc/7.form.lib.php';
+        include_once jp7_package_path('inc').'/7.app.lib.php';
+        include_once jp7_package_path('inc').'/7.form.lib.php';
 
         // Só para CHAR - checkbox
         if (startsWith('char_', $campo['tipo_de_campo'])) {
