@@ -121,7 +121,7 @@ class Jp7_Bootstrap
         $frontController->setRouter(new Jp7_Controller_Router());
         $frontController->setControllerDirectory(APPLICATION_PATH.'/controllers');
         //$frontController->setControllerDirectory(ROOT_PATH . '/institucional/application/modules/default/controllers');
-        $frontController->addControllerDirectory(ROOT_PATH.'/classes/Jp7', 'jp7');
+        $frontController->addControllerDirectory(jp7_package_path('classes').'/Jp7', 'jp7');
 
         if (is_dir(APPLICATION_PATH.'/modules')) {
             $frontController->addModuleDirectory(APPLICATION_PATH.'/modules');
