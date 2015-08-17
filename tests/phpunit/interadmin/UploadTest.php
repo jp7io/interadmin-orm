@@ -85,7 +85,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
 
     private function externalUrl()
     {
-        return 'http://client.fakeurl.com';
+        return 'http://www.site.com';
     }
 
 }
