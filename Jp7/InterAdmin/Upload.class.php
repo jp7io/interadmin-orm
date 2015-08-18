@@ -4,9 +4,19 @@ use League\Url\Url;
 
 class Jp7_InterAdmin_Upload
 {
+    public static $legacyTemplates = [
+                    'thumb_interadmin' => '40x40',
+                ];
+
     public static function isImage($path)
     {
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $path);
+    }
+
+    public static function imageCache()
+    {
+        global $config;
+        return $config->imagecache;
     }
 
     // Has upload[url] set on config (S3 or Local)
@@ -36,15 +46,29 @@ class Jp7_InterAdmin_Upload
         return $url->setPath($config->name_id . '/' . $path);
     }
 
+    public static function uselegacyTemplate($path, $template = 'original')
+    {
+        if ($template != 'original') {
+            $legacyPath = Url::createFromUrl($path);
+            $legacyPath->getQuery()->modify(['size' => $legacyTemplates[$template]]);
+            $path = $legacyPath->getRelativeUrl();
+        }
+        return $path;
+    }
+
     public static function useImageTemplate($path, $template = 'original')
     {
-        return jp7_replace_beginning('upload/', 'imagecache/' . $template . '/', $path);
+        if (self::imageCache()) {
+            return jp7_replace_beginning('upload/', 'imagecache/' . $template . '/', $path);
+        }
+
+        return self::uselegacyTemplate($path, $template);
     }
 
     public static function storagePath($path, $template = 'original')
     {
         $path = jp7_replace_beginning('../../', '', $path); // Remove '../../'
-        
+
         if (self::isImage($path)) {
             $path = self::useImageTemplate($path, $template);
         }
