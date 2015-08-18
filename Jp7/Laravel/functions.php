@@ -1,13 +1,29 @@
 <?php
 
 if (!function_exists('interadmin_data')) {
-    function human_filesize($file, $decimals = 2)
+    /**
+     * Converts 1024 to 1kB
+     *
+     * @param int $bytes
+     * @param int $decimals
+     * @return string   Human readable size
+     */
+    function human_size($bytes, $decimals = 2)
     {
-        $bytes = @filesize($file);
         $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
         $factor = floor((strlen($bytes) - 1) / 3);
 
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$size[$factor];
+    }
+    /**
+     * Converts "1 hour" to 3600
+     *
+     * @param string
+     * @return int
+     */
+    function time_to_int($time)
+    {
+        return strtotime($time) - time();
     }
 
     function to_slug($string, $separator = '-')
