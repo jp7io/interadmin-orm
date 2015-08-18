@@ -42,7 +42,7 @@ trait DynamicViewTrait
         $content = call_user_func_array(array($this, $method), $parameters);
         if ($content instanceof Response) {
             return $content;
-        }       
+        }
         return $this->response($content);
     }
 
