@@ -39,6 +39,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['../../upload/mediabox/00202630.jpeg', $this->storageUrl().'/upload/mediabox/00202630.jpeg'],
+            ['../../upload/mediabox/00202630.png', $this->storageUrl().'/upload/mediabox/00202630.png'],
             ['../../upload/mediabox/00202630.jpeg', $this->storageUrl().'/upload/mediabox/00202630.jpeg?size=40x40', 'thumb_interadmin'],
             ['../../upload/mediabox/00202630.jpeg?v=2', $this->storageUrl().'/upload/mediabox/00202630.jpeg?v=2&size=40x40', 'thumb_interadmin'],
             ['../../upload/mediabox/00202630.pdf', $this->storageUrl().'/upload/mediabox/00202630.pdf'],
@@ -69,6 +70,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['../../upload/mediabox/00202630.jpeg', $this->storageUrl().'/imagecache/original/mediabox/00202630.jpeg'],
+            ['../../upload/mediabox/00202630.png', $this->storageUrl().'/imagecache/original/mediabox/00202630.png'],
             ['../../upload/mediabox/00202630.jpeg', $this->storageUrl().'/imagecache/thumb_interadmin/mediabox/00202630.jpeg', 'thumb_interadmin'],
             ['../../upload/mediabox/00202630.jpeg?v=2', $this->storageUrl().'/imagecache/thumb_interadmin/mediabox/00202630.jpeg?v=2', 'thumb_interadmin'],
             ['../../upload/mediabox/00202630.pdf', $this->storageUrl().'/upload/mediabox/00202630.pdf'],
@@ -93,6 +95,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['../../upload/mediabox/00202630.jpeg', $this->appUrl().'/client/upload/mediabox/00202630.jpeg'],
+            ['../../upload/mediabox/00202630.png', $this->appUrl().'/client/upload/mediabox/00202630.png'],
             ['../../upload/mediabox/00202630.jpeg', $this->appUrl().'/client/upload/mediabox/00202630.jpeg?size=40x40', 'thumb_interadmin'],
             ['../../upload/mediabox/00202630.jpeg?v=2', $this->appUrl().'/client/upload/mediabox/00202630.jpeg?v=2&size=40x40', 'thumb_interadmin'],
             ['../../upload/mediabox/00202630.pdf', $this->appUrl().'/client/upload/mediabox/00202630.pdf'],
