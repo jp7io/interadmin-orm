@@ -1,6 +1,8 @@
 <?php
 
 use League\Url\Url;
+use League\Url\Components\Path;
+use League\Url\Components\Query;
 
 class Jp7_InterAdmin_Upload
 {
@@ -8,15 +10,15 @@ class Jp7_InterAdmin_Upload
                     'thumb_interadmin' => '40x40',
                 ];
 
-    public static function isImage($path)
+    public static function isImage($url)
     {
-        return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $path);
+        return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $url);
     }
 
     public static function imageCache()
     {
         global $config;
-        return $config->imagecache;
+        return isset($config->imagecache) && $config->imagecache;
     }
 
     // Has upload[url] set on config (S3 or Local)
@@ -29,51 +31,61 @@ class Jp7_InterAdmin_Upload
     public static function storageUrl($path)
     {
         global $config;
-        $url = Url::createFromUrl($config->storage['host']);
+        return self::createUrl($config->storage['host'], $path);
+    }
+
+    // No upload[url] setting / Legacy
+    public static function legacytUrl($path)
+    {
+        global $config;
+        $url = self::createUrl($config->server->host, $path);
+        $path = $url->getPath();
+        $path->prepend($config->name_id);
+        return $url;
+    }
+
+    public static function uselegacyTemplate($url, $template = 'original')
+    {
+        $legacyTemplate = self::$legacyTemplates[$template];
+        if (isset($legacyTemplate)) {
+            $url->getQuery()->modify(['size' => $legacyTemplate]);
+        }
+        return $url;
+    }
+
+    public static function useImageTemplate($url, $template = 'original')
+    {
+        if (self::imageCache()) {
+            $path = $url->getPath();
+            $path->remove('upload');
+            $path->prepend('imagecache/' . $template);
+            return $url;
+        }
+
+        return self::uselegacyTemplate($url, $template);
+    }
+
+    public static function storagePath($url, $template = 'original')
+    {
+        $path = $url->getPath();
+        // Remove '../../'
+        $path->remove('..');
+        $path->remove('..');
+
+        if (self::isImage($url->__toString())) {
+            $url = self::useImageTemplate($url, $template);
+        }
+        return $url;
+    }
+
+    public static function createUrl($host, $path)
+    {
+        $url = Url::createFromUrl($host);
         $url->setScheme('http');
         list($path, $query) = explode('?', $path);
         $url->setPath($path);
         $url->setQuery($query);
         return $url;
-    }
-
-    // No upload[url] setting / Legacy
-    public static function defaultUrl($path)
-    {
-        global $config;
-        $url = Url::createFromUrl($config->server->host);
-        $url->setScheme('http');
-        return $url->setPath($config->name_id . '/' . $path);
-    }
-
-    public static function uselegacyTemplate($path, $template = 'original')
-    {
-        if ($template != 'original') {
-            $legacyPath = Url::createFromUrl($path);
-            $legacyPath->getQuery()->modify(['size' => $legacyTemplates[$template]]);
-            $path = $legacyPath->getRelativeUrl();
-        }
-        return $path;
-    }
-
-    public static function useImageTemplate($path, $template = 'original')
-    {
-        if (self::imageCache()) {
-            return jp7_replace_beginning('upload/', 'imagecache/' . $template . '/', $path);
-        }
-
-        return self::uselegacyTemplate($path, $template);
-    }
-
-    public static function storagePath($path, $template = 'original')
-    {
-        $path = jp7_replace_beginning('../../', '', $path); // Remove '../../'
-
-        if (self::isImage($path)) {
-            $path = self::useImageTemplate($path, $template);
-        }
-
-        return $path;
     }
 
     /**
@@ -90,15 +102,12 @@ class Jp7_InterAdmin_Upload
             return $path;
         }
 
-        $path = self::storagePath($path, $template);
-
         if (self::hasExternalStorage()) {
             $url = self::storageUrl($path);
         } else {
-            // legacy
-            $url = self::defaultUrl($path);
+            $url = self::legacytUrl($path);
         }
-        
+        $url = self::storagePath($url, $template);
         return $url->__toString();
     }
 }
