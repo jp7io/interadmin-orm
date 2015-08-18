@@ -840,12 +840,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/inc.git",
-                "reference": "cc403113ae339e2d90f4d89a509ff5c46c073e19"
+                "reference": "de7fa264c052c8e768d1e4b28aa103072742b3c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/cc403113ae339e2d90f4d89a509ff5c46c073e19",
-                "reference": "cc403113ae339e2d90f4d89a509ff5c46c073e19",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/de7fa264c052c8e768d1e4b28aa103072742b3c0",
+                "reference": "de7fa264c052c8e768d1e4b28aa103072742b3c0",
                 "shasum": ""
             },
             "type": "library",
@@ -857,7 +857,7 @@
                 "source": "https://github.com/jp7internet/inc/tree/composer",
                 "issues": "https://github.com/jp7internet/inc/issues"
             },
-            "time": "2015-08-14 22:13:56"
+            "time": "2015-08-17 21:03:38"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
