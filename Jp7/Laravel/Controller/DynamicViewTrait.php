@@ -59,7 +59,7 @@ trait DynamicViewTrait
         return $view;
     }
 
-    protected function response($content)
+    protected function response($content = null)
     {
         if (is_null($content)) {
             $content = $this->view();
