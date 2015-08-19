@@ -27,9 +27,11 @@
   },
   "autoload": {
     "classmap": [
-      "Jp7",
       "legacy"
-    ]
+    ],
+    "psr-0": {
+      "Jp7_": ""
+    }
   },
   "scripts": {
     

@@ -110,8 +110,8 @@ class Jp7_Box_Manager
      */
     public static function setFromFiles($classesPath, $boxesPath)
     {
-        foreach (glob($classesPath.'/'.$boxesPath.'/*.class.php') as $file) {
-            $baseName = basename($file, '.class.php');
+        foreach (glob($classesPath.'/'.$boxesPath.'/*.php') as $file) {
+            $baseName = basename($file, '.php');
             if (endsWith('Abstract', $baseName)) {
                 continue;
             }

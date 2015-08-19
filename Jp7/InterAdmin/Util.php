@@ -346,7 +346,7 @@ STR;
     {
         global $c_interadminConfigPath;
 
-        $arquivo = dirname($c_interadminConfigPath).'/classes/'.str_replace('_', '/', $nomeClasse).'.class.php';
+        $arquivo = dirname($c_interadminConfigPath).'/classes/'.str_replace('_', '/', $nomeClasse).'.php';
         if (!is_file($arquivo)) {
             @mkdir(dirname($arquivo), 0777, true);
 
