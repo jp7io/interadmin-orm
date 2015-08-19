@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Interadmin;
+
 use Jp7_InterAdmin_Upload as Upload;
 
 class UploadTest extends \PHPUnit_Framework_TestCase
@@ -7,7 +9,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         global $config;
-        $config = (object) [ 
+        $config = (object) [
             'server' => (object)['host' => $this->appUrl()],
             'name_id' => 'client',
             'imagecache' => null,
@@ -27,13 +29,13 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         global $config;
         $config = (object) [
-        'storage' => ['host' => $this->storageUrl()],
+            'storage' => ['host' => $this->storageUrl()],
         ];
 
         $url = $this->url($filePath, $template);
 
         $this->assertEquals($expected, $url);
-    }  
+    }
 
     public function storageProvider()
     {
@@ -57,14 +59,14 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         global $config;
         $config = (object) [
-        'storage' => ['host' => $this->storageUrl()],
-        'imagecache' => true, 
+            'storage' => ['host' => $this->storageUrl()],
+            'imagecache' => true,
         ];
 
         $url = $this->url($filePath, $template);
 
         $this->assertEquals($expected, $url);
-    }  
+    }
 
     public function storageWithImageCacheProvider()
     {
@@ -82,7 +84,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider LegacyProvider
+     * @dataProvider legacyProvider
      */
     public function testUrlLegacy($filePath, $expected, $template = null)
     {
@@ -91,7 +93,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $url);
     }
 
-    public function LegacyProvider()
+    public function legacyProvider()
     {
         return [
             ['../../upload/mediabox/00202630.jpeg', $this->appUrl().'/client/upload/mediabox/00202630.jpeg'],
@@ -109,7 +111,7 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     private function url($filePath, $template)
     {
         if (isset($template)) {
-            return Upload::url($filePath, $template);     
+            return Upload::url($filePath, $template);
         }
         return $url = Upload::url($filePath);
     }
@@ -128,5 +130,4 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     {
         return 'http://www.site.com';
     }
-
 }
