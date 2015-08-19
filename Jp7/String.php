@@ -1,8 +1,6 @@
 <?php
 
-namespace Jp7;
-
-class String
+class Jp7_String
 {
     private $str;
 
