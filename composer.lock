@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8bb18b0d7a9a2f778c7426d13e714f0c",
+    "hash": "3166e8493f89dea4831c4495fb440273",
     "packages": [
         {
             "name": "adodb/adodb-php",
@@ -793,16 +793,16 @@
         },
         {
             "name": "jp7internet/inc",
-            "version": "dev-composer",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/inc.git",
-                "reference": "de7fa264c052c8e768d1e4b28aa103072742b3c0"
+                "reference": "332e642e7493108341aef1306f1aec20a1cb0401"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/de7fa264c052c8e768d1e4b28aa103072742b3c0",
-                "reference": "de7fa264c052c8e768d1e4b28aa103072742b3c0",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/332e642e7493108341aef1306f1aec20a1cb0401",
+                "reference": "332e642e7493108341aef1306f1aec20a1cb0401",
                 "shasum": ""
             },
             "type": "library",
@@ -811,10 +811,10 @@
             ],
             "description": "Jp7 Includes",
             "support": {
-                "source": "https://github.com/jp7internet/inc/tree/composer",
+                "source": "https://github.com/jp7internet/inc/tree/master",
                 "issues": "https://github.com/jp7internet/inc/issues"
             },
-            "time": "2015-08-17 21:03:38"
+            "time": "2015-08-20 22:48:31"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
