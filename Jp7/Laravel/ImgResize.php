@@ -15,6 +15,7 @@ class ImgResize
 {
     private static $lazy = false;
     private static $seo = false;
+    private static $minSrcsetWidth = 720;
     
     public static function getLazy()
     {
@@ -34,6 +35,16 @@ class ImgResize
     public static function setSeo($status)
     {
         static::$seo = (bool) $status;
+    }
+    
+    public static function getMinSrcsetWidth()
+    {
+        return static::$minSrcsetWidth;
+    }
+
+    public static function setMinSrcsetWidth($minSrcsetWidth)
+    {
+        static::$minSrcsetWidth = $minSrcsetWidth;
     }
     
     /**
@@ -112,7 +123,10 @@ class ImgResize
         foreach ($templates as $template) {
             $parts = explode('-', $template);
             $width = end($parts);
-            $srcs[] = static::url($img, $template) . " ${width}w";
+            
+            if ($width >= static::$minSrcsetWidth) {
+                $srcs[] = static::url($img, $template) . " ${width}w";
+            }
         }
         
         return implode(', ', $srcs);
