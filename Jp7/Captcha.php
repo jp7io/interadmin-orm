@@ -29,7 +29,7 @@ class Jp7_Captcha
 
     public function __construct()
     {
-        $this->font = ROOT_PATH.'/inc/3thparty/mpdf/ttfonts/DejaVuSans.ttf';
+        $this->font = jp7_package_path('classes/fonts/DejaVuSans.ttf');
     }
 
     protected function generateCode($characters)
