@@ -40,5 +40,6 @@
     "preferred-install": "dist",
     "component-dir": "vendor/components-installed"
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "dev",
+    "prefer-stable" : true
 }
