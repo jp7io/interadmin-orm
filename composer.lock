@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a37442e0fa049ecf0c5d920000656939",
+    "hash": "94c61ee156f70dd40c0455fdb9af620d",
     "packages": [
         {
             "name": "adodb/adodb-php",
@@ -380,16 +380,16 @@
         },
         {
             "name": "jp7internet/inc",
-            "version": "dev-master",
+            "version": "dev-composer",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/inc.git",
-                "reference": "332e642e7493108341aef1306f1aec20a1cb0401"
+                "reference": "804350350000224210d015edac463bdd13e67147"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/332e642e7493108341aef1306f1aec20a1cb0401",
-                "reference": "332e642e7493108341aef1306f1aec20a1cb0401",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/804350350000224210d015edac463bdd13e67147",
+                "reference": "804350350000224210d015edac463bdd13e67147",
                 "shasum": ""
             },
             "type": "library",
@@ -398,10 +398,10 @@
             ],
             "description": "Jp7 Includes",
             "support": {
-                "source": "https://github.com/jp7internet/inc/tree/master",
+                "source": "https://github.com/jp7internet/inc/tree/composer",
                 "issues": "https://github.com/jp7internet/inc/issues"
             },
-            "time": "2015-08-20 22:48:31"
+            "time": "2015-08-18 22:49:03"
         },
         {
             "name": "league/url",
@@ -456,40 +456,6 @@
                 "url"
             ],
             "time": "2015-07-15 08:24:12"
-        },
-        {
-            "name": "pagseguro/php",
-            "version": "2.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pagseguro/php.git",
-                "reference": "adf485792e6844ce7e8771e34de6c6330a7101f0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pagseguro/php/zipball/adf485792e6844ce7e8771e34de6c6330a7101f0",
-                "reference": "adf485792e6844ce7e8771e34de6c6330a7101f0",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "lib-curl": "*",
-                "lib-libxml": "*",
-                "lib-openssl": "*",
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "source/PagSeguroLibrary"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache License 2.0"
-            ],
-            "description": "Biblioteca de integração com o PagSeguro",
-            "time": "2014-04-22 13:51:11"
         },
         {
             "name": "phpoffice/phpexcel",
