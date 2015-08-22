@@ -18,11 +18,11 @@
     "jdorn/sql-formatter": "~1.2",
     "illuminate/support": "~5.1",
     "symfony/var-dumper": "~2.7.3",
-    "league/url": "^3.3",
-    "jp7internet/inc": "dev-composer"
+    "league/url": "^3.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "^4.8"
+    "phpunit/phpunit": "^4.8",
+    "jp7internet/inc": "dev-master"
   },
   "autoload": {
     "classmap": [
@@ -40,5 +40,5 @@
     "component-dir": "vendor/components-installed"
   },
   "minimum-stability": "dev",
-    "prefer-stable" : true
+  "prefer-stable": true
 }

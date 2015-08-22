@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "94c61ee156f70dd40c0455fdb9af620d",
+    "hash": "5b3c8d06a17d4134aca65fa765721919",
     "packages": [
         {
             "name": "adodb/adodb-php",
@@ -377,31 +377,6 @@
                 "sql"
             ],
             "time": "2014-01-12 16:20:24"
-        },
-        {
-            "name": "jp7internet/inc",
-            "version": "dev-composer",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:jp7internet/inc.git",
-                "reference": "804350350000224210d015edac463bdd13e67147"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/804350350000224210d015edac463bdd13e67147",
-                "reference": "804350350000224210d015edac463bdd13e67147",
-                "shasum": ""
-            },
-            "type": "library",
-            "license": [
-                "proprietary"
-            ],
-            "description": "Jp7 Includes",
-            "support": {
-                "source": "https://github.com/jp7internet/inc/tree/composer",
-                "issues": "https://github.com/jp7internet/inc/issues"
-            },
-            "time": "2015-08-18 22:49:03"
         },
         {
             "name": "league/url",
@@ -781,6 +756,31 @@
                 "instantiate"
             ],
             "time": "2015-06-14 21:17:01"
+        },
+        {
+            "name": "jp7internet/inc",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:jp7internet/inc.git",
+                "reference": "332e642e7493108341aef1306f1aec20a1cb0401"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/332e642e7493108341aef1306f1aec20a1cb0401",
+                "reference": "332e642e7493108341aef1306f1aec20a1cb0401",
+                "shasum": ""
+            },
+            "type": "library",
+            "license": [
+                "proprietary"
+            ],
+            "description": "Jp7 Includes",
+            "support": {
+                "source": "https://github.com/jp7internet/inc/tree/master",
+                "issues": "https://github.com/jp7internet/inc/issues"
+            },
+            "time": "2015-08-20 22:48:31"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
