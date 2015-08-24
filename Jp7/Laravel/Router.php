@@ -25,7 +25,7 @@ class Router extends MethodForwarder
         $this->cachefile = base_path($this->cachefile);
         
         if (is_file($this->cachefile)) {
-            $this->map = unserialize(file_get_contents($this->cachefile));
+            $this->loadCache();
         }
         
         parent::__construct($target);
@@ -40,6 +40,11 @@ class Router extends MethodForwarder
     public function saveCache()
     {
         file_put_contents($this->cachefile, serialize($this->map));
+    }
+    
+    public function loadCache()
+    {
+        $this->map = unserialize(file_get_contents($this->cachefile));
     }
     
     ////
