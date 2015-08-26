@@ -40,7 +40,7 @@ class Jp7_InterAdmin_Upload
         global $config;
         $url = self::createUrl($config->server->host, $path);
         $path = $url->getPath();
-        $path->prepend($config->name_id);
+        $path->prepend($config->server->path);
         return $url;
     }
 
