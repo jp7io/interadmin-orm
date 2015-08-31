@@ -66,11 +66,11 @@ class FileCache
         );
         extract($options + $default);
 
-        global $c_doc_root, $c_cache, $c_cache_delay;
+        global $c_doc_root, $config, $c_cache_delay;
         global $debugger, $s_session, $interadmin_gerar_menu;
 
         // Cache not desired
-        if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) {
+        if (!$config->cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) {
             return;
         }
 
