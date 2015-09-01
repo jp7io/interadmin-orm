@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use View;
 use stdClass;
 use Exception;
+use Request;
 
 trait DynamicViewTrait
 {
@@ -13,10 +14,17 @@ trait DynamicViewTrait
      * @var Variables to send to view
      */
     protected $_view;
+    protected $layout = 'layouts.master';
 
     public function constructDynamicViewTrait()
     {
         $this->_view = new stdClass();
+
+        $this->remote = null;
+        if (Request::ajax()) {
+            $this->layout = 'layouts.ajax';
+            $this->remote = true;
+        }
     }
 
     public function &__get($key)
@@ -92,7 +100,7 @@ trait DynamicViewTrait
     protected function _viewRoute($controllerClass, $action)
     {
         $controllerRoute = $this->_controllerRoute($controllerClass);
-
+        $controllerRoute = str_replace('app.http.controllers.', '', $controllerRoute);
         return "{$controllerRoute}.{$action}";
     }
 
