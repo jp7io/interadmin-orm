@@ -159,6 +159,15 @@ class Query extends Query\Base
         return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
     }
 
+    public function firstOrFail()
+    {
+        $result = $this->first();
+        if (!$result) {
+            throw new ModelNotFoundException('Unable to find first record.');
+        }
+        return $result;
+    }
+
     public function count()
     {
         if (func_num_args() > 0) {

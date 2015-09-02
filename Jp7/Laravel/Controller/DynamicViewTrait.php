@@ -20,6 +20,11 @@ trait DynamicViewTrait
     {
         $this->_view = new stdClass();
 
+        $this->beforeFilter('@checkAjax');
+    }
+    
+    public function checkAjax()
+    {
         $this->remote = null;
         if (Request::ajax()) {
             $this->layout = 'layouts.ajax';
