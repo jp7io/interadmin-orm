@@ -8,10 +8,11 @@ class ExceptionHandler
     {
         $mensagem = self::getMessage($exception);
         
-        $subject = '['.$_SERVER['HTTP_HOST'].'][Erro] '.$exception->getMessage();
+        $subject = '['.$_SERVER['HTTP_HOST'].']['.get_class($exception).'] '.
+            substr($exception->getMessage(), 0, 100);
         $headers  = 'MIME-Version: 1.0'."\r\n";
-        $headers .= 'Content-type: text/html; charset=iso-8859-1'."\r\n";
-        
+        $headers .= 'Content-type: text/html; charset=UTF-8'."\r\n";
+                
         mail('debug@jp7.com.br', $subject, $mensagem, $headers);
     }
 
