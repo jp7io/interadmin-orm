@@ -161,7 +161,7 @@ class Jp7_Salesforce_Client extends SforceEnterpriseClient
             @ini_set('default_socket_timeout', $options['connection_timeout']);
         }
         try {
-            $this->sforce = @new SoapClient($wsdl, $soapClientArray);
+            $this->sforce = @new Jp7_Salesforce_SoapClient($wsdl, $soapClientArray);
         } catch (Exception $e) {
             if ($options['connection_timeout']) {
                 @ini_restore('default_socket_timeout');
