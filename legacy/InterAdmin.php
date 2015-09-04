@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * JP7's PHP Functions.
  *
@@ -14,7 +16,7 @@
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
-class InterAdmin extends InterAdminAbstract
+class InterAdmin extends InterAdminAbstract implements Arrayable
 {
     /**
      * DEPRECATED: Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
@@ -1041,5 +1043,17 @@ class InterAdmin extends InterAdminAbstract
     public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')
     {
         return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
+    }
+    
+    public function toArray()
+    {
+        $array = $this->attributes;
+        foreach ($array as &$value) {
+            if ($value instanceof ArrayableInterface) {
+                $value = $value->toArray();
+            }
+        }
+
+        return $array;
     }
 }
