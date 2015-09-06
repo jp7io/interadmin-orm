@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_JSMin extends JSMin
+class Jp7_JSMin extends JsMin\Minify
 {
     public static function groupJavascript($files, $cache_dir = './cache/js', $cache_filename = 'head.js')
     {

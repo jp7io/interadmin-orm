@@ -28,6 +28,15 @@ class Jp7_Controller_Action extends Zend_Controller_Action
                 exit;
             }
         }
+
+        if ($this->_getParam('controller') == 'interadmin-remote') {
+            if ($interadmin_remote = reset($config->server->interadmin_remote)) {
+                $this->_redirect('http://'.$interadmin_remote.'/'.$config->name_id);
+            }
+            echo 'No InterAdmin remote found.';
+            exit;
+        }
+
         /*
         global $debugger;
         $debugger->showFileName('# Module: <b>' . $this->_getParam('module') . '</b>');

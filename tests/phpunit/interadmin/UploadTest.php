@@ -11,7 +11,6 @@ class UploadTest extends \PHPUnit_Framework_TestCase
         global $config;
         $config = (object) [
             'server' => (object)['host' => $this->appUrl()],
-            'name_id' => 'client',
             'imagecache' => null,
         ];
     }
@@ -94,6 +93,37 @@ class UploadTest extends \PHPUnit_Framework_TestCase
     }
 
     public function legacyProvider()
+    {
+        return [
+            ['../../upload/mediabox/00202630.jpeg', $this->appUrl().'/upload/mediabox/00202630.jpeg'],
+            ['../../upload/mediabox/00202630.png', $this->appUrl().'/upload/mediabox/00202630.png'],
+            ['../../upload/mediabox/00202630.jpeg', $this->appUrl().'/upload/mediabox/00202630.jpeg?size=40x40', 'thumb_interadmin'],
+            ['../../upload/mediabox/00202630.jpeg?v=2', $this->appUrl().'/upload/mediabox/00202630.jpeg?v=2&size=40x40', 'thumb_interadmin'],
+            ['../../upload/mediabox/00202630.pdf', $this->appUrl().'/upload/mediabox/00202630.pdf'],
+            ['../../upload/mediabox/00202630.pdf?v=2', $this->appUrl().'/upload/mediabox/00202630.pdf?v=2'],
+            ['_default/file.css', '_default/file.css'],
+            [$this->externalUrl().'/upload/image.jpg', $this->externalUrl().'/upload/image.jpg'],
+            [$this->externalUrl().'/upload/image.jpg', $this->externalUrl().'/upload/image.jpg', 'thumb_interadmin']
+        ];
+    }
+
+    /**
+     * @group path
+     * @dataProvider legacyProviderWithPath
+     */
+    public function testUrlLegacyWithPath($filePath, $expected, $template = null)
+    {
+        global $config;
+        $config->server = (object)[
+                    'host' => $this->appUrl(),
+                    'path' => 'client'
+                ];
+        $url = $this->url($filePath, $template);
+
+        $this->assertEquals($expected, $url);
+    }
+
+    public function legacyProviderWithPath()
     {
         return [
             ['../../upload/mediabox/00202630.jpeg', $this->appUrl().'/client/upload/mediabox/00202630.jpeg'],
