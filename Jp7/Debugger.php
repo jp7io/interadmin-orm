@@ -40,7 +40,7 @@ class Jp7_Debugger
      *
      * @var array
      */
-    protected $_log;
+    protected $_log = [];
     /**
      * Stores the start time which is used to calculate the processing time. Use the method startTime() to set this variable.
      *
