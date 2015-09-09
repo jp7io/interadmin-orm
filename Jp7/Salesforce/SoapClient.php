@@ -11,4 +11,14 @@ class Jp7_Salesforce_SoapClient extends SoapClient
         }
         return $response;
     }
+    
+    public function search($params)
+    {
+        $response = parent::search($params);
+        // FIX: https://github.com/developerforce/Force.com-Toolkit-for-PHP/issues/44
+        if (isset($response->result) && is_object($response->result->searchRecords)) {
+            $response->result->searchRecords = [$response->result->searchRecords];
+        }
+        return $response;
+    }
 }
