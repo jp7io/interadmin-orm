@@ -2,11 +2,11 @@
 
 namespace Jp7\Laravel\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use View;
-use Response;
 use stdClass;
 use Exception;
-use Config;
+use Request;
 
 trait DynamicViewTrait
 {
@@ -14,10 +14,22 @@ trait DynamicViewTrait
      * @var Variables to send to view
      */
     protected $_view;
+    protected $layout = 'layouts.master';
 
     public function constructDynamicViewTrait()
     {
         $this->_view = new stdClass();
+
+        $this->beforeFilter('@checkAjax');
+    }
+    
+    public function checkAjax()
+    {
+        $this->remote = null;
+        if (Request::ajax()) {
+            $this->layout = 'layouts.ajax';
+            $this->remote = true;
+        }
     }
 
     public function &__get($key)
@@ -40,19 +52,14 @@ trait DynamicViewTrait
      */
     public function callAction($method, $parameters)
     {
-        $response = call_user_func_array(array($this, $method), $parameters);
-
-        if (!is_null($response)) {
-            return $response;
+        $content = call_user_func_array(array($this, $method), $parameters);
+        if ($content instanceof Response) {
+            return $content;
         }
-        if ($method == 'show' && !$this->record) {
-            throw new Exception('Show action without record. You need to set $this->record inside your controller.');
-        }
-
-        return $this->makeView();
+        return $this->response($content);
     }
 
-    public function makeView()
+    protected function view()
     {
         $viewName = $this->_getViewName($this->action);
         $data = (array) $this->_view;
@@ -63,6 +70,14 @@ trait DynamicViewTrait
         }
 
         return $view;
+    }
+
+    protected function response($content = null)
+    {
+        if (is_null($content)) {
+            $content = $this->view();
+        }
+        return response($content);
     }
 
     /**
@@ -90,7 +105,7 @@ trait DynamicViewTrait
     protected function _viewRoute($controllerClass, $action)
     {
         $controllerRoute = $this->_controllerRoute($controllerClass);
-
+        $controllerRoute = str_replace('app.http.controllers.', '', $controllerRoute);
         return "{$controllerRoute}.{$action}";
     }
 
@@ -98,7 +113,7 @@ trait DynamicViewTrait
     {
         $filename = str_replace('.', '/', $route);
 
-        foreach (Config::get('view.paths') as $viewPath) {
+        foreach (config('view.paths') as $viewPath) {
             if (file_exists($viewPath.'/'.$filename.'.blade.php')) {
                 return true;
             }

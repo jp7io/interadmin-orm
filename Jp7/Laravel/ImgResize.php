@@ -16,6 +16,7 @@ class ImgResize
 {
     private static $lazy = false;
     private static $seo = false;
+    private static $minSrcsetWidth = 720;
     
     public static function getLazy()
     {
@@ -37,6 +38,16 @@ class ImgResize
         static::$seo = (bool) $status;
     }
     
+    public static function getMinSrcsetWidth()
+    {
+        return static::$minSrcsetWidth;
+    }
+
+    public static function setMinSrcsetWidth($minSrcsetWidth)
+    {
+        static::$minSrcsetWidth = $minSrcsetWidth;
+    }
+    
     /**
      * Generates image tag. Can create lazy loading images with "data-src".
      *
@@ -54,7 +65,7 @@ class ImgResize
         }
         $alt = $options['title'];
         
-        if (str_contains($template, '-')) {
+        if (is_null($template) || str_contains($template, '-')) {
             // Normal image with src=""
             // Preppend template to classes for CSS use
             $options['class'] = trim(array_get($options, 'class').' '.$template);
@@ -119,7 +130,10 @@ class ImgResize
         foreach ($templates as $template) {
             $parts = explode('-', $template);
             $width = end($parts);
-            $srcs[] = static::url($img, $template) . " ${width}w";
+            
+            if ($width >= static::$minSrcsetWidth) {
+                $srcs[] = static::url($img, $template) . " ${width}w";
+            }
         }
         
         return implode(', ', $srcs);

@@ -8,7 +8,6 @@ class Controller extends BaseController
 {
     protected static $current = null;
 
-    protected $layout = 'layouts.master';
     protected $action = '';
 
     public function __construct()

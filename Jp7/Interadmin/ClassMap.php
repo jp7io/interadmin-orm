@@ -4,6 +4,7 @@ namespace Jp7\Interadmin;
 
 class ClassMap
 {
+    CONST CACHE_KEY = 'Interadmin.classMap';
     private static $instance;
 
     private $classes;
@@ -18,7 +19,7 @@ class ClassMap
     {
         // singleton
         if (!self::$instance) {
-            self::$instance = \Cache::remember('Interadmin.classMap', 60, function () {
+            self::$instance = \Cache::remember(self::CACHE_KEY, 60, function () {
                 // cache instance
                 $instance = new self();
                 $instance->setClasses(self::loadMap('class'));
@@ -26,6 +27,9 @@ class ClassMap
                 // return cached instance
                 return $instance;
             });
+            if (self::$instance->isEmpty()) {
+                \Cache::forget(self::CACHE_KEY);
+            }
         }
 
         return self::$instance;
@@ -49,6 +53,11 @@ class ClassMap
         return $arr;
     }
 
+    public function isEmpty()
+    {
+        return !$this->classes && !$this->classesTipos;
+    }
+    
     public function setClasses(array $classes)
     {
         $this->classes = $classes;

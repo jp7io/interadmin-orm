@@ -11,12 +11,17 @@ trait RecordTrait
      * @var \Jp7\Interadmin\Query\Base
      */
     protected $scope = null;
+    protected $recordActions = ['show', 'edit', 'update', 'destroy'];
+    /**
+     * @var array   Everything except /create, /edit and custom actions
+     */
+    protected $implicitNamedActions = ['index', 'store', 'show', 'update', 'destroy'];
 
     public function constructRecordTrait()
     {
         $this->beforeFilter('@setScope');
         $this->beforeFilter('@setType');
-        $this->beforeFilter('@setRecord', ['only' => ['show', 'edit', 'update', 'destroy']]);
+        $this->beforeFilter('@setRecord', ['only' => $this->recordActions]);
     }
 
     public function getScope()
@@ -49,7 +54,7 @@ trait RecordTrait
     {
         $uri = $route->getUri();
 
-        if (!in_array($this->action, array('index', 'store', 'show', 'update', 'destroy'))) {
+        if (!in_array($this->action, $this->implicitNamedActions)) {
             $uri = dirname($uri); // Remove extra directory
         }
         if ($this->isRecordAction()) {
@@ -84,9 +89,16 @@ trait RecordTrait
             }
         }
     }
+    
+    /*
+    Find where to put this code:
+    if ($method == 'show' && !$this->record) {
+        throw new Exception('Show action without record. You need to set $this->record inside your controller.');
+    }
+    */
 
     protected function isRecordAction()
     {
-        return in_array($this->action, array('show', 'edit', 'update', 'destroy'));
+        return in_array($this->action, $this->recordActions);
     }
 }

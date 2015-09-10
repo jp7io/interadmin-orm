@@ -17,7 +17,7 @@ class Select extends \Former\Form\Fields\Select
     public function render()
     {
         // Use "Selecione" as default placeholder
-        if (!$this->getPlaceholder()) {
+        if (is_null($this->getPlaceholder())) {
             $this->placeholder('Selecione');
         }
         // Remove "disabled" from placeholder <option>

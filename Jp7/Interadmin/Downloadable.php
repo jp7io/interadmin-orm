@@ -72,7 +72,9 @@ trait Downloadable
 
     public function getSize()
     {
-        return human_filesize($this->getFilename());
+        if ($size = @filesize($this->getFilename())) {
+            return human_size($size);
+        }
     }
 
     private function config($key)
