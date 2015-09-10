@@ -9,7 +9,7 @@ class Jp7_InterAdmin_Upload
     public static $legacyTemplates = [
         'thumb_interadmin' => '40x40'
     ];
-
+    
     /**
      * Altera o endereço para que aponte para a url do cliente.
      *
@@ -19,11 +19,12 @@ class Jp7_InterAdmin_Upload
      */
     public static function url($path = '../../', $template = 'original')
     {
-        if (!startsWith('../../', $path)) {
+        if (!startsWith('../../upload/', $path)) {
             // Not an upload path => Wont change
             return $path;
         }
-
+        $path = substr($path, strlen('../../'));
+        
         if (self::hasExternalStorage()) {
             $url = self::storageUrl($path);
         } else {
@@ -41,7 +42,7 @@ class Jp7_InterAdmin_Upload
     public static function imageCache()
     {
         global $config;
-        return isset($config->imagecache) && $config->imagecache;
+        return !empty($config->imagecache);
     }
 
     // Has upload[url] set on config (S3 or Local)
@@ -60,10 +61,14 @@ class Jp7_InterAdmin_Upload
     // No upload[url] setting / Legacy
     protected static function legacyUrl($path)
     {
-        global $config;
+        global $config, $jp7_app;
         $url = self::createUrl($config->server->host, $path);
         $path = $url->getPath();
+        if ($jp7_app != 'interadmin') {
+            $path->prepend($jp7_app);
+        }
         $path->prepend($config->server->path);
+        
         return $url;
     }
 
@@ -71,7 +76,9 @@ class Jp7_InterAdmin_Upload
     {
         $legacyTemplate = self::$legacyTemplates[$template];
         if (isset($legacyTemplate)) {
-            $url->getQuery()->modify(['size' => $legacyTemplate]);
+            $url->getQuery()->modify([
+                'size' => $legacyTemplate
+            ]);
         }
         return $url;
     }
@@ -90,11 +97,6 @@ class Jp7_InterAdmin_Upload
 
     protected static function storagePath($url, $template = 'original')
     {
-        $path = $url->getPath();
-        // Remove '../../'
-        $path->remove('..');
-        $path->remove('..');
-
         if (self::isImage($url->__toString())) {
             $url = self::useImageTemplate($url, $template);
         }
