@@ -83,7 +83,7 @@ class InterSite
      *
      * @var string
      */
-    public $charset = 'ISO-8859-1';
+    public $charset = 'UTF-8';
 
     protected static $instance = null;
 
