@@ -38,7 +38,7 @@ class Jp7_InterAdmin_Upload
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $url);
     }
 
-    protected static function imageCache()
+    public static function imageCache()
     {
         global $config;
         return isset($config->imagecache) && $config->imagecache;
