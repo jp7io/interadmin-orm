@@ -10,6 +10,16 @@ abstract class Jp7_Box_BoxAbstract
             }
             if (is_string($record->params)) {
                 $this->params = unserialize($record->params);
+                if (!$this->params && $record->params) {
+                    // Try to fix UTF-8 when unserialize failed
+                    $this->params = unserialize(utf8_decode($record->params));
+                    if ($this->params) {
+                        utf8_encode_recursive($this->params);
+                        // Save with UTF-8
+                        $record->params = serialize($this->params);
+                        $record->save();
+                    }
+                }
             }
         }
     }
