@@ -8,9 +8,9 @@ class Jp7_Box_Images extends Jp7_Box_BoxAbstract
     public function prepareData()
     {
         $this->images = array();
-        $this->view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
-        $this->view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
-        $this->view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
+        $this->view->headScript()->appendFile(DEFAULT_PATH.'js/jquery/jquery.jp7.js');
+        $this->view->headScript()->appendFile(DEFAULT_PATH.'js/jquery/jquery.lightbox-0.5.js');
+        $this->view->headLink()->appendStylesheet(DEFAULT_PATH.'js/jquery/themes/jquery.lightbox-0.5.css');
 
         if ($this->view->record) {
             try {
