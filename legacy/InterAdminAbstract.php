@@ -828,7 +828,8 @@ abstract class InterAdminAbstract implements Serializable
             }
             if ($table == 'main') {
                 $alias = isset($aliases[$field]) ? $aliases[$field] : $field;
-                $value = $this->_getByForeignKey($value, $field, @$campos[$field], $object);
+                $campo = isset($campos[$field]) ? $campos[$field] : null;
+                $value = $this->_getByForeignKey($value, $field, $campo, $object);
                 if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
                     continue;
                 }
@@ -874,7 +875,8 @@ abstract class InterAdminAbstract implements Serializable
                 if (isset($attributes[$table]) && is_object($attributes[$table])) {
                     $subobject = $attributes[$table];
                     $alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-                    $value = $this->_getByForeignKey($value, $field, @$joinCampos[$field], $subobject);
+                    $campo = isset($joinCampos[$field]) ? $joinCampos[$field] : null;
+                    $value = $this->_getByForeignKey($value, $field, $campo, $subobject);
 
                     if (isset($subobject->$alias) && is_object($subobject->$alias)) {
                         continue;
