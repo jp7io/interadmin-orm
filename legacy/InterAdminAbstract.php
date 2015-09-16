@@ -13,7 +13,7 @@ abstract class InterAdminAbstract implements Serializable
 {
     use TryMethod;
     
-    const DEFAULT_FIELDS_ALIAS = false;
+    const DEFAULT_FIELDS_ALIAS = true;
     const DEFAULT_NAMESPACE = '';
     const DEFAULT_FIELDS = '*';
 
