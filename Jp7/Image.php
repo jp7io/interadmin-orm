@@ -174,7 +174,7 @@ class Jp7_Image
         $enlarge = true;
 
         $c_gd = function_exists('imagecreatefromjpeg');
-        $forcegd = $force_gd = false;
+        $forcegd = false;
         //$command_path = '/usr/bin/';
         // Check Size and Orientation (Horizontal x Vertical)
         if ($c_gd && $forcegd) {
@@ -269,7 +269,7 @@ class Jp7_Image
                 copy($src, $dst);
             }
         } else {
-            if ($c_gd && $force_gd) {
+            if ($c_gd && $forcegd) {
                 // GD Resize
                 $im_dst = imagecreatetruecolor($new_w, $new_h);
                 if ($crop === 'border') {
