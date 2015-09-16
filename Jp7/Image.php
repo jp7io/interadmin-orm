@@ -98,13 +98,12 @@ class Jp7_Image
 
     public function getImageProperties($pattern = '')
     {
-        $command = $command_path.'identify -verbose '.$this->src;
+        $command = 'identify -verbose '.$this->src;
         $properties = $this->command($command);
         $return = array();
         foreach ($properties as $property) {
             $property = explode(': ', $property);
-            $property [0] = trim($property [0]);
-            $property [1] = trim($property [1]);
+            $property = array_map('trim', $property);
             if (!$pattern || $pattern == $property [0]) {
                 $return[$property [0]] = $property [1];
             }
@@ -115,7 +114,8 @@ class Jp7_Image
 
     public function getImageProperty($property)
     {
-        return reset($this->getImageProperties($property));
+        $property = $this->getImageProperties($property);
+        return reset($property);
     }
 
     public function getImageDimensions()
@@ -155,7 +155,7 @@ class Jp7_Image
     public function resizeImage($w, $h)
     {
         // Param Parser
-        if (is_array($q)) {
+        if (isset($q) && is_array($q)) {
             $options = $q;
             if ($options['crop']) {
                 $crop = $options['crop'];
@@ -174,6 +174,7 @@ class Jp7_Image
         $enlarge = true;
 
         $c_gd = function_exists('imagecreatefromjpeg');
+        $forcegd = $force_gd = false;
         //$command_path = '/usr/bin/';
         // Check Size and Orientation (Horizontal x Vertical)
         if ($c_gd && $forcegd) {
@@ -295,11 +296,11 @@ class Jp7_Image
                 //echo $dst_h;
                 //die();
 
-                $command = $command_path.'convert '.$this->src.' -resize '.$new_w.' '.$this->dst;
+                $command = 'convert '.$this->src.' -resize '.$new_w.' '.$this->dst;
                 $this->image = $this->convert($command);
 
                 if ($crop) {
-                    $command = $command_path.'convert '.$this->src.' -gravity Center -crop 180x120+0+0 '.$this->dst;
+                    $command = 'convert '.$this->src.' -gravity Center -crop 180x120+0+0 '.$this->dst;
                     $this->image = $this->convert($command);
                 }
             }
