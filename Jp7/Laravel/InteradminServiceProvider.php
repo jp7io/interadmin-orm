@@ -20,8 +20,9 @@ class InteradminServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        BladeExtension::apply();
-        
+        if (config('view.includes-with-underline')) {
+            BladeExtension::apply();
+        }
         $this->bootOrm();
         $this->shareViewPath();
         // self::bootTestingEnv();
