@@ -61,7 +61,7 @@ trait DynamicViewTrait
 
     protected function view()
     {
-        $viewName = $this->_getViewName($this->action);
+        $viewName = $this->findViewName($this->action);
         $data = (array) $this->_view;
         $view = View::make($viewName, $data);
 
@@ -81,37 +81,41 @@ trait DynamicViewTrait
     }
 
     /**
-     * Get the view name.
+     * Find the view to be used.
      *
      * @return string
      */
-    private function _getViewName($method)
+    protected function findViewName($method)
     {
         $action = str_replace('_', '-', snake_case($method));
-
-        $viewRoute = $this->_viewRoute(get_class($this), $action);
-        if ($this->_viewExists($viewRoute)) {
-            return $viewRoute;
+        
+        $viewNames = [
+            $this->makeViewName(get_class($this), $action),
+            $this->makeViewName(get_parent_class($this), $action),
+            "templates.{$action}"
+        ];
+        
+        foreach ($viewNames as $viewName) {
+            if ($this->viewExists($viewName)) {
+                return $viewName;
+            }
         }
-
-        $viewRoute = $this->_viewRoute(get_parent_class($this), $action);
-        if ($this->_viewExists($viewRoute)) {
-            return $viewRoute;
-        }
-
-        return "templates.{$action}";
+        
+        throw new Exception('View not found in: ' . implode(', ', $viewNames));
     }
 
-    protected function _viewRoute($controllerClass, $action)
+    protected function makeViewName($controllerClass, $action)
     {
-        $controllerRoute = $this->_controllerRoute($controllerClass);
-        $controllerRoute = str_replace('app.http.controllers.', '', $controllerRoute);
-        return "{$controllerRoute}.{$action}";
+        $controllerPath = $this->studlyToSlug($controllerClass);
+        # Remove -controller in the end
+        $controllerPath = substr($controllerPath, 0, -strlen('-controller'));
+        $controllerPath = str_replace('app.http.controllers.', '', $controllerPath);
+        return "{$controllerPath}.{$action}";
     }
 
-    protected function _viewExists($route)
+    protected function viewExists($viewName)
     {
-        $filename = str_replace('.', '/', $route);
+        $filename = str_replace('.', '/', $viewName);
 
         foreach (config('view.paths') as $viewPath) {
             if (file_exists($viewPath.'/'.$filename.'.blade.php')) {
@@ -122,16 +126,19 @@ trait DynamicViewTrait
         return false;
     }
 
-    protected function _controllerRoute($controllerClass)
+    /**
+     * Turns Something\IndexController into something.index-controller
+     *
+     * @param string $class  Class name in studly case
+     * @return string
+     */
+    protected function studlyToSlug($class, $separator = '.')
     {
-        $explodedClassName = explode('\\', $controllerClass);
-        $slugArray = array_map(function ($string) {
-            $string = snake_case($string);
-            $string = str_replace('_', '-', $string);
-
-            return str_replace('-controller', '', $string);
-        }, $explodedClassName);
-
-        return implode('.', $slugArray);
+        $toSlug = function ($string) {
+            return str_replace('_', '-', snake_case($string));
+        };
+        $slugArray = array_map($toSlug, explode('\\', $class));
+        
+        return implode($separator, $slugArray);
     }
 }
