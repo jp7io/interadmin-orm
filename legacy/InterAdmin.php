@@ -11,6 +11,8 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class InterAdmin extends InterAdminAbstract implements Arrayable
 {
+    use \Jp7\Laravel\Url\RecordTrait;
+     
     /**
      * To be used temporarily with deprecated methods.
      */

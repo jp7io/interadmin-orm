@@ -26,6 +26,9 @@ use Jp7\CollectionUtil;
  */
 class InterAdminTipo extends InterAdminAbstract
 {
+    use \Jp7\Laravel\Routable;
+    use \Jp7\Laravel\Url\TypeTrait;
+    
     const ID_TIPO = 0;
 
     private static $inheritedFields = array(
