@@ -102,31 +102,28 @@ class Router extends MethodForwarder
     //// Route override
     ////
     
-    //public function resource($name, $controller = null, array $options = array())
-    public function resource($name, array $options = array())
+    public function resource($name, $controller = null, array $options = array())
     {
-        /*
-        if (is_array($controller) && empty($options)) {
+        if (!is_string($controller) && empty($options)) {
             $options = $controller;
             $controller = null;
         }
-        */
         if (empty($options['only'])) {
             $options['only'] = ['index', 'show'];
         }
         if (isset($options['id_tipo'])) {
             $this->addIdTipo($options['id_tipo'], $name);
         }
-        //if (is_null($controller)) {
-        if ($name === '/') {
-            $controller = 'Index';
-        } else {
-            $parts = explode('.', $name);
-            $parts = array_map('studly_case', $parts);
-            $controller = implode('\\', $parts);
+        if (is_null($controller)) {
+            if ($name === '/') {
+                $controller = 'Index';
+            } else {
+                $parts = explode('.', $name);
+                $parts = array_map('studly_case', $parts);
+                $controller = implode('\\', $parts);
+            }
+            $controller .= 'Controller';
         }
-        $controller .= 'Controller';
-        //}
         return parent::resource($name, $controller, $options);
     }
     
