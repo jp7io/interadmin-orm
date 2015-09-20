@@ -182,9 +182,9 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
         $view->params = $params;
 
         if ($params->lightbox) {
-            $view->headScript()->appendFile('/_default/js/jquery/jquery.jp7.js');
-            $view->headScript()->appendFile('/_default/js/jquery/jquery.lightbox-0.5.js');
-            $view->headLink()->appendStylesheet('/_default/js/jquery/themes/jquery.lightbox-0.5.css');
+            $view->headScript()->appendFile(DEFAULT_PATH.'js/jquery/jquery.jp7.js');
+            $view->headScript()->appendFile(DEFAULT_PATH.'js/jquery/jquery.lightbox-0.5.js');
+            $view->headLink()->appendStylesheet(DEFAULT_PATH.'js/jquery/themes/jquery.lightbox-0.5.css');
         }
 
         $view->headStyle()->appendStyle('
