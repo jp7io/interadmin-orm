@@ -26,6 +26,9 @@ use Jp7\CollectionUtil;
  */
 class InterAdminTipo extends InterAdminAbstract
 {
+    use \Jp7\Laravel\Routable;
+    use \Jp7\Laravel\Url\TypeTrait;
+    
     const ID_TIPO = 0;
 
     private static $inheritedFields = array(
@@ -634,9 +637,9 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public function getName()
     {
-        $affix = Lang::get('interadmin.affix');
+        $suffix = Lang::get('interadmin.suffix');
 
-        return $this->{'nome'.$affix} ?: $this->nome;
+        return $this->{'nome'.$suffix} ?: $this->nome;
     }
 
     /**
@@ -831,10 +834,10 @@ class InterAdminTipo extends InterAdminAbstract
     {
         $table = $this->getDb()->getTablePrefix();
         if ($this->language) {
-            if (!Lang::has('interadmin.affix')) {
-                throw new Exception('You need to add interadmin.affix to app/lang/'.App::getLocale().'/interadmin.php');
+            if (!Lang::has('interadmin.suffix')) {
+                throw new Exception('You need to add interadmin.suffix to app/lang/'.App::getLocale().'/interadmin.php');
             }
-            $table .= Lang::get('interadmin.affix');
+            $table .= Lang::get('interadmin.suffix');
         }
 
         return $table;
