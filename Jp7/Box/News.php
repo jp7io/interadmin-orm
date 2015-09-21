@@ -52,7 +52,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
 					<label>
 						<?php if (count($config->langs) > 1) {
     ?>
-							<img src="/_default/img/icons/<?php echo $key;
+							<img src="<?= DEFAULT_PATH ?>img/icons/<?php echo $key;
     ?>.png" style="vertical-align:middle;" />
 						<?php 
 }

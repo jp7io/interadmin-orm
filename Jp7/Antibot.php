@@ -3,7 +3,7 @@
 class Jp7_Antibot
 {
     protected $redirect;
-    protected $captcha_url = '/_default/site/_templates/antibot.php';
+    protected $captcha_url;
     protected $path;
     protected $ip;
     protected $attempts_before_captcha = 3;
@@ -11,6 +11,7 @@ class Jp7_Antibot
 
     protected function __construct($options = array())
     {
+        $this->captcha_url = DEFAULT_PATH.'site/_templates/antibot.php';
         $this->redirect = $options['redirect'] ?: $_SERVER['REQUEST_URI'];
         $this->captcha_url = $options['captcha_url'] ?: $this->captcha_url;
         $this->attempts_before_captcha = $options['attempts_before_captcha'] ?: $this->attempts_before_captcha;
