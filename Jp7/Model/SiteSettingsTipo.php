@@ -64,7 +64,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
                     $campo['value'] = self::$_dados[$campo['nome_id']];
                     $campo['opcoes'] = array();
 
-                    foreach (glob(ROOT_PATH.'/_default/templates/*', GLOB_ONLYDIR) as $templateDir) {
+                    foreach (glob(APPLICATION_PATH.'/../vendor/jp7internet/_default/templates/*', GLOB_ONLYDIR) as $templateDir) {
                         $relativeDir = str_replace(ROOT_PATH, '', $templateDir);
                         $campo['opcoes'][$relativeDir] = basename($relativeDir);
                     }
