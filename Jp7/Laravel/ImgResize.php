@@ -4,6 +4,7 @@ namespace Jp7\Laravel;
 
 use Jp7\Interadmin\Downloadable;
 use Storage;
+use InvalidArgumentException;
 
 /*
 Dynamic resize of images: imagecache/<template>/0001.jpg
@@ -55,19 +56,19 @@ class ImgResize
      * @param string|array          $template   Name of the template, or prefix for "srcset"
      * @param array                 $options    HTML options such as title, or class.
      */
-    public static function tag($img, $template = null, $options = [])
+    public static function tag($img, $template = 'original', $options = [])
     {
         if (!is_string($img) && !is_object($img)) {
-            throw new \InvalidArgumentException('$img should be a string or use Downloadable trait');
+            throw new InvalidArgumentException('$img should be a string or use Downloadable trait');
         }
         if (empty($options['title'])) {
             $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
         $alt = $options['title'];
         
-        if (is_null($template) || str_contains($template, '-')) {
+        if ($template == 'original' || str_contains($template, '-')) {
             // Normal image with src=""
-            // Preppend template to classes for CSS use
+            // Prepend template to classes for CSS use
             $options['class'] = trim(array_get($options, 'class').' '.$template);
             
             $url = static::url($img, $template, $alt);
@@ -149,8 +150,14 @@ class ImgResize
         return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
     }
     
+    protected static function storageUrl()
+    {
+        return 'http://'.config('interadmin.storage.host');
+    }
+    
     // SEO depends on RewriteModule
     // Should only be applied to local images
+    /*
     private static function seoReplace($url, $title)
     {
         if (starts_with($url, '/upload')) {
@@ -163,7 +170,8 @@ class ImgResize
         }
         return $url;
     }
-   
+    */
+    /*
     private static function isExternal($url)
     {
         $parsed = parse_url($url);
@@ -174,8 +182,9 @@ class ImgResize
 
         return ($baseUrl !== self::storageUrl() && $baseUrl !== config('app.url')) ;
     }
-
+    */
     // External images are downloaded locally to resize them
+    /*
     private static function downloadExternal($url)
     {
         $local = static::urlToFilename($url);
@@ -205,9 +214,5 @@ class ImgResize
 
         return implode('_', $filename);
     }
-
-    private static function storageUrl()
-    {
-        return 'http://'.config('interadmin.storage.host');
-    }
+    */
 }
