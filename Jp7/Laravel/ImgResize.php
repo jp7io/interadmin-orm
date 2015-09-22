@@ -66,7 +66,12 @@ class ImgResize
         }
         $alt = $options['title'];
         
-        if ($template == 'original' || str_contains($template, '-')) {
+        if (ends_with($template, '-')) {
+            // Image with srcset=""
+            $srcset = static::srcset($img, $template);
+            $element = ImgResizeElement::create(null, $alt, $options)
+                ->srcset($srcset);
+        } else {
             // Normal image with src=""
             // Prepend template to classes for CSS use
             $options['class'] = trim(array_get($options, 'class').' '.$template);
@@ -79,11 +84,6 @@ class ImgResize
                     ->data_src($url)
                     ->setLazy(true);
             }
-        } else {
-            // Image with srcset=""
-            $srcset = static::srcset($img, $template);
-            $element = ImgResizeElement::create(null, $alt, $options)
-                ->srcset($srcset);
         }
         
         return $element;
@@ -120,11 +120,14 @@ class ImgResize
     
     public static function srcset($img, $prefix)
     {
+        if (!ends_with($prefix, '-')) {
+            throw new InvalidArgumentException('Prefix for srcset must end with dash (Eg: small- or large-)');
+        }
         $all = array_keys(config('imagecache.templates'));
-        // If prefix is "wide"
+        // If prefix is "wide-"
         // Filters all templates starting with "wide-"
         $templates = array_filter($all, function ($x) use ($prefix) {
-            return starts_with($x, $prefix . '-');
+            return starts_with($x, $prefix);
         });
         
         $srcs = [];
