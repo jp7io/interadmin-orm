@@ -61,7 +61,7 @@ if (!function_exists('interadmin_data')) {
 
     function img_tag($img, $template = null, $options = array())
     {
-        return \Jp7\Laravel\ImgResize::tag($img, $template, $options);
+        return ImgResize::tag($img, $template, $options);
     }
 
     function _try($object)

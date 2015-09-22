@@ -3,7 +3,7 @@
 namespace Jp7\Laravel;
 
 use Jp7\Interadmin\Downloadable;
-use Storage;
+//use Storage;
 use InvalidArgumentException;
 
 /*
@@ -15,9 +15,9 @@ Better SEO on the URL: 0001.jpg => some-text-0001.jpg
 */
 class ImgResize
 {
-    private static $lazy = false;
-    private static $seo = false;
-    private static $minSrcsetWidth = 720;
+    protected static $lazy = false;
+    protected static $seo = false;
+    protected static $minSrcsetWidth = 720;
     
     public static function getLazy()
     {
@@ -66,6 +66,11 @@ class ImgResize
         }
         $alt = $options['title'];
         
+        return static::makeElement($img, $template, $alt, $options);
+    }
+    
+    protected static function makeElement($img, $template, $alt, $options)
+    {
         if (ends_with($template, '-')) {
             // Image with srcset=""
             $srcset = static::srcset($img, $template);
@@ -105,17 +110,10 @@ class ImgResize
 
         return Cdn::asset($url);
     }
-
-    public static function addTemplate($url, $template)
+    
+    protected static function storageUrl()
     {
-        /*
-        if (static::isExternal($url)) {
-            $url = static::downloadExternal($url);
-        }
-        */
-        $uploadPath = self::storageUrl() . '/upload/';
-        $cachePath = self::storageUrl() . '/imagecache/' .$template.'/';
-        return replace_prefix($uploadPath, $cachePath, $url);
+        return 'http://'.config('interadmin.storage.host');
     }
     
     public static function srcset($img, $prefix)
@@ -151,11 +149,6 @@ class ImgResize
     public static function blankGif()
     {
         return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
-    }
-    
-    protected static function storageUrl()
-    {
-        return 'http://'.config('interadmin.storage.host');
     }
     
     // SEO depends on RewriteModule

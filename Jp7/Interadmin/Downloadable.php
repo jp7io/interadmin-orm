@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin;
 
-use Jp7\Laravel\ImgResize;
+use ImgResize;
 use Exception;
 
 trait Downloadable

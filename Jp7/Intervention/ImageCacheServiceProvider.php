@@ -1,10 +1,13 @@
 <?php
 
-namespace Jp7\Laravel;
+namespace Jp7\Intervention;
 
 use Route;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Register imagecache-service routes
+ */
 class ImageCacheServiceProvider extends ServiceProvider
 {
     public function boot()

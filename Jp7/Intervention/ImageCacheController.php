@@ -1,11 +1,14 @@
 <?php
 
-namespace Jp7\Laravel;
+namespace Jp7\Intervention;
 
 use Illuminate\Routing\Controller as BaseController;
 use Intervention\Image\ImageManagerStatic as Image;
 use Storage;
 
+/**
+ * ImageCache using Storage as source
+ */
 class ImageCacheController extends BaseController
 {
     public function create($template, $filepath)
