@@ -82,7 +82,7 @@ class Jp7_Bootstrap
             );
 
             setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');
-        } elseif ($_COOKIE['ia_admin_bar']) {
+        } elseif (!empty($_COOKIE['ia_admin_bar'])) {
             setcookie('ia_admin_bar', '', 1, '/');
         }
     }
