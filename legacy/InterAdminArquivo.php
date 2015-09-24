@@ -142,7 +142,7 @@ class InterAdminArquivo extends InterAdminAbstract
      *
      * @todo Create a class for _arquivos_banco
      */
-    public function addToArquivosBanco($upload_root = '../../upload/')
+    public function addToArquivosBanco($uploadPath = 'upload/')
     {
         global $lang;
         // Inserindo no banco de arquivos
@@ -164,40 +164,14 @@ class InterAdminArquivo extends InterAdminAbstract
             $parent = $parent->getParent();
         }
 
-        $folder = $upload_root.toId($parent->getTipo()->getFieldsValues('nome')).'/';
-        // Montando nova url
-        $newurl = $folder.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
-
-        // Mkdir if needed
-        if (!is_dir(dirname($newurl))) {
-            @mkdir(dirname($newurl));
-            @chmod(dirname($newurl), 0777);
-        }
+        $filepath = toId($parent->getTipo()->getFieldsValues('nome')).'/'.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
 
         // Movendo arquivo temporário
-        if (!@rename($this->url, $newurl)) {
-            $msg = 'Impossível renomear arquivo "'.$this->url.'" para "'.$newurl.'".<br /> getcwd(): '.getcwd();
-            if (!is_file($this->url)) {
-                $msg .= '<br /> Arquivo '.basename($this->url).' não existe.';
-            }
-            if (!is_dir(dirname($this->url))) {
-                $msg .= '<br /> Diretório '.dirname($this->url).' não existe.';
-            }
-            if (!is_dir(dirname($newurl))) {
-                $msg .= '<br /> Diretório '.dirname($newurl).' não existe.';
-            }
-            throw new Exception($msg);
-        }
+        Storage::put($uploadPath.$filepath, file_get_contents($this->url), 'public');
 
-        $clientSideFolder = '../../upload/'.toId($parent->getTipo()->getFieldsValues('nome')).'/';
-        $this->url = $clientSideFolder.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
-
-        // Movendo o thumb
-        if ($this->url_thumb) {
-            $newurl_thumb = $folder.$id_arquivo_banco.'_t.'.$fieldsValues['tipo'];
-            @rename($this->url_thumb, $newurl_thumb);
-            $this->url_thumb = $newurl_thumb;
-        }
+        // Montando nova url
+        $clientSideFolder = '../../upload/';
+        $this->url = $clientSideFolder.$filepath;
 
         return $this->url;
     }
