@@ -25,10 +25,22 @@ class Storage extends Illuminate\Support\Facades\Storage
 
     private static function defaultInteradminConfig()
     {
-        global $c_cliente_physical_path, $c_remote, $c_cliente_remote_path, $config;
+        global $config, $jp7_app;
+        global $c_cliente_physical_path, $c_remote, $c_cliente_remote_path;
+        
         $ftp_path = $config->server->ftp_path ? $config->server->ftp_path : '/web';
 
-        if ($c_remote) {
+        if (!$jp7_app) {
+            // Site path
+            return [
+                'filesystems.default' => 'local',
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root'   => ROOT_PATH.'/'.$config->name_id
+                ]
+            ];
+        } elseif ($c_remote) {
+            // FTP
             return [
                 'filesystems.default' => 'ftp',
                 'filesystems.disks.ftp' => [
@@ -40,11 +52,12 @@ class Storage extends Illuminate\Support\Facades\Storage
                 ],
             ];
         } else {
+            // Client's config path
             return [
                 'filesystems.default' => 'local',
                 'filesystems.disks.local' => [
                     'driver' => 'local',
-                    'root'   => $c_cliente_physical_path,
+                    'root'   => $c_cliente_physical_path
                 ]
             ];
         }
