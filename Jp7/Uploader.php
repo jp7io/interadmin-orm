@@ -15,7 +15,7 @@ class Jp7_Uploader
     protected $fieldName;
     protected $extensionsFilter;
     protected $typesFilter;
-    protected $basePath = '../../upload/';
+    protected $basePath = 'upload/';
     /**
      * Numero em bytes: 9000000 = 9MB (Aprox.).
      *
@@ -79,38 +79,33 @@ class Jp7_Uploader
         if ($extension == '.jpeg') {
             $extension = '.jpg';
         }
-        $finalDestination = $this->getBasePath().$destination.$extension;
-
+        
+        $tempfile = jp7_path(sys_get_temp_dir()).$destination.$extension;
+        
         // Mkdir if needed
-        if (!is_dir(dirname($finalDestination))) {
-            @mkdir(dirname($finalDestination));
-            @chmod(dirname($finalDestination), 0777);
+        if (!is_dir(dirname($tempfile))) {
+            @mkdir(dirname($tempfile));
+            @chmod(dirname($tempfile), 0777);
         }
 
         if ($newsize && in_array($extension, array('.gif', '.jpg'))) {
             $resource = ($extension == '.jpg') ? imagecreatefromjpeg($tmp_name[$key]) : imagecreatefromgif($tmp_name[$key]);
-            jp7_resizeImage($resource, $tmp_name[$key], $finalDestination, $newsize[0], $newsize[1], 90, 10000000, $resizeMode == 'crop');
+            jp7_resizeImage($resource, $tmp_name[$key], $tempfile, $newsize[0], $newsize[1], 90, 10000000, $resizeMode == 'crop');
             imagedestroy($resource);
         } else {
             // Copy
-            copy($tmp_name[$key], $finalDestination);
+            copy($tmp_name[$key], $tempfile);
         }
-        if (!is_file($finalDestination)) {
-            $msg = 'Impossível copiar arquivo "'.$tmp_name[$key].'" para "'.$finalDestination.'".<br /> getcwd(): '.getcwd();
-            if (!is_file($tmp_name[$key])) {
-                $msg .= '<br /> Arquivo '.basename($tmp_name[$key]).' não existe.';
-            }
-            if (!is_dir(dirname($finalDestination))) {
-                $msg .= '<br /> Diretório '.dirname($finalDestination).' não existe.';
-            } elseif (!is_writable(dirname($finalDestination))) {
-                $msg .= '<br /> Diretório '.dirname($finalDestination).' não tem permissão de escrita.';
-            }
+        if (!is_file($tempfile)) {
+            $msg = 'Impossível copiar arquivo "'.$tmp_name[$key].'" para "'.$tempfile.'".<br /> getcwd(): '.getcwd();
             throw new Exception($msg);
         }
-
-        @chmod($finalDestination, 0777);
-
-        return $finalDestination;
+        
+        // Upload to storage
+        $filepath = $this->getBasePath().$destination.$extension;
+        Storage::put($filepath, file_get_contents($tempfile), 'public');
+        
+        return '../../'.$filepath;
     }
     /**
      * Returns $fieldName.
