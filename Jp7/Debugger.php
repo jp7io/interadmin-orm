@@ -69,13 +69,13 @@ class Jp7_Debugger
         }
         $this->_startTime[] = $_SERVER['REQUEST_TIME'];
         // Debug - SQL
-        $this->debugSql = $_GET['debug_sql'];
+        $this->debugSql = !empty($_GET['debug_sql']);
         // Debug - Filename
         if (isset($_GET['debug_filename'])) {
             setcookie('debug_filename', $_GET['debug_filename'], 0, '/');
             $_COOKIE['debug_filename'] = $_GET['debug_filename'];
         }
-        if ($_COOKIE['debug_filename']) {
+        if (!empty($_COOKIE['debug_filename'])) {
             $this->debugFilename = $_COOKIE['debug_filename'];
         }
         // Debug - Toolbar
