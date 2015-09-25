@@ -112,6 +112,9 @@ abstract class InterAdminAbstract implements Serializable
     {
         global $db;
         $vars = unserialize($data);
+        if ($vars === false) {
+            throw new Exception('Invalid serialized data.');
+        }
         foreach ($vars as $key => $value) {
             $this->$key = $value;
         }
