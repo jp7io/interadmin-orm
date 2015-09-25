@@ -53,10 +53,13 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
 				<div class="field">
 					<label>
 						<?php if (count($config->langs) > 1) {
-    ?>							<img src="/_default/img/icons/<?php echo $key;
-    ?>.png" style="vertical-align:middle;" />						<?php 
+    ?>
+							<img src="<?= DEFAULT_PATH ?>img/icons/<?php echo $key;
+    ?>.png" style="vertical-align:middle;" />
+						<?php 
 }
-    ?>					Título:</label>
+    ?>
+					Título:</label>
 					<input type="text" class="textbox" label="Título" placeholder="Automático"
 						name="<?php echo $this->id_box;
     ?>[title<?php echo $sufix;

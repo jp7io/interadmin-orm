@@ -288,7 +288,7 @@ class InterAdminField
         if ($campo_nome) {
             if (strpos($tipo_de_campo, 'tit_') === 0) {
             } elseif (strpos($tipo_de_campo, 'file_') === 0) {
-                $url = $valor ?: '/_default/img/px.png';
+                $url = $valor ?: DEFAULT_PATH.'img/px.png';
                 
                 echo ''.
                 $_tr.
@@ -550,7 +550,7 @@ class InterAdminField
             if ($campo['value']) {
                 $url = Jp7_InterAdmin_Upload::url($campo['value']);
             } else {
-                $url = '/_default/img/px.png';
+                $url = DEFAULT_PATH.'img/px.png';
             }
             ?>
 			<tr class="<?php echo $campo['tipo'];

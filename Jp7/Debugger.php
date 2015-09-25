@@ -54,7 +54,7 @@ class Jp7_Debugger
      */
     protected $_templateFilename;
     protected $_exceptionsEnabled = false;
-    protected $_maintenancePage = '/_default/index_manutencao.htm';
+    protected $_maintenancePage;
 
     /**
      * Public Constructor, it checks the flags and settings, will do nothing if $c_jp7 is <tt>FALSE</tt>.
@@ -63,6 +63,7 @@ class Jp7_Debugger
      */
     public function __construct()
     {
+        $this->_maintenancePage = DEFAULT_PATH.'index_manutencao.htm';
         global $c_jp7;
         if (!$c_jp7) {
             return; // Only by Devs
