@@ -61,7 +61,7 @@ if (!function_exists('interadmin_data')) {
 
     function img_tag($img, $template = null, $options = array())
     {
-        return \Jp7\Laravel\ImgResize::tag($img, $template, $options);
+        return ImgResize::tag($img, $template, $options);
     }
 
     function _try($object)
@@ -101,6 +101,24 @@ if (!function_exists('interadmin_data')) {
         }
         
         dd(compact('methods', 'object'));
+    }
+
+    /**
+     * Same as str_replace but only if the string starts with $search.
+     *
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     *
+     * @return string
+     */
+    function replace_prefix($search, $replace, $subject)
+    {
+        if (mb_strpos($subject, $search) === 0) {
+            return $replace.mb_substr($subject, mb_strlen($search));
+        } else {
+            return $subject;
+        }
     }
 
     // INTERADMIN COMPATIBILITY FUNCTIONS

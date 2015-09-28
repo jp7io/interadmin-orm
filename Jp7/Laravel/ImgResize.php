@@ -3,6 +3,8 @@
 namespace Jp7\Laravel;
 
 use Jp7\Interadmin\Downloadable;
+//use Storage;
+use InvalidArgumentException;
 
 /*
 Dynamic resize of images: imagecache/<template>/0001.jpg
@@ -13,9 +15,9 @@ Better SEO on the URL: 0001.jpg => some-text-0001.jpg
 */
 class ImgResize
 {
-    private static $lazy = false;
-    private static $seo = false;
-    private static $minSrcsetWidth = 720;
+    protected static $lazy = false;
+    protected static $seo = false;
+    protected static $minSrcsetWidth = 720;
     
     public static function getLazy()
     {
@@ -54,19 +56,29 @@ class ImgResize
      * @param string|array          $template   Name of the template, or prefix for "srcset"
      * @param array                 $options    HTML options such as title, or class.
      */
-    public static function tag($img, $template = null, $options = [])
+    public static function tag($img, $template = 'original', $options = [])
     {
         if (!is_string($img) && !is_object($img)) {
-            throw new \InvalidArgumentException('$img should be a string or use Downloadable trait');
+            throw new InvalidArgumentException('$img should be a string or use Downloadable trait');
         }
         if (empty($options['title'])) {
             $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
         $alt = $options['title'];
         
-        if (is_null($template) || str_contains($template, '-')) {
+        return static::makeElement($img, $template, $alt, $options);
+    }
+    
+    protected static function makeElement($img, $template, $alt, $options)
+    {
+        if (ends_with($template, '-')) {
+            // Image with srcset=""
+            $srcset = static::srcset($img, $template);
+            $element = ImgResizeElement::create(null, $alt, $options)
+                ->srcset($srcset);
+        } else {
             // Normal image with src=""
-            // Preppend template to classes for CSS use
+            // Prepend template to classes for CSS use
             $options['class'] = trim(array_get($options, 'class').' '.$template);
             
             $url = static::url($img, $template, $alt);
@@ -77,46 +89,43 @@ class ImgResize
                     ->data_src($url)
                     ->setLazy(true);
             }
-        } else {
-            // Image with srcset=""
-            $srcset = static::srcset($img, $template);
-            $element = ImgResizeElement::create(null, $alt, $options)
-                ->srcset($srcset);
         }
         
         return $element;
     }
 
-    public static function url($url, $template = null, $title = '')
+    public static function url($url, $template = 'original', $title = '')
     {
         // local test: $url = '/upload/mediabox/00202271.jpg';
         if (is_object($url)) {
             $img = $url;
-            $url = $img->getUrl();
+            $url = $img->getUrl($template);
         }
-        $isExternal = static::isExternal($url);
-        
-        if (static::$seo && !$isExternal) {
+      
+        /*
+        if (static::$seo && !static::isExternal($url)) {
             $url = static::seoReplace($url, $title);
         }
-        
-        if ($template) {
-            if ($isExternal) {
-                $url = static::downloadExternal($url);
-            }
-            $url = str_replace('/upload/', '/imagecache/'.$template.'/', $url);
-        }
+        */
 
         return Cdn::asset($url);
     }
     
+    protected static function storageUrl()
+    {
+        return 'http://'.config('interadmin.storage.host');
+    }
+    
     public static function srcset($img, $prefix)
     {
+        if (!ends_with($prefix, '-')) {
+            throw new InvalidArgumentException('Prefix for srcset must end with dash (Eg: small- or large-)');
+        }
         $all = array_keys(config('imagecache.templates'));
-        // If prefix is "wide"
+        // If prefix is "wide-"
         // Filters all templates starting with "wide-"
         $templates = array_filter($all, function ($x) use ($prefix) {
-            return starts_with($x, $prefix . '-');
+            return starts_with($x, $prefix);
         });
         
         $srcs = [];
@@ -144,6 +153,7 @@ class ImgResize
     
     // SEO depends on RewriteModule
     // Should only be applied to local images
+    /*
     private static function seoReplace($url, $title)
     {
         if (starts_with($url, '/upload')) {
@@ -156,24 +166,49 @@ class ImgResize
         }
         return $url;
     }
-   
+    */
+    /*
     private static function isExternal($url)
     {
-        return !empty(parse_url($url)['host']);
-    }
+        $parsed = parse_url($url);
+        $scheme = isset($parsed['scheme']) ? $parsed['scheme'] : '';
+        $host = isset($parsed['host']) ? $parsed['host'] : '';
 
+        $baseUrl = $scheme.'://'.$host;
+
+        return ($baseUrl !== self::storageUrl() && $baseUrl !== config('app.url')) ;
+    }
+    */
     // External images are downloaded locally to resize them
+    /*
     private static function downloadExternal($url)
     {
-        $local = to_slug(dirname($url)).'_'.to_slug(basename($url));
-        $dir = public_path('upload/_external');
+        $local = static::urlToFilename($url);
+        $filePath = '/upload/_external/' . $local;
         
-        if (!is_file($dir.'/'.$local)) {
+        if (!Storage::has($filePath)) {
             if ($file = @file_get_contents($url)) {
-                file_put_contents($dir.'/'.$local, $file);
+                Storage::put($filePath, $file);
             }
         }
         
-        return '/upload/_external/'.$local;
+        return self::storageUrl() . $filePath;
     }
+
+    private static function urlToFilename($url)
+    {
+        $parsed = parse_url($url);
+
+        $filename = [];
+        $filename[] = $parsed['host'];
+        $filename[] = dirname($parsed['path']);
+        $filename[] = basename($parsed['path']);
+
+        $filename = array_map(function($x) {
+            return preg_replace('/[^a-z0-9_.-]/ui', '', $x);
+        }, $filename);
+
+        return implode('_', $filename);
+    }
+    */
 }

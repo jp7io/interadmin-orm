@@ -2,35 +2,52 @@
 
 namespace Jp7\Interadmin;
 
+use ImgResize;
+use Exception;
+
 trait Downloadable
 {
-    // For client side use
-    public function getUrl()
+    public function isImage()
     {
-        $config = config('interadmin.upload');
-        // ../../upload => /upload
-        return str_replace($config['backend_url'], $config['relative_url'], $this->url);
-    }
-    
-    // Absolute client side URL
-    public function getAbsoluteUrl()
-    {
-        $config = config('interadmin.upload');
-        // ../../upload => www.example.com/upload
-        return str_replace($config['backend_url'], $config['absolute_url'], $this->url);
+        return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $this->url);
     }
 
-    // Server side file name
+    // Client side URL without hostname and protocol
+    public function getPath()
+    {
+        $config = config('interadmin.storage');
+
+        // '../..' => ''
+        return replace_prefix($config['backend_path'], $config['path'], $this->url);
+    }
+    
+    // For client side use
+    public function getUrl($template = 'original')
+    {
+        $config = config('interadmin.storage');
+        $storageUrl = 'http://'.$config['host'].$config['path'];
+        
+        // '../..' => 'http://www.example.com'
+        $url = replace_prefix($config['backend_path'], $storageUrl, $this->url);
+
+        if ($this->isImage()) {
+            $url = ImgResize::addTemplate($url, $template);
+        }
+
+        return $url;
+    }
+
+    // Filename inside Storage
     public function getFilename()
     {
         if ($this->isExternal()) {
-            throw new \Exception('Cant get filename of external image.');
+            throw new Exception('Cannot get filename of external image.');
         }
         
-        $config = config('interadmin.upload');
+        $backendPath = config('interadmin.storage.backend_path');
         $url = $this->removeQueryString();
         
-        return str_replace($config['backend_url'], $config['absolute_path'], $url);
+        return replace_prefix($backendPath.'/', '', $url);
     }
     
     public function removeQueryString()
@@ -56,8 +73,11 @@ trait Downloadable
 
     public function getSize()
     {
-        if ($size = @filesize($this->getFilename())) {
-            return human_size($size);
-        }
+        return Storage::size($this->getFilename());
+    }
+    
+    public function getHumanSize()
+    {
+        return human_size($this->getSize());
     }
 }
