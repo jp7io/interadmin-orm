@@ -102,12 +102,10 @@ class ImgResize
             $url = $img->getUrl($template);
         }
       
-        /*
-        if (static::$seo && !static::isExternal($url)) {
+        if (static::$seo) {
             $url = static::seoReplace($url, $title);
         }
-        */
-
+        
         return Cdn::asset($url);
     }
     
@@ -151,34 +149,22 @@ class ImgResize
         return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
     }
     
-    // SEO depends on RewriteModule
+    // SEO
     // Should only be applied to local images
-    /*
     private static function seoReplace($url, $title)
     {
-        if (starts_with($url, '/upload')) {
-            $basename = basename($url);
-            if (preg_match('/^\d{6,8}\./', $basename)) {
-                if ($slug = to_slug($title)) {
-                    $url = dirname($url).'/'.$slug.'-'.$basename;
-                }
-            }
+        if (!$title || static::isExternal($url)) {
+            return $url;
         }
-        return $url;
+        return $url.(str_contains($url, '?') ? '&' : '?').
+            'title='.to_slug($title);
     }
-    */
-    /*
-    private static function isExternal($url)
+    
+    protected static function isExternal($url)
     {
-        $parsed = parse_url($url);
-        $scheme = isset($parsed['scheme']) ? $parsed['scheme'] : '';
-        $host = isset($parsed['host']) ? $parsed['host'] : '';
-
-        $baseUrl = $scheme.'://'.$host;
-
-        return ($baseUrl !== self::storageUrl() && $baseUrl !== config('app.url')) ;
+        return parse_url($url, PHP_URL_HOST) != parse_url(self::storageUrl(), PHP_URL_HOST);
     }
-    */
+    
     // External images are downloaded locally to resize them
     /*
     private static function downloadExternal($url)
