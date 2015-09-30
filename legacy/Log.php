@@ -14,7 +14,7 @@ class Log extends Illuminate\Support\Facades\Log
         $monolog = new MonologLogger($config->server->host);
         
         $log = new \Illuminate\Log\Writer($monolog);
-        $log->useSyslog($jp7_app);
+        $log->useSyslog($config->name_id ?: $jp7_app);
         return $log;
     }
 }
