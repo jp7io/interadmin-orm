@@ -4,6 +4,7 @@ namespace Jp7\Interadmin;
 
 use ImgResize;
 use Exception;
+use Storage;
 
 trait Downloadable
 {
