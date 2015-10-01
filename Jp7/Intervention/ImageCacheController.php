@@ -4,6 +4,7 @@ namespace Jp7\Intervention;
 
 use Illuminate\Routing\Controller as BaseController;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Storage;
 
 /**
@@ -13,11 +14,18 @@ class ImageCacheController extends BaseController
 {
     public function create($template, $filepath)
     {
-        $original = Storage::get('upload/' . $filepath);
+        try {
+            $original = Storage::get('upload/' . $filepath);
+        } catch (FileNotFoundException $e) {
+            abort(404);
+        }
         $img = Image::make($original);
         
         if ($template !== 'original') {
             $templates = config('imagecache.templates');
+            if (!isset($templates[$template])) {
+                abort(404);
+            }
             $closure = $templates[$template];
             $img = $closure($img);
         }
