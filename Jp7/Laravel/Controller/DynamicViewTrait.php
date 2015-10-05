@@ -75,7 +75,7 @@ trait DynamicViewTrait
     protected function response($content = null)
     {
         if (is_null($content)) {
-            $content = $this->view();
+            $content = $this->view()->header('Vary', 'Accept');
         }
         return response($content);
     }
