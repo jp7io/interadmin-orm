@@ -134,9 +134,8 @@ class Jp7_Debugger
      */
     public function showFilename($filename)
     {
-        global $c_doc_root;
         if ($this->debugFilename && $this->isSafePoint()) {
-            echo '<div class="debug_msg">'.str_replace($c_doc_root, '/', str_replace('\\', '/', $filename)).'</div>';
+            echo '<div class="debug_msg">'.str_replace(BASE_PATH, '/', str_replace('\\', '/', $filename)).'</div>';
         }
         /*
         if ($this->active) {
@@ -179,8 +178,6 @@ class Jp7_Debugger
      */
     public function getBacktrace($msgErro = null, $sql = null, $backtrace = null)
     {
-        global $c_doc_root;
-
         $S = '';
         $sqlErrorPattern = '/(.*)right syntax to use near \'(.*)\' at line(.*)/';
 
@@ -392,7 +389,7 @@ class Jp7_Debugger
         $headers = 'To: '.$to.' <'.$to.">\r\n";
         //$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
 
-        return jp7_mail($to, $subject, $message, $headers, '', $template, true);
+        return jp7_mail($to, $subject, $message, $headers, '', '', true);
     }
     /**
      * Returns $maintenancePage.
