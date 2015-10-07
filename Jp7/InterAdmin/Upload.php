@@ -51,7 +51,7 @@ class Jp7_InterAdmin_Upload
         return static::$adapter;
     }
 
-    public static function setAdapter(AdapterInterface $adapter = null)
+    public static function setAdapter(AdapterInterface $adapter)
     {
         static::$adapter = $adapter;
     }
