@@ -56,7 +56,7 @@ class Jp7_Bootstrap
             Jp7_Controller_Dispatcher::setDefaultParentClass($prefix.'_Controller_Action');
         }
 
-        $config->build = interadmin_get_version($config->name_id, '{build}');
+        $config->build = interadmin_get_version();
     }
 
     public static function initAdminBar()
