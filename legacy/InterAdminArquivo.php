@@ -1,5 +1,7 @@
 <?php
 
+use Jp7_InterAdmin_Upload as Upload;
+
 /**
  * JP7's PHP Functions.
  *
@@ -236,9 +238,6 @@ class InterAdminArquivo extends InterAdminAbstract
     }
     public function getSize()
     {
-        $url = reset(explode('?', $this->url));
-        $url = jp7_replace_beginning('../../upload', 'upload', $url);
-
-        return jp7_file_size($url);
+        return Upload::getHumanSize($this->url);
     }
 }

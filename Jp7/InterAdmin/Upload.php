@@ -18,7 +18,7 @@ class Jp7_InterAdmin_Upload
      */
     public static function url($path = '../../', $template = 'original')
     {
-        if (!startsWith('../../upload/', $path)) {
+        if (static::isExternal($path)) {
             // Not an upload path => Wont change
             return $path;
         }
@@ -29,6 +29,20 @@ class Jp7_InterAdmin_Upload
         } else {
             return static::getAdapter()->url($path);
         }
+    }
+
+    public static function getHumanSize($path)
+    {
+        return jp7_human_size(static::getSize($path));
+    }
+
+    public static function getSize($path)
+    {
+        if (static::isExternal($path)) {
+            return;
+        }
+        $path = substr($path, strlen('../../'));
+        return Storage::size($path);
     }
 
     public static function isImage($url)
@@ -54,5 +68,10 @@ class Jp7_InterAdmin_Upload
     public static function setAdapter(AdapterInterface $adapter)
     {
         static::$adapter = $adapter;
+    }
+
+    protected static function isExternal($path)
+    {
+        return !startsWith('../../upload/', $path);
     }
 }
