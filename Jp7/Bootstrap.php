@@ -120,7 +120,7 @@ class Jp7_Bootstrap
         // Alterando o router para que $this->url() funcione corretamente na View
         $frontController->setRouter(new Jp7_Controller_Router());
         $frontController->setControllerDirectory(APPLICATION_PATH.'/controllers');
-        //$frontController->setControllerDirectory(ROOT_PATH . '/institucional/application/modules/default/controllers');
+        //$frontController->setControllerDirectory(. '/institucional/application/modules/default/controllers');
         $frontController->addControllerDirectory(jp7_package_path('classes').'/Jp7', 'jp7');
 
         if (is_dir(APPLICATION_PATH.'/modules')) {
@@ -183,7 +183,7 @@ class Jp7_Bootstrap
     public static function initLayout()
     {
         Zend_Layout::startMvc(APPLICATION_PATH.'/layouts/scripts');
-        //Zend_Layout::startMvc(ROOT_PATH . '/institucional/application/layouts/scripts');
+        //Zend_Layout::startMvc(. '/institucional/application/layouts/scripts');
         $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
         $viewRenderer->setView(new Jp7_View());
         $view = Zend_Layout::getMvcInstance()->getView();
@@ -194,7 +194,7 @@ class Jp7_Bootstrap
         // Permite o uso de templates no _default
         $view->setScriptPath(array_merge(
             array(APPLICATION_PATH.'/../vendor/jp7internet/_default/application/views/scripts'),
-            //array(ROOT_PATH . '/institucional/application/modules/default/views/scripts'),
+            //array(. '/institucional/application/modules/default/views/scripts'),
             $view->getScriptPaths()
         ));
         // Permite o uso de Helpers customizados da Jp7

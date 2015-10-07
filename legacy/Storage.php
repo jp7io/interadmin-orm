@@ -36,7 +36,7 @@ class Storage extends Illuminate\Support\Facades\Storage
                 'filesystems.default' => 'local',
                 'filesystems.disks.local' => [
                     'driver' => 'local',
-                    'root'   => ROOT_PATH.'/'.$config->name_id
+                    'root'   => BASE_PATH
                 ]
             ];
         } elseif ($c_remote) {

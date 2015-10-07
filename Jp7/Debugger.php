@@ -239,7 +239,7 @@ class Jp7_Debugger
         foreach ($backtrace as $key => $row) {
             $html .= '<tr><td>'.(count($backtrace) - $key).'</td>';
             $html .= '<td>'.$row['class'].$row['type'].$row['function'].'()</td>';
-            $html .= '<td>'.str_replace(ROOT_PATH, '', $row['file']).':'.$row['line'].'</td></tr>';
+            $html .= '<td>'.str_replace(BASE_PATH, '', $row['file']).':'.$row['line'].'</td></tr>';
         }
         $html .= '</table>';
 
