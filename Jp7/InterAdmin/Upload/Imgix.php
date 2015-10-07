@@ -1,22 +1,25 @@
 <?php
 
-class Jp7_InterAdmin_Upload_Imgix implements Jp7_InterAdmin_Upload_AdapterInterface
+use League\Url\Url;
+
+class Jp7_InterAdmin_Upload_Imgix extends Jp7_InterAdmin_Upload_AdapterAbstract
 {
 
     // IMGIX_HOST/upload/bla/123?w=40&h=40
-    public function url($path, $template)
+    public function imageUrl($path, $template)
     {
         global $config;
 
-        $url = 'http://'.$config->imgix['host'].'/'.$path;
+        $url = Url::createFromUrl($this->url($path));
+    
+        $url->setHost($config->imgix['host']);
 
         $params = $config->imgix['templates'][$template];
         
         if ($params) {
-            $url .= (str_contains($url, '?') ? '&' : '?').http_build_query($params);
+            $url->getQuery()->modify($params);
         }
 
-        return $url;
+        return (string) $url;
     }
-
 }

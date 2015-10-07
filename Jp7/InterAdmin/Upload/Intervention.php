@@ -1,18 +1,15 @@
 <?php
 
-class Jp7_InterAdmin_Upload_Intervention implements Jp7_InterAdmin_Upload_AdapterInterface
+class Jp7_InterAdmin_Upload_Intervention extends Jp7_InterAdmin_Upload_AdapterAbstract
 {
 
     // STORAGE_HOST/imagecache/something/bla/123
-    public function url($path, $template)
+    public function imageUrl($path, $template)
     {
         global $config;
 
         $path = jp7_replace_beginning('upload', 'imagecache/'.$template, $path);
 
-        $url = 'http://'.$config->storage['host'].'/'.$path;
-                
-        return $url;
+        return $this->url($path);
     }
-
 }

@@ -25,10 +25,9 @@ class Jp7_InterAdmin_Upload
         $path = substr($path, strlen('../../'));
         
         if (static::isImage($path)) {
-            return static::getAdapter()->url($path, $template);
+            return static::getAdapter()->imageUrl($path, $template);
         } else {
-            global $config;
-            return $config->storage['host'].'/'.$path;
+            return static::getAdapter()->url($path);
         }
     }
 
@@ -52,7 +51,7 @@ class Jp7_InterAdmin_Upload
         return static::$adapter;
     }
 
-    public static function setAdapter(AdapterInterface $adapter)
+    public static function setAdapter(AdapterInterface $adapter = null)
     {
         static::$adapter = $adapter;
     }
