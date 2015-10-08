@@ -1,15 +1,14 @@
 <?php
 
-use League\Url\Url;
-use League\Url\Components\Path;
-use League\Url\Components\Query;
+use Jp7_InterAdmin_Upload_AdapterInterface as AdapterInterface;
 
 class Jp7_InterAdmin_Upload
 {
-    public static $legacyTemplates = [
-        'thumb_interadmin' => '40x40'
-    ];
-    
+    /**
+     * @var AdapterInterface
+     */
+    protected static $adapter;
+
     /**
      * Altera o endereço para que aponte para a url do cliente.
      *
@@ -19,97 +18,60 @@ class Jp7_InterAdmin_Upload
      */
     public static function url($path = '../../', $template = 'original')
     {
-        if (!startsWith('../../upload/', $path)) {
+        if (static::isExternal($path)) {
             // Not an upload path => Wont change
             return $path;
         }
         $path = substr($path, strlen('../../'));
         
-        if (self::hasExternalStorage()) {
-            $url = self::storageUrl($path);
+        if (static::isImage($path)) {
+            return static::getAdapter()->imageUrl($path, $template);
         } else {
-            $url = self::legacyUrl($path);
+            return static::getAdapter()->url($path);
         }
-        $url = self::storagePath($url, $template);
-        return $url->__toString();
+    }
+
+    public static function getHumanSize($path)
+    {
+        return jp7_human_size(static::getSize($path));
+    }
+
+    public static function getSize($path)
+    {
+        if (static::isExternal($path)) {
+            return;
+        }
+        $path = substr($path, strlen('../../'));
+        return Storage::size($path);
     }
 
     public static function isImage($url)
     {
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $url);
     }
-
-    public static function imageCache()
+    
+    public static function getAdapter()
     {
         global $config;
-        return !empty($config->imagecache);
-    }
-
-    // Has upload[url] set on config (S3 or Local)
-    protected static function hasExternalStorage()
-    {
-        global $config;
-        return $config->storage && $config->storage['host'];
-    }
-
-    protected static function storageUrl($path)
-    {
-        global $config;
-        return self::createUrl($config->storage['host'], $path);
-    }
-
-    // No upload[url] setting / Legacy
-    protected static function legacyUrl($path)
-    {
-        global $config, $jp7_app;
-        $url = self::createUrl($config->server->host, $path);
-        $path = $url->getPath();
-        if ($jp7_app != 'interadmin') {
-            $path->prepend($jp7_app);
+        if (!static::$adapter) {
+            if ($config->imagecache === 'imgix') {
+                static::$adapter = new Jp7_InterAdmin_Upload_Imgix;
+            } elseif ($config->imagecache) {
+                static::$adapter = new Jp7_InterAdmin_Upload_Intervention;
+            } else {
+                static::$adapter = new Jp7_InterAdmin_Upload_Legacy;
+            }
         }
-        $path->prepend($config->server->path);
-        
-        return $url;
+        return static::$adapter;
     }
 
-    protected static function useLegacyTemplate($url, $template = 'original')
+    public static function setAdapter(AdapterInterface $adapter)
     {
-        $legacyTemplate = self::$legacyTemplates[$template];
-        if (isset($legacyTemplate)) {
-            $url->getQuery()->modify([
-                'size' => $legacyTemplate
-            ]);
-        }
-        return $url;
+        static::$adapter = $adapter;
     }
 
-    protected static function useImageTemplate($url, $template = 'original')
+    protected static function isExternal($path)
     {
-        if (self::imageCache()) {
-            $path = $url->getPath();
-            $path->remove('upload');
-            $path->prepend('imagecache/' . $template);
-            return $url;
-        }
-
-        return self::useLegacyTemplate($url, $template);
-    }
-
-    protected static function storagePath($url, $template = 'original')
-    {
-        if (self::isImage($url->__toString())) {
-            $url = self::useImageTemplate($url, $template);
-        }
-        return $url;
-    }
-
-    protected static function createUrl($host, $path)
-    {
-        $url = Url::createFromUrl($host);
-        $url->setScheme('http');
-        list($path, $query) = explode('?', $path);
-        $url->setPath($path);
-        $url->setQuery($query);
-        return $url;
+        return !startsWith('../../upload/', $path);
     }
 }

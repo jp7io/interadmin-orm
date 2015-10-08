@@ -264,6 +264,18 @@ class InterSite
                     break;
                 }
             }
+
+            // Storage
+            if (!$this->storage) {
+                $this->storage = [
+                    'host' => $this->server->host,
+                    'path' => $this->server->path
+                ];
+
+                if ($jp7_app && $jp7_app != 'interadmin') {
+                    $this->storage['path'] .= '/'.$jp7_app;
+                }
+            }
         }
     }
 
