@@ -20,7 +20,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
     public function init()
     {
         $config = Zend_Registry::get('config');
-        if (preg_match('~\b(alt|qa)\b~', $_SERVER['HTTP_HOST'])) {
+        if (preg_match('~\b(alt|qa)\b~', $_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_USER_AGENT'])) {
             if (!isset($_SERVER['PHP_AUTH_USER']) || $_SERVER['PHP_AUTH_USER'] != $config->name_id || $_SERVER['PHP_AUTH_PW'] != $config->name_id) {
                 header('WWW-Authenticate: Basic realm="'.$config->name.'"');
                 header('HTTP/1.0 401 Unauthorized');
