@@ -243,10 +243,10 @@ class Jp7_Image
             }
         }
         //
-        if (!$new_w) {
+        if (!isset($new_w)) {
             $new_w = $dst_w;
         }
-        if (!$new_h) {
+        if (!isset($new_h)) {
             $new_h = $dst_h;
         }
         // Checks if destination image is bigger than source image

@@ -15,12 +15,6 @@
 class FileCache
 {
     /**
-     * Site root directory.
-     *
-     * @var string
-     */
-    public $fileRoot;
-    /**
      * Path used to store cached files.
      *
      * @var string
@@ -66,7 +60,7 @@ class FileCache
         );
         extract($options + $default);
 
-        global $c_doc_root, $config, $c_cache_delay;
+        global $config, $c_cache_delay;
         global $debugger, $s_session, $interadmin_gerar_menu;
 
         // Cache not desired
@@ -74,8 +68,7 @@ class FileCache
             return;
         }
 
-        $this->fileRoot = $c_doc_root;
-        $this->cachePath = $this->getCachePath($this->fileRoot, $cachePath);
+        $this->cachePath = $this->getCachePath(BASE_PATH, $cachePath);
 
         if ($partial) {
             $nocache_force = $_GET['nocache_force'];
@@ -217,9 +210,7 @@ class FileCache
 
     public static function getCachePath($fileRoot, $cachePath = 'cache')
     {
-        global $config;
-
-        return $fileRoot.$config->name_id.'/'.$cachePath.'/';
+        return $fileRoot.'/'.$cachePath.'/';
     }
 
     public static function getFileName($request_uri, $storeId = null, $cachePath = '')
@@ -295,9 +286,7 @@ class FileCache
      */
     public function getLogFilename()
     {
-        global $config;
-
-        return $this->fileRoot.$config->name_id.'/interadmin/interadmin.log';
+        return BASE_PATH.'/interadmin/interadmin.log';
     }
     public static function getPlaceholder($name, $vars = array())
     {
