@@ -33,7 +33,11 @@ class Jp7_InterAdmin_Upload
 
     public static function getHumanSize($path)
     {
-        return jp7_human_size(static::getSize($path));
+        try {
+            return jp7_human_size(static::getSize($path));
+        } catch (RuntimeException $e) {
+            return '0KB';
+        }
     }
 
     public static function getSize($path)
