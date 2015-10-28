@@ -67,22 +67,18 @@ class Jp7_InterAdmin_JSTree
 
     public function createTipoNode($nome_lang, $tipo)
     {
-        $node = (object) array(
-            'data' => array(
-                'title' => $nome_lang,
-            ),
-            'attr' => array(
+        $node = (object) [
+            'text' => $nome_lang,
                 'id' => $tipo->id_tipo,
-            ),
-            'metadata' => array(
+            'data' => [
                 //'id_tipo' => $tipo->id_tipo,
                 'model_id_tipo' => $tipo->model_id_tipo,
                 'class' => $tipo->class,
-            ),
-            'children' => array(),
-        );
+            ],
+            'children' => [],
+        ];
         if ($tipo->icone) {
-            $node->data['icon'] = $this->getIconeUrl($tipo->icone);
+            $node->icon = $this->getIconeUrl($tipo->icone);
         }
 
         return $node;
@@ -103,16 +99,14 @@ class Jp7_InterAdmin_JSTree
 
     public function createNode($label, $callback = '', $icone = '')
     {
-        $node = (object) array(
-            'data' => array(
-                'title' => $label,
-            ),
-            'metadata' => array(
+        $node = (object) [
+            'text' => $label,
+            'data' => [
                 'callback' => $callback,
-            ),
-        );
+            ]
+        ];
         if ($icone) {
-            $node->data['icon'] = $this->getIconeUrl($icone);
+            $node->icon = $this->getIconeUrl($icone);
         }
 
         return $node;
