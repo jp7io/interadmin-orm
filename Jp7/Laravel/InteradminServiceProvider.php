@@ -41,8 +41,15 @@ class InteradminServiceProvider extends ServiceProvider
     {
         \InterAdminTipo::setDefaultClass(config('interadmin.namespace') . 'InterAdminTipo');
         
-        if (\Schema::hasTable('_tipos')) {
-            spl_autoload_register([DynamicLoader::class, 'load']);
+        try {
+            if (\Schema::hasTable('_tipos')) {
+                spl_autoload_register([DynamicLoader::class, 'load']);
+            }
+        } catch (\PDOException $e) {
+            if (\App::runningInConsole()) {
+                echo $e->getMessage() . PHP_EOL;
+            }
+            \Log::error($e);
         }
     }
     
