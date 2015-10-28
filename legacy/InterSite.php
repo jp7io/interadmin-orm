@@ -144,7 +144,7 @@ class InterSite
 
     public static function getHost()
     {
-        return getenv('INTERADMIN_HOST');
+        return parse_url(config('app.url'))['host'];
     }
     
     public static function __set_state($array)
