@@ -119,7 +119,7 @@ class ImgResize
         if (!ends_with($prefix, '-')) {
             throw new InvalidArgumentException('Prefix for srcset must end with dash (Eg: small- or large-)');
         }
-        $all = array_keys(config('imagecache.templates'));
+        $all = static::getAllTemplates();
         // If prefix is "wide-"
         // Filters all templates starting with "wide-"
         $templates = array_filter($all, function ($x) use ($prefix) {

@@ -23,4 +23,9 @@ class ImgResize extends BaseImgResize
     {
         return 'http://'.config('imgix.host');
     }
+
+    protected static function getAllTemplates()
+    {
+        return array_keys(config('imgix.templates'));
+    }
 }
