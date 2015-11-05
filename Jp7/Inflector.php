@@ -25,14 +25,14 @@ class Jp7_Inflector
      * @var
      */
     public static $plural_inflections = array(
-        '/m$/' => 'ns', // Bem -> Bens
-        '/([r|z])$/' => '\1es', // Paz -> Pazes, Bar -> Bares
-        '/([i])l$/' => '\1s', // Barril -> Barris
-        '/([a|e|o|u])l$/' => '\1is', // Sal -> Sais
-        '/^(m)[e|ê]s$/i' => '\1eses', // Mês -> Meses
-        '/^(c|p|escriv|alem|capel|capit)ão$/i' => '\1ães', // Cão -> Cães
-        '/^(m|irm|pag|gr|ch|benç|orf|sót|órg)ão$/i' => '\1ãos', // Mão -> Mãos
-        '/ão$/' => '\1ões', // Reunião -> Reuniões
+        '/m$/i' => 'ns', // Bem -> Bens
+        '/([r|z])$/i' => '\1es', // Paz -> Pazes, Bar -> Bares
+        '/([i])l$/i' => '\1s', // Barril -> Barris
+        '/([a|e|o|u])l$/i' => '\1is', // Sal -> Sais
+        '/^(m)[e|ê]s$/iu' => '\1eses', // Mês -> Meses
+        '/^(c|p|escriv|alem|capel|capit)ão$/iu' => '\1ães', // Cão -> Cães
+        '/^(m|irm|pag|gr|ch|benç|orf|sót|órg)ão$/iu' => '\1ãos', // Mão -> Mãos
+        '/ão$/iu' => '\1ões', // Reunião -> Reuniões
         '/([^s])$/' => '\1s', // Plural padrão
     );
 
