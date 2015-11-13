@@ -50,12 +50,17 @@ abstract class InterAdminAbstract implements Serializable
     /**
      * Magic set acessor.
      *
-     * @param string $attributeName
-     * @param string $attributeValue
+     * @param string $name
+     * @param string $value
      */
-    public function __set($attributeName, $attributeValue)
+    public function __set($name, $value)
     {
-        $this->attributes[$attributeName] = $attributeValue;
+        $mutator = 'set' . Str::studly($name) . 'Attribute';
+        if (method_exists($this, $mutator)) {
+            return $this->$mutator($value);
+        }
+
+        $this->attributes[$name] = $value;
     }
     /**
      * Magic unset acessor.
