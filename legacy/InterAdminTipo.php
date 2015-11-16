@@ -101,6 +101,11 @@ class InterAdminTipo extends InterAdminAbstract
         throw new BadMethodCallException($message);
     }
 
+    public function __isset($name)
+    {
+        return isset($this->attributes[$name]) || in_array($name, $this->getAttributesNames());
+    }
+
     /**
      * Returns an InterAdminTipo instance. If $options['class'] is passed,
      * it will be returned an object of the given class, otherwise it will search
