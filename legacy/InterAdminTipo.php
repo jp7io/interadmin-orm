@@ -377,9 +377,13 @@ class InterAdminTipo extends InterAdminAbstract
             throw new Exception('GROUP BY is not supported when using count().');
         }
 
-        $retorno = $this->findFirst(InterAdmin::DEPRECATED_METHOD, $options);
+        $rows = $this->deprecatedFind(['limit' => 2] + $options);
 
-        return isset($retorno->count_id) ? intval($retorno->count_id) : 0;
+        if (count($rows) > 1) {
+            throw new Exception('Could not resolve groupBy() before count().');
+        }
+
+        return isset($rows[0]->count_id) ? intval($rows[0]->count_id) : 0;
     }
 
     /**
