@@ -374,7 +374,7 @@ class InterAdminTipo extends InterAdminAbstract
 
         $retorno = $this->findFirst(InterAdmin::DEPRECATED_METHOD, $options);
 
-        return intval($retorno->count_id);
+        return isset($retorno->count_id) ? intval($retorno->count_id) : 0;
     }
 
     /**
