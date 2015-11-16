@@ -69,14 +69,14 @@ class InterAdminTipo extends InterAdminAbstract
         $this->id_tipo = $id_tipo;
     }
 
-    public function &__get($attributeName)
+    public function &__get($name)
     {
-        if (isset($this->attributes[$attributeName])) {
-            return $this->attributes[$attributeName];
-        } elseif (in_array($attributeName, $this->getAttributesNames())) {
+        if (isset($this->attributes[$name])) {
+            return $this->attributes[$name];
+        } elseif (in_array($name, $this->getAttributesNames())) {
             $this->loadAttributes($this->getAttributesNames(), false);
 
-            return $this->attributes[$attributeName];
+            return $this->attributes[$name];
         }
 
         return $null; // Needs to be variable to be returned as reference
