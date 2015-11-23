@@ -809,6 +809,7 @@ class InterAdminTipo extends InterAdminAbstract
             $this->getFieldsValues('log');
             InterAdmin::setPublishedFiltersEnabled($old_value);
         }
+        $this->date_modify = date('c');
         $this->log = date('d/m/Y H:i').' - '.InterAdmin::getLogUser().' - '.$_SERVER['REMOTE_ADDR'].chr(13).$this->log;
 
         // Inheritance
