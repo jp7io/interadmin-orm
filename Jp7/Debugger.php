@@ -63,7 +63,6 @@ class Jp7_Debugger
      */
     public function __construct()
     {
-        $this->_maintenancePage = DEFAULT_PATH.'index_manutencao.htm';
         global $c_jp7;
         if (!$c_jp7) {
             return; // Only by Devs
@@ -398,7 +397,7 @@ class Jp7_Debugger
      */
     public function getMaintenancePage()
     {
-        return $this->_maintenancePage;
+        return $this->_maintenancePage ?: DEFAULT_PATH.'index_manutencao.htm';
     }
     /**
      * Sets $maintenancePage.
