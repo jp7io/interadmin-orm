@@ -255,13 +255,13 @@ class InterAdminField
             if (strpos($tipo_de_campo, 'varchar_') === 0) {
                 switch ($xtra) {
                     case 'id': // ID
-                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                         if ($id && !$s_user['admin']) {
                             $onkeypress .= ' disabled="disabled"';
                         } // Impede alteração
                         break;
                     case 'id_email': // ID E-Mail
-                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                        $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                         break;
                     case 'email': // E-Mail
                         $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.+',event)\"";
