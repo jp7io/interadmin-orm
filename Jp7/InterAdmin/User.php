@@ -53,4 +53,81 @@ class Jp7_InterAdmin_User extends InterAdmin
         
         $this->save();
     }
+    
+    // Special - Disparo
+    public static function disparo($from, $id, $id_tipo)
+    {
+        if ($from != 'insert' || !$_POST['char_send_link'][0]) {
+            return;
+        }
+        $userTipo = (new InterAdmin_Login)->getUsuarioTipo();
+        $user = $userTipo->findById($id, [
+            'fields' => '*',
+            'fields_alias' => true,
+            'class' => Jp7_InterAdmin_User::class
+        ]);
+        
+        // Flash msg
+        Zend_Session::$_unitTestEnabled = true;
+        $msg = new Zend_Controller_Action_Helper_FlashMessenger();
+        
+        try {
+            if (!$user->isPublished()) {
+                throw new Exception('Usuário está despublicado');
+            } elseif (!$user->leitura) {
+                throw new Exception('Usuário sem acesso de leitura');
+            } elseif (!$user->email) {
+                throw new Exception('Usuário não possui e-mail cadastrado');
+            } else {
+                // User starts without password
+                $user->updateAttributes([
+                    // Its not MD5, so user will never login with it
+                    'senha' => uniqid()
+                ]);
+                
+                $mailer = new InterAdmin_Mailer_PasswordRegistration($user);
+                $mailer->handle();
+                
+                $msg->setNamespace('success');
+                $msg->addMessage('Enviado e-mail com link para cadastro de senha');
+            }
+        } catch (Exception $e) {
+            $msg->addMessage('Link para cadastro de senha não enviado: ' . $e->getMessage());
+        }
+    }
+    
+    // Special - Campo
+    public static function specialPassword($campo, $value, $parte = 'edit')
+    {
+        switch ($parte) {
+            case 'header':
+                return $campo['label'];
+            case 'list':
+                return $value;
+            case 'edit':
+                global $id;
+                
+                // Remove custom keys
+                $campo['nome'] = $campo['nome_original'];
+                unset($campo['tipo_de_campo']);
+                unset($campo['nome_original']);
+                
+                if (!$id) {
+                    // New user shows checkbox to send link
+                    $campo['tipo'] = 'char_send_link';
+                }
+                $interAdminField = new InterAdminField($campo);
+                ob_start();
+                $interAdminField->getHtml();
+                $html = ob_get_clean();
+                
+                if (!$id) {
+                    // New user shows checkbox to send link
+                    $end = '</td><td></td></tr>';
+                    $label = '<label for="jp7_db_checkbox_char_send_link[0]">Enviar link para cadastro de senha</label>';
+                    $html = str_replace($end, $label.$end, $html);
+                }
+                return $html;
+        }
+    }
 }
