@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Mfa extends InterAdmin
+class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
 {
     const DEFAULT_FIELDS_ALIAS = true;
 
@@ -16,34 +16,20 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
             $s_user = $s_session['temp_user'];
         }
 
-        $userTipo = new InterAdminTipo($s_user['id_tipo']);
+        $userTipo = new Jp7_InterAdmin_UserTipo($s_user['id_tipo']);
 
-        $aliases = $userTipo->getCamposAlias();
-        $campos = array();
-        if (in_array('usuario', $aliases)) {
-            $campos[] = 'usuario';
-        } elseif (in_array('login', $aliases)) {
-            $campos[] = 'login';
-        } else {
-            throw new Exception('Campo usuario não existe no tipo Usuários.');
-        }
-        if (in_array('mfa', $aliases)) {
-            $campos[] = 'mfa';
-            $campos[] = 'mfa_secret';
-        }
-        if (in_array('email', $aliases)) {
-            $campos[] = 'email';
+        if (!$userTipo->getCampoUsuario()) {
+            throw new Exception('Campo "usuario" não existe no tipo Usuários.');
         }
 
-        $loggedUser = $userTipo->findById($s_user['id'], array(
-            'fields' => $campos,
-               'fields_alias' => true,
-            'class' => get_class($this),
-           ));
-
-        return $loggedUser;
+        return $userTipo->findById($s_user['id'], array(
+            'fields' => '*',
+            'fields_alias' => true,
+            'class' => self::class,
+        ));
     }
 
+    // Special - Campo
     public static function habilitar($campo, $value, $parte = 'edit')
     {
         switch ($parte) {
@@ -163,7 +149,7 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
     private function getCliente()
     {
         global $config;
-        if (in_array($config->name_id, array('extra', 'casasbahia', 'pontofrio'))) {
+        if (in_array($config->name_id, array('extra', 'casasbahia', 'pontofrio', 'cdiscount'))) {
             return 'novapontocom';
         } else {
             return $config->name_id;
@@ -214,26 +200,13 @@ class Jp7_InterAdmin_Mfa extends InterAdmin
         $issuer = $this->getIssuer();
 
         $message = '<div style="font-family: Verdana;font-size: 13px;">';
-        $message .= 'Token de acesso para '.$issuer.':<br><br>';
+        $message .= 'Token de acesso - '.$issuer.':<br><br>';
         $message .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">'.$secret.'</div>';
         $message .= '<br><br>';
         $message .= 'Obrigado por solicitar o seu token de acesso.';
         $message .= '</div>';
         
         jp7_mail($this->email, $issuer.' Token', $message, 'From: '.$issuer." <no-reply@jp7.com.br>\r\n");
-    }
-
-    public function maskEmail()
-    {
-        list($username, $domain) = explode('@', $this->email);
-        $showchars = min(array(3, mb_strlen($username)));
-        $username = mb_substr($username, 0, $showchars).str_repeat('*', mb_strlen($username) - $showchars);
-
-        $parts = explode('.', $domain);
-        $parts[0] = mb_substr($parts[0], 0, 1).str_repeat('*', mb_strlen($parts[0]) - 1);
-        $domain = implode('.', $parts);
-
-        return $username.'@'.$domain;
     }
 
     public function createGoogleSecret()
