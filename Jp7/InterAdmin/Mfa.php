@@ -42,6 +42,7 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
                 $campo = array(
                     'tipo_de_campo' => 'select',
                     'xtra' => '',
+                    'value' => $value,
                     'opcoes' => array(
                         'email' => 'E-mail',
                         'google' => 'Google Authenticator',
