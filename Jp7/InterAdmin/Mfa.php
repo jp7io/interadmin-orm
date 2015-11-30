@@ -35,7 +35,6 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
         switch ($parte) {
             case 'header':
                 return $campo['label'];
-                break;
             case 'list':
                 return $value;
             case 'edit':
