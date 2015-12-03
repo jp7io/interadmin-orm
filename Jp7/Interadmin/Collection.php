@@ -59,6 +59,18 @@ class Collection extends BaseCollection
         return $array;
     }
 
+    public function radioList($column, $key)
+    {
+        $array = [];
+        foreach ($this->items as $item) {
+            $array[$item->$column] = [
+                'value' => $item->$key
+            ];
+        }
+
+        return $array;
+    }
+
     public function humanImplode($column, $glue, $lastGlue)
     {
         if ($items = $this->lists($column)) {
