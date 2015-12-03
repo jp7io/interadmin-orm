@@ -255,13 +255,13 @@ class InterAdminField
             if (strpos($tipo_de_campo, 'varchar_') === 0) {
                 switch ($xtra) {
                     case 'id': // ID
-                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                         if ($id && !$s_user['admin']) {
                             $onkeypress .= ' disabled="disabled"';
                         } // Impede alteração
                         break;
                     case 'id_email': // ID E-Mail
-                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                        $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                         break;
                     case 'email': // E-Mail
                         $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.+',event)\"";
@@ -278,7 +278,7 @@ class InterAdminField
                         break;
                 }
             }
-            $form = '<input type="'.((strpos($tipo_de_campo, 'password_') === 0) ? 'password'.($is->ch ? '" autocomplete="off' : '') : 'text').'" name="'.$campo.'[]" label="'.$campo_nome.'" value="'.htmlspecialchars($valor).'" title="'.$ajuda.'" maxlength="'.(($tamanho) ? $tamanho : 255).'"'.(($obrigatorio) ? ' obligatory="yes"' : '').$readonly.' class="inputs_width"'.(($tamanho) ? ' style="width:'.$tamanho.'em"' : '').$onkeypress.' xtra="'.$xtra.'" />'.$form_xtra;
+            $form = '<input type="'.((strpos($tipo_de_campo, 'password_') === 0) ? 'password'.($is->ch ? '" minlength="6" autocomplete="off' : '') : 'text').'" name="'.$campo.'[]" label="'.$campo_nome.'" value="'.htmlspecialchars($valor).'" title="'.$ajuda.'" maxlength="'.(($tamanho) ? $tamanho : 255).'"'.(($obrigatorio) ? ' obligatory="yes"' : '').$readonly.' class="inputs_width"'.(($tamanho) ? ' style="width:'.$tamanho.'em"' : '').$onkeypress.' xtra="'.$xtra.'" />'.$form_xtra;
         }
         $form .= '<input type="hidden" name="'.$campo.'_xtra[]" value="'.$xtra.'"'.$readonly.' />';
         if ($readonly && $valor_default) {
@@ -324,14 +324,16 @@ class InterAdminField
                 '</tr>';
                 echo $S;
             } elseif (strpos($tipo_de_campo, 'password_') === 0 && $valor) { // &&$xtra
+                $form = preg_replace('/value="[^"]+"/', 'value="" disabled', $form, 1);
+                
                 echo ''.
                 $_tr.
                     $_th.
                     '<td colspan="2">'.
                         '<table width="100%">'.
                             '<tr>'.
-                                '<td width="99%" style="display:none"><input type="password" name="'.$campo.'['.$j.']" disabled style="width:100%"><input type="hidden" name="'.$campo.'_xtra['.$j.']" value="'.$xtra.'"></td>'.
-                                "<td><input type=\"button\" value=\"Alterar...\" $readonly onclick=\"interadmin_inserir_password(this,'".$campo.'['.$j."]')\"><input type=\"text\" disabled style=\"width:1px;visibility:hidden\"></td>".
+                                '<td width="99%" style="display:none">'.$form.'</td>'.
+                                "<td><input type=\"button\" value=\"Alterar...\" $readonly onclick=\"interadmin_inserir_password(this,'".$campo.'['.($j ?: '')."]')\"><input type=\"text\" disabled style=\"width:1px;visibility:hidden\"></td>".
                             '</tr>'.
                         '</table>'.
                     '</td>'.

@@ -1004,7 +1004,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function getAdminAttributes()
     {
-        return array('id_string', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+        return array(
+            'id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish',
+            'date_insert', 'date_expire', 'date_modify', 'log', 'publish',
+            'deleted', 'hits', 'log_user', 'date_hit', 'versao'
+        );
     }
 
     /**
