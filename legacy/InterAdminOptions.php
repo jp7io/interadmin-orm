@@ -153,7 +153,7 @@ class InterAdminOptions
             $params[] = $this->options;
         }
 
-        $retorno = call_user_method_array($method_name, $this->tipo, $params);
+        $retorno = call_user_func_array([$this->tipo, $method_name], $params);
         if ($retorno instanceof self) {
             $this->options = InterAdmin::mergeOptions($this->options, $retorno->getOptionsArray());
 

@@ -1356,14 +1356,14 @@ class InterAdminTipo extends InterAdminAbstract
     {
         $options = new InterAdminOptions($this);
 
-        return call_user_method_array('where', $options, func_get_args());
+        return call_user_func_array([$options, 'where'], func_get_args());
     }
 
     public function fields($_)
     {
         $options = new InterAdminOptions($this);
 
-        return call_user_method_array('fields', $options, func_get_args());
+        return call_user_func_array([$options, 'fields'], func_get_args());
     }
 
     public function join($alias, $tipo, $on)
@@ -1405,6 +1405,6 @@ class InterAdminTipo extends InterAdminAbstract
     {
         $options = new InterAdminOptions($this);
 
-        return call_user_method_array('order', $options, func_get_args());
+        return call_user_func_array([$options, 'order'], func_get_args());
     }
 }
