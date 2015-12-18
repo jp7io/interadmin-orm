@@ -279,7 +279,8 @@ class Jp7_InterAdmin_Search
     public function isText($column)
     {
         if (strpos($column, 'varchar_') === 0 || strpos($column, 'text_') === 0) {
-            $sufixo = end(explode('_', $column));
+            $parts = explode('_', $column);
+            $sufixo = end($parts);
             if (!is_numeric($sufixo)) {
                 return true;
             } elseif ($sufixo < 4) {

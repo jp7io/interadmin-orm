@@ -466,7 +466,8 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public function findFirst($options = array())
     {
-        return reset($this->find(array('limit' => 1) + $options));
+        $result = $this->find(array('limit' => 1) + $options);
+        return reset($result);
     }
 
     /**
@@ -476,7 +477,8 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public function first()
     {
-        return reset($this->limit(1)->all());
+        $result = $this->limit(1)->all();
+        return reset($result);
     }
 
     /**
@@ -1184,7 +1186,8 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public static function findFirstTipo($options = array())
     {
-        return reset(self::findTipos(array('limit' => 1) + $options));
+        $result = self::findTipos(array('limit' => 1) + $options);
+        return reset($result);
     }
     /**
      * Retrieves the first InterAdminTipo with the given "model_id_tipo".
@@ -1196,7 +1199,8 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public static function findFirstTipoByModel($model_id_tipo, $options = array())
     {
-        return reset(self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options));
+        $result = self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options);
+        return reset($result);
     }
     /**
      * Retrieves all the InterAdminTipo with the given "model_id_tipo".

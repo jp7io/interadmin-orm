@@ -29,7 +29,7 @@ class Jp7_Date extends DateTime
      *
      * @return Jp7_Date
      */
-    public static function createFromFormat($format, $time, DateTimeZone $timezone = null)
+    public static function createFromFormat($format, $time, $timezone = null)
     {
         if ($timezone) {
             $date = parent::createFromFormat($format, $time, $timezone);
@@ -43,7 +43,7 @@ class Jp7_Date extends DateTime
         }
     }
 
-    public static function createFromString($time, $formats = array('d/m/Y', 'Y-m-d'), DateTimeZone $timezone = null)
+    public static function createFromString($time, $formats = array('d/m/Y', 'Y-m-d'), $timezone = null)
     {
         foreach ($formats as $format) {
             if ($date = static::createFromFormat($format, $time, $timezone)) {

@@ -15,7 +15,9 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
         if (!$s_user) {
             $s_user = $s_session['temp_user'];
         }
-
+        if (!$s_user['id_tipo']) {
+            return;
+        }
         $userTipo = new Jp7_InterAdmin_UserTipo($s_user['id_tipo']);
 
         if (!$userTipo->getCampoUsuario()) {
@@ -206,7 +208,10 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
         $message .= 'Obrigado por solicitar o seu token de acesso.';
         $message .= '</div>';
         
-        jp7_mail($this->email, $issuer.' Token', $message, 'From: '.$issuer." <no-reply@jp7.com.br>\r\n");
+        $subject = $issuer.' Token';
+        $headers = 'From: '.$issuer." <no-reply@jp7.com.br>\r\n";
+        
+        jp7_mail($this->email, $subject, $message, $headers);
     }
 
     public function createGoogleSecret()
