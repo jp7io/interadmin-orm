@@ -20,7 +20,9 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard
     {
         if (!$this->isDispatchable($request)) {
             $controller = $request->getControllerName();
-            if (!$this->getParam('useDefaultControllerAlways') && !empty($controller)) {
+            if (!$this->getParam('useDefaultControllerAlways') &&
+                !empty($controller) &&
+                !preg_match('/[^\d\w-]/', $controller)) {
                 // Abrir template dentro do mesmo cliente
                 $className = $this->_getControllerClassWithModelPrefix($request);
                 eval('class '.$className.' extends '.self::getDefaultParentClass().' {};');
