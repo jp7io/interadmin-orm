@@ -397,7 +397,7 @@ class Jp7_Debugger
      */
     public function getMaintenancePage()
     {
-        return $this->_maintenancePage ?: DEFAULT_PATH.'index_manutencao.htm';
+        return $this->_maintenancePage ?: DEFAULT_PATH.'/index_manutencao.htm';
     }
     /**
      * Sets $maintenancePage.

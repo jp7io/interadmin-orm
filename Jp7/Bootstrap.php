@@ -217,24 +217,24 @@ class Jp7_Bootstrap
             $metas['google-site-verification'] = $config->google_site_verification;
         }
 
-        defined('DEFAULT_PATH') || define('DEFAULT_PATH', $config->path.'/vendor/jp7internet/_default/');
+        defined('DEFAULT_PATH') || define('DEFAULT_PATH', $config->path.'/vendor/jp7internet/_default');
 
         // JS
         $scripts = array(
-            DEFAULT_PATH.'js/jquery/jquery-1.3.2.min.js',
-            DEFAULT_PATH.'js/interdyn.js',
-            DEFAULT_PATH.'js/interdyn_checkflash.js',
-            DEFAULT_PATH.'js/interdyn_form.js',
-            DEFAULT_PATH.'js/interdyn_form_lang_'.$lang->lang.'.js',
-            DEFAULT_PATH.'js/swfobject.js',
-            DEFAULT_PATH.'js/interdyn_menu.js',
+            DEFAULT_PATH.'/js/jquery/jquery-1.3.2.min.js',
+            DEFAULT_PATH.'/js/interdyn.js',
+            DEFAULT_PATH.'/js/interdyn_checkflash.js',
+            DEFAULT_PATH.'/js/interdyn_form.js',
+            DEFAULT_PATH.'/js/interdyn_form_lang_'.$lang->lang.'.js',
+            DEFAULT_PATH.'/js/swfobject.js',
+            DEFAULT_PATH.'/js/interdyn_menu.js',
             'js/functions.js',
         );
         foreach ($scripts as $file) {
             $view->headScript()->appendFile($file);
         }
         // CSS
-        $view->headLink()->appendStylesheet(DEFAULT_PATH.'css/7_w3c.css');
+        $view->headLink()->appendStylesheet(DEFAULT_PATH.'/css/7_w3c.css');
         $view->headLink()->appendStylesheet('css/main.css');
 
         Jp7_View::readErrors();

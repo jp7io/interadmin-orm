@@ -114,6 +114,6 @@ class Jp7_InterAdmin_JSTree
 
     public function getIconeUrl($icone)
     {
-        return DEFAULT_PATH.'img/icons/'.$icone.'.png';
+        return DEFAULT_PATH.'/img/icons/'.$icone.'.png';
     }
 }

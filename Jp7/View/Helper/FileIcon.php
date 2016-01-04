@@ -9,7 +9,7 @@ class Jp7_View_Helper_FileIcon extends Zend_View_Helper_Abstract
         ob_start();
         if (in_array($ext, $availableIcons)) {
             ?>
-            <img src="<?= DEFAULT_PATH ?>img/ico_file_<?php echo $ext;
+            <img src="<?= DEFAULT_PATH ?>/img/ico_file_<?php echo $ext;
             ?>.gif" alt="<?php echo $ext;
             ?>" />
 			<?php

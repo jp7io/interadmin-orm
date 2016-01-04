@@ -35,9 +35,9 @@ class Jp7_VideosController extends __Controller_Action
                 'fields' => array('title', 'video', 'thumb', 'summary', 'duration'),
             ));
 
-            $this->view->headScript()->appendFile(DEFAULT_PATH.'js/fancybox-2.1.5/jquery.fancybox.pack.js');
-            $this->view->headScript()->appendFile(DEFAULT_PATH.'js/fancybox-2.1.5/helpers/jquery.fancybox-media.js');
-            $this->view->headLink()->appendStylesheet(DEFAULT_PATH.'js/fancybox-2.1.5/jquery.fancybox.css');
+            $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/fancybox-2.1.5/jquery.fancybox.pack.js');
+            $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/fancybox-2.1.5/helpers/jquery.fancybox-media.js');
+            $this->view->headLink()->appendStylesheet(DEFAULT_PATH.'/js/fancybox-2.1.5/jquery.fancybox.css');
         }
     }
 }

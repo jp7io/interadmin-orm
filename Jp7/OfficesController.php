@@ -14,7 +14,7 @@ class Jp7_OfficesController extends __Controller_Action
         $officesTipo = self::getTipo();
 
         $this->view->headScript()->appendFile('http://maps.google.com/maps/api/js?sensor=true');
-        $this->view->headScript()->appendFile(DEFAULT_PATH.'js/jquery/jquery.jp7.js');
+        $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/jquery/jquery.jp7.js');
 
         if ($id) {
             $record = $officesTipo->findById($id, array(
