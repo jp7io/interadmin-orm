@@ -133,14 +133,15 @@ class Jp7_InterAdmin_Util
     public static function _importChildren($record, $use_id_string, $bind_children)
     {
         foreach ($record->_children as $child_id_tipo => $tipo_children) {
-            $child_tipo = InterAdminTipo::getInstance($child_id_tipo);
+            $childTipo = InterAdminTipo::getInstance($child_id_tipo);
+            $childTipo->setParent($record);
 
             foreach ($tipo_children as $child) {
                 unset($child->id);
                 unset($child->id_slug);
 
                 $child->setParent($record);
-                $child->setTipo($child_tipo);
+                $child->setTipo($childTipo);
 
                 if ($use_id_string || $bind_children) {
                     self::_importAttributeFromIdString($child, $bind_children);
