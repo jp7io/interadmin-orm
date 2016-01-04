@@ -147,7 +147,7 @@ class InterAdminField
                     $campo_array['where'] .= ' AND id IN('.($valor ?: '0').')';
                 }
                 if ($xtra == 'X') {
-                    include 'site/aplicacao/select_multi.php';
+                    require __DIR__.'/InterAdminField/select_multi.php';
                     $campo_nome = trim($campo_nome);
                     $campo_nome = interadmin_tipos_nome((is_numeric($campo_nome)) ? $campo_nome : 0);
                 } elseif ($xtra) {
