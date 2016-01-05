@@ -45,6 +45,10 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo
 
         if ($ips) {
             foreach ($ips as $ip) {
+                if ($ip->ip === '*.*.*.*') {
+                    return true;
+                }
+        
                 $ip->ip = '/'.addcslashes(str_replace('*', '[0-9]{1,3}', $ip->ip), '.').'/';
                 if (preg_match($ip->ip, $usuarioIp)) {
                     return true;
