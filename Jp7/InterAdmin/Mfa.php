@@ -228,7 +228,7 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
             self::$issuer = $c_interadmin_app_title.' - '.$config->name;
 
             if ($config->server->type != InterSite::PRODUCAO) {
-                self::$issuer .= ' ('.mb_strtoupper($config->server->type == 'Desenvolvimento' ? 'Dev' : '').')';
+                self::$issuer .= ' ('.$config->server->type.')';
             }
         }
 
