@@ -2,18 +2,30 @@
 
 namespace Jp7;
 
+use Mail;
+
 class ExceptionHandler
 {
+    const DEBUG_EMAIL = 'debug@jp7.com.br';
+    
     public static function handle($exception)
     {
-        $mensagem = self::getMessage($exception);
-        
-        $subject = '['.$_SERVER['HTTP_HOST'].']['.get_class($exception).'] '.
-            substr($exception->getMessage(), 0, 100);
-        $headers  = 'MIME-Version: 1.0'."\r\n";
-        $headers .= 'Content-type: text/html; charset=UTF-8'."\r\n";
-                
-        mail('debug@jp7.com.br', $subject, $mensagem, $headers);
+        $subject = self::getSubject($exception);
+        $html = self::getMessage($exception);
+                    
+        Mail::raw($html, function ($message) use ($subject) {
+            $message->getSwiftMessage()->setContentType('text/html');
+            
+            $message->to(self::DEBUG_EMAIL)
+                ->subject($subject);
+        });
+    }
+    
+    public static function getSubject($exception)
+    {
+        return '['.array_get($_SERVER, 'HTTP_HOST').']'.
+            '['.get_class($exception).']'.
+            ' '.substr($exception->getMessage(), 0, 100);
     }
 
     public static function getMessage($exception)
