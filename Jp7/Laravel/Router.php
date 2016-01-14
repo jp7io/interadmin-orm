@@ -129,7 +129,7 @@ class Router extends MethodForwarder
     
     public function group(array $attributes, Closure $callback)
     {
-        if (!empty($attributes['prefix']) && empty($attributes['namespace'])) {
+        if (!empty($attributes['prefix']) && !array_key_exists('namespace', $attributes)) {
             $attributes['namespace'] = studly_case($attributes['prefix']);
         }
         return parent::group($attributes, $callback);
