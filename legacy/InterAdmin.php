@@ -5,6 +5,7 @@ use Jp7\Interadmin\ClassMap;
 use Jp7\Interadmin\Query;
 use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 
 /**
  * Class which represents records on the table interadmin_{client name}.

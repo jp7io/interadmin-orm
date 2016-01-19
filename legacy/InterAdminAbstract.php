@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\Str;
 use Jp7\Interadmin\TipoCache;
 use Jp7\CollectionUtil;
 use Jp7\TryMethod;
