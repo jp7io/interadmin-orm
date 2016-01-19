@@ -31,11 +31,11 @@ class InterAdminTipo extends InterAdminAbstract
     
     const ID_TIPO = 0;
 
-    private static $inheritedFields = array(
+    private static $inheritedFields = [
         'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
         'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo', 'xtra_disabledfields', 'xtra_disabledchildren',
-    );
-    private static $privateFields = array('children', 'campos');
+    ];
+    private static $privateFields = ['children', 'campos'];
 
     protected static $_defaultClass = 'InterAdminTipo';
 
@@ -116,7 +116,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
      */
-    public static function getInstance($id_tipo, $options = array())
+    public static function getInstance($id_tipo, $options = [])
     {
         if (isset($options['class'])) {
             // Classe foi forçada
@@ -154,7 +154,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdminTipo|InterAdminAbstract
      */
-    public function getParent($options = array())
+    public function getParent($options = [])
     {
         if ($this->_parent) {
             return $this->_parent;
@@ -167,7 +167,7 @@ class InterAdminTipo extends InterAdminAbstract
     }
     public function getAncestors()
     {
-        $parents = array();
+        $parents = [];
         $parent = $this;
 
         while (($parent = $parent->getParent()) && $parent->id_tipo) {
@@ -195,7 +195,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @deprecated
      */
-    public function getChildren($deprecated, $options = array())
+    public function getChildren($deprecated, $options = [])
     {
         if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
             throw new Exception('Use children()->all() instead.');
@@ -206,7 +206,7 @@ class InterAdminTipo extends InterAdminAbstract
         if (empty($options['fields'])) {
             $options['fields'] = $this->getAttributesNames();
         } else {
-            $options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+            $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
         }
         $options['from'] = $this->getTableName().' AS main';
         $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
@@ -219,13 +219,13 @@ class InterAdminTipo extends InterAdminAbstract
 
         $rs = $this->_executeQuery($options);
 
-        $tipos = array();
+        $tipos = [];
         foreach ($rs as $row) {
-            $tipo = InterAdminTipo::getInstance($row->id_tipo, array(
+            $tipo = InterAdminTipo::getInstance($row->id_tipo, [
                 'db' => $this->_db,
                 'class' => isset($options['class']) ? $options['class'] : null,
                 'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
-            ));
+            ]);
             $tipo->setParent($this);
             $this->_getAttributesFromRow($row, $tipo, $options);
             $tipos[] = $tipo;
@@ -251,7 +251,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @deprecated
      */
-    public function deprecatedFind($options = array())
+    public function deprecatedFind($options = [])
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
 
@@ -263,7 +263,7 @@ class InterAdminTipo extends InterAdminAbstract
         $rs = $this->_executeQuery($options, $select_multi_fields);
         $options['select_multi_fields'] = $select_multi_fields;
 
-        $records = array();
+        $records = [];
         foreach ($rs as $row) {
             $_id = isset($row->id) ? $row->id : null;
             $record = InterAdmin::getInstance($_id, $optionsInstance, $this);
@@ -277,7 +277,7 @@ class InterAdminTipo extends InterAdminAbstract
             foreach ($options['eager_load'] as $relationshipData) {
                 if ($relationshipData['type'] == 'select') {
                     if ($relationshipData['levels']) {
-                        $selects = array();
+                        $selects = [];
                         $property = $relationshipData['name'];
                         foreach ($records as $item) {
                             if ($item->$property) {
@@ -295,33 +295,33 @@ class InterAdminTipo extends InterAdminAbstract
         return new Collection($records);
     }
 
-    public function deprecated_distinct($column, $options = array())
+    public function deprecated_distinct($column, $options = [])
     {
         return $this->deprecated_aggregate('DISTINCT', $column, $options);
     }
 
-    public function deprecated_max($column, $options = array())
+    public function deprecated_max($column, $options = [])
     {
         $retorno = $this->deprecated_aggregate('MAX', $column, $options);
 
         return $retorno[0];
     }
 
-    public function deprecated_min($column, $options = array())
+    public function deprecated_min($column, $options = [])
     {
         $retorno = $this->deprecated_aggregate('MIN', $column, $options);
 
         return $retorno[0];
     }
 
-    public function deprecated_sum($column, $options = array())
+    public function deprecated_sum($column, $options = [])
     {
         $retorno = $this->deprecated_aggregate('SUM', $column, $options);
 
         return $retorno[0];
     }
 
-    public function deprecated_avg($column, $options = array())
+    public function deprecated_avg($column, $options = [])
     {
         $retorno = $this->deprecated_aggregate('AVG', $column, $options);
 
@@ -344,7 +344,7 @@ class InterAdminTipo extends InterAdminAbstract
         }
 
         $rs = $this->_executeQuery($options);
-        $array = array();
+        $array = [];
         foreach ($rs as $row) {
             $array[] = $row->{'main.values'};
         }
@@ -359,18 +359,18 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return int Count of InterAdmins found.
      */
-    public function count($deprecated, $options = array())
+    public function count($deprecated, $options = [])
     {
         if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
             throw new Exception('Use records()->count() instead.');
         }
         if (empty($options['group'])) {
-            $options['fields'] = array('COUNT(id) AS count_id');
+            $options['fields'] = ['COUNT(id) AS count_id'];
         } elseif ($options['group'] == 'id') {
             // O COUNT() precisa trazer a contagem total em 1 linha
             // Caso exista GROUP BY id, ele traria em várias linhas
             // Esse é um tratamento especial apenas para o ID
-            $options['fields'] = array('COUNT(DISTINCT id) AS count_id');
+            $options['fields'] = ['COUNT(DISTINCT id) AS count_id'];
             unset($options['group']);
         } else {
             // Se houver GROUP BY com outro campo, retornará a contagem errada
@@ -391,13 +391,13 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdmin First InterAdmin object found.
      */
-    public function findFirst($deprecated, $options = array())
+    public function findFirst($deprecated, $options = [])
     {
         if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
             throw new Exception('Use records()->first() instead.');
         }
 
-        return $this->deprecatedFind(array('limit' => 1) + $options)->first();
+        return $this->deprecatedFind(['limit' => 1] + $options)->first();
     }
 
     /**
@@ -445,13 +445,13 @@ class InterAdminTipo extends InterAdminAbstract
     {
         if (!$A = $this->_getMetadata('campos')) {
             //unset($model->campos);
-            $campos_parameters = array(
+            $campos_parameters = [
                 'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
                 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
                 'default', 'nome_id',
-            );
+            ];
             $campos    = explode('{;}', $this->campos);
-            $A = array();
+            $A = [];
             for ($i = 0; $i < count($campos); $i++) {
                 $parameters = explode('{,}', $campos[$i]);
                 if ($parameters[0]) {
@@ -462,10 +462,10 @@ class InterAdminTipo extends InterAdminAbstract
                     }
                     if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
                         $id_tipo = $A[$parameters[0]]['nome'];
-                        $A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
+                        $A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, [
                             'db' => $this->_db,
                             'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
-                        ));
+                        ]);
                     }
                 }
             }
@@ -668,9 +668,9 @@ class InterAdminTipo extends InterAdminAbstract
 
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->id_tipo) {
-            $inheritingTipos = InterAdminTipo::findTiposByModel($this->id_tipo, array(
+            $inheritingTipos = InterAdminTipo::findTiposByModel($this->id_tipo, [
                 'class' => 'InterAdminTipo',
-            ));
+            ]);
             foreach ($inheritingTipos as $tipo) {
                 $tipo->syncInheritance();
                 $tipo->updateAttributes($tipo->attributes);
@@ -686,7 +686,7 @@ class InterAdminTipo extends InterAdminAbstract
         foreach (array_filter(explode(',', $this->inherited)) as $inherited_var) {
             $this->attributes[$inherited_var] = '';
         }
-        $this->inherited = array();
+        $this->inherited = [];
         // Atualizando cache com dados do modelo
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
@@ -730,7 +730,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return int Count of deleted InterAdmins.
      */
-    public function deprecated_deleteInterAdmins($options = array())
+    public function deprecated_deleteInterAdmins($options = [])
     {
         $records = $this->deprecatedFind($options);
         foreach ($records as $record) {
@@ -747,7 +747,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return int Count of deleted InterAdmins.
      */
-    public function deprecated_deleteInterAdminsForever($options = array())
+    public function deprecated_deleteInterAdminsForever($options = [])
     {
         $records = $this->deprecatedFind($options);
         foreach ($records as $record) {
@@ -765,7 +765,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return int Count of updated InterAdmins.
      */
-    public function deprecated_updateInterAdmins($attributes, $options = array())
+    public function deprecated_updateInterAdmins($attributes, $options = [])
     {
         $records = $this->deprecatedFind($options);
         foreach ($records as $record) {
@@ -782,11 +782,11 @@ class InterAdminTipo extends InterAdminAbstract
 
     public function getAttributesCampos()
     {
-        return array();
+        return [];
     }
     public function getAttributesAliases()
     {
-        return array();
+        return [];
     }
     public function getTableName()
     {
@@ -795,7 +795,7 @@ class InterAdminTipo extends InterAdminAbstract
     public function getInterAdminsOrder()
     {
         if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
-            $interadminsOrderBy = array();
+            $interadminsOrderBy = [];
             $campos = $this->getCampos();
             if ($campos) {
                 foreach ($campos as $key => $row) {
@@ -876,7 +876,7 @@ class InterAdminTipo extends InterAdminAbstract
         if (!$children = $this->_getMetadata('children')) {
             //$model = $this->getModel();
 
-            $children = array();
+            $children = [];
             $childrenArr = explode('{;}', $this->children);
             for ($i = 0; $i < count($childrenArr) - 1; $i++) {
                 $childrenArrParts = explode('{,}', $childrenArr[$i]);
@@ -884,7 +884,7 @@ class InterAdminTipo extends InterAdminAbstract
                     // Fix para tipos com estrutura antiga e desatualizada
                     $childrenArrParts = array_pad($childrenArrParts, 4, '');
                 }
-                $child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), $childrenArrParts);
+                $child = array_combine(['id_tipo', 'nome', 'ajuda', 'netos'], $childrenArrParts);
                 $nome_id = studly_case(to_slug($child['nome']));
                 $children[$nome_id] = $child;
             }
@@ -907,10 +907,10 @@ class InterAdminTipo extends InterAdminAbstract
         if (isset($childrenTipos[$nome_id])) {
             $id_tipo = $childrenTipos[$nome_id]['id_tipo'];
 
-            return InterAdminTipo::getInstance($id_tipo, array(
+            return InterAdminTipo::getInstance($id_tipo, [
                 'db' => $this->_db,
                 'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
-            ));
+            ]);
         }
     }
 
@@ -921,22 +921,22 @@ class InterAdminTipo extends InterAdminAbstract
         if (isset($relationships[$relationship])) {
             $data = $relationships[$relationship];
 
-            return array(
+            return [
                 'type' => 'select',
                 'tipo' => $data['provider'],
                 'name' => $relationship,
                 'alias' => true,
-            );
+            ];
         }
         // As children
         $studlyCased = ucfirst($relationship);
         if ($childrenTipo = $this->getInterAdminsChildrenTipo($studlyCased)) {
-            return array(
+            return [
                 'type' => 'children',
                 'tipo' => $childrenTipo,
                 'name' => $relationship,
                 'alias' => true,
-            );
+            ];
         }
         // As method
         $optionsInstance = ['default_class' => static::DEFAULT_NAMESPACE.'InterAdmin'];
@@ -954,9 +954,9 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdmin
      */
-    public function deprecated_createInterAdmin(array $attributes = array())
+    public function deprecated_createInterAdmin(array $attributes = [])
     {
-        $options = array('default_class' => static::DEFAULT_NAMESPACE.'InterAdmin');
+        $options = ['default_class' => static::DEFAULT_NAMESPACE.'InterAdmin'];
         $record = InterAdmin::getInstance(0, $options, $this);
         if ($mostrar = $this->getCamposAlias('char_key')) {
             $record->$mostrar = 'S';
@@ -980,20 +980,20 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
      */
-    public function getTiposUsingThisModel($options = array())
+    public function getTiposUsingThisModel($options = [])
     {
         if (!isset($this->_tiposUsingThisModel)) {
-            $options2 = array(
+            $options2 = [
                 'fields' => 'id_tipo',
                 'from' => $this->getTableName().' AS main',
-                'where' => array(
+                'where' => [
                     "model_id_tipo = '".$this->id_tipo."'",
-                ),
-            );
+                ],
+            ];
             $rs = $this->_executeQuery($options2);
 
             $options['default_class'] = static::DEFAULT_NAMESPACE.'InterAdminTipo';
-            $this->_tiposUsingThisModel = array();
+            $this->_tiposUsingThisModel = [];
             foreach ($rs as $row) {
                 $this->_tiposUsingThisModel[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);
             }
@@ -1009,9 +1009,9 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdminTipo
      */
-    public static function findFirstTipo($options = array())
+    public static function findFirstTipo($options = [])
     {
-        $tipos = self::findTipos(array('limit' => 1) + $options);
+        $tipos = self::findTipos(['limit' => 1] + $options);
 
         return empty($tipos) ? null : $tipos[0];
     }
@@ -1023,9 +1023,9 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdminTipo
      */
-    public static function findFirstTipoByModel($model_id_tipo, $options = array())
+    public static function findFirstTipoByModel($model_id_tipo, $options = [])
     {
-        return self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options)[0];
+        return self::findTiposByModel($model_id_tipo, ['limit' => 1] + $options)[0];
     }
     /**
      * Retrieves all the InterAdminTipo with the given "model_id_tipo".
@@ -1035,7 +1035,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return array
      */
-    public static function findTiposByModel($model_id_tipo, $options = array())
+    public static function findTiposByModel($model_id_tipo, $options = [])
     {
         $options['where'][] = "model_id_tipo = '".$model_id_tipo."'";
         if ($model_id_tipo != '0') {
@@ -1052,7 +1052,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @return InterAdminTipo[]
      */
-    public static function findTipos($options = array())
+    public static function findTipos($options = [])
     {
         $instance = new self();
         if (isset($options['db'])) {
@@ -1061,7 +1061,7 @@ class InterAdminTipo extends InterAdminAbstract
         if (!isset($options['fields'])) {
             $options['fields'] = [];
         }
-        $options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+        $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
 
         $options['from'] = $instance->getTableName().' AS main';
         if (empty($options['where'])) {
@@ -1075,13 +1075,13 @@ class InterAdminTipo extends InterAdminAbstract
         $options['campos'] = $instance->getAttributesCampos();
 
         $rs = $instance->_executeQuery($options);
-        $tipos = array();
+        $tipos = [];
 
         foreach ($rs as $row) {
-            $tipo = InterAdminTipo::getInstance($row->id_tipo, array(
+            $tipo = InterAdminTipo::getInstance($row->id_tipo, [
                 'db' => $instance->getDb(),
                 'class' => isset($options['class']) ? $options['class'] : null,
-            ));
+            ]);
             $instance->_getAttributesFromRow($row, $tipo, $options);
             $tipos[] = $tipo;
         }
@@ -1093,10 +1093,10 @@ class InterAdminTipo extends InterAdminAbstract
     {
         $this->_whereArrayFix($options['where']); // FIXME
 
-        $optionsInstance = array(
+        $optionsInstance = [
             'class' => isset($options['class']) ? $options['class'] : null,
             'default_class' => static::DEFAULT_NAMESPACE.'InterAdmin',
-        );
+        ];
 
         $recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
         if ($this->_parent instanceof InterAdmin) {
@@ -1117,7 +1117,7 @@ class InterAdminTipo extends InterAdminAbstract
         $this->_resolveWildcard($options['fields'], $recordModel);
 
         if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-            $requiredFields = array_intersect(array('id', 'id_tipo', 'id_slug'), $recordModel->getColumns());
+            $requiredFields = array_intersect(['id', 'id_tipo', 'id_slug'], $recordModel->getColumns());
             $options['fields'] = array_merge($requiredFields, (array) $options['fields']);
         }
 
@@ -1128,7 +1128,7 @@ class InterAdminTipo extends InterAdminAbstract
         $options['aliases'] = $recordModel->getAttributesAliases();
         $options['campos'] = $recordModel->getAttributesCampos();
         $options['model'] = $recordModel;
-        $options['eager_load'] = array();
+        $options['eager_load'] = [];
 
         if (isset($options['with'])) {
             foreach ($options['with'] as $withRelationship) {
@@ -1140,12 +1140,12 @@ class InterAdminTipo extends InterAdminAbstract
                     if ($relationshipData['type'] === 'select') {
                         // select.* - Esse carregamento é feito com join para aproveitar código existente
                         // E também porque join é mais rápido para hasOne() do que um novo select
-                        $options['fields'][$levels[0]] = array('*');
+                        $options['fields'][$levels[0]] = ['*'];
                         array_shift($levels);
                     }
-                    $options['eager_load'][] = $relationshipData + array(
+                    $options['eager_load'][] = $relationshipData + [
                         'levels' => $levels,
-                    );
+                    ];
                 } else {
                     throw new Exception('Unknown relationship: '.$levels[0]);
                 }
@@ -1155,7 +1155,7 @@ class InterAdminTipo extends InterAdminAbstract
 
     public function getInterAdminsAdminAttributes()
     {
-        return array('id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted', 'hits');
+        return ['id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted', 'hits'];
     }
 
     public function getFillable()
@@ -1179,12 +1179,12 @@ class InterAdminTipo extends InterAdminAbstract
         return $query->whereIn('id_tipo', $tipos);
     }
 
-    public function deprecatedTypelessFind($options = array())
+    public function deprecatedTypelessFind($options = [])
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
 
         $rs = $this->_executeQuery($options);
-        $records = array();
+        $records = [];
         foreach ($rs as $row) {
             $type = InterAdminTipo::getInstance($row->id_tipo);
 
@@ -1231,7 +1231,7 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public function getAdminAttributes()
     {
-        return array();
+        return [];
     }
 
     public function records()

@@ -3,7 +3,7 @@
 class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
 {    protected static $_children;
 
-    public $attributes = array(
+    public $attributes = [
         'id_tipo' => 'Content',
         'nome' => 'Conteúdo',
         'campos' => 'varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}2{,}{,}{,}{,}{,}{,}{,}title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}subtitle{;}text_1{,}Resumo{,}{,}3{,}{,}{,}html_light{,}{,}{,}{,}{,}{,}{,}{,}{,}summary{;}text_2{,}Texto{,}{,}20{,}{,}S{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}text{;}file_1{,}Imagem{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}image{;}int_key{,}Ordem{,}{,}{,}{,}{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
@@ -19,7 +19,7 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
         'editar' => 'S',
-    );
+    ];
 
     public function __construct()
     {

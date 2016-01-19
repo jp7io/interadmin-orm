@@ -17,7 +17,7 @@ class Collection extends BaseCollection
             if (is_object($subitem)) {
                 $key = $subitem->__toString();
                 if (!array_key_exists($key, $subitems)) {
-                    $subitem->$keepItemsAs = array();
+                    $subitem->$keepItemsAs = [];
                     $subitems[$key] = $subitem;
                 }
                 $subitems[$key]->{$keepItemsAs}[] = $item;

@@ -17,7 +17,7 @@ class CollectionUtil
      */
     public static function separate($array, $clause)
     {
-        $separated = array();
+        $separated = [];
 
         $properties = explode('.', $clause);
         foreach ($array as $item) {
@@ -37,14 +37,14 @@ class CollectionUtil
             $first = reset($array);
 
             $tipo = $first->getType();
-            $retornos = $tipo->find(array(
+            $retornos = $tipo->find([
                 'class' => 'InterAdmin',
                 'fields' => $fields,
                 'fields_alias' => $fields_alias,
-                'where' => array('id IN ('.implode(',', $array).')'),
+                'where' => ['id IN ('.implode(',', $array).')'],
                 'order' => 'FIELD(id,'.implode(',', $array).')',
                 //'debug' => true
-            ));
+            ]);
             foreach ($retornos as $key => $retorno) {
                 $array[$key]->attributes = $retorno->attributes + $array[$key]->attributes;
             }
@@ -54,7 +54,7 @@ class CollectionUtil
     public static function eagerLoad($records, $relationships)
     {
         if (!is_array($relationships)) {
-            $relationships = array($relationships);
+            $relationships = [$relationships];
         }
         $relationship = array_shift($relationships);
 
@@ -94,7 +94,7 @@ class CollectionUtil
                 $children = self::separate($children, 'parent_id');
 
                 foreach ($records as $record) {
-                    $record->setEagerLoad($relationship, $children[$record->id] ?: array());
+                    $record->setEagerLoad($relationship, $children[$record->id] ?: []);
                 }
             } else {
                 throw new Exception('Unsupported relationship type: "'.$data['type'].'" for class '.get_class($model).' - ID: '.$model->id);

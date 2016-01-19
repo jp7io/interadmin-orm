@@ -10,7 +10,7 @@ class Type extends Base
 {
     protected function _isChar($field)
     {
-        $chars = array(
+        $chars = [
             'mostrar',
             'language',
             'menu',
@@ -28,7 +28,7 @@ class Type extends Base
             'publish_tipo',
             'visualizar',
             'deleted_tipo',
-        );
+        ];
 
         return in_array($field, $chars);
     }
@@ -53,7 +53,7 @@ class Type extends Base
         return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
     }
 
-    public function build(array $attributes = array())
+    public function build(array $attributes = [])
     {
         $className = InterAdminTipo::getDefaultClass();
 
@@ -64,7 +64,7 @@ class Type extends Base
         return $child->fill($attributes);
     }
 
-    public function create(array $attributes = array())
+    public function create(array $attributes = [])
     {
         return $this->build($attributes)->save();
     }

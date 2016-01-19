@@ -5,7 +5,7 @@ namespace Jp7\Interadmin;
 class TipoCache
 {
     protected $key;
-    protected static $cache = array();
+    protected static $cache = [];
 
     public static function getInstance()
     {

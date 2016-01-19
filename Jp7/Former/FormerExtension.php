@@ -139,7 +139,7 @@ class FormerExtension
         } elseif ($field->getType() === 'radios') {
             $radios = [];
             foreach ($campoType->records()->all() as $record) {
-                $radios[$record->getName()] = array('value' => $record->id);
+                $radios[$record->getName()] = ['value' => $record->id];
             }
             $field->radios($radios);
         }

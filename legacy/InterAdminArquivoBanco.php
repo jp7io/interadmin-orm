@@ -2,7 +2,7 @@
 
 class InterAdminArquivoBanco
 {
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
     }

@@ -13,7 +13,7 @@ class Table extends \HtmlObject\Table
      *
      * @return $this
      */
-    public function rows(array $rows = array())
+    public function rows(array $rows = [])
     {
         // Cancel if no rows
         if (!$rows) {
@@ -32,9 +32,9 @@ class Table extends \HtmlObject\Table
         }
 
         // Nest into table
-        $this->nest(array(
+        $this->nest([
             'tbody' => $tbody,
-        ));
+        ]);
 
         return $this;
     }

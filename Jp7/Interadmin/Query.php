@@ -33,7 +33,7 @@ class Query extends Query\Base
     /**
      * Create a record without saving.
      */
-    public function build(array $attributes = array())
+    public function build(array $attributes = [])
     {
         return $this->provider->deprecated_createInterAdmin($attributes);
     }
@@ -41,7 +41,7 @@ class Query extends Query\Base
     /**
      * Create and save a record.
      */
-    public function create(array $attributes = array())
+    public function create(array $attributes = [])
     {
         return $this->build($attributes)->save();
     }
@@ -106,7 +106,7 @@ class Query extends Query\Base
             throw new BadMethodCallException('Bad relationship path: '.$relationshipPath);
         }
 
-        $joins = array();
+        $joins = [];
 
         while ($relationship = array_shift($path)) {
             $relationshipData = $type->getRelationshipData($relationship);
@@ -186,7 +186,7 @@ class Query extends Query\Base
      */
     public function min($column)
     {
-        return $this->aggregate(__FUNCTION__, array($column));
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -198,7 +198,7 @@ class Query extends Query\Base
      */
     public function max($column)
     {
-        return $this->aggregate(__FUNCTION__, array($column));
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     /**
@@ -210,7 +210,7 @@ class Query extends Query\Base
      */
     public function sum($column)
     {
-        $result = $this->aggregate(__FUNCTION__, array($column));
+        $result = $this->aggregate(__FUNCTION__, [$column]);
 
         return $result ?: 0;
     }
@@ -224,7 +224,7 @@ class Query extends Query\Base
      */
     public function avg($column)
     {
-        return $this->aggregate(__FUNCTION__, array($column));
+        return $this->aggregate(__FUNCTION__, [$column]);
     }
 
     protected function aggregate($function, $columns)
@@ -272,9 +272,9 @@ class Query extends Query\Base
 
     public function lists($column, $key = null)
     {
-        $array = $this->provider->deprecatedFind(array(
+        $array = $this->provider->deprecatedFind([
             'fields' => array_filter([$column, $key]),
-        ) + $this->options);
+        ] + $this->options);
 
         return jp7_collect(array_pluck($array, $column, $key));
     }
@@ -284,9 +284,9 @@ class Query extends Query\Base
      */
     public function jsonList($column, $key)
     {
-        $items = $this->provider->deprecatedFind(array(
+        $items = $this->provider->deprecatedFind([
             'fields' => array_filter([$column, $key]),
-        ) + $this->options);
+        ] + $this->options);
 
         return $items->jsonList($column, $key);
     }

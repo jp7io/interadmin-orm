@@ -20,7 +20,7 @@ trait TypeTrait
      *
      * @return string
      */
-    public function getUrl($action = 'index', array $parameters = array())
+    public function getUrl($action = 'index', array $parameters = [])
     {
         if (func_num_args() === 1 && is_array($action)) {
             list($action, $parameters) = [null, $action];
@@ -56,7 +56,7 @@ trait TypeTrait
 
     public function getRoute($action = 'index')
     {
-        $validActions = array('index', 'show', 'create', 'store', 'update', 'destroy', 'edit');
+        $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
         if (!in_array($action, $validActions)) {
             throw new BadMethodCallException('Invalid action "'.$action.'", valid actions: '.implode(', ', $validActions));
         }

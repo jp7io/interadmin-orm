@@ -26,7 +26,7 @@ trait RecordTrait
         }
 
         $variables = Router::getVariablesFromRoute($route);
-        $hasSlug = in_array($action, array('show', 'edit', 'update', 'destroy'));
+        $hasSlug = in_array($action, ['show', 'edit', 'update', 'destroy']);
 
         if ($hasSlug) {
             $removedVar = array_pop($variables);

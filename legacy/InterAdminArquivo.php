@@ -44,17 +44,17 @@ class InterAdminArquivo extends InterAdminAbstract
      *
      * @return InterAdminTipo
      */
-    public function getType($options = array())
+    public function getType($options = [])
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
                 kd('not implemented');
                 $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
             }
-            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
+            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
                 'db' => $this->_db,
                 'class' => $options['class'],
-            ));
+            ]);
         }
 
         return $this->_tipo;
@@ -76,7 +76,7 @@ class InterAdminArquivo extends InterAdminAbstract
      *
      * @return InterAdmin
      */
-    public function getParent($options = array())
+    public function getParent($options = [])
     {
         if (!$this->_parent) {
             $tipo = $this->getType();
@@ -124,16 +124,16 @@ class InterAdminArquivo extends InterAdminAbstract
     {
         global $lang;
         // Inserindo no banco de arquivos
-        $fieldsValues = array(
+        $fieldsValues = [
             'id_tipo' => $this->id_tipo,
             'id' => $this->id,
             'tipo' => $this->getExtension(),
             'parte' => intval($this->parte),
             'keywords' => $this->nome,
             'lang' => $lang->lang,
-        );
+        ];
 
-        $banco = new InterAdminArquivoBanco(array('db_prefix' => $this->db_prefix));
+        $banco = new InterAdminArquivoBanco(['db_prefix' => $this->db_prefix]);
         $id_arquivo_banco = $banco->addFile($fieldsValues);
 
         // Descobrindo o caminho da pasta
@@ -182,21 +182,21 @@ class InterAdminArquivo extends InterAdminAbstract
 
     public function getAttributesAliases()
     {
-        return array();
+        return [];
     }
     public function getAttributesCampos()
     {
-        return array();
+        return [];
     }
 
     public function getFillable()
     {
-        return array('parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem');
+        return ['parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem'];
     }
 
     public function getAttributesNames()
     {
-        return array('id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted');
+        return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
     public function getTableName()
     {
@@ -224,6 +224,6 @@ class InterAdminArquivo extends InterAdminAbstract
      */
     public function getAdminAttributes()
     {
-        return array();
+        return [];
     }
 }

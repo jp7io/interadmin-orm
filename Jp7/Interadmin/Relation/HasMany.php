@@ -40,10 +40,10 @@ class HasMany
             $conditions = array_merge($conditions, $where);
         }
 
-        return array(
+        return [
             'tipo' => $type,
             'conditions' => $conditions,
-        );
+        ];
     }
 
     public function query()

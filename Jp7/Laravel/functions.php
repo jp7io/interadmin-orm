@@ -10,7 +10,7 @@ if (!function_exists('interadmin_data')) {
      */
     function human_size($bytes, $decimals = 2)
     {
-        $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+        $size = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
 
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$size[$factor];
@@ -44,12 +44,12 @@ if (!function_exists('interadmin_data')) {
 
     function error_controller($action)
     {
-        $request = Request::create('/error/'.$action, 'GET', array());
+        $request = Request::create('/error/'.$action, 'GET', []);
 
         return Route::dispatch($request);
     }
 
-    function link_open($url, $attributes = array())
+    function link_open($url, $attributes = [])
     {
         return substr(link_to($url, '', $attributes), 0, -4);
     }
@@ -59,7 +59,7 @@ if (!function_exists('interadmin_data')) {
         return '</a>';
     }
 
-    function img_tag($img, $template = null, $options = array())
+    function img_tag($img, $template = null, $options = [])
     {
         return ImgResize::tag($img, $template, $options);
     }

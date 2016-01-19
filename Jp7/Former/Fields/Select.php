@@ -10,7 +10,7 @@ class Select extends \Former\Form\Fields\Select
             throw new \Exception('Use ->lists(attr_name,id)');
         }
         
-        $this->children = array();
+        $this->children = [];
         return parent::options($list, $selected, $valuesAsKeys);
     }
     

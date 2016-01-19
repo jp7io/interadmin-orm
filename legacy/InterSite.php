@@ -18,13 +18,13 @@ class InterSite
      *
      * @var array
      */
-    public $servers = array();
+    public $servers = [];
     /**
      * Array of languages for this site.
      *
      * @var array
      */
-    public $langs = array();
+    public $langs = [];
     /**
      * Current server.
      *

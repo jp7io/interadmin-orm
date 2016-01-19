@@ -8,12 +8,12 @@ class File extends Base
 {
     protected function _isChar($field)
     {
-        $chars = array(
+        $chars = [
             'mostrar',
             'destaque',
             'deleted',
             'link_blank',
-        );
+        ];
 
         return in_array($field, $chars);
     }
@@ -30,12 +30,12 @@ class File extends Base
         return $this->provider->getArquivos(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
     }
 
-    public function build(array $attributes = array())
+    public function build(array $attributes = [])
     {
         return $this->provider->deprecated_createArquivo($attributes);
     }
 
-    public function create(array $attributes = array())
+    public function create(array $attributes = [])
     {
         return $this->build($attributes)->save();
     }

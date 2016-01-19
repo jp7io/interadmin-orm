@@ -52,7 +52,7 @@ trait DynamicViewTrait
      */
     public function callAction($method, $parameters)
     {
-        $content = call_user_func_array(array($this, $method), $parameters);
+        $content = call_user_func_array([$this, $method], $parameters);
         if ($content instanceof Response) {
             return $content;
         }

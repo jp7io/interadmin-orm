@@ -15,23 +15,23 @@ abstract class Base
     protected $or = false;
     protected $prefix = '';
 
-    protected $operators = array(
+    protected $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'not like', 'between', 'ilike',
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
-    );
+    ];
 
     public function __construct(InterAdminAbstract $provider)
     {
         $this->provider = $provider;
-        $this->options = array(
-            'fields' => array(),
-            'where' => array(),
+        $this->options = [
+            'fields' => [],
+            'where' => [],
             'order' => null,
             'group' => null,
             'limit' => null,
-        );
+        ];
     }
 
     public function __call($method_name, $params)
@@ -56,7 +56,7 @@ abstract class Base
             $where = $this->_whereClosure($column);
         } else {
             if (func_num_args() == 2) {
-                list($value, $operator) = array($operator, '=');
+                list($value, $operator) = [$operator, '='];
             } elseif ($this->invalidOperatorAndValue($operator, $value)) {
                 throw new \InvalidArgumentException('Value must be provided.');
             }
@@ -182,7 +182,7 @@ abstract class Base
         if (array_key_exists(0, $hash)) {
             throw new \InvalidArgumentException('Invalid column.');
         }
-        $where = array();
+        $where = [];
         foreach ($hash as $key => $value) {
             $where[] = $this->_parseComparison($key, '=', $value);
         }
@@ -292,7 +292,7 @@ abstract class Base
     {
         $type = $this->_resolveType($className);
         $joinOn = $this->_parseConditions($conditions, $type, $alias)[0];
-        $this->options['joins'][$alias] = array($_joinType, $type, $joinOn);
+        $this->options['joins'][$alias] = [$_joinType, $type, $joinOn];
 
         return $this;
     }

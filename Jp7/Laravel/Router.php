@@ -102,7 +102,7 @@ class Router extends MethodForwarder
     //// Route override
     ////
     
-    public function resource($name, $controller = null, array $options = array())
+    public function resource($name, $controller = null, array $options = [])
     {
         if (!is_string($controller) && empty($options)) {
             $options = $controller;
@@ -177,10 +177,10 @@ class Router extends MethodForwarder
         
     public function getVariablesFromRoute($route)
     {
-        $matches = array();
+        $matches = [];
         preg_match_all('/{(\w+)}/', $route->getUri(), $matches);
 
-        return $matches[1] ?: array();
+        return $matches[1] ?: [];
     }
     
     /**

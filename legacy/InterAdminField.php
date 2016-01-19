@@ -25,7 +25,7 @@ class InterAdminField
      *
      * @return
      */
-    public function __construct($field = array())
+    public function __construct($field = [])
     {
         $this->field = $field;
     }
@@ -41,7 +41,7 @@ class InterAdminField
      */
     public static function getSelectTipoXtras()
     {
-        return array('S', 'ajax_tipos', 'radio_tipos');
+        return ['S', 'ajax_tipos', 'radio_tipos'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam tipos.
@@ -50,7 +50,7 @@ class InterAdminField
      */
     public static function getSpecialTipoXtras()
     {
-        return array('tipos_multi', 'tipos');
+        return ['tipos_multi', 'tipos'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam múltiplos registros.
@@ -59,7 +59,7 @@ class InterAdminField
      */
     public static function getSpecialMultiXtras()
     {
-        return array('registros_multi', 'tipos_multi');
+        return ['registros_multi', 'tipos_multi'];
     }
     /**
      * Retorna o valor do campo no header (cabeçalho da listagem).
