@@ -24,7 +24,7 @@ class Jp7_InterAdmin_Soap_Reflection
 
     public function getMethods()
     {
-        $methods = array();
+        $methods = [];
         $reflection = new Zend_Server_Reflection();
 
         // Reflection das classes na stack

@@ -35,7 +35,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
         /* TODO: OpenID 2.0 (7.3) XRI and Yadis discovery */
 
         /* HTML-based discovery */
-        $response = $this->_httpRequest($id, 'GET', array(), $status);
+        $response = $this->_httpRequest($id, 'GET', [], $status);
         if ($status != 200 || !is_string($response)) {
             return false;
         }
@@ -155,7 +155,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
             unset($expires);
         }
 
-        $params = array();
+        $params = [];
         if ($version >= 2.0) {
             $params['openid.ns'] = Zend_OpenId::NS_2_0;
         }
@@ -176,9 +176,9 @@ class Jp7_Openid extends Zend_OpenId_Consumer
                     $this->_session->claimed_id = 'http://specs.openid.net/auth/2.0/identifier_select';
                 }
             } elseif (defined('SID')) {
-                $_SESSION['zend_openid'] = array(
+                $_SESSION['zend_openid'] = [
                     'identity' => $id,
-                    'claimed_id' => $claimedId, );
+                    'claimed_id' => $claimedId, ];
                 if (strpos($server, 'https://www.google.com') === 0) {
                     $_SESSION['zend_openid']['identity'] = 'http://specs.openid.net/auth/2.0/identifier_select';
                     $_SESSION['zend_openid']['claimed_id'] = 'http://specs.openid.net/auth/2.0/identifier_select';
@@ -426,7 +426,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
                 return false;
             }
 
-            $params2 = array();
+            $params2 = [];
             foreach ($params as $key => $val) {
                 if (strpos($key, 'openid_ns_') === 0) {
                     $key = 'openid.ns.'.mb_substr($key, mb_strlen('openid_ns_'));
@@ -444,7 +444,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
 
                 return false;
             }
-            $r = array();
+            $r = [];
             if (is_string($ret)) {
                 foreach (explode("\n", $ret) as $line) {
                     $line = trim($line);

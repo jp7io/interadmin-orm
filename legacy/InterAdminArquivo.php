@@ -44,7 +44,7 @@ class InterAdminArquivo extends InterAdminAbstract
      * @param int   $id_arquivo This record's 'id_arquivo'.
      * @param array $options    Default array of options. Available keys: db_prefix, fields.
      */
-    public function __construct($id_arquivo = 0, $options = array())
+    public function __construct($id_arquivo = 0, $options = [])
     {
         $this->id_arquivo = $id_arquivo;
         $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
@@ -61,17 +61,17 @@ class InterAdminArquivo extends InterAdminAbstract
      *
      * @return InterAdminTipo
      */
-    public function getTipo($options = array())
+    public function getTipo($options = [])
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
                 $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
             }
-            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
+            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
-            ));
+            ]);
         }
 
         return $this->_tipo;
@@ -93,7 +93,7 @@ class InterAdminArquivo extends InterAdminAbstract
      *
      * @return InterAdmin
      */
-    public function getParent($options = array())
+    public function getParent($options = [])
     {
         if (!$this->_parent) {
             $tipo = $this->getTipo();
@@ -148,16 +148,16 @@ class InterAdminArquivo extends InterAdminAbstract
     {
         global $lang;
         // Inserindo no banco de arquivos
-        $fieldsValues = array(
+        $fieldsValues = [
             'id_tipo' => $this->id_tipo,
             'id' => $this->id,
             'tipo' => $this->getExtension(),
             'parte' => intval($this->parte),
             'keywords' => $this->nome,
             'lang' => $lang->lang,
-        );
+        ];
 
-        $banco = new InterAdminArquivoBanco(array('db_prefix' => $this->db_prefix));
+        $banco = new InterAdminArquivoBanco(['db_prefix' => $this->db_prefix]);
         $id_arquivo_banco = $banco->addFile($fieldsValues);
 
         // Descobrindo o caminho da pasta
@@ -198,15 +198,15 @@ class InterAdminArquivo extends InterAdminAbstract
 
     public function getAttributesAliases()
     {
-        return array();
+        return [];
     }
     public function getAttributesCampos()
     {
-        return array();
+        return [];
     }
     public function getAttributesNames()
     {
-        return array('id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted');
+        return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
     public function getTableName()
     {
@@ -234,7 +234,7 @@ class InterAdminArquivo extends InterAdminAbstract
      */
     public function getAdminAttributes()
     {
-        return array();
+        return [];
     }
     public function getSize()
     {

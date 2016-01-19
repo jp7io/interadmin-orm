@@ -8,12 +8,12 @@ class Jp7_Box_Offices extends Jp7_Box_BoxAbstract
     public function prepareData()
     {
         $officeTipo = InterAdminTipo::findFirstTipoByModel('Offices');
-        $this->offices = array();
+        $this->offices = [];
         if ($this->officeTipo = $officeTipo) {
-            $options = array(
-                'fields' => array('*', 'state' => array('sigla')),
+            $options = [
+                'fields' => ['*', 'state' => ['sigla']],
                 'limit' => $this->params->limit,
-            );
+            ];
             if ($this->params->featured) {
                 $options['where'][] = "featured <> ''";
             }

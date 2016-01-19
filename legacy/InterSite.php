@@ -41,13 +41,13 @@ class InterSite
      *
      * @var array
      */
-    public $servers = array();
+    public $servers = [];
     /**
      * Array of languages for this site.
      *
      * @var array
      */
-    public $langs = array();
+    public $langs = [];
     /**
      * Current server.
      *
@@ -309,7 +309,7 @@ class InterSite
                 $message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
                 if ($this->servers) {
                     if ($siteProducao = $this->getFirstServerByType(self::PRODUCAO)) {
-                        $urlProducao = 'http://'.jp7_implode('/', array($siteProducao->host, $siteProducao->path));
+                        $urlProducao = 'http://'.jp7_implode('/', [$siteProducao->host, $siteProducao->path]);
                         $messageLink = 'Acesse o site: <a href="'.$urlProducao.'">'.$urlProducao.'</a>';
                     }
                 }
@@ -318,11 +318,11 @@ class InterSite
         }
 
         /* @todo TEMP - Creating old globals */
-        $oldtypes = array(
+        $oldtypes = [
             self::PRODUCAO => 'Principal',
             self::QA => 'QA',
             self::DESENVOLVIMENTO => 'Local',
-        );
+        ];
         $GLOBALS['c_url'] = $this->url;
         $GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
         $GLOBALS['c_site'] = $this->name_id;
@@ -355,7 +355,7 @@ class InterSite
             $GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
         }
         foreach ($this->langs as $sigla => $lang) {
-            $GLOBALS['c_lang'][] = array($sigla, $lang->name, (bool) $lang->multibyte);
+            $GLOBALS['c_lang'][] = [$sigla, $lang->name, (bool) $lang->multibyte];
         }
         $GLOBALS['c_lang_default'] = $this->lang_default;
         /* TEMP - Creating old globals */

@@ -30,13 +30,13 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
      *
      * @param string $category [optional]
      */
-    public function parserInterAdmins($interAdmins = array(), $category = '', $helpers = array())
+    public function parserInterAdmins($interAdmins = [], $category = '', $helpers = [])
     {
         if (!is_array($interAdmins)) {
             throw new Jp7_Feed_Exception("Undefined value for 'id'");
         }
 
-        $helpers = array_merge(array(
+        $helpers = array_merge([
             'content' => 'texto', // string
             'title' => 'titulo', // string
             'link' => 'link', // string This or getUrl()
@@ -45,7 +45,7 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
             'id' => 'this.link', // valid URI/IRI
             'date_modified' => 'date_modify', // Timestamp value
             'date_created' => 'date_publish', // Timestamp value
-        ), $helpers);
+        ], $helpers);
 
         if (mb_substr($helpers['id'], 0, 5) == 'this.') {
             $methodId = 'get'.ucfirst(mb_strtolower(ltrim($helpers['id'], 'this.')));
@@ -57,7 +57,7 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
                 $entry->setTitle($entryData->$helpers['title']);
                 $entry->setLink($entryData->$helpers['link'] ? $entryData->$helpers['link'] : $entryData->getUrl());
                 if ($category) {
-                    $entry->addCategory(array('term' => $category));
+                    $entry->addCategory(['term' => $category]);
                 }
 
                 if ($entryData->$helpers['content']) {
@@ -106,7 +106,7 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
     private function concatenateFields(InterAdmin $object, $fields, $glue = ' - ')
     {
         if (is_array($fields)) {
-            $concatenated = array();
+            $concatenated = [];
 
             foreach ($fields as $field) {
                 if ($str = $object->$field) {

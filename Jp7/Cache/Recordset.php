@@ -4,12 +4,12 @@ class Jp7_Cache_Recordset extends Jp7_Cache_Data
 {
     protected static $_cachedir = './cache/_mysql/';
 
-    public function __construct($id, $options = array())
+    public function __construct($id, $options = [])
     {
-        $options = $options + array(
+        $options = $options + [
             'lifetime' => '1327770882',
             'cache_dir' => self::$_cachedir,
-        );
+        ];
         if (!is_dir(self::$_cachedir)) {
             mkdir(self::$_cachedir);
             @chmod(self::$_cachedir, 0777);
@@ -27,7 +27,7 @@ class Jp7_Cache_Recordset extends Jp7_Cache_Data
 
     public function save($rs)
     {
-        $rows = array();
+        $rows = [];
         while ($row = $rs->FetchNextObj()) {
             $rows[] = $row;
         }

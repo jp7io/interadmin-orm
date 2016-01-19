@@ -29,7 +29,7 @@ abstract class InterAdminAbstract implements Serializable
      *
      * @var array
      */
-    public $attributes = array();
+    public $attributes = [];
     /**
      * Used to know if the values were updated through setFieldsValues().
      * Hack for compatibility with legacy sites.
@@ -151,16 +151,16 @@ abstract class InterAdminAbstract implements Serializable
         }
         // Retrieving data
         if ($fieldsToLoad) {
-            $options = array(
+            $options = [
                 'fields' => (array) $fieldsToLoad,
                 'fields_alias' => $fieldsAlias,
                 'from' => $this->getTableName().' AS main',
-                'where' => array($this->_primary_key.' = '.intval($this->{$this->_primary_key})),
+                'where' => [$this->_primary_key.' = '.intval($this->{$this->_primary_key})],
                 // Internal use
                 'aliases' => $this->getAttributesAliases(),
                 'campos' => $this->getAttributesCampos(),
                 //'skip_published_filters' => array('main')
-            );
+            ];
             $rs = $this->_executeQuery($options);
             if ($row = $rs->FetchNextObj()) {
                 if ($forceAsString) {
@@ -231,7 +231,7 @@ abstract class InterAdminAbstract implements Serializable
     public function increment($attribute, $by = 1)
     {
         $this->$attribute += $by;
-        $this->_update(array($attribute => $this->$attribute));
+        $this->_update([$attribute => $this->$attribute]);
     }
     /**
      * Updates using SQL.
@@ -242,7 +242,7 @@ abstract class InterAdminAbstract implements Serializable
     {
         $db = $this->getDb();
 
-        $valuesToSave = array();
+        $valuesToSave = [];
         $aliases = array_flip($this->getAttributesAliases());
 
         foreach ($attributes as $key => $value) {
@@ -291,7 +291,7 @@ abstract class InterAdminAbstract implements Serializable
     {
         $interAdminClass = static::DEFAULT_NAMESPACE.'InterAdmin';
 
-        $options = array();
+        $options = [];
         if (strpos($field, 'date_') === 0) {
             return new Jp7_Date($value);
         }
@@ -351,7 +351,7 @@ abstract class InterAdminAbstract implements Serializable
      *
      * @return ADORecordSet
      */
-    protected function _executeQuery($options, &$select_multi_fields = array())
+    protected function _executeQuery($options, &$select_multi_fields = [])
     {
         global $debugger;
         $db = $this->getDb();
@@ -370,7 +370,7 @@ abstract class InterAdminAbstract implements Serializable
         if ($options['fields_alias']) {
             $options['aliases'] = array_flip($options['aliases']);
         } else {
-            $options['aliases'] = array();
+            $options['aliases'] = [];
         }
         if (array_key_exists('use_published_filters', $options)) {
             $use_published_filters = $options['use_published_filters'];
@@ -456,7 +456,7 @@ abstract class InterAdminAbstract implements Serializable
      *
      * @return
      */
-    protected function _resolveSqlClausesAlias(&$options = array(), $use_published_filters)
+    protected function _resolveSqlClausesAlias(&$options = [], $use_published_filters)
     {
         // Group by para wheres com children
         if (empty($options['group']) && strpos(@$options['fields'][0], 'DISTINCT') === false) {
@@ -483,7 +483,7 @@ abstract class InterAdminAbstract implements Serializable
 
         return $this->_resolveSql($clause, $options, $use_published_filters);
     }
-    protected function _resolveSql($clause, &$options = array(), $use_published_filters)
+    protected function _resolveSql($clause, &$options = [], $use_published_filters)
     {
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
@@ -492,11 +492,11 @@ abstract class InterAdminAbstract implements Serializable
         $keyword = '\b[a-zA-Z0-9_.]+\b';
         // not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
         $not_function = '(?![ ]?\()';
-        $reserved = array(
+        $reserved = [
             'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
             'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
             'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END',
-        );
+        ];
 
         $offset = 0;
         $ignoreJoinsUntil = -1;
@@ -506,7 +506,7 @@ abstract class InterAdminAbstract implements Serializable
             
             // Resolvendo true e false para char
             if (mb_strtolower($termo) == 'true' || mb_strtolower($termo) == 'false') {
-                $negativas = array('', '!');
+                $negativas = ['', '!'];
                 if (mb_strtolower($termo) == 'false') {
                     $negativas = array_reverse($negativas);
                 }
@@ -538,11 +538,11 @@ abstract class InterAdminAbstract implements Serializable
                             throw new Exception('The field "'.$table.'" cannot be used as a join on $options.'.
                                     'Expected a child named "'.$joinNome.'". Found: '.implode(', ', array_keys($childrenArr)));
                         }
-                        $joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
+                        $joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db_prefix' => $this->db_prefix,
                             'db' => $this->_db,
                             'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
-                        ));
+                        ]);
 
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
                         $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
@@ -550,10 +550,10 @@ abstract class InterAdminAbstract implements Serializable
                         (($existsMatches[4]) ? ' AND ' : '');
                     } elseif ($options['joins'][$table]) {
                         $joinTipo = $options['joins'][$table][1];
-                        $onClause = array(
+                        $onClause = [
                             'joins' => $options['joins'],
                             'where' => $options['joins'][$table][2],
-                        );
+                        ];
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
                         $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
                         ' WHERE '.$joinFilter.$this->_resolveSqlClausesAlias($onClause, $use_published_filters).(($existsMatches[4]) ? ' AND ' : '');
@@ -584,7 +584,7 @@ abstract class InterAdminAbstract implements Serializable
                             $options['from'][] = $this->db_prefix.'_tags AS '.$table.
                             ' ON '.$table.'.parent_id = main.id';
                         }
-                        $joinAliases = array();
+                        $joinAliases = [];
                         // Joins com children
                     } elseif (strpos($table, 'children_') === 0) {
                         $joinNome = Jp7_Inflector::camelize(mb_substr($table, 9));
@@ -592,11 +592,11 @@ abstract class InterAdminAbstract implements Serializable
                         if (!$childrenArr[$joinNome]) {
                             throw new Exception('The field "'.$table.'" cannot be used as a join on $options.');
                         }
-                        $joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
+                        $joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db_prefix' => $this->db_prefix,
                             'db' => $this->_db,
                             'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
-                        ));
+                        ]);
                         if ($offset > $ignoreJoinsUntil && !in_array($table, (array) $options['from_alias'])) {
                             $options['from_alias'][] = $table;
                             $options['from'][] = $joinTipo->getInterAdminsTableName().
@@ -654,7 +654,7 @@ abstract class InterAdminAbstract implements Serializable
      *
      * @return array Revolved $fields.
      */
-    protected function _resolveFieldsAlias(&$options = array(), $table = 'main.')
+    protected function _resolveFieldsAlias(&$options = [], $table = 'main.')
     {
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
@@ -681,10 +681,10 @@ abstract class InterAdminAbstract implements Serializable
                         $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                         // Processamento dos campos do select_multi é feito depois
                         $joinTipo = null;
-                        $options['select_multi_fields'][$join] = array(
+                        $options['select_multi_fields'][$join] = [
                             'fields' => $fields[$join],
                             'fields_alias' => $options['fields_alias'],
-                        );
+                        ];
                     } else {
                         $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                         // Join e Recursividade
@@ -694,15 +694,15 @@ abstract class InterAdminAbstract implements Serializable
                         $joinTipo = $this->getCampoTipo($campos[$nome]);
                     }
                     if ($joinTipo) {
-                        if ($fields[$join] == array('*')) {
+                        if ($fields[$join] == ['*']) {
                             $fields[$join] = $joinTipo->getCamposNames();
                         }
-                        $joinOptions = array(
+                        $joinOptions = [
                             'fields' => $fields[$join],
                             'fields_alias' => $options['fields_alias'],
                             'campos' => $joinTipo->getCampos(),
                             'aliases' => array_flip($joinTipo->getCamposAlias()),
-                        );
+                        ];
                         $this->_resolveFieldsAlias($joinOptions, $join.'.');
                         foreach ($joinOptions['fields'] as $joinField) {
                             array_push($fields, $joinField);
@@ -741,7 +741,7 @@ abstract class InterAdminAbstract implements Serializable
     /**
      * Helper function to add a join.
      */
-    protected function _addJoinAlias(&$options = array(), $alias, $campo, $table = 'main')
+    protected function _addJoinAlias(&$options = [], $alias, $campo, $table = 'main')
     {
         $joinTipo = $this->getCampoTipo($campo);
         if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
@@ -769,7 +769,7 @@ abstract class InterAdminAbstract implements Serializable
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
         if (!$options['fields_alias']) {
-            $aliases = array();
+            $aliases = [];
         }
         if ($aliases) {
             $fields = array_flip($aliases);
@@ -806,7 +806,7 @@ abstract class InterAdminAbstract implements Serializable
                     // Joins no options
                     list($_joinType, $joinTipo, $_on) = $options['joins'][$table];
                     if (!is_object($attributes[$table])) {
-                        $attributes[$table] = InterAdmin::getInstance(0, array(), $joinTipo);
+                        $attributes[$table] = InterAdmin::getInstance(0, [], $joinTipo);
                     }
                 }
                 if ($joinTipo) {
@@ -906,7 +906,7 @@ abstract class InterAdminAbstract implements Serializable
                 ' WHERE '.$this->_primary_key.' = '.$this->$pk;
             $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
         }
-        $this->attributes = array();
+        $this->attributes = [];
         $this->_deleted = true;
     }
 
@@ -919,7 +919,7 @@ abstract class InterAdminAbstract implements Serializable
         if (is_string($where)) {
             $where = jp7_explode(' AND ', $where);
         } elseif (!$where) {
-            $where = array();
+            $where = [];
         }
     }
 

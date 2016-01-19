@@ -45,8 +45,8 @@ class Jp7_Collections
         $clause = preg_replace('/\s+/', ' ', $clause);
         $keys = explode(',', $clause);
 
-        $novaArray = array();
-        $hashExistente = array();
+        $novaArray = [];
+        $hashExistente = [];
 
         foreach ($array as $item) {
             $hash = ':';
@@ -113,14 +113,14 @@ class Jp7_Collections
     public static function flip($compactedArray, $property)
     {
         $newPropertyName = key($compactedArray);
-        $subitens = array();
+        $subitens = [];
         foreach ($compactedArray[$newPropertyName] as $item) {
             $subitem = $item->$property;
             unset($item->$property);
             if (is_object($subitem)) {
                 $key = $subitem->__toString();
                 if (!array_key_exists($key, $subitens)) {
-                    $subitem->$newPropertyName = array();
+                    $subitem->$newPropertyName = [];
                     $subitens[$key] = $subitem;
                 }
                 $subitens[$key]->{$newPropertyName}[] = $item;
@@ -132,7 +132,7 @@ class Jp7_Collections
 
     public static function separate($array, $property)
     {
-        $separated = array();
+        $separated = [];
         foreach ($array as $item) {
             $separated[$item->$property][] = $item;
         }
@@ -150,7 +150,7 @@ class Jp7_Collections
      */
     public static function sort($array, $clause, $debug = false)
     {
-        $dirMap = array('desc' => 1, 'asc' => -1);
+        $dirMap = ['desc' => 1, 'asc' => -1];
 
         $clause = preg_replace('/\s+/', ' ', $clause);
         $keys = explode(',', $clause);
@@ -249,7 +249,7 @@ class Jp7_Collections
      */
     public static function implode($separator, $array, $propertyName = 'nome', $discardEmptyValues = true)
     {
-        $stringArr = array();
+        $stringArr = [];
         foreach ($array as $item) {
             if ($item instanceof InterAdminTipo) {
                 $stringArr[] = $item->getFieldsValues($propertyName);
@@ -283,7 +283,7 @@ class Jp7_Collections
      */
     public static function prefixToArray($multiarray, $prefix)
     {
-        $newarray = array();
+        $newarray = [];
         $preflen = mb_strlen($prefix) + 1;
         foreach ($multiarray as $name => $array) {
             $namekey = mb_substr($name, $preflen);
@@ -303,14 +303,14 @@ class Jp7_Collections
             $first = reset($array);
 
             $tipo = $first->getTipo();
-            $retornos = $tipo->find(array(
+            $retornos = $tipo->find([
                 'class' => 'InterAdmin',
                 'fields' => $fields,
                 'fields_alias' => $fields_alias,
-                'where' => array('id IN ('.implode(',', $array).')'),
+                'where' => ['id IN ('.implode(',', $array).')'],
                 'order' => 'FIELD(id,'.implode(',', $array).')',
                 //'debug' => true
-            ));
+            ]);
             foreach ($retornos as $key => $retorno) {
                 $array[$key]->attributes = $retorno->attributes + $array[$key]->attributes;
             }

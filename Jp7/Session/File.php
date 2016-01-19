@@ -69,12 +69,12 @@ class Jp7_Session_File
         static::$save_handler = $static_class;
 
         return session_set_save_handler(
-            array($static_class, 'open'),
-            array($static_class, 'close'),
-            array($static_class, 'read'),
-            array($static_class, 'write'),
-            array($static_class, 'destroy'),
-            array($static_class, 'gc')
+            [$static_class, 'open'],
+            [$static_class, 'close'],
+            [$static_class, 'read'],
+            [$static_class, 'write'],
+            [$static_class, 'destroy'],
+            [$static_class, 'gc']
         );
     }
 

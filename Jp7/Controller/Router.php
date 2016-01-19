@@ -37,7 +37,7 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite
         $extraParams = array_diff_key($userParams, $current);
         $userParams = $userParams + $current;
 
-        $url = array();
+        $url = [];
         foreach ($extraParams as $key => $value) {
             $url[] = $value;
             $url[] = $key;

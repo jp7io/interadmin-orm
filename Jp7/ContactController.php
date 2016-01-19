@@ -14,9 +14,9 @@ class Jp7_ContactController extends __Controller_Action
         $contactTipo = self::getTipo();
         // Introdução
         if ($introductionTipo = $contactTipo->getFirstChildByModel('Introduction')) {
-            $this->view->introductionItens = $introductionTipo->find(array(
+            $this->view->introductionItens = $introductionTipo->find([
                 'fields' => '*',
-            ));
+            ]);
         }
 
         // Formulário
@@ -84,23 +84,23 @@ class Jp7_ContactController extends __Controller_Action
 
         $formHelper = new Jp7_Form();
         // E-mail normal para os destinatários do site
-        $mail = $formHelper->createMail($record, array(
+        $mail = $formHelper->createMail($record, [
             'subject' => 'Site '.$config->name.' - '.$contactTipo->nome,
             'title' => $contactTipo->nome,
             'recipients' => $recipients,
-        ));
+        ]);
         $mail->setFrom($record->email, $record->name);
         $mail->send();
 
         if ($sendReply) {
             // E-mail de resposta para o usuário
-            $reply = $formHelper->createMail($record, array(
+            $reply = $formHelper->createMail($record, [
                 'subject' => 'Confirmação de Recebimento - '.$config->name.' - '.$contactTipo->nome,
                 'title' => $contactTipo->nome,
-                'recipients' => array($record), // Envia para o próprio usuário
+                'recipients' => [$record], // Envia para o próprio usuário
                 'message' => 'Agradecemos o seu contato.<br />'.
                     'Por favor, aguarde nosso retorno em breve.<br /><br />',
-            ));
+            ]);
             $reply->setFrom($config->admin_email, $config->admin_name);
             $reply->send();
         }
@@ -110,9 +110,9 @@ class Jp7_ContactController extends __Controller_Action
     {
         $recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
 
-        return $recipientsTipo->find(array(
-            'fields' => array('name', 'email'),
-        ));
+        return $recipientsTipo->find([
+            'fields' => ['name', 'email'],
+        ]);
     }
 
     protected function _getFormHtml($campos, $record)

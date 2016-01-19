@@ -9,7 +9,7 @@ class Jp7_InterAdmin_Tagcloud
     {
         global $db, $db_prefix, $lang;
         $DbNow = $db->BindTimeStamp(date('Y-m-d H:i:s'));
-        $tags_arr = array();
+        $tags_arr = [];
         $sql = 'SELECT registros.id, registros.hits'.
             ' FROM '.$db_prefix.$lang->prefix.' AS registros'.
             ' INNER JOIN '.$db_prefix.$lang->prefix.'_tags AS tags'.
@@ -31,7 +31,7 @@ class Jp7_InterAdmin_Tagcloud
         }
         $rs->Close();
 
-        $tags_arr_unique = array();
+        $tags_arr_unique = [];
         foreach ($tags_arr as $tag) {
             $tag_key = ($tag->id) ? $tag->id_tipo.';'.$tag->id : $tag->id_tipo;
             $tags_arr_unique[$tag_key]['obj'] = $tag;

@@ -9,32 +9,32 @@ class Jp7_Box_Manager
     const COL_2_RIGHT = 5;
     const COL_3 = 6;
 
-    public static $labels = array(
+    public static $labels = [
         self::COL_1_LEFT => '1 coluna - Esquerda',
         self::COL_1_CENTER => '1 coluna - Centro',
         self::COL_1_RIGHT => '1 coluna - Direita',
         self::COL_2_LEFT => '2 colunas - Esquerda',
         self::COL_2_RIGHT => '2 colunas - Direita',
         self::COL_3 => '3 colunas',
-    );
+    ];
 
-    public static $positions = array(
+    public static $positions = [
         self::COL_1_LEFT => 0,
         self::COL_1_CENTER => 1,
         self::COL_1_RIGHT => 2,
         self::COL_2_LEFT => 0,
         self::COL_2_RIGHT => 1,
         self::COL_3 => 0,
-    );
+    ];
 
-    public static $widths = array(
+    public static $widths = [
         self::COL_1_LEFT => 1,
         self::COL_1_CENTER => 1,
         self::COL_1_RIGHT => 1,
         self::COL_2_LEFT => 2,
         self::COL_2_RIGHT => 2,
         self::COL_3 => 3,
-    );
+    ];
     /**
      * @var Zend_View
      */
@@ -43,7 +43,7 @@ class Jp7_Box_Manager
     /**
      * @var array
      */
-    private static $array = array(
+    private static $array = [
         'content' => 'Jp7_Box_Content',
         'facebook' => 'Jp7_Box_Facebook',
         'facebook-comments' => 'Jp7_Box_FacebookComments',
@@ -60,7 +60,7 @@ class Jp7_Box_Manager
         'videos' => 'Jp7_Box_Videos',
         'youtube' => 'Jp7_Box_Youtube',
         '_content' => 'Jp7_Box_PageContent',
-    );
+    ];
 
     /**
      * @var bool Define se é uma página de registro (com ID), ou página de Tipo. O que permite variações nos boxes.
@@ -178,10 +178,10 @@ class Jp7_Box_Manager
      */
     public static function buildBoxes($boxTipo)
     {
-        $records = $boxTipo->find(array(
-            'fields' => array('*'),
-            'where' => array(self::getRecordMode() ? "records_page <> ''" : "records_page = ''"),
-        ));
+        $records = $boxTipo->find([
+            'fields' => ['*'],
+            'where' => [self::getRecordMode() ? "records_page <> ''" : "records_page = ''"],
+        ]);
         // Convert to objects
         $columns = self::createObjects($records);
         // Layout
@@ -197,13 +197,13 @@ class Jp7_Box_Manager
                     $columns[$position]->width = new stdClass();
                 }
                 $columns[$position]->width = self::$widths[$layout];
-                $columns[$position]->boxes = array(self::createBoxFromId('_content'));
+                $columns[$position]->boxes = [self::createBoxFromId('_content')];
             }
         }
 
         $widthCount = 0;
         $i = 0;
-        $rows = array();
+        $rows = [];
         // Loading data
         foreach ($columns as $column) {
             foreach ($column->boxes as $box) {
@@ -229,12 +229,12 @@ class Jp7_Box_Manager
     public static function createObjects($columns)
     {
         foreach ($columns as $column) {
-            $records = $column->getBoxes(array(
-                'fields' => array('*'),
+            $records = $column->getBoxes([
+                'fields' => ['*'],
                 'fields_alias' => true,
                 'use_published_filters' => true,
-            ));
-            $column->boxes = array();
+            ]);
+            $column->boxes = [];
             foreach ($records as $record) {
                 if ($box = self::createBox($record)) {
                     $column->boxes[] = $box;

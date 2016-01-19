@@ -2,7 +2,7 @@
 
 class Jp7_View_Helper_Box extends Zend_View_Helper_Abstract
 {
-    public function Box($id_box, $params = array())
+    public function Box($id_box, $params = [])
     {
         $classe = Jp7_Box_Manager::get($id_box);
         if (!$classe) {

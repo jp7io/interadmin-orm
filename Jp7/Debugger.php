@@ -294,7 +294,7 @@ class Jp7_Debugger
      */
     public function addLog($value, $tag = 'log', $time = null)
     {
-        $this->_log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
+        $this->_log[] = ['tag' => $tag, 'value' => $value, 'time' => $time];
     }
     /**
      * Returns the log array.

@@ -37,7 +37,7 @@ class Jp7_Openid_GoogleExtension extends Zend_OpenId_Extension
         $this->params[$key] = $value;
     }
 
-    private $params = array(
+    private $params = [
         'openid.ns.ui' => 'http://specs.openid.net/extensions/ui/1.0',
         'openid.ns.ext1' => 'http://openid.net/srv/ax/1.0',
         'openid.ext1.mode' => 'fetch_request',
@@ -45,7 +45,7 @@ class Jp7_Openid_GoogleExtension extends Zend_OpenId_Extension
         'openid.ext1.required' => 'email',
         'openid.ui.mode' => 'popup',
         'openid.ui.icon' => 'true',
-    );
+    ];
 
     public function prepareRequest(&$params)
     {

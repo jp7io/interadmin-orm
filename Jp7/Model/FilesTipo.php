@@ -2,7 +2,7 @@
 
 class Jp7_Model_FilesTipo extends Jp7_Model_TipoAbstract
 {
-    public $attributes = array(
+    public $attributes = [
         'id_tipo' => 'Files',
         'nome' => 'Arquivos para Download',
         'campos' => 'varchar_key{,}Nome{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}name{;}file_1{,}Arquivo{,}{,}{,}S{,}S{,}trigger{,}S{,}{,}{,}{,}{,}{,}{,}{,}file{;}int_key{,}Ordem{,}{,}{,}{,}S{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
@@ -19,7 +19,7 @@ class Jp7_Model_FilesTipo extends Jp7_Model_TipoAbstract
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
         'editar' => 'S',
         'icone' => 'page_white_put',
-    );
+    ];
 
     public function createChildren(InterAdminTipo $tipo)
     {

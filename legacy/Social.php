@@ -19,64 +19,64 @@
 class Social
 {
     /* Bookmarking */
-    public $displaySocials = array();
+    public $displaySocials = [];
 
-    private $mainSocials = array(
-        'delicious' => array(
+    private $mainSocials = [
+        'delicious' => [
             'title' => 'Delicious',
             'url' => 'http://del.icio.us/post?url=%url%&title=%title%',
-        ),
-        'myweb' => array(
+        ],
+        'myweb' => [
             'title' => 'Yahoo MyWeb',
             'url' => 'http://myweb2.search.yahoo.com/myresults/bookmarklet?u=%url%&t=%title%',
-        ),
-        'google' => array(
+        ],
+        'google' => [
             'title' => 'Google Bookmarks',
             'url' => 'http://www.google.com/bookmarks/mark?op=edit&bkmk=%url%&title=%title%',
-        ),
+        ],
         'stumbleupon' => 'StumbleUpon',
-        'digg' => array(
+        'digg' => [
             'title' => 'Digg',
             'url' => 'http://digg.com/submit?phase=2&url=%url%&title=%title%',
-        ),
-        'live' => array(
+        ],
+        'live' => [
             'title' => 'Windows Live',
             // Idioma na string (mkt = pt-br)
             'url' => 'https://favorites.live.com/quickadd.aspx?marklet=1&mkt=pt-br&url=%url%&title=%title%&top=1',
-        ),
+        ],
         'reddit' => 'Reddit',
-    );
-    private $extendedSocials = array(
-        'twitter' => array(
+    ];
+    private $extendedSocials = [
+        'twitter' => [
             'title' => 'Twitter',
             'url' => 'http://twitter.com/?status=%title% - %url%',
-        ),
-        'linkedin' => array(
+        ],
+        'linkedin' => [
             'title' => 'LinkedIn',
             'url' => 'http://www.linkedin.com/shareArticle?mini=true&url=%url%&title=%title%&summary=&source=',
-        ),
-        'facebook' => array(
+        ],
+        'facebook' => [
             'title' => 'Facebook',
             'url' => 'http://www.facebook.com/share.php?u=%url%',
-        ),
-        'myspace' => array(
+        ],
+        'myspace' => [
             'title' => 'MySpace',
             'url' => 'http://www.myspace.com/Modules/PostTo/Pages/?l=3&u=%url%&t=%title%&c=',
-        ),
+        ],
         'slashdot' => 'Slashdot',
         'ask' => 'Ask',
         'blinklist' => 'Blinklist',
         'multiply' => 'Multiply',
-        'technorati' => array(
+        'technorati' => [
             'title' => 'Technorati',
             'url' => 'http://www.technorati.com/faves?add=%url%',
-        ),
-        'yahoobkm' => array(
+        ],
+        'yahoobkm' => [
             'title' => 'Yahoo Bookmarks',
             'url' => 'http://bookmarks.yahoo.com/toolbar/savebm?opener=tb&u=%url%&t=%title%',
-        ),
-    );
-    private $otherSocials = array(
+        ],
+    ];
+    private $otherSocials = [
         'propeller' => 'Propeller',
         'backflip' => 'Backflip',
         'kaboodle' => 'Kaboodle',
@@ -98,8 +98,8 @@ class Social
         'furl' => 'Furl',
         'newsvine' => 'Newsvine',
         'yardbarker' => 'Yardbarker',
-    );
-    private $allSocials = array();
+    ];
+    private $allSocials = [];
 
     private function createSocial($theme)
     {
@@ -118,7 +118,7 @@ class Social
                 $this->displaySocials = $this->allSocials;
                 break;
             case 'custom':
-                $this->displaySocials = array();
+                $this->displaySocials = [];
                 break;
             default:
                 $this->displaySocials = $this->mainSocials;
@@ -148,7 +148,7 @@ class Social
         }
     }
 
-    public function newBookmark($theme = 'main', $add = array(), $remove = array())
+    public function newBookmark($theme = 'main', $add = [], $remove = [])
     {
         // Create a social
         self::createSocial($theme);
@@ -161,7 +161,7 @@ class Social
             self::removeSocials($remove);
         }
     }
-    public function displayBookmark($limiter = 5, $url = false, $title = '', $target = '_blank', $customUrl = array())
+    public function displayBookmark($limiter = 5, $url = false, $title = '', $target = '_blank', $customUrl = [])
     {
         // Must create a social first
         if (!$this->displaySocials) {

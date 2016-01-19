@@ -9,7 +9,7 @@ class Jp7_Antibot
     protected $attempts_before_captcha = 3;
     protected $seconds_before_reset = 300; // 5 minutos
 
-    protected function __construct($options = array())
+    protected function __construct($options = [])
     {
         $this->captcha_url = DEFAULT_PATH.'/site/_templates/antibot.php';
         $this->redirect = $options['redirect'] ?: $_SERVER['REQUEST_URI'];
@@ -28,7 +28,7 @@ class Jp7_Antibot
         $this->filename = preg_replace('/\W+/', '_', $_SERVER['REMOTE_ADDR']);
     }
 
-    public static function getInstance($options = array())
+    public static function getInstance($options = [])
     {
         return new static($options);
     }
@@ -90,7 +90,7 @@ class Jp7_Antibot
             }
         }
 
-        return (object) array('count' => 0, 'first_attempt' => time());
+        return (object) ['count' => 0, 'first_attempt' => time()];
     }
 
     public function saveData($data)
@@ -105,7 +105,7 @@ class Jp7_Antibot
     public function secret()
     {
         if (!is_array($_SESSION['_antispoof'])) {
-            $_SESSION['_antispoof'] = array();
+            $_SESSION['_antispoof'] = [];
         }
         $secret = uniqid();
         $_SESSION['_antispoof'][] = $secret;

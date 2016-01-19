@@ -25,7 +25,7 @@
      *
      * @return Jp7_Cache_Output
      */
-    public static function getInstance(array $frontOptions = array(), array $backOptions = array())
+    public static function getInstance(array $frontOptions = [], array $backOptions = [])
     {
         if (!self::$_instance) {
             global $debugger, $s_session;
@@ -37,14 +37,14 @@
 
             self::$_delay = intval($config->cache_delay);
 
-            $frontDefault = array(
+            $frontDefault = [
                 'lifetime' => 86400, // 1 dia
                 'class_name' => self::$_className,
                 'automatic_cleaning_factor' => 100,
-            );
-            $backDefault = array(
+            ];
+            $backDefault = [
                 'cache_dir' => self::$_cachedir,
-            );
+            ];
             $frontOptions = $frontOptions + $frontDefault;
             // Necessário pela falta do PHP 5.3 e late static bind
             self::$_cachedir = $backDefault['cache_dir'];
@@ -122,7 +122,7 @@
      * @param bool   $echoData         If set to true, datas are sent to the browser
      * @param int    $priority         integer between 0 (very low priority) and 10 (maximum priority) used by some particular backends
      */
-    public function end($tags = array(), $specificLifetime = false, $forcedDatas = null, $echoData = true, $priority = 8)
+    public function end($tags = [], $specificLifetime = false, $forcedDatas = null, $echoData = true, $priority = 8)
     {
         /* CODIGO ORIGINAL DA ZEND */
         if ($forcedDatas === null) {
@@ -170,7 +170,7 @@
      *
      * @return
      */
-    public static function getPlaceholder($name, $vars = array())
+    public static function getPlaceholder($name, $vars = [])
     {
         return '{CACHE:'.$name.'|'.serialize($vars).'}'."\n";
     }
@@ -222,11 +222,11 @@
      {
          $params = Zend_Controller_Front::getInstance()->getRequest()->getParams();
 
-         $id = toId(implode('_', array(
+         $id = toId(implode('_', [
             $params['controller'],
             $params['action'],
             $params['lang'],
-            $params['module'], )
+            $params['module'], ]
         ));
 
          if ($data) {
@@ -283,7 +283,7 @@
             $metas = $this->getBackend()->getMetadatas($id);
 
             $css = 'position:absolute;border:1px solid black;border-top:0px;font-weight:bold;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000;cursor:pointer;';
-            $title = array(
+            $title = [
                 '# Cache: ',
                     '  '.self::$_cachedir.$id,
                     '  '.date('d/m/Y H:i:s', $metas['mtime']),
@@ -294,7 +294,7 @@
                 '# Delay para limpeza: '.self::$_delay.' segundos',
                 '# IP Servidor: '.$_SERVER['SERVER_ADDR'],
                 '# DB: '.$config->db->host.'/'.$config->db->name,
-            );
+            ];
 
             $title = implode('&#013;', $title);
 

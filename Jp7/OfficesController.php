@@ -17,9 +17,9 @@ class Jp7_OfficesController extends __Controller_Action
         $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/jquery/jquery.jp7.js');
 
         if ($id) {
-            $record = $officesTipo->findById($id, array(
-                'fields' => array('*', 'state' => array('sigla')),
-            ));
+            $record = $officesTipo->findById($id, [
+                'fields' => ['*', 'state' => ['sigla']],
+            ]);
             if (!$record) {
                 $this->_redirect($officesTipo->getUrl());
             }
@@ -27,14 +27,14 @@ class Jp7_OfficesController extends __Controller_Action
         } else {
             // Introdução
             if ($introductionTipo = $officesTipo->getFirstChildByModel('Introduction')) {
-                $this->view->introductionItens = $introductionTipo->find(array(
+                $this->view->introductionItens = $introductionTipo->find([
                     'fields' => '*',
-                ));
+                ]);
             }
 
-            $this->view->records = $officesTipo->find(array(
-                'fields' => array('*', 'state' => array('sigla')),
-            ));
+            $this->view->records = $officesTipo->find([
+                'fields' => ['*', 'state' => ['sigla']],
+            ]);
         }
     }
 }

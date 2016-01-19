@@ -72,11 +72,11 @@ class Jp7_Diff_Xml
      *
      * @return string
      */
-    public static function elementClean($element, $attribs = array(), $contents = '')
+    public static function elementClean($element, $attribs = [], $contents = '')
     {
         global $wgContLang;
         if ($attribs) {
-            $attribs = array_map(array('UtfNormal', 'cleanUp'), $attribs);
+            $attribs = array_map(['UtfNormal', 'cleanUp'], $attribs);
         }
         if ($contents) {
             //wfProfileIn( __METHOD__ . '-norm' );
@@ -141,7 +141,7 @@ class Jp7_Diff_Xml
     {
         global $wgContLang;
         $namespaces = $wgContLang->getFormattedNamespaces();
-        $options = array();
+        $options = [];
 
         // Godawful hack... we'll be frequently passed selected namespaces
         // as strings since PHP is such a shithole.
@@ -152,7 +152,7 @@ class Jp7_Diff_Xml
         }
 
         if (!is_null($all)) {
-            $namespaces = array($all => wfMsg('namespacesall')) + $namespaces;
+            $namespaces = [$all => wfMsg('namespacesall')] + $namespaces;
         }
         foreach ($namespaces as $index => $name) {
             if ($index < NS_MAIN) {
@@ -164,8 +164,8 @@ class Jp7_Diff_Xml
             $options[] = self::option($name, $index, $index === $selected);
         }
 
-        $ret = self::openElement('select', array('id' => 'namespace', 'name' => $element_name,
-            'class' => 'namespaceselector', ))
+        $ret = self::openElement('select', ['id' => 'namespace', 'name' => $element_name,
+            'class' => 'namespaceselector', ])
             ."\n"
             .implode("\n", $options)
             ."\n"
@@ -189,7 +189,7 @@ class Jp7_Diff_Xml
     public static function monthSelector($selected = '', $allmonths = null, $id = 'month')
     {
         global $wgLang;
-        $options = array();
+        $options = [];
         if (is_null($selected)) {
             $selected = '';
         }
@@ -200,7 +200,7 @@ class Jp7_Diff_Xml
             $options[] = self::option($wgLang->getMonthName($i), $i, $selected === $i);
         }
 
-        return self::openElement('select', array('id' => $id, 'name' => 'month', 'class' => 'mw-month-selector'))
+        return self::openElement('select', ['id' => $id, 'name' => 'month', 'class' => 'mw-month-selector'])
             .implode("\n", $options)
             .self::closeElement('select');
     }
@@ -233,7 +233,7 @@ class Jp7_Diff_Xml
         }
 
         return self::label(wfMsg('year'), 'year').' '.
-            self::input('year', 4, $encYear, array('id' => 'year', 'maxlength' => 4)).' '.
+            self::input('year', 4, $encYear, ['id' => 'year', 'maxlength' => 4]).' '.
             self::label(wfMsg('month'), 'month').' '.
             self::monthSelector($encMonth, -1);
     }
@@ -268,13 +268,13 @@ class Jp7_Diff_Xml
             $options .= self::option("$code - $name", $code, ($code == $selected))."\n";
         }
 
-        return array(
+        return [
             self::label(wfMsg('yourlanguage'), 'wpUserLanguage'),
             self::tags('select',
-                array('id' => 'wpUserLanguage', 'name' => 'wpUserLanguage'),
+                ['id' => 'wpUserLanguage', 'name' => 'wpUserLanguage'],
                 $options
             ),
-        );
+        ];
     }
 
     /**
@@ -286,9 +286,9 @@ class Jp7_Diff_Xml
      *
      * @return string
      */
-    public static function span($text, $class, $attribs = array())
+    public static function span($text, $class, $attribs = [])
     {
-        return self::element('span', array('class' => $class) + $attribs, $text);
+        return self::element('span', ['class' => $class] + $attribs, $text);
     }
 
     /**
@@ -301,9 +301,9 @@ class Jp7_Diff_Xml
      *
      * @return string
      */
-    public static function wrapClass($text, $class, $tag = 'span', $attribs = array())
+    public static function wrapClass($text, $class, $tag = 'span', $attribs = [])
     {
-        return self::tags($tag, array('class' => $class) + $attribs, $text);
+        return self::tags($tag, ['class' => $class] + $attribs, $text);
     }
 
     /**
@@ -316,12 +316,12 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function input($name, $size = false, $value = false, $attribs = array())
+    public static function input($name, $size = false, $value = false, $attribs = [])
     {
-        return self::element('input', array(
+        return self::element('input', [
             'name' => $name,
             'size' => $size,
-            'value' => $value, ) + $attribs);
+            'value' => $value, ] + $attribs);
     }
 
     /**
@@ -334,9 +334,9 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function password($name, $size = false, $value = false, $attribs = array())
+    public static function password($name, $size = false, $value = false, $attribs = [])
     {
-        return self::input($name, $size, $value, array_merge($attribs, array('type' => 'password')));
+        return self::input($name, $size, $value, array_merge($attribs, ['type' => 'password']));
     }
 
     /**
@@ -346,7 +346,7 @@ class Jp7_Diff_Xml
      */
     public static function attrib($name, $present = true)
     {
-        return $present ? array($name => $name) : array();
+        return $present ? [$name => $name] : [];
     }
 
     /**
@@ -358,13 +358,13 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function check($name, $checked = false, $attribs = array())
+    public static function check($name, $checked = false, $attribs = [])
     {
         return self::element('input', array_merge(
-            array(
+            [
                 'name' => $name,
                 'type' => 'checkbox',
-                'value' => 1, ),
+                'value' => 1, ],
             self::attrib('checked', $checked),
             $attribs));
     }
@@ -379,12 +379,12 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function radio($name, $value, $checked = false, $attribs = array())
+    public static function radio($name, $value, $checked = false, $attribs = [])
     {
-        return self::element('input', array(
+        return self::element('input', [
             'name' => $name,
             'type' => 'radio',
-            'value' => $value, ) + self::attrib('checked', $checked) + $attribs);
+            'value' => $value, ] + self::attrib('checked', $checked) + $attribs);
     }
 
     /**
@@ -397,7 +397,7 @@ class Jp7_Diff_Xml
      */
     public static function label($label, $id)
     {
-        return self::element('label', array('for' => $id), $label);
+        return self::element('label', ['for' => $id], $label);
     }
 
     /**
@@ -412,7 +412,7 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function inputLabel($label, $name, $id, $size = false, $value = false, $attribs = array())
+    public static function inputLabel($label, $name, $id, $size = false, $value = false, $attribs = [])
     {
         list($label, $input) = self::inputLabelSep($label, $name, $id, $size, $value, $attribs);
 
@@ -422,12 +422,12 @@ class Jp7_Diff_Xml
     /**
      * Same as Jp7_Diff_Xml::inputLabel() but return input and label in an array.
      */
-    public static function inputLabelSep($label, $name, $id, $size = false, $value = false, $attribs = array())
+    public static function inputLabelSep($label, $name, $id, $size = false, $value = false, $attribs = [])
     {
-        return array(
+        return [
             self::label($label, $id),
-            self::input($name, $size, $value, array('id' => $id) + $attribs),
-        );
+            self::input($name, $size, $value, ['id' => $id] + $attribs),
+        ];
     }
 
     /**
@@ -435,9 +435,9 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function checkLabel($label, $name, $id, $checked = false, $attribs = array())
+    public static function checkLabel($label, $name, $id, $checked = false, $attribs = [])
     {
-        return self::check($name, $checked, array('id' => $id) + $attribs).
+        return self::check($name, $checked, ['id' => $id] + $attribs).
             '&nbsp;'.
             self::label($label, $id);
     }
@@ -447,9 +447,9 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function radioLabel($label, $name, $value, $id, $checked = false, $attribs = array())
+    public static function radioLabel($label, $name, $value, $id, $checked = false, $attribs = [])
     {
-        return self::radio($name, $value, $checked, array('id' => $id) + $attribs).
+        return self::radio($name, $value, $checked, ['id' => $id] + $attribs).
             '&nbsp;'.
             self::label($label, $id);
     }
@@ -462,15 +462,15 @@ class Jp7_Diff_Xml
      *
      * @return string HTML
      */
-    public static function submitButton($value, $attribs = array())
+    public static function submitButton($value, $attribs = [])
     {
-        return Html::element('input', array('type' => 'submit', 'value' => $value) + $attribs);
+        return Html::element('input', ['type' => 'submit', 'value' => $value] + $attribs);
     }
 
     /**
      * @deprecated Synonymous to Html::hidden()
      */
-    public static function hidden($name, $value, $attribs = array())
+    public static function hidden($name, $value, $attribs = [])
     {
         return Html::hidden($name, $value, $attribs);
     }
@@ -486,7 +486,7 @@ class Jp7_Diff_Xml
      * @return string HTML
      */
     public static function option($text, $value = null, $selected = false,
-            $attribs = array())
+            $attribs = [])
     {
         if (!is_null($value)) {
             $attribs['value'] = $value;
@@ -527,7 +527,7 @@ class Jp7_Diff_Xml
                 if ($optgroup) {
                     $options .= self::closeElement('optgroup');
                 }
-                $options .= self::openElement('optgroup', array('label' => $value));
+                $options .= self::openElement('optgroup', ['label' => $value]);
                 $optgroup = true;
             } elseif (mb_substr($value, 0, 2) == '**') {
                 // groupmember
@@ -546,7 +546,7 @@ class Jp7_Diff_Xml
             $options .= self::closeElement('optgroup');
         }
 
-        $attribs = array();
+        $attribs = [];
         if ($name) {
             $attribs['id'] = $name;
             $attribs['name'] = $name;
@@ -572,7 +572,7 @@ class Jp7_Diff_Xml
      * @param $content Pre-escaped content for the fieldset. If false, only open fieldset is returned.
      * @param $attribs Any attributes to fieldset-element.
      */
-    public static function fieldset($legend = false, $content = false, $attribs = array())
+    public static function fieldset($legend = false, $content = false, $attribs = [])
     {
         $s = self::openElement('fieldset', $attribs)."\n";
         if ($legend) {
@@ -595,14 +595,14 @@ class Jp7_Diff_Xml
      * @param $rows The number of rows for the textarea
      * @param $attribs Any other attributes for the textarea
      */
-    public static function textarea($name, $content, $cols = 40, $rows = 5, $attribs = array())
+    public static function textarea($name, $content, $cols = 40, $rows = 5, $attribs = [])
     {
         return self::element('textarea',
-                    array('name' => $name,
+                    ['name' => $name,
                         'id' => $name,
                         'cols' => $cols,
                         'rows' => $rows,
-                    ) + $attribs,
+                    ] + $attribs,
                     $content, false);
     }
 
@@ -618,7 +618,7 @@ class Jp7_Diff_Xml
     public static function escapeJsString($string)
     {
         // See ECMA 262 section 7.8.4 for string literal format
-        $pairs = array(
+        $pairs = [
             '\\' => '\\\\',
             '"' => '\\"',
             '\'' => '\\\'',
@@ -638,7 +638,7 @@ class Jp7_Diff_Xml
             # this is a common problem with Farsi text.
             "\xe2\x80\x8c" => '\\u200c', // ZERO WIDTH NON-JOINER
             "\xe2\x80\x8d" => '\\u200d', // ZERO WIDTH JOINER
-        );
+        ];
 
         return strtr($string, $pairs);
     }
@@ -749,8 +749,8 @@ class Jp7_Diff_Xml
     public static function escapeTagsOnly($in)
     {
         return str_replace(
-            array('"', '>', '<'),
-            array('&quot;', '&gt;', '&lt;'),
+            ['"', '>', '<'],
+            ['&quot;', '&gt;', '&lt;'],
             $in);
     }
 
@@ -770,16 +770,16 @@ class Jp7_Diff_Xml
 
         foreach ($fields as $labelmsg => $input) {
             $id = "mw-$labelmsg";
-            $form .= self::openElement('tr', array('id' => $id));
-            $form .= self::tags('td', array('class' => 'mw-label'), wfMsgExt($labelmsg, array('parseinline')));
-            $form .= self::openElement('td', array('class' => 'mw-input')).$input.self::closeElement('td');
+            $form .= self::openElement('tr', ['id' => $id]);
+            $form .= self::tags('td', ['class' => 'mw-label'], wfMsgExt($labelmsg, ['parseinline']));
+            $form .= self::openElement('td', ['class' => 'mw-input']).$input.self::closeElement('td');
             $form .= self::closeElement('tr');
         }
 
         if ($submitLabel) {
             $form .= self::openElement('tr');
-            $form .= self::tags('td', array(), '');
-            $form .= self::openElement('td', array('class' => 'mw-submit')).self::submitButton(wfMsg($submitLabel)).self::closeElement('td');
+            $form .= self::tags('td', [], '');
+            $form .= self::openElement('td', ['class' => 'mw-submit']).self::submitButton(wfMsg($submitLabel)).self::closeElement('td');
             $form .= self::closeElement('tr');
         }
 
@@ -797,12 +797,12 @@ class Jp7_Diff_Xml
      *
      * @return string
      */
-    public static function buildTable($rows, $attribs = array(), $headers = null)
+    public static function buildTable($rows, $attribs = [], $headers = null)
     {
         $s = self::openElement('table', $attribs);
         if (is_array($headers)) {
             foreach ($headers as $id => $header) {
-                $attribs = array();
+                $attribs = [];
                 if (is_string($id)) {
                     $attribs['id'] = $id;
                 }
@@ -810,7 +810,7 @@ class Jp7_Diff_Xml
             }
         }
         foreach ($rows as $id => $row) {
-            $attribs = array();
+            $attribs = [];
             if (is_string($id)) {
                 $attribs['id'] = $id;
             }
@@ -833,7 +833,7 @@ class Jp7_Diff_Xml
     {
         $s = self::openElement('tr', $attribs);
         foreach ($cells as $id => $cell) {
-            $attribs = array();
+            $attribs = [];
             if (is_string($id)) {
                 $attribs['id'] = $id;
             }

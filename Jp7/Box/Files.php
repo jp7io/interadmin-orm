@@ -9,17 +9,17 @@ class Jp7_Box_Files extends Jp7_Box_BoxAbstract
     {
         if ($this->view->record) {
             try {
-                $this->files = $this->view->record->getArquivosParaDownload(array(
-                    'fields' => array('name', 'file'),
-                ));
+                $this->files = $this->view->record->getArquivosParaDownload([
+                    'fields' => ['name', 'file'],
+                ]);
             } catch (Exception $e) {
                 // Do nothing, method getArquivosParaDownload doesnt exist
             }
         } elseif ($this->view->tipo) {
             if ($filesTipo = $this->view->tipo->getFirstChildByModel('ContentFiles')) {
-                $this->files = $filesTipo->find(array(
-                    'fields' => array('name', 'file'),
-                ));
+                $this->files = $filesTipo->find([
+                    'fields' => ['name', 'file'],
+                ]);
             }
         }
     }

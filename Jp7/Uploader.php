@@ -55,7 +55,7 @@ class Jp7_Uploader
      * @throws Jp7_Uploader_InvalidExtensionException For type/extension not valid.
      * @throws Exception                              For unknown upload error (browser, server, etc).
      */
-    public function save($key, $destination, array $newsize = array(), $resizeMode = 'resize')
+    public function save($key, $destination, array $newsize = [], $resizeMode = 'resize')
     {
         extract($_FILES[$this->fieldName]);
 
@@ -88,7 +88,7 @@ class Jp7_Uploader
             @chmod(dirname($tempfile), 0777);
         }
 
-        if ($newsize && in_array($extension, array('.gif', '.jpg'))) {
+        if ($newsize && in_array($extension, ['.gif', '.jpg'])) {
             $resource = ($extension == '.jpg') ? imagecreatefromjpeg($tmp_name[$key]) : imagecreatefromgif($tmp_name[$key]);
             jp7_resizeImage($resource, $tmp_name[$key], $tempfile, $newsize[0], $newsize[1], 90, 10000000, $resizeMode == 'crop');
             imagedestroy($resource);

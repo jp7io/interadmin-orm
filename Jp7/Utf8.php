@@ -2,7 +2,7 @@
 
 class Jp7_Utf8
 {
-    public static $cp1252 = array(
+    public static $cp1252 = [
         "\xC2\x80",
         "\xC2\x82",
         "\xC2\x83",
@@ -30,9 +30,9 @@ class Jp7_Utf8
         "\xC2\x9C",
         "\xC2\x9E",
         "\xC2\x9F",
-    );
+    ];
 
-    public static $utf8 = array(
+    public static $utf8 = [
         "\xE2\x82\xAC",  // EURO SIGN
         "\xE2\x80\x9A",  // SINGLE LOW-9 QUOTATION MARK
         "\xC6\x92",      // LATIN SMALL LETTER F WITH HOOK
@@ -60,7 +60,7 @@ class Jp7_Utf8
         "\xC5\x93",      // Latin Small Ligature Oe
         "\xC5\xBE",      // Latin Small Letter Z With Caron
         "\xC5\xB8",       // Latin Capital Letter Y With Diaeresis
-    );
+    ];
 
     /**
      * Converts a string with mixed encodings (ASCII, ISO-8859-1, CP1252) to UTF-8.

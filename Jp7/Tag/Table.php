@@ -2,7 +2,7 @@
 
 class Jp7_Tag_Table extends Jp7_Tag_Container
 {
-    public function tr($attrs = array())
+    public function tr($attrs = [])
     {
         $tr = new Jp7_Tag_Tr($attrs);
         $this->add($tr);
@@ -27,7 +27,7 @@ class Jp7_Tag_Table extends Jp7_Tag_Container
     {
         $trs = $this->getItems();
 
-        $out = array();
+        $out = [];
         foreach ($trs as $col_i => $row) {
             foreach ($row->getItems() as $row_i => $cell) {
                 if (!$out[$row_i]) {

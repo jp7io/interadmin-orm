@@ -26,7 +26,7 @@ class Jp7_Salesforce_Client extends SforceEnterpriseClient
                 if (count($limitArr) > 1) {
                     list($offset, $limit) = array_map('intval', $limitArr);
                 } else {
-                    list($offset, $limit) = array(0, intval($options['limit']));
+                    list($offset, $limit) = [0, intval($options['limit'])];
                 }
                 $options['limit'] = $offset + $limit;
                 $query .= ' LIMIT '.$options['limit'];
@@ -99,10 +99,10 @@ class Jp7_Salesforce_Client extends SforceEnterpriseClient
     {
         $this->sforce->__setSoapHeaders(null);
         if ($this->callOptions != null) {
-            $this->sforce->__setSoapHeaders(array($this->callOptions));
+            $this->sforce->__setSoapHeaders([$this->callOptions]);
         }
         if ($this->loginScopeHeader != null) {
-            $this->sforce->__setSoapHeaders(array($this->loginScopeHeader));
+            $this->sforce->__setSoapHeaders([$this->loginScopeHeader]);
         }
         // JP7 - Adicionado Cache
         $skey = 's_salesforce_cache';
@@ -111,16 +111,16 @@ class Jp7_Salesforce_Client extends SforceEnterpriseClient
         if ($cache && $cache['saved'] > strtotime('-10 minutes')) {
             $result = $cache['result'];
         } else {
-            $result = $this->sforce->login(array(
+            $result = $this->sforce->login([
              'username' => $username,
              'password' => $password,
-            ));
+            ]);
             $result = $result->result;
 
-            $_SESSION[$skey][$this->wsdl] = array(
+            $_SESSION[$skey][$this->wsdl] = [
                 'result' => $result,
                 'saved' => time(),
-            );
+            ];
         }
         $this->_setLoginHeader($result);
 

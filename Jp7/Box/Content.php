@@ -13,10 +13,10 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
 
                 $this->title = ($this->params->{'title'.$lang->prefix}) ? $this->params->{'title'.$lang->prefix} : $this->sectionTipo->getNome();
 
-                $options = array(
-                    'fields' => array('*'),
+                $options = [
+                    'fields' => ['*'],
                     'limit' => $this->params->limit,
-                );
+                ];
                 if ($this->params->featured) {
                     $options['where'][] = "featured <> ''";
                 }
@@ -75,16 +75,16 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
 				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box;
         ?>[section][]">
 					<?php
-                    $tipos = InterAdminTipo::findTipos(array(
-                        'fields' => array('nome'),
-                        'where' => array(
+                    $tipos = InterAdminTipo::findTipos([
+                        'fields' => ['nome'],
+                        'where' => [
                             "campos LIKE '%}title{%'",
                             "campos LIKE '%}image{%'",
                             "model_id_tipo != 'Introduction'",
-                        ),
+                        ],
                         'order' => 'parent_id_tipo, ordem',
                         'use_published_filters' => true,
-                    ));
+                    ]);
         ?>
 					<?php echo $this->tiposOptions($tipos, $this->params->section, true);
         ?>

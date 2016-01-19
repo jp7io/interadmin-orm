@@ -4,7 +4,7 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo
 {
     const DEFAULT_FIELDS_ALIAS = true;
 
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         /*
          * @global Define o $id_tipo em que são gravados os usuários com acesso.
@@ -18,14 +18,14 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo
 
     public function login($username, $password)
     {
-        $usuario = $this->findFirst(array(
-            'fields' => array('secoes'),
-            'where' => array(
+        $usuario = $this->findFirst([
+            'fields' => ['secoes'],
+            'where' => [
                 "usuario = '".addslashes($username)."'",
                 "senha = '".md5($password)."'",
-            ),
+            ],
             'use_published_filters' => true,
-        ));
+        ]);
 
         if ($usuario && $this->verifyIps($usuario)) {
             return $usuario;
@@ -34,11 +34,11 @@ class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo
 
     public function verifyIps($usuario)
     {
-        $ips = $usuario->getIps(array(
-            'fields' => array('ip'),
+        $ips = $usuario->getIps([
+            'fields' => ['ip'],
             'fields_alias' => true,
             'use_published_filters' => true,
-        ));
+        ]);
 
         //Verifica se IP é igual ou está na faixa de ip cadastrados
         $usuarioIp = $_SERVER['REMOTE_ADDR'];

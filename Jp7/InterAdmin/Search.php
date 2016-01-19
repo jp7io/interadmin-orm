@@ -11,7 +11,7 @@ class Jp7_InterAdmin_Search
 {
     private $booleanMode = false;
 
-    public function search($search, $date_filter = false, $exclude_tables = array())
+    public function search($search, $date_filter = false, $exclude_tables = [])
     {
         global $db;
 
@@ -19,7 +19,7 @@ class Jp7_InterAdmin_Search
         $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
         //krumo($sql);
 
-        $rows = array();
+        $rows = [];
         while ($row = $rs->FetchNextObj()) {
             $rows[] = $row;
         }
@@ -29,15 +29,15 @@ class Jp7_InterAdmin_Search
         return $rows;
     }
 
-    public function checkIndexes($exclude_tables = array())
+    public function checkIndexes($exclude_tables = [])
     {
         global $db;
-        $tables = array_diff($this->getTables(), $exclude_tables && is_array($exclude_tables) ? $exclude_tables : array());
+        $tables = array_diff($this->getTables(), $exclude_tables && is_array($exclude_tables) ? $exclude_tables : []);
         foreach ($tables as $table) {
             $indexes = $db->MetaIndexes($table);
             $columns = $db->MetaColumnNames($table);
             if ($columns) {
-                $textColumns = array_filter($columns, array($this, 'isText'));
+                $textColumns = array_filter($columns, [$this, 'isText']);
                 if ($textColumns) {
                     if (count($textColumns) > 16) {
                         $textColumns = array_slice($textColumns, 0, 16);
@@ -62,12 +62,12 @@ class Jp7_InterAdmin_Search
         return $sql;
     }
 
-    public function getSql($search, $date_filter, $exclude_tables = array())
+    public function getSql($search, $date_filter, $exclude_tables = [])
     {
         global $db;
 
         $tables = array_diff($this->getTables(), $exclude_tables);
-        $sqls = array();
+        $sqls = [];
         foreach ($tables as $table) {
             $tableSql = $this->getTableSql($table, $search, $date_filter);
             if ($tableSql) {
@@ -82,14 +82,14 @@ class Jp7_InterAdmin_Search
     {
         global $db_prefix;
 
-        $options = array(
+        $options = [
             'fields' => 'tabela',
             'group' => 'tabela',
             'where' => $this->getTipoFilter(),
             'class' => 'InterAdminTipo',
-        );
+        ];
 
-        $tables = array();
+        $tables = [];
         $tipos = InterAdminTipo::findTipos($options);
         foreach ($tipos as $tipo) {
             $tables[] = $db_prefix.($tipo->tabela ? '_'.$tipo->tabela : '');
@@ -116,14 +116,14 @@ class Jp7_InterAdmin_Search
         if (!$columns) {
             return false;
         }
-        $textColumns = array_filter($columns, array($this, 'isText'));
+        $textColumns = array_filter($columns, [$this, 'isText']);
         if (!$textColumns) {
             return false;
         }
         if (count($textColumns) > 16) {
             $textColumns = array_slice($textColumns, 0, 16);
         }
-        $fields = array();
+        $fields = [];
         $fields[] = in_array('id', $columns) ? 'id' : '0 AS id';
         $fields[] = in_array('id_tipo', $columns) ? 'id_tipo' : '0 AS id_tipo';
         $fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns).' AS varchar_key';
@@ -136,9 +136,9 @@ class Jp7_InterAdmin_Search
         }
         //$fields[] = "'$table' AS tablename";
 
-        $short_words = array('de', 'do', 'da', 'ao', 'em', 'no', 'na');
+        $short_words = ['de', 'do', 'da', 'ao', 'em', 'no', 'na'];
 
-        $where = array();
+        $where = [];
         // Trata as aspas como uma palavra só
         preg_match_all('/-?"(?:\\\\.|[^\\\\"])*"|[^" ]+/', $search, $matches);
         $words = $matches[0];
@@ -176,14 +176,14 @@ class Jp7_InterAdmin_Search
             $words = array_unique($words);
             $weight = round(5 / count($words), 1);
             foreach ($words as $word) {
-                $plural = array();
+                $plural = [];
                 $plural[] = $word;
                 if (!endsWith('*', $word)) {
                     $plural[] = Jp7_Inflector::plural($word);
                 }
                 $plural = array_unique($plural);
                 if (mb_strlen($word) > 4) {
-                    $like = array();
+                    $like = [];
                     foreach ($plural as $word) {
                         $like[] = reset($textColumns)." LIKE '%".str_replace('*', '%', $word)."%'";
                     }
@@ -206,12 +206,12 @@ class Jp7_InterAdmin_Search
 
         if ($date_filter) {
             if (in_array('date_publish', $columns)) {
-                $date_filters = array(
+                $date_filters = [
                     'day' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)',
                     'week' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)',
                     'month' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)',
                     'year' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)',
-                );
+                ];
 
                 if ($date_filters[$date_filter]) {
                     $where[] = $date_filters[$date_filter];

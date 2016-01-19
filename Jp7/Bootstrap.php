@@ -14,7 +14,7 @@ class Jp7_Bootstrap
             unset($_COOKIE['PHPSESSID']); // Bug Zend_Session + Usuário com cookie errado
         }
 
-        Zend_Session::setOptions(array('throw_startup_exceptions' => error_reporting()));
+        Zend_Session::setOptions(['throw_startup_exceptions' => error_reporting()]);
 
         Zend_Registry::set('session', new Zend_Session_Namespace());
         Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
@@ -40,7 +40,7 @@ class Jp7_Bootstrap
         // Iniciando $s_session. Compatibilidade
         if (is_null($GLOBALS['s_session'])) {
             if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
-                $_SESSION[$config->name_id]['interadmin'] = array();
+                $_SESSION[$config->name_id]['interadmin'] = [];
             }
             $GLOBALS['s_session'] = &$_SESSION[$config->name_id]['interadmin'];
             $GLOBALS['s_user'] = &$GLOBALS['s_session']['user'];
@@ -73,13 +73,13 @@ class Jp7_Bootstrap
                 $GLOBALS['s_session']['preview'] = (bool) $_GET['ia_preview'];
             }
 
-            $admin_bar_data = array(
+            $admin_bar_data = [
                 'server' => $config->server->interadmin_remote ? reset($config->server->interadmin_remote) : $_SERVER['HTTP_HOST'],
                 'cliente' => $config->name_id,
                 'preview' => (bool) $GLOBALS['s_session']['preview'],
                 'no_hook' => (bool) $GLOBALS['s_session']['no_hook'],
                 'c_jp7' => $c_jp7,
-            );
+            ];
 
             setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');
         } elseif (!empty($_COOKIE['ia_admin_bar'])) {
@@ -175,7 +175,7 @@ class Jp7_Bootstrap
         if (is_file($language_file)) {
             $translate = new Zend_Translate('array', $language_file, $lang->lang);
         } else {
-            $translate = new Zend_Translate('array', null, $lang->lang, array('disableNotices' => true));
+            $translate = new Zend_Translate('array', null, $lang->lang, ['disableNotices' => true]);
         }
         Zend_Registry::set('Zend_Translate', $translate);
     }
@@ -193,7 +193,7 @@ class Jp7_Bootstrap
         }
         // Permite o uso de templates no _default
         $view->setScriptPath(array_merge(
-            array(APPLICATION_PATH.'/../vendor/jp7internet/_default/application/views/scripts'),
+            [APPLICATION_PATH.'/../vendor/jp7internet/_default/application/views/scripts'],
             //array(. '/institucional/application/modules/default/views/scripts'),
             $view->getScriptPaths()
         ));
@@ -204,7 +204,7 @@ class Jp7_Bootstrap
         $config = Zend_Registry::get('config');
         $lang = Zend_Registry::get('lang');
 
-        $metas = array(
+        $metas = [
             'language' => $lang->lang,
             'description' => $config->lang->description,
             'keywords' => $config->lang->keywords,
@@ -212,7 +212,7 @@ class Jp7_Bootstrap
             'robots' => 'all',
             'author' => 'JP7 - http://www.jp7.com.br',
             'generator' => 'JP7 InterAdmin',
-        );
+        ];
         if ($config->google_site_verification) {
             $metas['google-site-verification'] = $config->google_site_verification;
         }
@@ -220,7 +220,7 @@ class Jp7_Bootstrap
         defined('DEFAULT_PATH') || define('DEFAULT_PATH', $config->path.'/vendor/jp7internet/_default');
 
         // JS
-        $scripts = array(
+        $scripts = [
             DEFAULT_PATH.'/js/jquery/jquery-1.3.2.min.js',
             DEFAULT_PATH.'/js/interdyn.js',
             DEFAULT_PATH.'/js/interdyn_checkflash.js',
@@ -229,7 +229,7 @@ class Jp7_Bootstrap
             DEFAULT_PATH.'/js/swfobject.js',
             DEFAULT_PATH.'/js/interdyn_menu.js',
             'js/functions.js',
-        );
+        ];
         foreach ($scripts as $file) {
             $view->headScript()->appendFile($file);
         }

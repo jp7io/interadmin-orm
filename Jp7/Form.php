@@ -29,19 +29,19 @@ class Jp7_Form extends Zend_Form
      *
      * @return Jp7_Mail
      */
-    public function createMail(InterAdmin $record, $options = array())
+    public function createMail(InterAdmin $record, $options = [])
     {
         // Configuração
         $config = Zend_Registry::get('config');
 
-        $default = array(
+        $default = [
             'template' => 'templates/email.phtml',
             'title' => '',
             'subject' => '',
             'message' => '',
             'config' => $config,
             'recipients' => false,
-        );
+        ];
         $options = $options + $default;
 
         // Layout
@@ -80,7 +80,7 @@ class Jp7_Form extends Zend_Form
         return $mail;
     }
 
-    public function prepareMailHtml(InterAdmin $record, $options = array())
+    public function prepareMailHtml(InterAdmin $record, $options = [])
     {
         global $lang;
 
@@ -165,14 +165,14 @@ class Jp7_Form extends Zend_Form
      *
      * @return array
      */
-    public function createElements(array $campos, $prefix = '', array $options = array())
+    public function createElements(array $campos, $prefix = '', array $options = [])
     {
-        $options = $options + array(
+        $options = $options + [
             'label_suffix' => ':',
             'required_suffix' => '',
-        );
+        ];
 
-        $elements = array();
+        $elements = [];
         foreach ($campos as $campo) {
             if ($campo['form']) {
                 $element = $this->createElementFromCampo($campo, $prefix, $options);
@@ -190,11 +190,11 @@ class Jp7_Form extends Zend_Form
         $name = $prefix.$campo['nome_id'];
         $label_suffix = $options['label_suffix'].(($campo['obrigatorio']) ? $options['required_suffix'] : '');
 
-        $options = array(
+        $options = [
             'label' => $campo['nome'].$label_suffix,
             'description' => $campo['ajuda'],
             'required' => (bool) $campo['obrigatorio'],
-        );
+        ];
 
         switch ($prefixCampo) {
             case 'text':
@@ -205,13 +205,13 @@ class Jp7_Form extends Zend_Form
                 }
                 $element = $this->createElement('textarea', $name, $options);
                 if ($campo['tamanho']) {
-                    $element->setOptions(array('rows' => $campo['tamanho']));
+                    $element->setOptions(['rows' => $campo['tamanho']]);
                 }
                 break;
             case 'select':
                 $registros = $campo['nome']->find();
 
-                $multiOptions = array();
+                $multiOptions = [];
                 foreach ($registros as $registro) {
                     $multiOptions[(string) $registro] = $registro->getStringValue();
                 }
@@ -223,11 +223,11 @@ class Jp7_Form extends Zend_Form
                     $element = $this->createElement('multicheckbox', $name, $options);
                 } elseif ($campo['xtra'] == 'radio') {
                     if (!$campo['obrigatorio']) {
-                        $options['multiOptions'] = array('' => 'Nenhum') + $options['multiOptions'];
+                        $options['multiOptions'] = ['' => 'Nenhum'] + $options['multiOptions'];
                     }
                     $element = $this->createElement('radio', $name, $options);
                 } else {
-                    $options['multiOptions'] = array('' => '-- selecione --') + $options['multiOptions'];
+                    $options['multiOptions'] = ['' => '-- selecione --'] + $options['multiOptions'];
                     $element = $this->createElement('select', $name, $options);
                 }
                 break;
@@ -245,7 +245,7 @@ class Jp7_Form extends Zend_Form
                 break;
             case 'file':
                 $element = $this->createElement('filepreview', $name, $options);
-                $element->addValidator('ExcludeExtension', false, array('php', 'exe'));
+                $element->addValidator('ExcludeExtension', false, ['php', 'exe']);
                 $element->addFilter('Rename', uniqid());
                 break;
             case 'char':

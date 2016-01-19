@@ -15,9 +15,9 @@ class Jp7_VideosController extends __Controller_Action
 
         if ($id) {
             # show
-            $record = $contentTipo->findById($id, array(
-                'fields' => array('title', 'video', 'summary', 'duration'),
-            ));
+            $record = $contentTipo->findById($id, [
+                'fields' => ['title', 'video', 'summary', 'duration'],
+            ]);
             if (!$record) {
                 $this->_redirect($contentTipo->getUrl());
             }
@@ -26,14 +26,14 @@ class Jp7_VideosController extends __Controller_Action
             # index
             // Introdução
             if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {
-                $this->view->introductionItens = $introductionTipo->find(array(
+                $this->view->introductionItens = $introductionTipo->find([
                     'fields' => '*',
-                ));
+                ]);
             }
 
-            $this->view->records = $contentTipo->find(array(
-                'fields' => array('title', 'video', 'thumb', 'summary', 'duration'),
-            ));
+            $this->view->records = $contentTipo->find([
+                'fields' => ['title', 'video', 'thumb', 'summary', 'duration'],
+            ]);
 
             $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/fancybox-2.1.5/jquery.fancybox.pack.js');
             $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/fancybox-2.1.5/helpers/jquery.fancybox-media.js');

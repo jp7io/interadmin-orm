@@ -25,17 +25,17 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
 
     protected function _findChildByModel($model_id_tipo)
     {
-        $child = InterAdminTipo::findFirstTipoByModel($model_id_tipo, array(
-            'where' => array("admin <> ''"),
-        ));
+        $child = InterAdminTipo::findFirstTipoByModel($model_id_tipo, [
+            'where' => ["admin <> ''"],
+        ]);
         if (!$child) {
             // Tenta criar o tipo filho caso ele não exista
-            $sistemaTipo = InterAdminTipo::findFirstTipo(array(
-                'where' => array(
+            $sistemaTipo = InterAdminTipo::findFirstTipo([
+                'where' => [
                     "nome = 'Sistema'",
                     "admin <> ''",
-                ),
-            ));
+                ],
+            ]);
             if ($sistemaTipo) {
                 $columns = $sistemaTipo->getDb()->MetaColumns($sistemaTipo->getTableName());
                 if ($columns['MODEL_ID_TIPO']->type == 'varchar') {

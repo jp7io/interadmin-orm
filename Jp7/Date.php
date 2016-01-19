@@ -43,7 +43,7 @@ class Jp7_Date extends DateTime
         }
     }
 
-    public static function createFromString($time, $formats = array('d/m/Y', 'Y-m-d'), $timezone = null)
+    public static function createFromString($time, $formats = ['d/m/Y', 'Y-m-d'], $timezone = null)
     {
         foreach ($formats as $format) {
             if ($date = static::createFromFormat($format, $time, $timezone)) {
@@ -76,13 +76,13 @@ class Jp7_Date extends DateTime
         global $lang;
         switch ($lang->lang) {
             case 'en':
-                $units_names = array('years' => 'year', 'months' => 'month', 'weeks' => 'week', 'days' => 'day', 'hours' => 'hour', 'minutes' => 'minute');
+                $units_names = ['years' => 'year', 'months' => 'month', 'weeks' => 'week', 'days' => 'day', 'hours' => 'hour', 'minutes' => 'minute'];
                 $now = 'now';
                 $yesterday = 'yesterday';
                 $ago = 'ago';
                 break;
             default:
-                $units_names = array('anos' => 'ano', 'meses' => 'mês', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto');
+                $units_names = ['anos' => 'ano', 'meses' => 'mês', 'semanas' => 'semana', 'dias' => 'dia', 'horas' => 'hora', 'minutos' => 'minuto'];
                 $now = 'agora';
                 $yesterday = 'ontem';
                 $ago = 'atrás';
@@ -92,7 +92,7 @@ class Jp7_Date extends DateTime
         }
         $timeStamp = self::_toTime($timeStamp);
         $currentTime = time();
-        $units = array_combine($units_names, array(31556926, 2629743, 604800, 86400, 3600, 60));
+        $units = array_combine($units_names, [31556926, 2629743, 604800, 86400, 3600, 60]);
         $seconds = $currentTime - $timeStamp;
         if ($seconds <= 60) {
             return $now;

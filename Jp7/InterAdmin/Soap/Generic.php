@@ -10,7 +10,7 @@ class Jp7_InterAdmin_Soap_Generic
      *
      * @return mixed
      */
-    public function get($className, $options = array())
+    public function get($className, $options = [])
     {
         $tipo = Jp7_InterAdmin_Soap::getClassTipo($className);
 
@@ -25,7 +25,7 @@ class Jp7_InterAdmin_Soap_Generic
      *
      * @return mixed
      */
-    public function getFirst($className, $options = array())
+    public function getFirst($className, $options = [])
     {
         $options['limit'] = 1;
 
@@ -40,7 +40,7 @@ class Jp7_InterAdmin_Soap_Generic
      *
      * @return mixed
      */
-    public function getAll($className, $options = array())
+    public function getAll($className, $options = [])
     {
         $options['use_published_filters'] = false;
 

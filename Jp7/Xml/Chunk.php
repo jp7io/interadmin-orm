@@ -33,11 +33,11 @@ class Jp7_Xml_Chunk
    *
    * @var array Contains all major options
    */
-  public $options = array(
+  public $options = [
     'path' => './',       // string The path to check for $file in
     'element' => '',      // string The XML element to return
     'chunkSize' => 512,    // integer The amount of bytes to retrieve in each chunk
-  );
+  ];
 
   /**
    * file.
@@ -81,10 +81,10 @@ class Jp7_Xml_Chunk
    *
    * @author Dom Hastings
    */
-  public function __construct($file, $options = array())
+  public function __construct($file, $options = [])
   {
       // merge the options together
-    $this->options = array_merge($this->options, (is_array($options) ? $options : array()));
+    $this->options = array_merge($this->options, (is_array($options) ? $options : []));
 
     // check that the path ends with a /
     if (substr($this->options['path'], -1) != '/') {
