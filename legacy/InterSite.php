@@ -281,7 +281,7 @@ class InterSite
 
     public function start()
     {
-        global $debugger;
+        global $debugger, $jp7_app;
 
         if (!self::isWakeupEnabled()) {
             return;
