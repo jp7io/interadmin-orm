@@ -329,7 +329,7 @@ class InterSite
         $GLOBALS['c_menu'] = @$this->menu;
         $GLOBALS['c_cache'] = $this->cache;
         $GLOBALS['c_cache_delay'] = @$this->cache_delay;
-        $GLOBALS['db_prefix'] = 'interadmin_'.$this->name_id;
+        $GLOBALS['db_prefix'] = $jp7_app.'_'.$this->name_id;
         $GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
         $GLOBALS['c_analytics'] = @$this->google_analytics;
         $GLOBALS['googlemaps_key'] = @$this->google_maps;
