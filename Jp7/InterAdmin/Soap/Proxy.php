@@ -28,7 +28,7 @@ class Jp7_InterAdmin_Soap_Proxy
                 foreach ($classes as $classe) {
                     if (method_exists($classe, $methodName)) {
                         $obj = new $classe();
-                        $result = call_user_func_array(array($obj, $methodName), $params);
+                        $result = call_user_func_array([$obj, $methodName], $params);
                         break 2;
                     }
                 }

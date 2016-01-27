@@ -16,7 +16,7 @@
  */
 class Jp7_Inflector
 {
-    private static $plural_cache = array();
+    private static $plural_cache = [];
 
     /**
      * Regular expressions for plurals, each item is composed of $pattern => $replacement.
@@ -24,7 +24,7 @@ class Jp7_Inflector
      *
      * @var
      */
-    public static $plural_inflections = array(
+    public static $plural_inflections = [
         '/m$/i' => 'ns', // Bem -> Bens
         '/([r|z])$/i' => '\1es', // Paz -> Pazes, Bar -> Bares
         '/([i])l$/i' => '\1s', // Barril -> Barris
@@ -34,7 +34,7 @@ class Jp7_Inflector
         '/^(m|irm|pag|gr|ch|benç|orf|sót|órg)ão$/iu' => '\1ãos', // Mão -> Mãos
         '/ão$/iu' => '\1ões', // Reunião -> Reuniões
         '/([^s])$/' => '\1s', // Plural padrão
-    );
+    ];
 
     /**
      * Returns the plural form of the word in the string.

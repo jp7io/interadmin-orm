@@ -25,8 +25,8 @@ class Jp7_Diff_WordLevel extends Jp7_Diff_Mapped
     {
         //wfProfileIn( __METHOD__ );
 
-        $words = array();
-        $stripped = array();
+        $words = [];
+        $stripped = [];
         $first = true;
         foreach ($lines as $line) {
             # If the line is too long, just pretend the entire line is one big word
@@ -41,7 +41,7 @@ class Jp7_Diff_WordLevel extends Jp7_Diff_Mapped
                 $words[] = $line;
                 $stripped[] = $line;
             } else {
-                $m = array();
+                $m = [];
                 if (preg_match_all('/ ( [^\S\n]+ | [0-9_A-Za-z\x80-\xff]+ | . ) (?: (?!< \n) [^\S\n])? /xs',
                 $line, $m)) {
                     $words = array_merge($words, $m[0]);
@@ -50,7 +50,7 @@ class Jp7_Diff_WordLevel extends Jp7_Diff_Mapped
             }
         }
         //wfProfileOut( __METHOD__ );
-        return array($words, $stripped);
+        return [$words, $stripped];
     }
 
     public function orig()

@@ -2,9 +2,9 @@
 
 abstract class Jp7_Tag_Container extends Jp7_Tag
 {
-    protected $items = array();
+    protected $items = [];
 
-    public function __construct($attrs = array())
+    public function __construct($attrs = [])
     {
         $this->attrs = $attrs;
     }

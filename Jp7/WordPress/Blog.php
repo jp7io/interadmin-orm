@@ -4,21 +4,21 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract
 {
     const PK = 'blog_id';
 
-    public function getFirstPost($options = array())
+    public function getFirstPost($options = [])
     {
-        return reset($this->getPosts(array('limit' => 1) + $options));
+        return reset($this->getPosts(['limit' => 1] + $options));
     }
 
-    public function getPosts($options = array())
+    public function getPosts($options = [])
     {
         if (!$this->blog_id) {
             throw new Exception('Field "blog_id" is empty.');
         }
 
-        $options += array(
+        $options += [
             'from' => $this->getPrefix().'posts',
             'fields' => '*',
-        );
+        ];
 
         if ($options['class']) {
             $class = $options['class'];
@@ -29,28 +29,28 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract
         return self::retrieveObjects($this->_db, $options, $class.'_Post');
     }
 
-    public function getOptionByName($name, $options = array())
+    public function getOptionByName($name, $options = [])
     {
         $options['where'][] = "option_name = '".$name."'";
 
         return $this->getFirstOption($options);
     }
 
-    public function getFirstOption($options = array())
+    public function getFirstOption($options = [])
     {
-        return reset($this->getOptions(array('limit' => 1) + $options));
+        return reset($this->getOptions(['limit' => 1] + $options));
     }
 
-    public function getOptions($options = array())
+    public function getOptions($options = [])
     {
         if (!$this->blog_id) {
             throw new Exception('Field "blog_id" is empty.');
         }
 
-        $options += array(
+        $options += [
             'from' => $this->getPrefix().'options',
             'fields' => '*',
-        );
+        ];
 
         if ($options['class']) {
             $class = $options['class'];
@@ -109,13 +109,13 @@ class Jp7_WordPress_Blog extends Jp7_WordPress_RecordAbstract
         return Jp7_WordPress::getPrefix().(($this->blog_id > 1) ? $this->blog_id.'_' : '');
     }
 
-    public function getTopic($options = array())
+    public function getTopic($options = [])
     {
-        $options += array(
+        $options += [
             'from' => Jp7_WordPress::getPrefix().'blogs_cets_topic',
             'fields' => '*',
             'where' => 'id = (SELECT topic_id FROM '.Jp7_WordPress::getPrefix().'blogs_cets_topic_relationship WHERE blog_id = '.$this->blog_id.')',
-        );
+        ];
 
         if ($options['class']) {
             $class = $options['class'];

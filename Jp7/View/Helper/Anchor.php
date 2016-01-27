@@ -2,7 +2,7 @@
 
 class Jp7_View_Helper_Anchor extends Zend_View_Helper_Abstract
 {
-    public $already_used = array(
+    public $already_used = [
         'master' => 1,
         'header' => 1,
         'container' => 1,
@@ -10,7 +10,7 @@ class Jp7_View_Helper_Anchor extends Zend_View_Helper_Abstract
         'footer' => 1,
         'breadcrumbs' => 1,
         'menu' => 1,
-    );
+    ];
 
     public function Anchor($title)
     {

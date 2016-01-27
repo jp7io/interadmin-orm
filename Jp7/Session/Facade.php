@@ -2,7 +2,7 @@
 
 class Jp7_Session_Facade implements ArrayAccess
 {
-    private $_data = array();
+    private $_data = [];
     public function __construct($session)
     {
         trigger_error('Experimental - do not use', E_USER_WARNING);

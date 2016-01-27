@@ -119,7 +119,7 @@ class Browser
         $this->sol = ($this->os == 'sol');
         // Robots
         if ($this->browser == $useragent) {
-            $robots = array(
+            $robots = [
                 'wget',
                 'getright',
                 'yahoo',
@@ -131,7 +131,7 @@ class Browser
                 'linkexchange',
                 'slurp',
                 'google',
-            );
+            ];
             for ($i = 0; $i < count($robots); $i++) {
                 if (strpos(mb_strtolower($useragent), $robots[$i]) !== false) {
                     $this->robot = $robots[$i];

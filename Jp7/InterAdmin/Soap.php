@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Soap
 {
-    protected static $classes = array();
+    protected static $classes = [];
 
     /**
      * @param string $type
@@ -64,7 +64,7 @@ STR;
             $result = self::_formatAttributes($result);
         }
 
-        return array($method.'Result' => $result);
+        return [$method.'Result' => $result];
     }
     /**
      * @param InterAdminAbstract $record
@@ -103,8 +103,8 @@ STR;
         global $config;
         $server = new Jp7_InterAdmin_Soap_AutoDiscover('Jp7_InterAdmin_Soap_Strategy', $config->url);
         // Usuario possui as seções liberadas
-        $server->setOperationBodyStyle(array('use' => 'literal'));
-        $server->setBindingStyle(array('style' => 'document'));
+        $server->setOperationBodyStyle(['use' => 'literal']);
+        $server->setBindingStyle(['style' => 'document']);
 
         return $server;
     }
@@ -120,9 +120,9 @@ STR;
         $server = new Zend_Soap_Server($wsdl);
         $server->setEncoding('UTF-8');
         $server->registerFaultException('Jp7_InterAdmin_Soap_Exception');
-        $server->setClassmap(array(
+        $server->setClassmap([
             'Options' => 'Jp7_InterAdmin_Soap_Options',
-        ));
+        ]);
 
         return $server;
     }
@@ -176,45 +176,45 @@ STR;
 
         // Elements
         $schema = $dom->getElementsByTagName('schema')->item(0);
-        $elements = array();
-        $types = array();
+        $elements = [];
+        $types = [];
         foreach ($schema->childNodes as $child) {
             $tagname = str_replace($child->prefix.':', '', $child->nodeName);
             if ($tagname == 'element') {
                 $elements[$child->getAttribute('name')] = $child;
             } elseif ($tagname == 'complexType') {
                 // Attributes
-                $attributes = array();
+                $attributes = [];
                 $attrs = $child->getElementsByTagName('element');
                 foreach ($attrs as $attr) {
-                    $attributes[] = array(
+                    $attributes[] = [
                         'name' => $attr->getAttribute('name'),
                         'type' => $attr->getAttribute('type').(($attr->getAttribute('maxOccurs') == 'unbounded') ? '[]' : ''),
-                    );
+                    ];
                 }
                 $types[$child->getAttribute('name')] = $attributes;
             }
         }
 
         // Funções
-        $functions = array();
+        $functions = [];
 
         $portType = $dom->getElementsByTagName('portType')->item(0);
         $operations = $portType->getElementsByTagName('operation');
         foreach ($operations as $operation) {
-            $function = array(
+            $function = [
                 'name' => $operation->getAttribute('name'),
                 'description' => $operation->getElementsByTagName('documentation')->item(0)->textContent,
-                'params' => array(),
-            );
+                'params' => [],
+            ];
             // Parâmetros
             $params = $elements[$operation->getAttribute('name')]->getElementsByTagName('element');
             foreach ($params as $param) {
-                $function['params'][] = array(
+                $function['params'][] = [
                     'name' => $param->getAttribute('name'),
                     'type' => $param->getAttribute('type'),
                     'optional' => $param->getAttribute('nillable'),
-                );
+                ];
             }
             // Retorno
             $return = $elements[$operation->getAttribute('name').'Response']->getElementsByTagName('element');

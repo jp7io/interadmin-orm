@@ -88,7 +88,7 @@ class Jp7_Deprecated
             $debugger->showSql($sql, null, $sql_debug, 'color:#FFFFFF;background:#444444;');
         }
         // Split
-        $sql_slipt = preg_replace(array('/([	 ])(FROM )/', '/([	 ])(WHERE )/', '/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
+        $sql_slipt = preg_replace(['/([	 ])(FROM )/', '/([	 ])(WHERE )/', '/([ 	])(ORDER BY )/'], '{;}\1\2', $sql, 1);
         $sql_slipt = explode('{;}', $sql_slipt);
         foreach ($sql_slipt as $value) {
             if (!$sql_select && strpos($value, 'SELECT ') !== false) {
@@ -456,7 +456,7 @@ class Jp7_Deprecated
         $ext = mb_substr($ext, $pos1);
         if ($ext == 'swf') {
             if (!$parameters) {
-                $parameters = array(wmode => 'transparent');
+                $parameters = [wmode => 'transparent'];
             }
             global $is;
             foreach ($parameters as $key => $value) {

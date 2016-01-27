@@ -9,17 +9,17 @@ class Jp7_Box_Videos extends Jp7_Box_BoxAbstract
     {
         if ($this->view->record) {
             try {
-                $this->videos = $this->view->record->getVideos(array(
-                    'fields' => array('*'),
-                ));
+                $this->videos = $this->view->record->getVideos([
+                    'fields' => ['*'],
+                ]);
             } catch (Exception $e) {
                 // Do nothing, method getVideos doesnt exist
             }
         } elseif ($this->view->tipo) {
             if ($videosTipo = $this->view->tipo->getFirstChildByModel('ContentVideos')) {
-                $this->videos = $videosTipo->find(array(
-                    'fields' => array('*'),
-                ));
+                $this->videos = $videosTipo->find([
+                    'fields' => ['*'],
+                ]);
             }
         }
     }

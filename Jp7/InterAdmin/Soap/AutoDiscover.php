@@ -57,31 +57,31 @@ class Jp7_InterAdmin_Soap_AutoDiscover extends Zend_Soap_AutoDiscover
         }
 
         // Add the input message (parameters)
-        $args = array();
+        $args = [];
         if ($this->_bindingStyle['style'] == 'document') {
             // Document style: wrap all parameters in a sequence element
-            $sequence = array();
+            $sequence = [];
             foreach ($prototype->getParameters() as $param) {
-                $sequenceElement = array(
+                $sequenceElement = [
                     'name' => $param->getName(),
                     'type' => $wsdl->getType($param->getType()),
-                );
+                ];
                 if ($param->isOptional()) {
                     $sequenceElement['nillable'] = 'true';
                     $sequenceElement['minOccurs'] = '0'; /* FIXME APENAS ESSA LINHA É CODIGO DA JP7 */
                 }
                 $sequence[] = $sequenceElement;
             }
-            $element = array(
+            $element = [
                 'name' => $function->getName(),
                 'sequence' => $sequence,
-            );
+            ];
             // Add the wrapper element part, which must be named 'parameters'
-            $args['parameters'] = array('element' => $wsdl->addElement($element));
+            $args['parameters'] = ['element' => $wsdl->addElement($element)];
         } else {
             // RPC style: add each parameter as a typed part
             foreach ($prototype->getParameters() as $param) {
-                $args[$param->getName()] = array('type' => $wsdl->getType($param->getType()));
+                $args[$param->getName()] = ['type' => $wsdl->getType($param->getType())];
             }
         }
         $wsdl->addMessage($function->getName().'In', $args);
@@ -93,25 +93,25 @@ class Jp7_InterAdmin_Soap_AutoDiscover extends Zend_Soap_AutoDiscover
 
         if ($isOneWayMessage == false) {
             // Add the output message (return value)
-            $args = array();
+            $args = [];
             if ($this->_bindingStyle['style'] == 'document') {
                 // Document style: wrap the return value in a sequence element
-                $sequence = array();
+                $sequence = [];
                 if ($prototype->getReturnType() != 'void') {
-                    $sequence[] = array(
+                    $sequence[] = [
                         'name' => $function->getName().'Result',
                         'type' => $wsdl->getType($prototype->getReturnType()),
-                    );
+                    ];
                 }
-                $element = array(
+                $element = [
                     'name' => $function->getName().'Response',
                     'sequence' => $sequence,
-                );
+                ];
                 // Add the wrapper element part, which must be named 'parameters'
-                $args['parameters'] = array('element' => $wsdl->addElement($element));
+                $args['parameters'] = ['element' => $wsdl->addElement($element)];
             } elseif ($prototype->getReturnType() != 'void') {
                 // RPC style: add the return value as a typed part
-                $args['return'] = array('type' => $wsdl->getType($prototype->getReturnType()));
+                $args['return'] = ['type' => $wsdl->getType($prototype->getReturnType())];
             }
             $wsdl->addMessage($function->getName().'Out', $args);
         }

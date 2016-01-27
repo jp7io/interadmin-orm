@@ -19,12 +19,12 @@ class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
         $decorators = $this->getDecorators();
         if (empty($decorators)) {
             $this->addDecorator('File')
-                ->addDecorator(array('fileWrapper' => 'HtmlTag'), array('tag' => 'div', 'class' => 'file'))
+                ->addDecorator(['fileWrapper' => 'HtmlTag'], ['tag' => 'div', 'class' => 'file'])
                 ->addDecorator('ViewHelper')
                 ->addDecorator('Errors') // append
-                ->addDecorator('Description', array('tag' => 'p', 'class' => 'description')) // append
-                ->addDecorator('HtmlTag', array('tag' => 'dd')) // wrap
-                ->addDecorator('Label', array('tag' => 'dt')); // prepend
+                ->addDecorator('Description', ['tag' => 'p', 'class' => 'description']) // append
+                ->addDecorator('HtmlTag', ['tag' => 'dd']) // wrap
+                ->addDecorator('Label', ['tag' => 'dt']); // prepend
         }
 
         return $this;

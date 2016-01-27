@@ -4,7 +4,7 @@ class Jp7_View_Helper_ItemClass extends Zend_View_Helper_Abstract
 {
     public function ItemClass($count, $key, $item = null)
     {
-        $classes = array();
+        $classes = [];
         if ($key == 0) {
             $classes[] = 'first-child';
         }

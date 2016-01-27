@@ -5,7 +5,7 @@ abstract class Jp7_Tag
     protected $value;
     protected $attrs;
 
-    public function __construct($value, $attrs = array())
+    public function __construct($value, $attrs = [])
     {
         $this->value = $value;
         $this->attrs = $attrs;

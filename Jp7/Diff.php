@@ -40,7 +40,7 @@ class Jp7_Diff
     public function reverse()
     {
         $rev = $this;
-        $rev->edits = array();
+        $rev->edits = [];
         foreach ($this->edits as $edit) {
             $rev->edits[] = $edit->reverse();
         }
@@ -93,7 +93,7 @@ class Jp7_Diff
      */
     public function orig()
     {
-        $lines = array();
+        $lines = [];
 
         foreach ($this->edits as $edit) {
             if ($edit->orig) {
@@ -114,7 +114,7 @@ class Jp7_Diff
      */
     public function closing()
     {
-        $lines = array();
+        $lines = [];
 
         foreach ($this->edits as $edit) {
             if ($edit->closing) {
@@ -171,7 +171,7 @@ class _HWLDF_WordAccumulator
 {
     public function _HWLDF_WordAccumulator()
     {
-        $this->_lines = array();
+        $this->_lines = [];
         $this->_line = '';
         $this->_group = '';
         $this->_tag = '';

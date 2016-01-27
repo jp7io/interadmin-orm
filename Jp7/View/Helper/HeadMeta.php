@@ -2,11 +2,11 @@
 
 class Jp7_View_Helper_HeadMeta extends Zend_View_Helper_HeadMeta
 {
-    private $_toRemove = array();
+    private $_toRemove = [];
 
     public function removeMeta($type, $key = '')
     {
-        $this->_toRemove[] = array($type, $key);
+        $this->_toRemove[] = [$type, $key];
     }
 
     public function toString($indent = null)

@@ -44,10 +44,10 @@ STR;
     public static function getRedirects(InterAdminTipo $redirectTipo)
     {
         $redirects = "# Redirects\r\n";
-        $records = $redirectTipo->find(array(
-            'fields' => array('url', 'destino', 'tipo_redirecionamento' => array('nome')),
+        $records = $redirectTipo->find([
+            'fields' => ['url', 'destino', 'tipo_redirecionamento' => ['nome']],
             'use_published_filters' => true,
-        ));
+        ]);
         foreach ($records as $record) {
             $redirects .= $record->getRedirect();
         }

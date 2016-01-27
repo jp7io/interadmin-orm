@@ -8,11 +8,11 @@ class Jp7_Box_Sections extends Jp7_Box_BoxAbstract
             if ($this->sectionTipo = InterAdminTipo::getInstance($section)) {
                 $this->title = ($this->params->title) ? $this->params->title : $this->sectionTipo->getNome();
 
-                $options = array(
-                    'fields' => array('nome'),
-                    'where' => array("menu <> ''"),
+                $options = [
+                    'fields' => ['nome'],
+                    'where' => ["menu <> ''"],
                     'limit' => $this->params->limit,
-                );
+                ];
 
                 $this->sections = $this->sectionTipo->getChildren($options);
             }
@@ -48,15 +48,15 @@ class Jp7_Box_Sections extends Jp7_Box_BoxAbstract
 				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box;
         ?>[section][]">
 					<?php
-                    $tipos = InterAdminTipo::findTipos(array(
-                        'where' => array(
+                    $tipos = InterAdminTipo::findTipos([
+                        'where' => [
                             "admin = ''",
                             "menu != ''",
                             // "model_id_tipo NOT IN ('Boxes', 'Settings', 'Introduction', 'Images')"
-                        ),
+                        ],
                         'order' => 'parent_id_tipo, ordem',
                         'use_published_filters' => true,
-                    ));
+                    ]);
         ?>
 					<?php echo $this->tiposOptions($tipos,  $this->params->section);
         ?>

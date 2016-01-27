@@ -2,12 +2,12 @@
 
 class Jp7_InterAdmin_JSTree
 {
-    public $tree = array();
-    public $tipos = array();
-    public $options = array();
+    public $tree = [];
+    public $tipos = [];
+    public $options = [];
     protected static $permissionsLevel = 3;
 
-    public function __construct($options = array(), $root_id_tipo = 0)
+    public function __construct($options = [], $root_id_tipo = 0)
     {
         global $lang;
 
@@ -32,11 +32,11 @@ class Jp7_InterAdmin_JSTree
     {
         global $lang;
 
-        $options = array(
-            'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo', 'icone'),
+        $options = [
+            'fields' => ['nome', 'parent_id_tipo', 'model_id_tipo', 'icone'],
             'use_published_filters' => true,
             'class' => 'InterAdminTipo',
-        );
+        ];
 
         if ($nivel == 0) {
             $options['where'][] = ($this->options['admin']) ? "admin <> ''" : "admin = ''";
@@ -114,6 +114,6 @@ class Jp7_InterAdmin_JSTree
 
     public function getIconeUrl($icone)
     {
-        return DEFAULT_PATH.'img/icons/'.$icone.'.png';
+        return DEFAULT_PATH.'/img/icons/'.$icone.'.png';
     }
 }

@@ -56,7 +56,7 @@ abstract class Jp7_WordPress_BaseAbstract
         $sql = self::formatQuery($options);
         $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 
-        $array = array();
+        $array = [];
         while ($row = $rs->FetchNextObj()) {
             $object = new $className($db, $options['from']);
             foreach ($row as $key => $value) {

@@ -7,28 +7,28 @@ class Jp7_WordPress_User extends Jp7_WordPress_RecordAbstract
     const LEVEL_CONTRIBUTOR = 1;
     const LEVEL_SUBSCRIBER = 0;
 
-    public function getMetaByKey($key, $options = array())
+    public function getMetaByKey($key, $options = [])
     {
         $options['where'][] = "meta_key = '".$key."'";
 
         return $this->getFirstMeta($options);
     }
 
-    public function getFirstMeta($options = array())
+    public function getFirstMeta($options = [])
     {
-        return reset($this->getMetas(array('limit' => 1) + $options));
+        return reset($this->getMetas(['limit' => 1] + $options));
     }
 
-    public function getMetas($options = array())
+    public function getMetas($options = [])
     {
         if (!$this->ID) {
             throw new Exception('Field "ID" is empty.');
         }
 
-        $options += array(
+        $options += [
             'from' => Jp7_WordPress::getPrefix().'usermeta',
             'fields' => '*',
-        );
+        ];
         $options['where'][] = 'user_id = '.$this->ID;
 
         return self::retrieveObjects($this->_db, $options, get_class($this).'Meta');
@@ -47,22 +47,22 @@ class Jp7_WordPress_User extends Jp7_WordPress_RecordAbstract
         $className = get_class($this).'Meta';
 
         $meta = new $className($this->_db, Jp7_WordPress::getPrefix().'usermeta');
-        $meta->setAttributes(array(
+        $meta->setAttributes([
             'user_id' => $this->ID,
             'meta_key' => $key,
             'meta_value' => $value,
-        ));
+        ]);
 
         return $meta;
     }
 
-    public function addMetas($metas = array())
+    public function addMetas($metas = [])
     {
         if (!$this->ID) {
             throw new Exception('Field "ID" is empty.');
         }
 
-        $metas = $metas + array(
+        $metas = $metas + [
             'jabber' => '',
             'yim' => '',
             'aim' => '',
@@ -76,7 +76,7 @@ class Jp7_WordPress_User extends Jp7_WordPress_RecordAbstract
             'nickname' => '',
             'last_name' => '',
             'first_name' => '',
-        );
+        ];
 
         foreach ($metas as $key => $value) {
             $obj = $this->createMeta($key, $value);
@@ -100,15 +100,15 @@ class Jp7_WordPress_User extends Jp7_WordPress_RecordAbstract
 
     public function addTo(Jp7_WordPress_Blog $blog, $user_level)
     {
-        $capArray = array(
+        $capArray = [
             self::LEVEL_ADMINISTRATOR => 'administrator',
             self::LEVEL_CONTRIBUTOR => 'contributor',
             self::LEVEL_SUBSCRIBER => 'subscriber',
-        );
+        ];
 
         $cap = $capArray[$user_level];
 
-        $capabilities = $this->createMeta($blog->getPrefix().'capabilities',  array($cap => 1));
+        $capabilities = $this->createMeta($blog->getPrefix().'capabilities',  [$cap => 1]);
         $capabilities->save();
 
         $userLevel = $this->createMeta($blog->getPrefix().'user_level', $user_level);

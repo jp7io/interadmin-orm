@@ -53,13 +53,13 @@ class Jp7_Controller_Action extends Zend_Controller_Action
             return;
         }
 
-        $siteSettingsTipo = InterAdminTipo::findFirstTipoByModel('SiteSettings', array(
-            'where' => array("admin != ''"),
-        ));
+        $siteSettingsTipo = InterAdminTipo::findFirstTipoByModel('SiteSettings', [
+            'where' => ["admin != ''"],
+        ]);
         if ($siteSettingsTipo) {
-            $siteSettings = $siteSettingsTipo->findFirst(array(
-                'fields' => array('*'),
-            ));
+            $siteSettings = $siteSettingsTipo->findFirst([
+                'fields' => ['*'],
+            ]);
             if ($siteSettings) {
                 $config = Zend_Registry::get('config');
                 $attributes = $siteSettings->attributes;
@@ -273,14 +273,14 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         $tipo = static::getRootTipo();
         $path = static::getTiposPath();
 
-        $array = array(
+        $array = [
             'root' => $tipo,
-        );
+        ];
         foreach ($path as $key => $directory) {
-            $tipo = $tipo->getFirstChild(array(
-                'fields' => array('template', 'nome'),
-                'where' => array("id_tipo_string = '".toId($directory)."'"),
-            ));
+            $tipo = $tipo->getFirstChild([
+                'fields' => ['template', 'nome'],
+                'where' => ["id_tipo_string = '".toId($directory)."'"],
+            ]);
             if (toSeo($tipo->nome) != $directory) {
                 $tipo = null;
             }
@@ -298,7 +298,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         $front = Zend_Controller_Front::getInstance();
         $request = $front->getRequest();
 
-        $path = array();
+        $path = [];
         if ($request->getModuleName() != $front->getDefaultModule()) {
             $path['module'] = $request->getModuleName();
         }
@@ -362,10 +362,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
     {
         $lang = Zend_Registry::get('lang');
 
-        $options = array(
-            'fields' => array('nome'),
-            'where' => array('menu <> ""'),
-        );
+        $options = [
+            'fields' => ['nome'],
+            'where' => ['menu <> ""'],
+        ];
 
         if ($lang->prefix) {
             // Performance, não é necessário, mas diminui as queries
@@ -395,9 +395,9 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         if ($tipo = static::getTipo()) {
             $settingsTipo = $tipo->getFirstChildByModel('Settings');
             if ($settingsTipo instanceof InterAdminTipo) {
-                return $settingsTipo->findFirst(array(
-                    'fields' => array('title', 'keywords', 'description', 'overwrite_keywords'),
-                ));
+                return $settingsTipo->findFirst([
+                    'fields' => ['title', 'keywords', 'description', 'overwrite_keywords'],
+                ]);
             }
         }
     }

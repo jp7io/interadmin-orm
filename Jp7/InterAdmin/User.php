@@ -8,7 +8,7 @@ class Jp7_InterAdmin_User extends InterAdmin
     public function maskEmail()
     {
         list($username, $domain) = explode('@', $this->email);
-        $showchars = min(array(3, mb_strlen($username)));
+        $showchars = min([3, mb_strlen($username)]);
         $username = mb_substr($username, 0, $showchars).str_repeat('*', mb_strlen($username) - $showchars);
 
         $parts = explode('.', $domain);

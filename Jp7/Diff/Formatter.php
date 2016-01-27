@@ -42,7 +42,7 @@ class Jp7_Diff_Formatter
 
         $xi = $yi = 1;
         $block = false;
-        $context = array();
+        $context = [];
 
         $nlead = $this->leading_context_lines;
         $ntrail = $this->trailing_context_lines;
@@ -75,7 +75,7 @@ class Jp7_Diff_Formatter
                     $context = array_slice($context, sizeof($context) - $nlead);
                     $x0 = $xi - sizeof($context);
                     $y0 = $yi - sizeof($context);
-                    $block = array();
+                    $block = [];
                     if ($context) {
                         $block[] = new _DiffOp_Copy($context);
                     }

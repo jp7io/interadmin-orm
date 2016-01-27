@@ -14,7 +14,7 @@ class Jp7_Mail extends Zend_Mail
      */
     public function parseEmailAndSet($method, $email)
     {
-        $allowedMethods = array('addTo', 'setFrom', 'addBcc', 'addCc', 'setReturnPath');
+        $allowedMethods = ['addTo', 'setFrom', 'addBcc', 'addCc', 'setReturnPath'];
 
         if (!in_array($method, $allowedMethods)) {
             throw new Zend_Mail_Exception('Invalid method for this function.');

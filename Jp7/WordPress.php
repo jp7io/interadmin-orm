@@ -11,69 +11,69 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract
         $this->_db->execute("set names 'utf8'");
     }
 
-    public function getFirstBlog($options = array())
+    public function getFirstBlog($options = [])
     {
-        return reset($this->getBlogs(array('limit' => 1) + $options));
+        return reset($this->getBlogs(['limit' => 1] + $options));
     }
 
-    public function getBlogs($options = array())
+    public function getBlogs($options = [])
     {
-        $options += array(
+        $options += [
             'from' => self::$prefix.'blogs',
             'fields' => '*',
-        );
+        ];
 
         return self::retrieveObjects($this->_db, $options, get_class($this).'_Blog');
     }
 
-    public function getFirstPost($options = array())
+    public function getFirstPost($options = [])
     {
-        return reset($this->getPosts(array('limit' => 1) + $options));
+        return reset($this->getPosts(['limit' => 1] + $options));
     }
 
-    public function getPosts($options = array())
+    public function getPosts($options = [])
     {
-        $options += array(
+        $options += [
             'from' => self::$prefix.'posts',
             'fields' => '*',
-        );
+        ];
 
         return self::retrieveObjects($this->_db, $options, get_class($this).'_Post');
     }
 
-    public function getOptionByName($name, $options = array())
+    public function getOptionByName($name, $options = [])
     {
         $options['where'][] = "option_name = '".$name."'";
 
         return $this->getFirstOption($options);
     }
 
-    public function getFirstOption($options = array())
+    public function getFirstOption($options = [])
     {
-        return reset($this->getOptions(array('limit' => 1) + $options));
+        return reset($this->getOptions(['limit' => 1] + $options));
     }
 
-    public function getOptions($options = array())
+    public function getOptions($options = [])
     {
-        $options += array(
+        $options += [
             'from' => self::$prefix.'options',
             'fields' => '*',
-        );
+        ];
 
         return self::retrieveObjects($this->_db, $options, get_class($this).'_Option');
     }
 
-    public function getFirstUser($options = array())
+    public function getFirstUser($options = [])
     {
-        return reset($this->getUsers(array('limit' => 1) + $options));
+        return reset($this->getUsers(['limit' => 1] + $options));
     }
 
-    public function getUsers($options = array())
+    public function getUsers($options = [])
     {
-        $options += array(
+        $options += [
             'from' => self::$prefix.'users',
             'fields' => '*',
-        );
+        ];
 
         return self::retrieveObjects($this->_db, $options, __CLASS__.'_User');
     }
@@ -90,7 +90,7 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract
         $hasher = new Jp7_WordPress_PasswordHash();
 
         $user = new $className($this->_db, self::$prefix.'users');
-        $user->setAttributes(array(
+        $user->setAttributes([
            'ID' => '',
            'user_login' => $username,
            'user_pass' => $hasher->HashPassword($password),
@@ -103,7 +103,7 @@ class Jp7_WordPress extends Jp7_WordPress_BaseAbstract
            'display_name' => '',
            'spam' => '0',
            'deleted' => '0',
-        ));
+        ]);
 
         return $user;
     }

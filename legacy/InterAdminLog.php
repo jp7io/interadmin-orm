@@ -47,7 +47,7 @@ class InterAdminLog extends InterAdminAbstract
      * @param int   $id_log  This record's 'id_log'.
      * @param array $options Default array of options. Available keys: db_prefix, db, fields.
      */
-    public function __construct($id_log = 0, $options = array())
+    public function __construct($id_log = 0, $options = [])
     {
         $this->id_log = $id_log;
         $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
@@ -64,17 +64,17 @@ class InterAdminLog extends InterAdminAbstract
      *
      * @return InterAdminTipo
      */
-    public function getTipo($options = array())
+    public function getTipo($options = [])
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
                 $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_log', $this->id_log, 'id_tipo');
             }
-            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
+            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
-            ));
+            ]);
         }
 
         return $this->_tipo;
@@ -96,7 +96,7 @@ class InterAdminLog extends InterAdminAbstract
      *
      * @return InterAdmin
      */
-    public function getParent($options = array())
+    public function getParent($options = [])
     {
         if (!$this->_parent) {
             $tipo = $this->getTipo();
@@ -120,15 +120,15 @@ class InterAdminLog extends InterAdminAbstract
 
     public function getAttributesAliases()
     {
-        return array();
+        return [];
     }
     public function getAttributesCampos()
     {
-        return array();
+        return [];
     }
     public function getAttributesNames()
     {
-        return array('id_log', 'id', 'id_tipo', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert');
+        return ['id_log', 'id', 'id_tipo', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
     }
     public function getTableName()
     {
@@ -150,9 +150,9 @@ class InterAdminLog extends InterAdminAbstract
      */
     public function getAdminAttributes()
     {
-        return array();
+        return [];
     }
-    public static function create($attributes = array())
+    public static function create($attributes = [])
     {
         global $s_user, $lang;
         $log = new self();
@@ -167,16 +167,16 @@ class InterAdminLog extends InterAdminAbstract
         return $log;
     }
 
-    public static function countLogs($options = array())
+    public static function countLogs($options = [])
     {
-        $logs = self::findLogs(array(
+        $logs = self::findLogs([
             'fields' => 'count(id)',
-        ) + $options);
+        ] + $options);
 
         return $logs[0]->count_id;
     }
 
-    public static function findLogs($options = array())
+    public static function findLogs($options = [])
     {
         $instance = new self();
         if ($options['db']) {
@@ -186,7 +186,7 @@ class InterAdminLog extends InterAdminAbstract
             $instance->db_prefix = $options['db_prefix'];
         }
 
-        $options['fields'] = array_merge(array('id_log'), (array) $options['fields']);
+        $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
         $options['from'] = $instance->getTableName().' AS main';
 
         if (!$options['where']) {
@@ -200,13 +200,13 @@ class InterAdminLog extends InterAdminAbstract
         $options['campos'] = $instance->getAttributesCampos();
 
         $rs = $instance->_executeQuery($options);
-        $logs = array();
+        $logs = [];
 
         while ($row = $rs->FetchNextObj()) {
-            $log = new self($row->id_tipo, array(
+            $log = new self($row->id_tipo, [
                 'db_prefix' => $instance->db_prefix,
                 'db' => $instance->getDb(),
-            ));
+            ]);
             $instance->_getAttributesFromRow($row, $log, $options);
             $logs[] = $log;
         }

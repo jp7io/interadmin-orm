@@ -100,7 +100,7 @@ class Jp7_Image
     {
         $command = 'identify -verbose '.$this->src;
         $properties = $this->command($command);
-        $return = array();
+        $return = [];
         foreach ($properties as $property) {
             $property = explode(': ', $property);
             $property = array_map('trim', $property);

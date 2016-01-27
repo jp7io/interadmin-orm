@@ -4,14 +4,14 @@ class Jp7_Box_Slideshow extends Jp7_Box_BoxAbstract
 {
     public function prepareData()
     {
-        $this->items = array();
+        $this->items = [];
         if ($tipo = $this->view->tipo) {
             if ($slideshowTipo = $tipo->getFirstChildByModel('Slideshow')) {
-                $this->view->headScript()->appendFile(DEFAULT_PATH.'js/jquery/jquery.jp7.js');
+                $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/jquery/jquery.jp7.js');
 
-                $this->items = $slideshowTipo->find(array(
+                $this->items = $slideshowTipo->find([
                     'fields' => '*',
-                ));
+                ]);
             }
         }
 
@@ -45,10 +45,10 @@ div.box-slideshow .slideshow-item img {
 				<select class="selectbox" obligatory="yes" label="Efeito" name="<?php echo $this->id_box;
         ?>[effect][]">
 					<?php
-                    $options = array(
-                        (object) array('value' => 'fadeOut', 'text' => 'Desaparecer gradualmente - Fade Out'),
-                        (object) array('value' => 'slideLeft', 'text' => 'Deslizar para a esquerda'),
-                    );
+                    $options = [
+                        (object) ['value' => 'fadeOut', 'text' => 'Desaparecer gradualmente - Fade Out'],
+                        (object) ['value' => 'slideLeft', 'text' => 'Deslizar para a esquerda'],
+                    ];
         ?>
 					<?php echo $this->options($options, $this->params->effect ? $this->params->effect : 'fadeOut');
         ?>

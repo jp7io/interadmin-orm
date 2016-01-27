@@ -27,7 +27,7 @@ class InterAdminField
      *
      * @return
      */
-    public function __construct($field = array())
+    public function __construct($field = [])
     {
         $this->field = $field;
     }
@@ -79,7 +79,7 @@ class InterAdminField
         }
         if (!$valor && !$id) {
             if (strpos($tipo_de_campo, 'select_') === 0 && $valor_default && !is_numeric($valor_default)) {
-                $valor_default_arr = array();
+                $valor_default_arr = [];
                 $valor_string_arr = jp7_explode(',', $valor_default);
                 foreach ($valor_string_arr as $_value) {
                     $valorTipo = ($campo_array['nome'] instanceof InterAdminTipo) ? $campo_array['nome'] : InterAdminTipo::getInstance($campo_nome);
@@ -137,17 +137,17 @@ class InterAdminField
                 $form = '<div class="select_multi">';
                 ob_start();
 
-                $temp_campo_nome = self::getCampoHeader(array(
+                $temp_campo_nome = self::getCampoHeader([
                     'tipo' => $tipo_de_campo,
                     'nome' => $campo_nome,
                     'label' => $campo_array['label'],
-                ));
+                ]);
                 if ($xtra == 'X' && $readonly) {
                     $xtra = ''; // Com busca não tem readonly
                     $campo_array['where'] .= ' AND id IN('.($valor ?: '0').')';
                 }
                 if ($xtra == 'X') {
-                    include 'site/aplicacao/select_multi.php';
+                    require __DIR__.'/InterAdminField/select_multi.php';
                     $campo_nome = trim($campo_nome);
                     $campo_nome = interadmin_tipos_nome((is_numeric($campo_nome)) ? $campo_nome : 0);
                 } elseif ($xtra) {
@@ -174,11 +174,11 @@ class InterAdminField
                 '<option value="0">Selecione</option>'.
                 '<option value="0">--------------------</option>';
                 if ($xtra == 'radio') {
-                    $temp_campo_nome = self::getCampoHeader(array(
+                    $temp_campo_nome = self::getCampoHeader([
                         'tipo' => $tipo_de_campo,
                         'nome' => $campo_nome,
                         'label' => $campo_array['label'],
-                    ));
+                    ]);
                     $form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', $campo_array['where'], 'radio', $campo.'['.$j.']', $temp_campo_nome, $obrigatorio, $readonly);
                 } elseif ($xtra == 'radio_tipos') {
                     $form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo.'['.$j.']', true, $readonly, $obrigatorio);
@@ -190,9 +190,9 @@ class InterAdminField
                     //interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
                     if ($valor) {
                         $tipoObj = new InterAdminTipo($campo_nome);
-                        $options = array(
+                        $options = [
                             'where' => ' AND id='.$valor,
-                        );
+                        ];
                         $rows = $tipoObj->find($options);
                         foreach ($rows as $row) {
                             $form .= '<option value="'.$row->id.'" value="'.$row->id.'"'.(($row->id == $valor) ? ' selected' : '').'>'.toHTML($row->getStringValue()).'</option>';
@@ -288,7 +288,7 @@ class InterAdminField
         if ($campo_nome) {
             if (strpos($tipo_de_campo, 'tit_') === 0) {
             } elseif (strpos($tipo_de_campo, 'file_') === 0) {
-                $url = $valor ?: DEFAULT_PATH.'img/px.png';
+                $url = $valor ?: DEFAULT_PATH.'/img/px.png';
                 
                 echo ''.
                 $_tr.
@@ -386,7 +386,7 @@ class InterAdminField
      */
     public static function getSelectTipoXtras()
     {
-        return array('S', 'ajax_tipos', 'radio_tipos');
+        return ['S', 'ajax_tipos', 'radio_tipos'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam tipos.
@@ -395,7 +395,7 @@ class InterAdminField
      */
     public static function getSpecialTipoXtras()
     {
-        return array('tipos_multi', 'tipos');
+        return ['tipos_multi', 'tipos'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam múltiplos registros.
@@ -404,7 +404,7 @@ class InterAdminField
      */
     public static function getSpecialMultiXtras()
     {
-        return array('registros_multi', 'tipos_multi');
+        return ['registros_multi', 'tipos_multi'];
     }
     /**
      * Retorna o valor do campo no header (cabeçalho da listagem).
@@ -451,7 +451,7 @@ class InterAdminField
             return jp7_date_format($valor, 'd/m/Y - H:i');
         } elseif (strpos($key, 'select_') === 0) {
             if ($valor) {
-                $registros = array();
+                $registros = [];
                 foreach (jp7_explode(',', $valor) as $valor_i) {
                     if (in_array($campo['xtra'], self::getSelectTipoXtras())) {
                         $registros[] = jp7_string_left(interadmin_tipos_nome($valor_i), 10);
@@ -471,7 +471,7 @@ class InterAdminField
             $url = Jp7_InterAdmin_Upload::url($valor);
             $ext = jp7_extension($url);
             $url_size = '';
-            if (!in_array($ext, array('gif', 'jpg', 'jpeg', 'png', '---'))) {
+            if (!in_array($ext, ['gif', 'jpg', 'jpeg', 'png', '---'])) {
                 // Size
                 if ($c_remote) {
                     $url_size = '<span class="filesize" presrc="'.$url.'"></span>';
@@ -552,7 +552,7 @@ class InterAdminField
             if ($campo['value']) {
                 $url = Jp7_InterAdmin_Upload::url($campo['value']);
             } else {
-                $url = DEFAULT_PATH.'img/px.png';
+                $url = DEFAULT_PATH.'/img/px.png';
             }
             ?>
 			<tr class="<?php echo $campo['tipo'];

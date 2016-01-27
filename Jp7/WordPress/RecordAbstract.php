@@ -38,7 +38,7 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract
         $db = $this->_db;
         $selfClass = get_class($this);
 
-        $valuesToSave = array();
+        $valuesToSave = [];
 
         foreach ($attributes as $key => $value) {
             switch (gettype($value)) {

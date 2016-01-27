@@ -11,15 +11,15 @@ class Jp7_FilesController extends __Controller_Action
 
         $filesTipo = self::getTipo();
 
-        $this->view->records = $filesTipo->find(array(
-            'fields' => array('name', 'file'),
-        ));
+        $this->view->records = $filesTipo->find([
+            'fields' => ['name', 'file'],
+        ]);
 
         // Introdução
         if ($introductionTipo = $filesTipo->getFirstChildByModel('Introduction')) {
-            $this->view->introductionItens = $introductionTipo->find(array(
+            $this->view->introductionItens = $introductionTipo->find([
                 'fields' => '*',
-            ));
+            ]);
         }
     }
 }

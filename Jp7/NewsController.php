@@ -14,15 +14,15 @@ class Jp7_NewsController extends __Controller_Action
             // Irá cachear uma página diferente para cada registro
             Jp7_Cache_Output::getInstance()->start((string) $id);
 
-            $record = $newsTipo->findById($id, array(
-                'fields' => array('*', 'date_publish'),
-            ));
+            $record = $newsTipo->findById($id, [
+                'fields' => ['*', 'date_publish'],
+            ]);
             if (!$record) {
                 $this->_redirect($newsTipo->getUrl());
             }
-            $record->subitens = $record->getSubitens(array(
-                'fields' => array('*'),
-            ));
+            $record->subitens = $record->getSubitens([
+                'fields' => ['*'],
+            ]);
             /*
             $record->files = $record->getArquivosParaDownload(array(
                 'fields' => array('name', 'file')
@@ -35,9 +35,9 @@ class Jp7_NewsController extends __Controller_Action
             // Irá cachear uma página diferente para cada registro
             Jp7_Cache_Output::getInstance()->start($archive.$this->_getParam('p_page'));
 
-            $options = array(
-                'fields' => array('*', 'date_publish'),
-            );
+            $options = [
+                'fields' => ['*', 'date_publish'],
+            ];
             if ($archive) {
                 $archiveArr = array_map('intval', explode('/', $archive));
                 if (checkdate($archiveArr[1], 1, $archiveArr[0])) {
@@ -50,29 +50,29 @@ class Jp7_NewsController extends __Controller_Action
             global $config;
             $paginationClassName = ucfirst($config->name_id.'_Pagination');
             if (class_exists($paginationClassName)) {
-                $pagination = new $paginationClassName(array(
+                $pagination = new $paginationClassName([
                     'records' => $newsTipo->count($options),
-                ));
+                ]);
             } else {
-                $pagination = new Pagination(array(
+                $pagination = new Pagination([
                     'records' => $newsTipo->count($options),
                     'next_char' => 'Próxima',
                     'back_char' => 'Anterior',
                     'show_first_and_last' => true,
-                ));
+                ]);
             }
 
-            $this->view->introductionItens = array();
+            $this->view->introductionItens = [];
             if (!$this->view->archive && $pagination->page == 1) {
                 // Introdução na primeira página (Menos em página de Arquivo Mensal)
                 if ($introductionTipo = $newsTipo->getFirstChildByModel('Introduction')) {
-                    $this->view->introductionItens = $introductionTipo->find(array(
+                    $this->view->introductionItens = $introductionTipo->find([
                         'fields' => '*',
-                    ));
+                    ]);
                 }
             }
 
-            $this->view->news = $newsTipo->find($options + array('limit' => $pagination));
+            $this->view->news = $newsTipo->find($options + ['limit' => $pagination]);
             $this->view->pagination = $pagination;
         }
     }

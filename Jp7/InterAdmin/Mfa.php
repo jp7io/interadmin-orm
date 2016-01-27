@@ -24,11 +24,11 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
             throw new Exception('Campo "usuario" não existe no tipo Usuários.');
         }
 
-        return $userTipo->findById($s_user['id'], array(
+        return $userTipo->findById($s_user['id'], [
             'fields' => '*',
             'fields_alias' => true,
             'class' => self::class,
-        ));
+        ]);
     }
 
     // Special - Campo
@@ -40,15 +40,15 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
             case 'list':
                 return $value;
             case 'edit':
-                $campo = array(
+                $campo = [
                     'tipo_de_campo' => 'select',
                     'xtra' => '',
                     'value' => $value,
-                    'opcoes' => array(
+                    'opcoes' => [
                         'email' => 'E-mail',
                         'google' => 'Google Authenticator',
-                    ),
-                ) + $campo;
+                    ],
+                ] + $campo;
                 ob_start();
                 $field = new InterAdminField($campo);
                 echo $field->getHtml();
@@ -79,12 +79,12 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
             return true;
         }
 
-        $dbToken = $this->getValidMfaToken(array(
-            'where' => array(
+        $dbToken = $this->getValidMfaToken([
+            'where' => [
                 "md5(id) = '".$mfaCookie['id']."'",
                 "md5(UNIX_TIMESTAMP(date_publish)) = '".$mfaCookie['timestamp']."'",
-            ),
-        ));
+            ],
+        ]);
 
         return !$dbToken;
     }
@@ -97,7 +97,7 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
             return $gauth->verifyCode($this->mfa_secret, $code);
         } elseif ($this->mfa === 'email') {
             if ($this->mfa_secret === $code) {
-                $this->updateAttributes(array('mfa_secret' => ''));
+                $this->updateAttributes(['mfa_secret' => '']);
 
                 return true;
             }
@@ -119,14 +119,14 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
 
     public function getValidMfaToken($options)
     {
-        $options = InterAdmin::mergeOptions(array(
-            'fields' => array('date_publish'),
+        $options = InterAdmin::mergeOptions([
+            'fields' => ['date_publish'],
             'fields_alias' => true,
-            'where' => array(
+            'where' => [
                 "date_publish >= '".new Jp7_Date('-15 days')."'",
-            ),
+            ],
             'use_published_filters' => true,
-        ), $options);
+        ], $options);
 
         return $this->getFirstMfaTokens($options);
     }
@@ -151,7 +151,7 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
     private function getCliente()
     {
         global $config;
-        if (in_array($config->name_id, array('extra', 'casasbahia', 'pontofrio', 'cdiscount'))) {
+        if (in_array($config->name_id, ['extra', 'casasbahia', 'pontofrio', 'cdiscount'])) {
             return 'novapontocom';
         } else {
             return $config->name_id;
@@ -166,10 +166,10 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
         
         $mfaToken = $this->addMfaToken($last_code);
 
-        $cookie = array(
+        $cookie = [
             'id' => md5($mfaToken->id),
             'timestamp' => md5($mfaToken->date_publish->getTimestamp()),
-        );
+        ];
 
         setcookie('mfa['.$this->getCliente().']['.$cookieKey.']', serialize($cookie), strtotime('+15 days'), '/');
     }
@@ -195,9 +195,9 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
         for ($i = 0; $i < 6; $i++) {
             $secret .= rand(0, 9);
         }
-        $this->updateAttributes(array(
+        $this->updateAttributes([
             'mfa_secret' => $secret,
-        ));
+        ]);
 
         $issuer = $this->getIssuer();
 
@@ -228,7 +228,7 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
             self::$issuer = $c_interadmin_app_title.' - '.$config->name;
 
             if ($config->server->type != InterSite::PRODUCAO) {
-                self::$issuer .= ' ('.mb_strtoupper($config->server->type == 'Desenvolvimento' ? 'Dev' : '').')';
+                self::$issuer .= ' ('.$config->server->type.')';
             }
         }
 

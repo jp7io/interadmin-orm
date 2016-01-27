@@ -13,16 +13,16 @@ class Jp7_Cache_Data
      *
      * @return
      */
-    public function __construct($id, $options = array())
+    public function __construct($id, $options = [])
     {
         if (!is_scalar($id)) {
             $id = md5(serialize($id));
         }
         $this->id = $id;
-        $this->options = $options + array(
+        $this->options = $options + [
             'lifetime' => 0,
             'cache_dir' => self::$_cachedir,
-        );
+        ];
     }
 
     public function load()

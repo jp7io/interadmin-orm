@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated
+ */
 class Jp7_String
 {
     private $str;

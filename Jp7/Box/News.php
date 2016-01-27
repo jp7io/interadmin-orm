@@ -11,11 +11,11 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
         $this->sectionTipo = $newsTipo;
 
         if ($newsTipo) {
-            $options = array(
-                'fields' => array('title', 'image', 'date_publish'),
+            $options = [
+                'fields' => ['title', 'image', 'date_publish'],
                 'fields_alias' => true, // Não dá para garantir que está true por padrão
                 'limit' => $this->params->limit,
-            );
+            ];
             if ($this->params->featured) {
                 $options['where'][] = "featured <> ''";
             }
@@ -26,7 +26,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
 
             $this->_prepareDataImages();
         } else {
-            $this->news = array();
+            $this->news = [];
         }
     }
     /**
@@ -52,7 +52,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
 					<label>
 						<?php if (count($config->langs) > 1) {
     ?>
-							<img src="<?= DEFAULT_PATH ?>img/icons/<?php echo $key;
+							<img src="<?= DEFAULT_PATH ?>/img/icons/<?php echo $key;
     ?>.png" style="vertical-align:middle;" />
 						<?php 
 }

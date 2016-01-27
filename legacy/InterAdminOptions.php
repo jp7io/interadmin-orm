@@ -8,11 +8,11 @@ class InterAdminOptions
     public function __construct(InterAdminTipo $tipo)
     {
         $this->tipo = $tipo;
-        $this->options = array(
-            'fields' => array(),
+        $this->options = [
+            'fields' => [],
             'fields_alias' => true,
-            'where' => array(),
-        );
+            'where' => [],
+        ];
     }
 
     public function where($_)
@@ -26,14 +26,14 @@ class InterAdminOptions
             $where = array_map([$this, '_escapeParam'], $where);
             array_unshift($where, $format);
 
-            $where = array(call_user_func_array('sprintf', $where));
+            $where = [call_user_func_array('sprintf', $where)];
         } else {
             $where = $where[0];
             if (is_array($where)) {
                 if (!is_numeric(key($where))) {
                     // Hash = [a => 1, b => 2]
                     $original = $where;
-                    $where = array();
+                    $where = [];
                     foreach ($original as $key => $value) {
                         if (is_array($value)) {
                             $escaped = array_map([$this, '_escapeParam'], $value);
@@ -46,7 +46,7 @@ class InterAdminOptions
                     }
                 }
             } else {
-                $where = array($where);
+                $where = [$where];
             }
         }
         $this->options['where'] = array_merge($this->options['where'], $where);
@@ -73,21 +73,21 @@ class InterAdminOptions
 
     public function join($alias, $tipo, $on)
     {
-        $this->options['joins'][$alias] = array('INNER', $tipo, $on);
+        $this->options['joins'][$alias] = ['INNER', $tipo, $on];
 
         return $this;
     }
 
     public function leftJoin($alias, $tipo, $on)
     {
-        $this->options['joins'][$alias] = array('LEFT', $tipo, $on);
+        $this->options['joins'][$alias] = ['LEFT', $tipo, $on];
 
         return $this;
     }
 
     public function rightJoin($alias, $tipo, $on)
     {
-        $this->options['joins'][$alias] = array('RIGHT', $tipo, $on);
+        $this->options['joins'][$alias] = ['RIGHT', $tipo, $on];
 
         return $this;
     }

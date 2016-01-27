@@ -2,7 +2,7 @@
 
 class Jp7_Vimeo
 {
-    protected static $_cache = array();
+    protected static $_cache = [];
 
     protected static function _getData($vimeoUrl)
     {

@@ -79,7 +79,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      * @param string $id      This record's 'id'.
      * @param array  $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
      */
-    public function __construct($id = '0', $options = array())
+    public function __construct($id = '0', $options = [])
     {
         $id = (string) $id;
         $this->id = is_numeric($id) ? $id : '0';
@@ -88,7 +88,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $this->_db = @$options['db'];
 
         if ($options['fields'] && $this->id) {
-            $options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+            $options = $options + ['fields_alias' => static::DEFAULT_FIELDS_ALIAS];
             $this->getFieldsValues($options['fields'], false, $options['fields_alias']);
         }
     }
@@ -103,9 +103,9 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
      */
-    public static function getInstance($id, $options = array(), InterAdminTipo $tipo = null)
+    public static function getInstance($id, $options = [], InterAdminTipo $tipo = null)
     {
-        $optionsWithoutFields = array_merge($options, array('fields' => array()));
+        $optionsWithoutFields = array_merge($options, ['fields' => []]);
 
         // Default Class
         if (!$options['default_class']) {
@@ -244,7 +244,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
         $children = $this->getTipo()->getInterAdminsChildren();
-        $patterns = array(
+        $patterns = [
             'get{ChildName}',
             'getFirst{ChildName}',
             'get{ChildName}ById',
@@ -252,7 +252,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             'get{ChildName}Count',
             'create{ChildName}',
             'delete{ChildName}',
-        );
+        ];
         foreach (array_keys($children) as $childName) {
             foreach ($patterns as $pattern) {
                 $message .= "\t\t- ".str_replace('{ChildName}', $childName, $pattern)."\n";
@@ -284,7 +284,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdminTipo
      */
-    public function getTipo($options = array())
+    public function getTipo($options = [])
     {
         if (!$this->_tipo) {
             if (!$id_tipo = $this->id_tipo) {
@@ -295,11 +295,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                     $id_tipo = $row->id_tipo;
                 }
             }
-            $this->setTipo(InterAdminTipo::getInstance($id_tipo, array(
+            $this->setTipo(InterAdminTipo::getInstance($id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
-            )));
+            ]));
         }
 
         return $this->_tipo;
@@ -321,13 +321,13 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdmin
      */
-    public function getParent($options = array())
+    public function getParent($options = [])
     {
         if (!$this->_parent) {
             if (!$this->parent_id || !$this->parent_id_tipo) {
-                $this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
+                $this->getFieldsValues(['parent_id', 'parent_id_tipo']);
             }
-            $options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+            $options = $options + ['fields_alias' => static::DEFAULT_FIELDS_ALIAS];
 
             $parentTipo = null;
             if ($this->parent_id_tipo) {
@@ -373,7 +373,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return
      */
-    public function createChild($id_tipo, array $attributes = array())
+    public function createChild($id_tipo, array $attributes = [])
     {
         return $this->getChildrenTipo($id_tipo)->createInterAdmin($attributes);
     }
@@ -385,7 +385,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdminTipo
      */
-    public function getChildrenTipo($id_tipo, $options = array())
+    public function getChildrenTipo($id_tipo, $options = [])
     {
         $id_tipo = (string) $id_tipo;
         if (empty($this->_childrenTipos[$id_tipo])) {
@@ -409,11 +409,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return array Array of InterAdmin objects.
      */
-    public function getChildren($id_tipo, $options = array())
+    public function getChildren($id_tipo, $options = [])
     {
-        $children = array();
+        $children = [];
         if ($id_tipo) {
-            $options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+            $options = $options + ['fields_alias' => static::DEFAULT_FIELDS_ALIAS];
             if ($childrenTipo = $this->getChildrenTipo($id_tipo)) {
                 $children = $childrenTipo->find($options);
             }
@@ -429,9 +429,9 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return int Count of InterAdmins found.
      */
-    public function getChildrenCount($id_tipo, $options = array())
+    public function getChildrenCount($id_tipo, $options = [])
     {
-        $options['fields'] = array('COUNT(DISTINCT id)');
+        $options['fields'] = ['COUNT(DISTINCT id)'];
         $retorno = $this->getFirstChild($id_tipo, $options);
 
         return intval($retorno->count_distinct_id);
@@ -444,9 +444,9 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdmin
      */
-    public function getFirstChild($id_tipo, $options = array())
+    public function getFirstChild($id_tipo, $options = [])
     {
-        $retorno = $this->getChildren($id_tipo, array('limit' => 1) + $options);
+        $retorno = $this->getChildren($id_tipo, ['limit' => 1] + $options);
 
         return $retorno[0];
     }
@@ -459,7 +459,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdmin
      */
-    public function getChildById($id_tipo, $id, $options = array())
+    public function getChildById($id_tipo, $id, $options = [])
     {
         $options['limit'] = 1;
         $options['where'][] = 'id = '.intval($id);
@@ -475,7 +475,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return int Number of deleted children.
      */
-    public function deleteChildren($id_tipo, $options = array())
+    public function deleteChildren($id_tipo, $options = [])
     {
         $children = $this->getChildren($id_tipo, $options);
         foreach ($children as $child) {
@@ -492,7 +492,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return int Count of deleted InterAdmins.
      */
-    public function deleteChildrenForever($id_tipo, $options = array())
+    public function deleteChildrenForever($id_tipo, $options = [])
     {
         if ($id_tipo) {
             $tipo = $this->getChildrenTipo($id_tipo);
@@ -507,7 +507,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return InterAdminArquivo
      */
-    public function createArquivo(array $attributes = array())
+    public function createArquivo(array $attributes = [])
     {
         $className = static::DEFAULT_NAMESPACE.'InterAdminArquivo';
         if (!class_exists($className)) {
@@ -528,9 +528,9 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return array Array of InterAdminArquivo objects.
      */
-    public function getArquivos($options = array())
+    public function getArquivos($options = [])
     {
-        $arquivos = array();
+        $arquivos = [];
 
         $className = (class_exists($options['class'])) ? $options['class'] : static::DEFAULT_NAMESPACE.'InterAdminArquivo';
         $arquivoModel = new $className(0);
@@ -539,7 +539,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $this->_resolveWildcard($options['fields'], $arquivoModel);
         $this->_whereArrayFix($options['where']); // FIXME
 
-        $options['fields'] = array_merge(array('id_arquivo'), (array) $options['fields']);
+        $options['fields'] = array_merge(['id_arquivo'], (array) $options['fields']);
         $options['from'] = $arquivoModel->getTableName().' AS main';
         $options['where'][] = 'id_tipo = '.intval($this->id_tipo);
         $options['where'][] = 'id = '.intval($this->id);
@@ -550,12 +550,12 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
         $rs = $this->_executeQuery($options);
 
-        $records = array();
+        $records = [];
         while ($row = $rs->FetchNextObj()) {
-            $arquivo = new $className($row->id_arquivo, array(
+            $arquivo = new $className($row->id_arquivo, [
                 'db_prefix' => $this->getTipo()->db_prefix,
                 'db' => $this->_db,
-            ));
+            ]);
             $arquivo->setTipo($this->getTipo());
             $arquivo->setParent($this);
             $this->_getAttributesFromRow($row, $arquivo, $options);
@@ -564,9 +564,9 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
         return $arquivos;
     }
-    public function getFirstArquivo($options = array())
+    public function getFirstArquivo($options = [])
     {
-        $retorno = $this->getArquivos($options + array('limit' => 1));
+        $retorno = $this->getArquivos($options + ['limit' => 1]);
 
         return $retorno[0];
     }
@@ -577,7 +577,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return int Number of deleted arquivos.
      */
-    public function deleteArquivos($options = array())
+    public function deleteArquivos($options = [])
     {
         $arquivos = $this->getArquivos($options);
         foreach ($arquivos as $arquivo) {
@@ -587,7 +587,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         return count($arquivos);
     }
 
-    public function createLog(array $attributes = array())
+    public function createLog(array $attributes = [])
     {
         $log = InterAdminLog::create($attributes);
         $log->setParent($this);
@@ -668,7 +668,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @return array
      */
-    public function getTags($options = array())
+    public function getTags($options = [])
     {
         if (!$this->_tags || $options) {
             $db = $this->getDb();
@@ -680,15 +680,15 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                 (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
             $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 
-            $this->_tags = array();
+            $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
                 if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
                     $tag_text = $tag_tipo->getFieldsValues('nome');
                     if ($row->id) {
-                        $options = array(
-                            'fields' => array('varchar_key'),
-                            'where' => array('id = '.$row->id),
-                        );
+                        $options = [
+                            'fields' => ['varchar_key'],
+                            'where' => ['id = '.$row->id],
+                        ];
                         if ($tag_registro = $tag_tipo->findFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
@@ -718,7 +718,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     public function isPublished()
     {
         global $config, $s_session;
-        $this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
+        $this->getFieldsValues(['date_publish', 'date_expire', 'char_key', 'publish', 'deleted']);
 
         return (
             strtotime($this->date_publish) <= self::getTimestamp() &&
@@ -747,7 +747,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             if (strpos($key, 'select_') === 0) {
                 $tipoObj = $this->getCampoTipo($campos[$key]);
                 $value_arr = explode(',', $value);
-                $str_arr = array();
+                $str_arr = [];
                 foreach ($value_arr as $value_id) {
                     $str_arr[] = jp7_fields_values($tipoObj->getInterAdminsTableName(), 'id', $value_id, 'varchar_key');
                 }
@@ -771,7 +771,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     public function getStringValue()
     {
         $campos = $this->getTipo()->getCampos();
-        $camposCombo = array();
+        $camposCombo = [];
         if (key_exists('varchar_key', $campos)) {
             $campos['varchar_key']['combo'] = 'S';
         } elseif (key_exists('select_key', $campos)) {
@@ -784,7 +784,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         }
         if ($camposCombo) {
             $valoresCombo = $this->getFieldsValues($camposCombo);
-            $stringValue = array();
+            $stringValue = [];
             foreach ($valoresCombo as $key => $value) {
                 if ($value instanceof InterAdminFieldFile) {
                     continue;
@@ -986,7 +986,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         }
         if (isset($initial['where']) && isset($extended['where'])) {
             if (!is_array($extended['where'])) {
-                $extended['where'] = array($extended['where']);
+                $extended['where'] = [$extended['where']];
             }
             $extended['where'] = array_merge($extended['where'], $initial['where']);
         }
@@ -1004,11 +1004,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function getAdminAttributes()
     {
-        return array(
+        return [
             'id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish',
             'date_insert', 'date_expire', 'date_modify', 'log', 'publish',
             'deleted', 'hits', 'log_user', 'date_hit', 'versao'
-        );
+        ];
     }
 
     /**
@@ -1031,11 +1031,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         }
 
         $campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
-        $record = $campoTipo->findFirst(array(
-            'where' => array($searchColumn." = '".$searchValue."'"),
-        ));
+        $record = $campoTipo->findFirst([
+            'where' => [$searchColumn." = '".$searchValue."'"],
+        ]);
         if (startsWith('select_multi_', $nomeCampo)) {
-            $this->$attribute = array($record);
+            $this->$attribute = [$record];
         } else {
             $this->$attribute = $record;
         }

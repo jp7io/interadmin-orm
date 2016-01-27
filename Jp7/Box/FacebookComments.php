@@ -15,10 +15,10 @@ class Jp7_Box_FacebookComments extends Jp7_Box_BoxAbstract
 				<select class="selectbox" obligatory="yes" label="Cores" name="<?php echo $this->id_box;
         ?>[colorscheme][]">
 					<?php
-                    $options = array(
-                        (object) array('value' => 'light', 'text' => 'Claras / Light'),
-                        (object) array('value' => 'dark', 'text' => 'Escuras / Dark'),
-                    );
+                    $options = [
+                        (object) ['value' => 'light', 'text' => 'Claras / Light'],
+                        (object) ['value' => 'dark', 'text' => 'Escuras / Dark'],
+                    ];
         ?>
 					<?php echo $this->options($options, $this->params->colorscheme ? $this->params->colorscheme : 'light');
         ?>

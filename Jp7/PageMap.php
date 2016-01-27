@@ -7,13 +7,13 @@ class Jp7_PageMap
         $str = '';
         foreach ($this as $type => $objects) {
             if (!is_array($objects)) {
-                $objects = array($objects);
+                $objects = [$objects];
             }
             foreach ($objects as $attributes) {
                 $str .= "\t".'<DataObject type="'.$type.'">'."\r\n";
                 foreach ($attributes as $name => $values) {
                     if (!is_array($values)) {
-                        $values = array($values);
+                        $values = [$values];
                     }
                     foreach ($values as $value) {
                         $str .= "\t\t".'<Attribute name="'.$name.'" value="'.$value.'" />'."\r\n";

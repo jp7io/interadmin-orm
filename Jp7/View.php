@@ -2,10 +2,10 @@
 
 class Jp7_View extends Zend_View
 {
-    public static $_currentFiles = array();
-    public static $_errorsLog = array();
+    public static $_currentFiles = [];
+    public static $_errorsLog = [];
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
         parent::__construct($config);
 

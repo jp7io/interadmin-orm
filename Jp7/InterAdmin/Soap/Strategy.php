@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeSequence
 {
-    protected $_inProgress = array();
+    protected $_inProgress = [];
 
     protected function _appendElements($dom, $container, $elements)
     {
@@ -40,11 +40,11 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 
                 // Jp7
                 if ($type == 'Options') {
-                    $this->_appendElements($dom, $all, array(
+                    $this->_appendElements($dom, $all, [
                         'fields' => 'xsd:string',
                         'where' => 'xsd:string',
                         'limit' => 'xsd:string',
-                    ));
+                    ]);
                 } else {
                     if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
                         $tipo = Jp7_InterAdmin_Soap::getClassTipo($type);
@@ -52,14 +52,14 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                         $tipo->getCamposAlias();
                         $campos = $tipo->getCampos();
 
-                        $elements = array();
+                        $elements = [];
                         foreach ($campos as $campo) {
                             if (strpos($campo['tipo'], 'tit_') === false && strpos($campo['tipo'], 'func_') === false) {
                                 $elements[$campo['nome_id']] = $this->_getCampoType($tipo, $campo);
                             }
                         }
 
-                        $elements += array(
+                        $elements += [
                             'id' => 'xsd:int',
                             'id_tipo' => 'xsd:int',
                             'parent_id' => 'xsd:int',
@@ -68,12 +68,12 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                             'date_publish' => 'xsd:dateTime',
                             'deleted' => 'xsd:boolean',
                             'publish' => 'xsd:boolean',
-                        );
+                        ];
 
                         $this->_appendElements($dom, $all, $elements);
                     } else {
                         // InterAdminTipo
-                        $this->_appendElements($dom, $all, array(
+                        $this->_appendElements($dom, $all, [
                             'id_tipo' => 'xsd:int',
                             'nome' => 'xsd:string',
                             'parent_id_tipo' => 'xsd:int',
@@ -82,7 +82,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                             'class_tipo' => 'xsd:string',
                             'deleted_tipo' => 'xsd:boolean',
                             'mostrar' => 'xsd:boolean',
-                        ));
+                        ]);
                     }
                 }
 

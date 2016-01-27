@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Util
 {
-    protected static $_default_vars = array('id_slug', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted');
+    protected static $_default_vars = ['id_slug', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted'];
 
     /**
      * Exports records and their children.
@@ -14,19 +14,19 @@ class Jp7_InterAdmin_Util
      */
     public static function export(InterAdminTipo $tipoObj, array $ids, $use_id_string = false)
     {
-        $options = array(
-            'fields' => array_merge(array('*'), self::$_default_vars),
+        $options = [
+            'fields' => array_merge(['*'], self::$_default_vars),
             'class' => 'InterAdmin',
             'fields_alias' => false,
-        );
+        ];
 
         $optionsRegistros = $options;
         if ($use_id_string) {
             $optionsRegistros = self::_prepareOptionsForIdString($optionsRegistros, $tipoObj);
         }
-        $exports = $tipoObj->find($optionsRegistros + array(
+        $exports = $tipoObj->find($optionsRegistros + [
             'where' => 'id IN('.implode(',', $ids).')',
-        ));
+        ]);
 
         $tiposChildren = $tipoObj->getInterAdminsChildren();
         foreach ($exports as $export) {
@@ -38,7 +38,7 @@ class Jp7_InterAdmin_Util
 
     protected static function _exportChildren($export, $tiposChildren, $use_id_string, $options)
     {
-        $export->_children = array();
+        $export->_children = [];
         foreach ($tiposChildren as $tipoChildrenArr) {
             $optionsChildren = $options;
             $optionsChildren['where'][] = "deleted = ''";
@@ -67,7 +67,7 @@ class Jp7_InterAdmin_Util
             $isSpecialRegistro = strpos($campo['tipo'], 'special_') === 0 && $campo['xtra'] == 'registros' && $tipo->getCampoTipo($campo) instanceof InterAdminTipo;
             $isSelectRegistro = strpos($campo['tipo'], 'select_') === 0 && strpos($campo['tipo'], 'select_multi_') !== 0 && !in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
             if ($isSpecialRegistro || $isSelectRegistro) {
-                $options['fields'][$campo['tipo']] = array('id_string');
+                $options['fields'][$campo['tipo']] = ['id_string'];
             }
         }
 
@@ -81,7 +81,7 @@ class Jp7_InterAdmin_Util
                 $attributeTipo = InterAdminTipo::getInstance($attribute->id_tipo);
                 //$attribute->setTipo($attributeTipo);
                 if ($attributeTipo) {
-                    $options = array();
+                    $options = [];
                     if ($bind_children) {
                         $options['order'] = 'parent_id = '.$record->parent_id.' DESC, ';
                     }
@@ -105,9 +105,9 @@ class Jp7_InterAdmin_Util
      */
     public static function import(array $records, InterAdminTipo $tipoObj, InterAdmin $parent = null, $import_children = true, $use_id_string = false, $bind_children = false)
     {
-        $returnIds = array();
+        $returnIds = [];
         foreach ($records as $record) {
-            $returnId = array('id' => $record->id);
+            $returnId = ['id' => $record->id];
             unset($record->id);
             unset($record->id_slug);
 
@@ -197,9 +197,9 @@ class Jp7_InterAdmin_Util
 
     public static function syncTipos($model)
     {
-        $inheritedTipos = InterAdminTipo::findTiposByModel($model->id_tipo, array(
+        $inheritedTipos = InterAdminTipo::findTiposByModel($model->id_tipo, [
             'class' => 'InterAdminTipo',
-        ));
+        ]);
         ?>
 		&bull; <?php echo $model->id_tipo;
         ?> - <?php echo $model->nome;

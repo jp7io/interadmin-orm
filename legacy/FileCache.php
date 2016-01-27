@@ -51,13 +51,13 @@ class FileCache
      * @param string $cachePath Sets the directory where the cache will be saved, the default value is 'cache'.
      * @param int    $lifetime  Lifetime in seconds. Cached files with $lifetime == 0 expire using getLogTime().
      */
-    public function __construct($storeId = false, array $options = array())
+    public function __construct($storeId = false, array $options = [])
     {
-        $default = array(
+        $default = [
             'partial' => false,
             'cachePath' => 'cache',
             'lifetime' => 0,
-        );
+        ];
         extract($options + $default);
 
         global $config, $c_cache_delay;
@@ -179,7 +179,7 @@ class FileCache
             if ($c_jp7 && strpos($this->fileName, 'xml') === false) {
                 global $config;
                 $css = 'position:absolute;border:1px solid black;border-top:0px;font-weight:bold;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000;cursor:pointer;';
-                $title = array(
+                $title = [
                     '# Cache: ',
                         '  '.$this->cachePath.$this->fileName,
                         '  '.date('d/m/Y H:i:s', @filemtime($this->cachePath.$this->fileName)),
@@ -190,7 +190,7 @@ class FileCache
                     '# Delay para limpeza: '.intval($this->delay).' segundos',
                     '# IP Servidor: '.$_SERVER['SERVER_ADDR'],
                     '# DB: '.$config->db->host.'/'.$config->db->name,
-                );
+                ];
 
                 $title = implode('&#013;', $title);
 
@@ -288,7 +288,7 @@ class FileCache
     {
         return BASE_PATH.'/interadmin/interadmin.log';
     }
-    public static function getPlaceholder($name, $vars = array())
+    public static function getPlaceholder($name, $vars = [])
     {
         return '{CACHE:'.$name.'|'.serialize($vars).'}'."\n";
     }

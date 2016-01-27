@@ -18,18 +18,18 @@ class Jp7_View_Helper_FormDate extends Zend_View_Helper_FormElement
         unset($attribs['showTime']);
 
         $valueDate = $dateObj->isValid() ? $dateObj->format('d/m/Y') : '';
-        $date = $this->view->formText($name.'[date]', $valueDate, $attribs + array(
+        $date = $this->view->formText($name.'[date]', $valueDate, $attribs + [
             'class' => 'date',
             'placeholder' => 'Dia/Mês/Ano',
-        ));
+        ]);
 
         unset($attribs['id']); // nao repetir ID no time
         if ($showTime) {
             $valueTime = $dateObj->isValid() ? $dateObj->format('H:i') : '';
-            $time = $this->view->formText($name.'[time]', $valueTime, $attribs + array(
+            $time = $this->view->formText($name.'[time]', $valueTime, $attribs + [
                 'class' => 'time',
                 'placeholder' => '00:00',
-            ));
+            ]);
         }
 
         return $date.$time;

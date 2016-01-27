@@ -14,15 +14,15 @@ class Jp7_ContentController extends __Controller_Action
         $contentTipo = self::getTipo();
 
         if ($id) {
-            $record = $contentTipo->findById($id, array(
-                'fields' => array('*'),
-            ));
+            $record = $contentTipo->findById($id, [
+                'fields' => ['*'],
+            ]);
             if (!$record) {
                 $this->_redirect($contentTipo->getUrl());
             }
-            $record->subitens = $record->getSubitens(array(
-                'fields' => array('*'),
-            ));
+            $record->subitens = $record->getSubitens([
+                'fields' => ['*'],
+            ]);
 
             /*
             $record->files = $record->getArquivosParaDownload(array(
@@ -34,22 +34,22 @@ class Jp7_ContentController extends __Controller_Action
         } else {
             // Introdução
             if ($introductionTipo = $contentTipo->getFirstChildByModel('Introduction')) {
-                $this->view->introductionItens = $introductionTipo->find(array(
+                $this->view->introductionItens = $introductionTipo->find([
                     'fields' => '*',
-                ));
+                ]);
             }
 
-            $this->view->records = $contentTipo->find(array(
-                'fields' => array('*'),
-            ));
+            $this->view->records = $contentTipo->find([
+                'fields' => ['*'],
+            ]);
 
             foreach ($this->view->records as $record) {
                 if (!$record->text) {
-                    $record->subitens = $record->getSubitens(array(
-                        'fields' => array('*'),
-                    ));
+                    $record->subitens = $record->getSubitens([
+                        'fields' => ['*'],
+                    ]);
                 } else {
-                    $record->subitens = array();
+                    $record->subitens = [];
                 }
             }
         }
