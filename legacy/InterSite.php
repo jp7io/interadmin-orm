@@ -303,7 +303,7 @@ class InterSite
                 header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
                 header('Location: http://'.$this->server->host.$_SERVER['REQUEST_URI']);
                 exit;
-            case !$this->server: {
+            case !$this->server:
                 $message = 'Host não está presente nas configurações: '.$_SERVER['HTTP_HOST'];
                 //jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
                 $message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
@@ -315,7 +315,6 @@ class InterSite
                 }
                 die($message.$messageLink);
             }
-        }
 
         /* @todo TEMP - Creating old globals */
         $oldtypes = [
@@ -329,7 +328,7 @@ class InterSite
         $GLOBALS['c_menu'] = @$this->menu;
         $GLOBALS['c_cache'] = $this->cache;
         $GLOBALS['c_cache_delay'] = @$this->cache_delay;
-        $GLOBALS['db_prefix'] = $jp7_app.'_'.$this->name_id;
+        $GLOBALS['db_prefix'] = ($jp7_app ?: 'interadmin').'_'.$this->name_id;
         $GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
         $GLOBALS['c_analytics'] = @$this->google_analytics;
         $GLOBALS['googlemaps_key'] = @$this->google_maps;
