@@ -21,6 +21,9 @@ class InterAdminOptions
         if (count($where) > 1) {
             // Prepared statement: email LIKE ?
             $format = array_shift($where);
+            if (strpos($format, '?') === false) {
+                throw new Exception('Expected question mark: email LIKE ?');
+            }
             $format = str_replace('?', '%s', $format);
 
             $where = array_map([$this, '_escapeParam'], $where);
