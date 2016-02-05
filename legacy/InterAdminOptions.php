@@ -5,6 +5,13 @@ class InterAdminOptions
     private $tipo;
     private $options;
 
+    protected $operators = [
+        '=', '<', '>', '<=', '>=', '<>', '!=',
+        'like', 'not like', 'between', 'ilike',
+        '&', '|', '^', '<<', '>>',
+        'rlike', 'regexp', 'not regexp',
+    ];
+    
     public function __construct(InterAdminTipo $tipo)
     {
         $this->tipo = $tipo;
@@ -14,52 +21,80 @@ class InterAdminOptions
             'where' => [],
         ];
     }
-
-    public function where($_)
+    
+    protected function invalidOperatorAndValue($operator, $value)
     {
-        $where = func_get_args();
-        if (count($where) > 1) {
-            // Prepared statement: email LIKE ?
-            $format = array_shift($where);
-            $format = str_replace('?', '%s', $format);
-
-            $where = array_map([$this, '_escapeParam'], $where);
-            array_unshift($where, $format);
-
-            $where = [call_user_func_array('sprintf', $where)];
-        } else {
-            $where = $where[0];
-            if (is_array($where)) {
-                if (!is_numeric(key($where))) {
-                    // Hash = [a => 1, b => 2]
-                    $original = $where;
-                    $where = [];
-                    foreach ($original as $key => $value) {
-                        if (is_array($value)) {
-                            $escaped = array_map([$this, '_escapeParam'], $value);
-                            $where[] = "$key IN (".implode(',', $escaped).')';
-                        } elseif (is_bool($value)) {
-                            $where[] = "$key ".($value ? "<> ''" : "= ''");
-                        } else {
-                            $where[] = "$key = ".$this->_escapeParam($value);
-                        }
-                    }
+        $isOperator = in_array($operator, $this->operators);
+        return ($isOperator && $operator != '=' && is_null($value));
+    }
+    
+    public function where($column, $operator = null, $value = null)
+    {
+        if (is_array($column)) {
+            // Hash = [a => 1, b => 2]
+            $original = $where;
+            $where = [];
+            foreach ($original as $key => $value) {
+                if (is_array($value)) {
+                    $escaped = array_map([$this, '_escapeParam'], $value);
+                    $where[] = "$key IN (".implode(',', $escaped).')';
+                } elseif (is_bool($value)) {
+                    $where[] = "$key ".($value ? "<> ''" : "= ''");
+                } else {
+                    $where[] = "$key = ".$this->_escapeParam($value);
                 }
-            } else {
-                $where = [$where];
             }
+        } else {
+            if (func_num_args() == 2) {
+                list($value, $operator) = [$operator, '='];
+            } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+                throw new \InvalidArgumentException('Value must be provided.');
+            }
+            if (!in_array(strtolower($operator), $this->operators, true)) {
+                if (is_null($value)) {
+                    // short circuit operator
+                    list($operator, $value) = ['=', $operator];
+                } else {
+                    throw new \InvalidArgumentException('Invalid operator.');
+                }
+            }
+            if (str_contains($column, ' ') || str_contains($column, '(')) {
+                throw new \BadMethodCallException('Invalid column.');
+            }
+            $where = $this->_parseComparison($column, $operator, $value);
         }
         $this->options['where'] = array_merge($this->options['where'], $where);
-
+        
         return $this;
     }
+    
+    protected function _parseComparison($column, $operator, $value)
+    {
+        if (is_null($value) && $operator == '=') {
+            $operator = 'IS';
+        }
+        return $column.' '.$operator.' '.$this->_escapeParam($value);
+    }
 
+    public function whereRaw($where)
+    {
+        $this->options['where'][] = $where;
+        return $this;
+    }
+    
     protected function _escapeParam($value)
     {
-        if (is_string($value)) {
-            $value = "'".addslashes($value)."'";
+        global $db;
+        if (is_object($value)) {
+            $value = $value->__toString();
         }
-
+        if (is_string($value)) {
+            $value = $db->qstr($value);
+        }
+        if (is_null($value)) {
+            $value = 'NULL';
+        }
+        
         return $value;
     }
 
@@ -122,7 +157,7 @@ class InterAdminOptions
         return $this;
     }
 
-    public function usePublishedFilters($filters = true)
+    public function published($filters = true)
     {
         $this->options['use_published_filters'] = (bool) $filters;
 
