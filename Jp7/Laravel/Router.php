@@ -71,7 +71,7 @@ class Router extends MethodForwarder
     public function getRouteByIdTipo($id_tipo, $action = 'index')
     {
         if (!isset($this->map[$id_tipo])) {
-            throw new \Exception('There is no route registered for id_tipo: ' . $id_tipo);
+            throw new RouteException('There is no route registered for id_tipo: ' . $id_tipo);
         }
         $mappedRoute = $this->map[$id_tipo];
         $routePrefix = ($mappedRoute != '/') ? $mappedRoute . '.' : '';
