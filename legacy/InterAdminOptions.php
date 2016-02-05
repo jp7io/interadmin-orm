@@ -4,6 +4,7 @@ class InterAdminOptions
 {
     private $tipo;
     private $options;
+    private $allFields = true;
 
     protected $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
@@ -16,7 +17,7 @@ class InterAdminOptions
     {
         $this->tipo = $tipo;
         $this->options = [
-            'fields' => [],
+            'fields' => ['*'],
             'fields_alias' => true,
             'where' => [],
         ];
@@ -30,11 +31,10 @@ class InterAdminOptions
     
     public function where($column, $operator = null, $value = null)
     {
+        $where = [];
         if (is_array($column)) {
             // Hash = [a => 1, b => 2]
-            $original = $where;
-            $where = [];
-            foreach ($original as $key => $value) {
+            foreach ($column as $key => $value) {
                 if (is_array($value)) {
                     $escaped = array_map([$this, '_escapeParam'], $value);
                     $where[] = "$key IN (".implode(',', $escaped).')';
@@ -47,7 +47,7 @@ class InterAdminOptions
         } else {
             if (func_num_args() == 2) {
                 list($value, $operator) = [$operator, '='];
-            } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+            } elseif (func_num_args() == 1 || $this->invalidOperatorAndValue($operator, $value)) {
                 throw new \InvalidArgumentException('Value must be provided.');
             }
             if (!in_array(strtolower($operator), $this->operators, true)) {
@@ -61,7 +61,7 @@ class InterAdminOptions
             if (str_contains($column, ' ') || str_contains($column, '(')) {
                 throw new \BadMethodCallException('Invalid column.');
             }
-            $where = $this->_parseComparison($column, $operator, $value);
+            $where[] = $this->_parseComparison($column, $operator, $value);
         }
         $this->options['where'] = array_merge($this->options['where'], $where);
         
@@ -101,6 +101,11 @@ class InterAdminOptions
     public function fields($_)
     {
         $fields = is_array($_) ? $_ : func_get_args();
+        if ($this->allFields) {
+            $this->options['fields'] = [];
+            $this->allFields = false;
+        }
+
         $this->options['fields'] = array_merge($this->options['fields'], $fields);
 
         return $this;
