@@ -1,7 +1,10 @@
 <?php
 
-class Jp7_InterAdmin_Field_Base {
-    
+use HtmlObject\Element;
+
+use Jp7_InterAdmin_Field_FieldInterface as FieldInterface;
+
+class Jp7_InterAdmin_Field_Base implements FieldInterface {
     protected $ordem;
     protected $tipo;
     protected $nome;
@@ -42,13 +45,30 @@ class Jp7_InterAdmin_Field_Base {
         $this->nome_id = $campo['nome_id'];
     }
 
-    public function getHeaderValue($value)
+    public function getHeaderHtml()
     {
-        return $value;
+        return Element::th($this->getHeaderValue())
+            ->title($this->tipo);
+    }
+
+    public function getListHtml(ADOFetchObj $record)
+    {
+        return Element::td($this->getListValue($record));
+    }
+
+    public function getHeaderValue()
+    {
+        return $this->nome;
+    }
+
+    public function getListValue(ADOFetchObj $record)
+    {
+        return $this->getValue($record);
     }
     
-    public function getListValue($value)
+    protected function getValue(ADOFetchObj $record)
     {
-        return $value;
+        $column = $this->tipo;
+        return $record->$column;
     }
 }
