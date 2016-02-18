@@ -37,7 +37,7 @@ class ExceptionHandler
         $mensagem .= self::strong('LINE').$exception->getLine().'<br><hr>';
 
         $mensagem .= self::strong('URL').(isset($_SERVER['HTTPS']) ? 'https://' : 'http://').
-            $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].PHP_EOL;
+            array_get($_SERVER, 'HTTP_HOST').array_get($_SERVER, 'REQUEST_URI').PHP_EOL;
         $mensagem .= '<hr />';
 
         $mensagem .= self::highlightCode($exception);
