@@ -183,6 +183,11 @@ class InterAdminOptions
     {
         return $this->tipo->findFirst($this->options);
     }
+    
+    public function createInterAdmin(array $attributes = [])
+    {
+        return $this->tipo->createInterAdmin($attributes);
+    }
 
     public function __call($method_name, $params)
     {
