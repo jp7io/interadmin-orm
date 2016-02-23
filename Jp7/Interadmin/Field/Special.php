@@ -1,5 +1,8 @@
 <?php
 
-class Jp7_Interadmin_Field_Special extends Jp7_Interadmin_Field_Func {
+namespace Jp7\Interadmin\Field;
+
+class Special extends Func
+{
     
 }

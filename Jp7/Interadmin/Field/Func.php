@@ -1,6 +1,11 @@
 <?php
 
-class Jp7_Interadmin_Field_Func extends Jp7_Interadmin_Field_Base {
+namespace Jp7\Interadmin\Field;
+
+use ADOFetchObj;
+
+class Func extends Base
+{
     public function getHeaderValue()
     {
         if (is_callable($this->nome)) {

@@ -1,5 +1,8 @@
 <?php
 
-class Jp7_Interadmin_Field_Varchar extends Jp7_Interadmin_Field_Base {
+namespace Jp7\Interadmin\Field;
+
+class Varchar extends Base
+{
     
 }

@@ -1,10 +1,12 @@
 <?php
 
+namespace Jp7\Interadmin\Field;
+
 use HtmlObject\Element;
+use ADOFetchObj;
 
-use Jp7_Interadmin_Field_FieldInterface as FieldInterface;
-
-class Jp7_Interadmin_Field_Base implements FieldInterface {
+class Base implements FieldInterface
+{
     protected $ordem;
     protected $tipo;
     protected $nome;
@@ -26,7 +28,8 @@ class Jp7_Interadmin_Field_Base implements FieldInterface {
     /**
      * @param array $campo
      */
-    public function __construct(array $campo) {
+    public function __construct(array $campo)
+    {
         $this->tipo = $campo['tipo'];
         $this->nome = $campo['nome'];
         $this->ajuda = $campo['ajuda'];

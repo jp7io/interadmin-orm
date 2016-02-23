@@ -1,8 +1,11 @@
 <?php
 
-class Jp7_Interadmin_Field_Password extends Jp7_Interadmin_Field_Base {
-    
-     public function getListValue($value) {
+namespace Jp7\Interadmin\Field;
+
+class Password extends Base
+{
+    public function getListValue($value)
+    {
          return $value ? '******' : '';
-     }
+    }
 }

@@ -1,8 +1,11 @@
 <?php
 
+namespace Jp7\Interadmin\Field;
+
 use HtmlObject\Element;
 
-class Jp7_Interadmin_Field_Char extends Jp7_Interadmin_Field_Base {
+class Char extends Base
+{
     public function getHeaderHtml()
     {
          return Element::th(substr($this->getHeaderValue(), 0, 3))

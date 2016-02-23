@@ -1,8 +1,10 @@
 <?php
 
-class Jp7_Interadmin_Field_Factory {
+namespace Jp7\Interadmin\Field;
 
-    protected $namespace = 'Jp7_Interadmin_Field_';
+class Factory
+{
+    protected $namespace = 'Jp7\\Interadmin\\Field\\';
     /*
     protected $map = [
         'text' => [],

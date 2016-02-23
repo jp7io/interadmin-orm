@@ -1,7 +1,11 @@
 <?php
 
+namespace Jp7\Interadmin\Field;
 
-interface Jp7_Interadmin_Field_FieldInterface {
+use ADOFetchObj;
+
+interface FieldInterface
+{
     
     public function getHeaderHtml();
 

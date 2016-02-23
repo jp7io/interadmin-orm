@@ -1,6 +1,12 @@
 <?php
 
-class Jp7_Interadmin_Field_Select extends Jp7_Interadmin_Field_Base {
+namespace Jp7\Interadmin\Field;
+
+use InterAdminTipo;
+use ADOFetchObj;
+
+class Select extends Base
+{
     
     public function getHeaderValue()
     {
