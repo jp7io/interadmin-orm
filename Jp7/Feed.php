@@ -54,14 +54,14 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
         foreach ($interAdmins as $entryData) {
             if ($entryData instanceof InterAdmin) {
                 $entry = $this->createEntry();
-                $entry->setTitle($entryData->$helpers['title']);
-                $entry->setLink($entryData->$helpers['link'] ? $entryData->$helpers['link'] : $entryData->getUrl());
+                $entry->setTitle($entryData->{$helpers['title']});
+            $entry->setLink($entryData->{$helpers['link']} ? $entryData->{$helpers['link']} : $entryData->getUrl());
                 if ($category) {
                     $entry->addCategory(['term' => $category]);
                 }
 
-                if ($entryData->$helpers['content']) {
-                    $entry->setContent($entryData->$helpers['content']);
+                if ($entryData->{$helpers['content']}) {
+                    $entry->setContent($entryData->{$helpers['content']});
                 }
 
                 $entry->setId($methodId ? $entry->$methodId() : $helpers['id']);
@@ -79,8 +79,8 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
                     $entry->setDateCreated(null);
                 }
 
-                if ($entryData->$helpers['description']) {
-                    $entry->setDescription($entryData->$helpers['description']);
+                if ($entryData->{$helpers['description']}) {
+                    $entry->setDescription($entryData->{$helpers['description']});
                 }
 
                 $this->addEntry($entry);

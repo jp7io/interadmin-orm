@@ -36,6 +36,14 @@ class Jp7_Controller_Action extends Zend_Controller_Action
             echo 'No InterAdmin remote found.';
             exit;
         }
+        if ($this->_getParam('controller') == 'intermail-remote') {
+            require BASE_PATH.'/intermail/config.php';
+            if ($interadmin_remote = reset($config->server->interadmin_remote)) {
+                $this->_redirect('http://'.$interadmin_remote.'/'.$config->name_id);
+            }
+            echo 'No InterMail remote found.';
+            exit;
+        }
 
         /*
         global $debugger;
