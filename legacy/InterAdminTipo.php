@@ -1359,6 +1359,11 @@ class InterAdminTipo extends InterAdminAbstract
 
         return call_user_func_array([$options, 'where'], func_get_args());
     }
+    
+    public function whereRaw($where)
+    {
+        return (new InterAdminOptions($this))->whereRaw($where);
+    }
 
     public function fields($_)
     {
@@ -1369,37 +1374,27 @@ class InterAdminTipo extends InterAdminAbstract
 
     public function join($alias, $tipo, $on)
     {
-        $options = new InterAdminOptions($this);
-
-        return $options->join($alias, $tipo, $on);
+        return (new InterAdminOptions($this))->join($alias, $tipo, $on);
     }
 
     public function leftJoin($alias, $tipo, $on)
     {
-        $options = new InterAdminOptions($this);
-
-        return $options->leftJoin($alias, $tipo, $on);
+        return (new InterAdminOptions($this))->leftJoin($alias, $tipo, $on);
     }
 
     public function rightJoin($alias, $tipo, $on)
     {
-        $options = new InterAdminOptions($this);
-
-        return $options->rightJoin($alias, $tipo, $on);
+        return (new InterAdminOptions($this))->rightJoin($alias, $tipo, $on);
     }
 
     public function limit($offset, $rows = null)
     {
-        $options = new InterAdminOptions($this);
-
-        return $options->limit($offset, $rows);
+        return (new InterAdminOptions($this))->limit($offset, $rows);
     }
 
     public function group($group)
     {
-        $options = new InterAdminOptions($this);
-
-        return $options->group($group);
+        return (new InterAdminOptions($this))->group($group);
     }
 
     public function order($_)
@@ -1407,5 +1402,15 @@ class InterAdminTipo extends InterAdminAbstract
         $options = new InterAdminOptions($this);
 
         return call_user_func_array([$options, 'order'], func_get_args());
+    }
+    
+    public function debug($debug = true)
+    {
+        return (new InterAdminOptions($this))->debug($debug);
+    }
+    
+    public function published($filters = true)
+    {
+        return (new InterAdminOptions($this))->published($filters);
     }
 }

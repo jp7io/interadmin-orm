@@ -58,7 +58,7 @@ class UploadImgixTest extends \PHPUnit_Framework_TestCase
         if (isset($template)) {
             return Upload::url($filePath, $template);
         }
-        return $url = Upload::url($filePath);
+        return Upload::url($filePath);
     }
 
     private function storageHost()
