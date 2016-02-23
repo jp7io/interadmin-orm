@@ -60,7 +60,7 @@ class Jp7_Interadmin_User extends InterAdmin
         if ($from != 'insert' || !$_POST['char_send_link'][0]) {
             return;
         }
-        $userTipo = (new InterAdmin_Login)->getUsuarioTipo();
+        $userTipo = (new Interadmin_Login)->getUsuarioTipo();
         $user = $userTipo->findById($id, [
             'fields' => '*',
             'fields_alias' => true,
@@ -85,7 +85,7 @@ class Jp7_Interadmin_User extends InterAdmin
                     'senha' => uniqid()
                 ]);
                 
-                $mailer = new InterAdmin_Mailer_PasswordRegistration($user);
+                $mailer = new Interadmin_Mailer_PasswordRegistration($user);
                 $mailer->handle();
                 
                 $msg->setNamespace('success');

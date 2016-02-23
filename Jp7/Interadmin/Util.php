@@ -165,7 +165,7 @@ class Jp7_Interadmin_Util
             throw new Exception('Não é possível copiar para tipos com tabela customizada.');
         }
 
-        $beforCopyEvent = InterAdmin_Event_BeforeCopy::getInstance();
+        $beforCopyEvent = Interadmin_Event_BeforeCopy::getInstance();
         $beforCopyEvent->setIdTipo($tipoObj->id_tipo);
         $beforCopyEvent->notify();
 
@@ -182,9 +182,9 @@ class Jp7_Interadmin_Util
         $returnIds = self::import($registros, $tipoDestino, $parent, true, $use_id_string, $bind_children);
         InterAdmin::setLogUser($oldLogUser);
 
-        if (InterAdmin_Event_AfterCopy::getInstance()->hasObservers()) {
+        if (Interadmin_Event_AfterCopy::getInstance()->hasObservers()) {
             foreach ($returnIds as $returnId) {
-                $afterCopyEvent = InterAdmin_Event_AfterCopy::getInstance();
+                $afterCopyEvent = Interadmin_Event_AfterCopy::getInstance();
                 $afterCopyEvent->setIdTipo($tipoDestino->id_tipo);
                 $afterCopyEvent->setId($returnId['id']);
                 $afterCopyEvent->setCopyId($returnId['new_id']);
