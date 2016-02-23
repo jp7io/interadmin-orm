@@ -5,30 +5,32 @@ namespace Jp7\Interadmin\Field;
 use InterAdminTipo;
 use ADOFetchObj;
 
-class Select extends Base
+class Select extends ColumnField
 {
+    const XTRA_BY_TYPE = 'S';
+    protected $name = 'select';
     
-    public function getHeaderValue()
+    public function getHeaderText()
     {
-        if ($this->label) {
-            return $this->label;
-        } elseif ($this->nome instanceof InterAdminTipo) {
-            return $this->nome->getFieldsValues('nome');
-        } elseif ($this->nome == 'all') {
+        if ($this->campo['label']) {
+            return $this->campo['label'];
+        } elseif ($this->campo['nome'] instanceof InterAdminTipo) {
+            return $this->campo['nome']->getFieldsValues('nome');
+        } elseif ($this->campo['nome'] == 'all') {
             return 'Tipos';
         }
         throw new Exception('Not implemented');
     }
     
-    public function getListValue(ADOFetchObj $record)
+    public function getCellText(ADOFetchObj $record)
     {
-        if (!$value = $this->getValue($record)) {
+        if (!$value = parent::getCellText($record)) {
             return;
         }
         if ($this->hasTipoRelationship()) {
             return interadmin_tipos_nome($value);
         } else {
-            $registro = $this->nome->findById($value);
+            $registro = $this->campo['nome']->findById($value);
             if ($registro) {
                 return $registro->getStringValue();
             }
@@ -38,6 +40,6 @@ class Select extends Base
     
     protected function hasTipoRelationship()
     {
-        return in_array($this->xtra, ['S', 'ajax_tipos', 'radio_tipos']);
+        return in_array($this->campo['xtra'], [self::XTRA_BY_TYPE, 'ajax_tipos', 'radio_tipos']);
     }
 }

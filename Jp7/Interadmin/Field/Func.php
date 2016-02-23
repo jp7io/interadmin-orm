@@ -4,30 +4,34 @@ namespace Jp7\Interadmin\Field;
 
 use ADOFetchObj;
 
-class Func extends Base
+class Func extends ColumnField
 {
-    public function getHeaderValue()
+    protected $name = 'func';
+    
+    public function getHeaderHtml()
     {
-        if (is_callable($this->nome)) {
-            ob_start();
-            $response = call_user_func($this->nome, get_object_vars($this), '', 'header');
-            $response .= ob_get_clean();
-            return $response;
+        if (is_callable($this->campo['nome'])) {
+            return $this->runFunc('', 'header');
         } else {
-            return 'Function '.$this->nome.' not found.';
+            return 'Function '.$this->campo['nome'].' not found.';
         }
     }
     
-    public function getListValue(ADOFetchObj $record)
+    public function getCellHtml(ADOFetchObj $record)
     {
-        if (is_callable($this->nome)) {
-            $value = $this->getValue($record);
-            ob_start();
-            $response = call_user_func($this->nome, get_object_vars($this), $value, 'list');
-            $response .= ob_get_clean();
-            return $response;
+        if (is_callable($this->campo['nome'])) {
+            $value = $this->getCellText($record);
+            return $this->runFunc($value, 'list');
         } else {
-            return 'Function '.$this->nome.' not found.';
+            return 'Function '.$this->campo['nome'].' not found.';
         }
+    }
+    
+    protected function runFunc($value, $parte)
+    {
+         ob_start();
+         $response = call_user_func($this->campo['nome'], get_object_vars($this), $value, $parte);
+         $response .= ob_get_clean();
+         return $response;
     }
 }

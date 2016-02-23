@@ -2,10 +2,14 @@
 
 namespace Jp7\Interadmin\Field;
 
-class Password extends Base
+use ADOFetchObj;
+
+class Password extends ColumnField
 {
-    public function getListValue($value)
+    protected $name = 'password';
+    
+    public function getCellText(ADOFetchObj $value)
     {
-         return $value ? '******' : '';
+        return parent::getCellText($value) ? '******' : '';
     }
 }

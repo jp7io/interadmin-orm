@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Field;
 
-class File extends Base
+class File extends ColumnField
 {
-    
+    protected $name = 'file';
 }

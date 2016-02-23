@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Field;
 
-class Varchar extends Base
+class Varchar extends ColumnField
 {
-    
+    protected $name = 'varchar';
 }

@@ -2,18 +2,14 @@
 
 namespace Jp7\Interadmin\Field;
 
-use HtmlObject\Element;
+use ADOFetchObj;
 
-class Char extends Base
+class Char extends ColumnField
 {
-    public function getHeaderHtml()
-    {
-         return Element::th(substr($this->getHeaderValue(), 0, 3))
-            ->title($this->getHeaderValue().' ('.$this->tipo.')');
-    }
+    protected $name = 'char';
     
-    public function getListHtml($value)
+    public function getCellHtml(ADOFetchObj $value)
     {
-        return Element::td($this->getListValue($value) ? '&bull;' : '');
+        return $this->getCellText($value) ? '&bull;' : '';
     }
 }
