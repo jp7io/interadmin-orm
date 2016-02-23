@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Upload_Intervention extends Jp7_InterAdmin_Upload_AdapterAbstract
+class Jp7_Interadmin_Upload_Intervention extends Jp7_Interadmin_Upload_AdapterAbstract
 {
 
     // STORAGE_HOST/imagecache/something/bla/123

@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_JSTree
+class Jp7_Interadmin_JSTree
 {
     public $tree = [];
     public $tipos = [];

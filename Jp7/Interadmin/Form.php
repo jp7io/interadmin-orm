@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Form extends InterAdminField
+class Jp7_Interadmin_Form extends InterAdminField
 {
     public $tipo;
     public $campos;

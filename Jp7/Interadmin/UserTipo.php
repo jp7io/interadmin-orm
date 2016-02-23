@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_UserTipo extends InterAdminTipo
+class Jp7_Interadmin_UserTipo extends InterAdminTipo
 {
     public function getCampoUsuario()
     {

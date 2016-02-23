@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Soap_UsuarioTipo extends InterAdminTipo
+class Jp7_Interadmin_Soap_UsuarioTipo extends InterAdminTipo
 {
     const DEFAULT_FIELDS_ALIAS = true;
 

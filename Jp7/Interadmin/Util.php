@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Util
+class Jp7_Interadmin_Util
 {
     protected static $_default_vars = ['id_slug', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted'];
 

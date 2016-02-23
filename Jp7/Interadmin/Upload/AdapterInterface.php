@@ -1,6 +1,6 @@
 <?php
 
-interface Jp7_InterAdmin_Upload_AdapterInterface
+interface Jp7_Interadmin_Upload_AdapterInterface
 {
     public function imageUrl($path, $template);
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Interadmin;
 
-use Jp7_InterAdmin_Upload as Upload;
+use Jp7_Interadmin_Upload as Upload;
 
 class UploadImgixTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        Upload::setAdapter(new \Jp7_InterAdmin_Upload_Imgix);
+        Upload::setAdapter(new \Jp7_Interadmin_Upload_Imgix);
     }
 
     public function tearDown()

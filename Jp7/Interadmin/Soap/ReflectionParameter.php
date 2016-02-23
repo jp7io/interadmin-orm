@@ -3,7 +3,7 @@
 /**
  * É usado para simular um parâmetro de cada método no WebService.
  */
-class Jp7_InterAdmin_Soap_ReflectionParameter
+class Jp7_Interadmin_Soap_ReflectionParameter
 {
     protected $name;
     protected $type;

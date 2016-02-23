@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Soap_Generic
+class Jp7_Interadmin_Soap_Generic
 {
     /**
      * Retorna todos os registros publicados.
@@ -12,7 +12,7 @@ class Jp7_InterAdmin_Soap_Generic
      */
     public function get($className, $options = [])
     {
-        $tipo = Jp7_InterAdmin_Soap::getClassTipo($className);
+        $tipo = Jp7_Interadmin_Soap::getClassTipo($className);
 
         return $tipo->find($options);
     }

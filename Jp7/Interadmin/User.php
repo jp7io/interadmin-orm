@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_User extends InterAdmin
+class Jp7_Interadmin_User extends InterAdmin
 {
     /**
      * Masks something@example.com into someth***@exam***.com
@@ -64,7 +64,7 @@ class Jp7_InterAdmin_User extends InterAdmin
         $user = $userTipo->findById($id, [
             'fields' => '*',
             'fields_alias' => true,
-            'class' => Jp7_InterAdmin_User::class
+            'class' => Jp7_Interadmin_User::class
         ]);
         
         // Flash msg

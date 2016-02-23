@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeSequence
+class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeSequence
 {
     protected $_inProgress = [];
 
@@ -19,7 +19,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
     public function addComplexType($type)
     {
         if (!in_array($type, $this->getContext()->getTypes())) {
-            $isDynamicClass = Jp7_InterAdmin_Soap::isDynamicClass($type);
+            $isDynamicClass = Jp7_Interadmin_Soap::isDynamicClass($type);
             if (mb_substr($type, mb_strlen($type) - 2) == '[]' || ($type != 'Options' && !$isDynamicClass && !is_subclass_of($type, 'InterAdminAbstract'))) {
                 try {
                     return parent::addComplexType($type);
@@ -47,7 +47,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                     ]);
                 } else {
                     if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
-                        $tipo = Jp7_InterAdmin_Soap::getClassTipo($type);
+                        $tipo = Jp7_Interadmin_Soap::getClassTipo($type);
 
                         $tipo->getCamposAlias();
                         $campos = $tipo->getCampos();

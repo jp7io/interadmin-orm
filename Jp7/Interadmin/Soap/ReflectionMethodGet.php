@@ -3,7 +3,7 @@
 /**
  * É usado para simular um método no WebService.
  */
-class Jp7_InterAdmin_Soap_ReflectionMethodGet
+class Jp7_Interadmin_Soap_ReflectionMethodGet
 {
     protected $secao;
 
@@ -27,7 +27,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet
     public function getParameters()
     {
         return [
-            new Jp7_InterAdmin_Soap_ReflectionParameter('options', 'Options'),
+            new Jp7_Interadmin_Soap_ReflectionParameter('options', 'Options'),
         ];
     }
 

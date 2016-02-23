@@ -1,13 +1,13 @@
 <?php
 
-class Jp7_InterAdmin_Exception extends Exception
+class Jp7_Interadmin_Exception extends Exception
 {
     protected $sql;
 
     /**
      * Returns $sql.
      *
-     * @see Jp7_InterAdmin_Exception::$sql
+     * @see Jp7_Interadmin_Exception::$sql
      */
     public function getSql()
     {
@@ -19,7 +19,7 @@ class Jp7_InterAdmin_Exception extends Exception
      *
      * @param object $sql
      *
-     * @see Jp7_InterAdmin_Exception::$sql
+     * @see Jp7_Interadmin_Exception::$sql
      */
     public function setSql($sql)
     {

@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Field_Func extends Jp7_InterAdmin_Field_Base {
+class Jp7_Interadmin_Field_Func extends Jp7_Interadmin_Field_Base {
     public function getHeaderValue()
     {
         if (is_callable($this->nome)) {

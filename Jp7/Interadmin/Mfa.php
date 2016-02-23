@@ -1,13 +1,13 @@
 <?php
 
-class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
+class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
 {
     const DEFAULT_FIELDS_ALIAS = true;
 
     private static $issuer;
 
     /**
-     * @return Jp7_InterAdmin_Mfa
+     * @return Jp7_Interadmin_Mfa
      */
     public static function getLoggedUser($s_user = null)
     {
@@ -18,7 +18,7 @@ class Jp7_InterAdmin_Mfa extends Jp7_InterAdmin_User
         if (!$s_user['id_tipo']) {
             return;
         }
-        $userTipo = new Jp7_InterAdmin_UserTipo($s_user['id_tipo']);
+        $userTipo = new Jp7_Interadmin_UserTipo($s_user['id_tipo']);
 
         if (!$userTipo->getCampoUsuario()) {
             throw new Exception('Campo "usuario" não existe no tipo Usuários.');

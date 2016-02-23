@@ -3,7 +3,7 @@
 /**
  * Usada para adicionar os métodos de cada Tipo no WebService.
  */
-class Jp7_InterAdmin_Soap_Reflection
+class Jp7_Interadmin_Soap_Reflection
 {
     protected $usuario;
 
@@ -28,15 +28,15 @@ class Jp7_InterAdmin_Soap_Reflection
         $reflection = new Zend_Server_Reflection();
 
         // Reflection das classes na stack
-        foreach (Jp7_InterAdmin_Soap::getClasses() as $className) {
+        foreach (Jp7_Interadmin_Soap::getClasses() as $className) {
             $methods = array_merge($methods, $reflection->reflectClass($className)->getMethods());
         }
 
-        // Reflection dinâmico para Jp7_InterAdmin_Soap_Generic
+        // Reflection dinâmico para Jp7_Interadmin_Soap_Generic
         foreach ($this->usuario->secoes as $secao) {
-            $methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGet($secao);
-            $methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetAll($secao);
-            $methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetFirst($secao);
+            $methods[] = new Jp7_Interadmin_Soap_ReflectionMethodGet($secao);
+            $methods[] = new Jp7_Interadmin_Soap_ReflectionMethodGetAll($secao);
+            $methods[] = new Jp7_Interadmin_Soap_ReflectionMethodGetFirst($secao);
         }
 
         return $methods;

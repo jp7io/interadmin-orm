@@ -1,7 +1,7 @@
 <?php
 
 
-interface Jp7_InterAdmin_Field_FieldInterface {
+interface Jp7_Interadmin_Field_FieldInterface {
     
     public function getHeaderHtml();
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Interadmin;
 
-use Jp7_InterAdmin_Upload as Upload;
+use Jp7_Interadmin_Upload as Upload;
 
 class UploadInterventionTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        Upload::setAdapter(new \Jp7_InterAdmin_Upload_Intervention);
+        Upload::setAdapter(new \Jp7_Interadmin_Upload_Intervention);
     }
 
     public function tearDown()

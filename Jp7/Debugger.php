@@ -213,7 +213,7 @@ class Jp7_Debugger
         if (count($_COOKIE)) {
             $S .= $this->_getBacktraceLabel('COOKIE').print_r($_COOKIE, true);
         }
-        if (class_exists('Jp7_InterAdmin_Soap') && Jp7_InterAdmin_Soap::isSoapRequest()) {
+        if (class_exists('Jp7_Interadmin_Soap') && Jp7_Interadmin_Soap::isSoapRequest()) {
             $S .= $this->_getBacktraceLabel('HTTP_SOAPACTION').print_r($_SERVER['HTTP_SOAPACTION'], true);
             $S .= $this->_getBacktraceLabel('CONTENT_TYPE').print_r($_SERVER['CONTENT_TYPE'], true);
             $S .= $this->_getBacktraceLabel('PHP INPUT').htmlspecialchars(print_r(file_get_contents('php://input'), true));

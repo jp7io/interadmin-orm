@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Soap
+class Jp7_Interadmin_Soap
 {
     protected static $classes = [];
 
@@ -96,12 +96,12 @@ STR;
     /**
      * Creates a WSDL server.
      *
-     * @return Jp7_InterAdmin_Soap_AutoDiscover
+     * @return Jp7_Interadmin_Soap_AutoDiscover
      */
     public static function createWsdlServer()
     {
         global $config;
-        $server = new Jp7_InterAdmin_Soap_AutoDiscover('Jp7_InterAdmin_Soap_Strategy', $config->url);
+        $server = new Jp7_Interadmin_Soap_AutoDiscover('Jp7_Interadmin_Soap_Strategy', $config->url);
         // Usuario possui as seções liberadas
         $server->setOperationBodyStyle(['use' => 'literal']);
         $server->setBindingStyle(['style' => 'document']);
@@ -119,9 +119,9 @@ STR;
     {
         $server = new Zend_Soap_Server($wsdl);
         $server->setEncoding('UTF-8');
-        $server->registerFaultException('Jp7_InterAdmin_Soap_Exception');
+        $server->registerFaultException('Jp7_Interadmin_Soap_Exception');
         $server->setClassmap([
-            'Options' => 'Jp7_InterAdmin_Soap_Options',
+            'Options' => 'Jp7_Interadmin_Soap_Options',
         ]);
 
         return $server;

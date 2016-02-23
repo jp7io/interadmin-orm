@@ -1,6 +1,6 @@
 <?php
 
-abstract class Jp7_InterAdmin_Upload_AdapterAbstract implements Jp7_InterAdmin_Upload_AdapterInterface
+abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_Upload_AdapterInterface
 {
     public function url($path)
     {

@@ -2,7 +2,7 @@
 
 use League\Url\Url;
 
-class Jp7_InterAdmin_Upload_Imgix extends Jp7_InterAdmin_Upload_AdapterAbstract
+class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
 {
 
     // IMGIX_HOST/upload/bla/123?w=40&h=40

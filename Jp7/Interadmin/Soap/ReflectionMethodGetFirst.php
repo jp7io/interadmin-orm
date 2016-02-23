@@ -3,7 +3,7 @@
 /**
  * É usado para simular um método no WebService.
  */
-class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_ReflectionMethodGet
+class Jp7_Interadmin_Soap_ReflectionMethodGetFirst extends Jp7_Interadmin_Soap_ReflectionMethodGet
 {
     /**
      * @return string

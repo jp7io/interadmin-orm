@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Soap_Proxy
+class Jp7_Interadmin_Soap_Proxy
 {
     /**
      * Função que age como proxy entre a chamada e o método real.
@@ -17,14 +17,14 @@ class Jp7_InterAdmin_Soap_Proxy
             // Formatando os parâmetros
             $params = (array) $args[0];
             foreach ($params as $key => $param) {
-                if ($param instanceof Jp7_InterAdmin_Soap_Options) {
+                if ($param instanceof Jp7_Interadmin_Soap_Options) {
                     $params[$key] = $param->getArray();
                 }
             }
 
             while (true) {
                 // Classes na stack
-                $classes = Jp7_InterAdmin_Soap::getClasses();
+                $classes = Jp7_Interadmin_Soap::getClasses();
                 foreach ($classes as $classe) {
                     if (method_exists($classe, $methodName)) {
                         $obj = new $classe();
@@ -35,7 +35,7 @@ class Jp7_InterAdmin_Soap_Proxy
 
                 // Genérico
                 if (strpos($methodName, 'get') === 0) {
-                    $generic = new Jp7_InterAdmin_Soap_Generic();
+                    $generic = new Jp7_Interadmin_Soap_Generic();
 
                     $options = reset($params);
                     // Por padrão só pega os publicados
@@ -55,15 +55,15 @@ class Jp7_InterAdmin_Soap_Proxy
                 }
                 break;
             }
-        } catch (Jp7_InterAdmin_Exception $e) {
+        } catch (Jp7_Interadmin_Exception $e) {
             if (strpos($e->getMessage(), 'Unknown column') !== false) {
                 $nomeCampo = preg_replace('/([^.]*).(.*?)\'(.*)/', '\2', $e->getMessage());
-                throw new Jp7_InterAdmin_Soap_Exception('Unknown field "'.$nomeCampo.'" in "fields" or "where".');
+                throw new Jp7_Interadmin_Soap_Exception('Unknown field "'.$nomeCampo.'" in "fields" or "where".');
             } else {
-                throw new Jp7_InterAdmin_Soap_Exception('Invalid format for "where" or "limit".');
+                throw new Jp7_Interadmin_Soap_Exception('Invalid format for "where" or "limit".');
             }
         }
 
-        return Jp7_InterAdmin_Soap::formatResult($result, $methodName);
+        return Jp7_Interadmin_Soap::formatResult($result, $methodName);
     }
 }

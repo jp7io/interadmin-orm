@@ -7,7 +7,7 @@
 //`text_2`
 //)
 
-class Jp7_InterAdmin_Search
+class Jp7_Interadmin_Search
 {
     private $booleanMode = false;
 

@@ -1,8 +1,8 @@
 <?php
 
-use Jp7_InterAdmin_Upload_AdapterInterface as AdapterInterface;
+use Jp7_Interadmin_Upload_AdapterInterface as AdapterInterface;
 
-class Jp7_InterAdmin_Upload
+class Jp7_Interadmin_Upload
 {
     /**
      * @var AdapterInterface
@@ -59,11 +59,11 @@ class Jp7_InterAdmin_Upload
         global $config;
         if (!static::$adapter) {
             if ($config->imagecache === 'imgix') {
-                static::$adapter = new Jp7_InterAdmin_Upload_Imgix;
+                static::$adapter = new Jp7_Interadmin_Upload_Imgix;
             } elseif ($config->imagecache) {
-                static::$adapter = new Jp7_InterAdmin_Upload_Intervention;
+                static::$adapter = new Jp7_Interadmin_Upload_Intervention;
             } else {
-                static::$adapter = new Jp7_InterAdmin_Upload_Legacy;
+                static::$adapter = new Jp7_Interadmin_Upload_Legacy;
             }
         }
         return static::$adapter;

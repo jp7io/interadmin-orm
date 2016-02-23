@@ -1,6 +1,6 @@
 <?php
 
-class Jp7_InterAdmin_Tagcloud
+class Jp7_Interadmin_Tagcloud
 {
     public $maxFontSize = 20;
     public $minFontSize = 9;

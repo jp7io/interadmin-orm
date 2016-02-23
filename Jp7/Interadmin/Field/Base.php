@@ -2,9 +2,9 @@
 
 use HtmlObject\Element;
 
-use Jp7_InterAdmin_Field_FieldInterface as FieldInterface;
+use Jp7_Interadmin_Field_FieldInterface as FieldInterface;
 
-class Jp7_InterAdmin_Field_Base implements FieldInterface {
+class Jp7_Interadmin_Field_Base implements FieldInterface {
     protected $ordem;
     protected $tipo;
     protected $nome;
