@@ -21,11 +21,11 @@ abstract class BaseField implements FieldInterface
     
     public function getHeaderHtml()
     {
-        return $this->getHeaderText();
+        return e($this->getHeaderText());
     }
 
     public function getCellHtml(ADOFetchObj $record)
     {
-        return $this->getCellText($record);
+        return nl2br(e($this->getCellText($record)));
     }
 }

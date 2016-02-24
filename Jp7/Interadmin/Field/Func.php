@@ -10,28 +10,22 @@ class Func extends ColumnField
     
     public function getHeaderHtml()
     {
-        if (is_callable($this->campo['nome'])) {
-            return $this->runFunc('', 'header');
-        } else {
-            return 'Function '.$this->campo['nome'].' not found.';
-        }
+        return $this->getFuncHtml('', 'header');
     }
     
     public function getCellHtml(ADOFetchObj $record)
     {
-        if (is_callable($this->campo['nome'])) {
-            $value = $this->getCellText($record);
-            return $this->runFunc($value, 'list');
-        } else {
-            return 'Function '.$this->campo['nome'].' not found.';
-        }
+        return $this->getFuncHtml($this->getCellText($record), 'list');
     }
     
-    protected function runFunc($value, $parte)
+    protected function getFuncHtml($value, $parte)
     {
-         ob_start();
-         $response = call_user_func($this->campo['nome'], get_object_vars($this), $value, $parte);
-         $response .= ob_get_clean();
-         return $response;
+        if (!is_callable($this->campo['nome'])) {
+            return 'Function '.$this->campo['nome'].' not found.';
+        }
+        ob_start();
+        $response = call_user_func($this->campo['nome'], $this->campo, $value, $parte);
+        $response .= ob_get_clean();
+        return $response;
     }
 }

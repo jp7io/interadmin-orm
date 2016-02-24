@@ -5,6 +5,13 @@ namespace Jp7\Interadmin\Field;
 use ADOFetchObj;
 use HtmlObject\Element;
 
+///////// Hierarchy ////////////////
+// Tag          <td>{!! $Html !!}</td>
+// -> Html      <span>{{ $Text }}</span>
+//    -> Text   Hi
+// --------------------------------
+// <td><span>Hi</span></td>
+//
 interface FieldInterface
 {
     /**

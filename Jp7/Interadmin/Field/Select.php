@@ -22,20 +22,37 @@ class Select extends ColumnField
         throw new Exception('Not implemented');
     }
     
+    public function getCellHtml(ADOFetchObj $record) {
+        return $this->formatText(parent::getCellText($record), true);
+    }
+
     public function getCellText(ADOFetchObj $record)
     {
-        if (!$value = parent::getCellText($record)) {
-            return;
+        return $this->formatText(parent::getCellText($record), false);
+    }
+    
+    protected function formatText($id, $html)
+    {
+        list($value, $status) = $this->getValueAndStatus($id);
+        if ($html) {
+            return ($status ? e($value) : '<del>'.e($value).'</del>');
+        }
+        return $value.($status ? '' : ' [deleted]');
+    }
+    
+    protected function getValueAndStatus($id)
+    {
+        if (!$id) {
+            return ['', true];
         }
         if ($this->hasTipoRelationship()) {
-            return interadmin_tipos_nome($value);
-        } else {
-            $registro = $this->campo['nome']->findById($value);
-            if ($registro) {
-                return $registro->getStringValue();
-            }
+            return [interadmin_tipos_nome($id), true];
         }
-        return $value.' (Deletado)';
+        $related = $this->campo['nome']->findById($id);
+        if ($related) {
+            return [$related->getStringValue(), $related->isPublished()];
+        }
+        return [$id, false];
     }
     
     protected function hasTipoRelationship()
