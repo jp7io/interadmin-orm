@@ -1,5 +1,5 @@
 <?php
-
+/* Laravel 4 */
 namespace Jp7\Flysystem;
 
 use Aws\S3\S3Client;
