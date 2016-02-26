@@ -1,11 +1,15 @@
 <?php
 
+namespace Jp7\Interadmin;
+
+use Exception;
+
 /**
  * Class which represents records on the table interadmin_{client name}_arquivos.
  */
-class InterAdminArquivo extends InterAdminAbstract
+class FileRecord extends RecordAbstract
 {
-    use \Jp7\Interadmin\Downloadable;
+    use Downloadable;
 
     protected $_primary_key = 'id_arquivo';
 
@@ -16,15 +20,15 @@ class InterAdminArquivo extends InterAdminAbstract
      */
     public $db_prefix;
     /**
-     * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record�s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record�s 'id_tipo'.
      *
-     * @var InterAdminTipo
+     * @var Type
      */
     protected $_tipo;
     /**
-     * Contains the parent InterAdmin object, i.e. the record with an 'id' equal to this record's 'parent_id'.
+     * Contains the parent Record object, i.e. the record with an 'id' equal to this record's 'parent_id'.
      *
-     * @var InterAdmin
+     * @var Record
      */
     protected $_parent;
     /**
@@ -38,11 +42,11 @@ class InterAdminArquivo extends InterAdminAbstract
         $this->id_arquivo = $id_arquivo;
     }
     /**
-     * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
+     * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public function getType($options = [])
     {
@@ -51,7 +55,7 @@ class InterAdminArquivo extends InterAdminAbstract
                 kd('not implemented');
                 $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
             }
-            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
+            $this->_tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,
                 'class' => $options['class'],
             ]);
@@ -60,9 +64,9 @@ class InterAdminArquivo extends InterAdminAbstract
         return $this->_tipo;
     }
     /**
-     * Sets the InterAdminTipo object for this record, changing the $_tipo property.
+     * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param InterAdminTipo $tipo
+     * @param Type $tipo
      */
     public function setType($tipo)
     {
@@ -70,27 +74,27 @@ class InterAdminArquivo extends InterAdminAbstract
         $this->_tipo = $tipo;
     }
     /**
-     * Gets the parent InterAdmin object for this record, which is then cached on the $_parent property.
+     * Gets the parent Record object for this record, which is then cached on the $_parent property.
      *
      * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class.
      *
-     * @return InterAdmin
+     * @return Record
      */
     public function getParent($options = [])
     {
         if (!$this->_parent) {
             $tipo = $this->getType();
             if ($this->id || $this->getFieldsValues('id')) {
-                $this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
+                $this->_parent = Record::getInstance($this->id, $options, $tipo);
             }
         }
 
         return $this->_parent;
     }
     /**
-     * Sets the parent InterAdmin object for this record, changing the $_parent property.
+     * Sets the parent Record object for this record, changing the $_parent property.
      *
-     * @param InterAdmin $parent
+     * @param Record $parent
      */
     public function setParent($parent)
     {
@@ -133,7 +137,7 @@ class InterAdminArquivo extends InterAdminAbstract
             'lang' => $lang->lang,
         ];
 
-        $banco = new InterAdminArquivoBanco(['db_prefix' => $this->db_prefix]);
+        $banco = new FileDatabase(['db_prefix' => $this->db_prefix]);
         $id_arquivo_banco = $banco->addFile($fieldsValues);
 
         // Descobrindo o caminho da pasta
@@ -154,15 +158,15 @@ class InterAdminArquivo extends InterAdminAbstract
 
         // Movendo arquivo tempor�rio
         if (!@rename($this->url, $newurl)) {
-            $msg = 'Imposs�vel renomear arquivo "'.$this->url.'" para "'.$newurl.'".<br /> getcwd(): '.getcwd();
+            $msg = 'Impossivel renomear arquivo "'.$this->url.'" para "'.$newurl.'".<br /> getcwd(): '.getcwd();
             if (!is_file($this->url)) {
-                $msg .= '<br /> Arquivo '.basename($this->url).' n�o existe.';
+                $msg .= '<br /> Arquivo '.basename($this->url).' nao existe.';
             }
             if (!is_dir(dirname($this->url))) {
-                $msg .= '<br /> Diret�rio '.dirname($this->url).' n�o existe.';
+                $msg .= '<br /> Diretorio '.dirname($this->url).' nao existe.';
             }
             if (!is_dir(dirname($newurl))) {
-                $msg .= '<br /> Diret�rio '.dirname($newurl).' n�o existe.';
+                $msg .= '<br /> Diretorio '.dirname($newurl).' nao existe.';
             }
             throw new Exception($msg);
         }
@@ -208,7 +212,7 @@ class InterAdminArquivo extends InterAdminAbstract
     }
 
     /**
-     * @see InterAdminAbstract::getCampoTipo()
+     * @see RecordAbstract::getCampoTipo()
      */
     public function getCampoTipo($campo)
     {
@@ -220,7 +224,7 @@ class InterAdminArquivo extends InterAdminAbstract
         return '';
     }
     /**
-     * @see InterAdminAbstract::getAdminAttributes()
+     * @see RecordAbstract::getAdminAttributes()
      */
     public function getAdminAttributes()
     {

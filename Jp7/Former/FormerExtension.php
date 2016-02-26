@@ -4,8 +4,8 @@ namespace Jp7\Former;
 
 use Former\Former as OriginalFormer;
 use Debugbar;
-use InterAdmin;
-use InterAdminField;
+use Jp7\Interadmin\Record;
+use Jp7\Interadmin\FieldUtil;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -60,7 +60,7 @@ class FormerExtension
 
     public function populate($model)
     {
-        if ($model instanceof InterAdmin) {
+        if ($model instanceof Record) {
             $this->model = $model;
             $this->rules = $model->getRules();
         }
@@ -112,7 +112,7 @@ class FormerExtension
         $campo = $campos[$name];
 
         // Set label
-        $label = InterAdminField::getCampoHeader($campo);
+        $label = FieldUtil::getCampoHeader($campo);
         $field->label($label);
 
         // Populate options

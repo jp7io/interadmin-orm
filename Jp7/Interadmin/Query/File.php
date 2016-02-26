@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Query;
 
-use InterAdmin;
+use Jp7\Interadmin\Record;
 
 class File extends Base
 {
@@ -20,14 +20,14 @@ class File extends Base
 
     public function all()
     {
-        return $this->provider->getArquivos(InterAdmin::DEPRECATED_METHOD, $this->options);
+        return $this->provider->getArquivos(Record::DEPRECATED_METHOD, $this->options);
     }
 
     public function first()
     {
         $this->options['limit'] = 1;
 
-        return $this->provider->getArquivos(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->getArquivos(Record::DEPRECATED_METHOD, $this->options)->first();
     }
 
     public function build(array $attributes = [])

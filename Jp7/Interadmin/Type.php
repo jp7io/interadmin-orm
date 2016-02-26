@@ -1,10 +1,14 @@
 <?php
 
-use Jp7\Interadmin\Collection;
-use Jp7\Interadmin\TipoCache;
-use Jp7\Interadmin\Query;
-use Jp7\Interadmin\ClassMap;
+namespace Jp7\Interadmin;
+
 use Jp7\CollectionUtil;
+use BadMethodCallException;
+use InvalidArgumentException;
+use Exception;
+use Lang;
+use Request;
+use App;
 
 /**
  * JP7's PHP Functions.
@@ -20,11 +24,11 @@ use Jp7\CollectionUtil;
 /**
  * Class which represents records on the table interadmin_{client name}_tipos.
  *
- * @property string $interadminsOrderby SQL Order By for the records of this InterAdminTipo.
- * @property string $class Class to be instantiated for the records of this InterAdminTipo.
- * @property string $tabela Table of this Tipo, or of its Model, if it has no table.
+ * @property string $interadminsOrderby SQL Order By for the records of this Type.
+ * @property string $class Class to be instantiated for the records of this Type.
+ * @property string $tabela Table of this Type, or of its Model, if it has no table.
  */
-class InterAdminTipo extends InterAdminAbstract
+class Type extends RecordAbstract
 {
     use \Jp7\Laravel\Routable;
     use \Jp7\Laravel\Url\TypeTrait;
@@ -37,7 +41,7 @@ class InterAdminTipo extends InterAdminAbstract
     ];
     private static $privateFields = ['children', 'campos'];
 
-    protected static $_defaultClass = 'InterAdminTipo';
+    protected static $_defaultClass = self::class;
 
     protected $_primary_key = 'id_tipo';
 
@@ -48,9 +52,9 @@ class InterAdminTipo extends InterAdminAbstract
      */
     protected $_url;
     /**
-     * Contains the parent InterAdminTipo object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
+     * Contains the parent Type object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
      *
-     * @var InterAdminTipo
+     * @var self
      */
     protected $_parent;
 
@@ -107,14 +111,14 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Returns an InterAdminTipo instance. If $options['class'] is passed,
+     * Returns an Type instance. If $options['class'] is passed,
      * it will be returned an object of the given class, otherwise it will search
      * on the database which class to instantiate.
      *
      * @param int   $id_tipo This record's 'id_tipo'.
      * @param array $options Default array of options. Available keys: class, default_class.
      *
-     * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
+     * @return Type Returns an Type or a child class in case it's defined on its 'class_tipo' property.
      */
     public static function getInstance($id_tipo, $options = [])
     {
@@ -148,11 +152,11 @@ class InterAdminTipo extends InterAdminAbstract
     }
     */
     /**
-     * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
+     * Gets the parent Type object for this record, which is then cached on the $_parent property.
      *
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return InterAdminTipo|InterAdminAbstract
+     * @return Type|RecordAbstract
      */
     public function getParent($options = [])
     {
@@ -160,9 +164,9 @@ class InterAdminTipo extends InterAdminAbstract
             return $this->_parent;
         }
         if ($this->parent_id_tipo) {
-            $options['default_class'] = static::DEFAULT_NAMESPACE.'InterAdminTipo';
+            $options['default_class'] = static::DEFAULT_NAMESPACE.'Type';
 
-            return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
+            return $this->_parent = self::getInstance($this->parent_id_tipo, $options);
         }
     }
     public function getAncestors()
@@ -178,26 +182,26 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Sets the parent InterAdminTipo or InterAdmin object for this record, changing the $_parent property.
+     * Sets the parent Type or Record object for this record, changing the $_parent property.
      *
-     * @param InterAdminAbstract $parent
+     * @param RecordAbstract $parent
      */
-    public function setParent(InterAdminAbstract $parent = null)
+    public function setParent(RecordAbstract $parent = null)
     {
         $this->_parent = $parent;
     }
     /**
-     * Retrieves the children of this InterAdminTipo.
+     * Retrieves the children of this Type.
      *
      * @param array $options Default array of options. Available keys: fields, where, order, class.
      *
-     * @return array Array of InterAdminTipo objects.
+     * @return array Array of Type objects.
      *
      * @deprecated
      */
     public function getChildren($deprecated, $options = [])
     {
-        if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
+        if ($deprecated != Record::DEPRECATED_METHOD) {
             throw new Exception('Use children()->all() instead.');
         }
 
@@ -221,10 +225,10 @@ class InterAdminTipo extends InterAdminAbstract
 
         $tipos = [];
         foreach ($rs as $row) {
-            $tipo = InterAdminTipo::getInstance($row->id_tipo, [
+            $tipo = self::getInstance($row->id_tipo, [
                 'db' => $this->_db,
                 'class' => isset($options['class']) ? $options['class'] : null,
-                'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
+                'default_class' => static::DEFAULT_NAMESPACE.'Type',
             ]);
             $tipo->setParent($this);
             $this->_getAttributesFromRow($row, $tipo, $options);
@@ -236,7 +240,7 @@ class InterAdminTipo extends InterAdminAbstract
 
     public function children()
     {
-        return new \Jp7\Interadmin\Query\Type($this);
+        return new Query\Type($this);
     }
 
     public function childrenByModel($model_id_tipo)
@@ -247,7 +251,7 @@ class InterAdminTipo extends InterAdminAbstract
     /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
      *
-     * @return InterAdmin[] Array of InterAdmin objects.
+     * @return Record[] Array of Record objects.
      *
      * @deprecated
      */
@@ -256,7 +260,7 @@ class InterAdminTipo extends InterAdminAbstract
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
 
         $options['where'][] = 'id_tipo = '.$this->id_tipo;
-        if ($this->_parent instanceof InterAdmin) {
+        if ($this->_parent instanceof Record) {
             $options['where'][] =  'parent_id = '.intval($this->_parent->id);
         }
 
@@ -266,8 +270,8 @@ class InterAdminTipo extends InterAdminAbstract
         $records = [];
         foreach ($rs as $row) {
             $_id = isset($row->id) ? $row->id : null;
-            $record = InterAdmin::getInstance($_id, $optionsInstance, $this);
-            if ($this->_parent instanceof InterAdmin) {
+            $record = Record::getInstance($_id, $optionsInstance, $this);
+            if ($this->_parent instanceof Record) {
                 $record->setParent($this->_parent);
             }
             $this->_getAttributesFromRow($row, $record, $options);
@@ -339,7 +343,7 @@ class InterAdminTipo extends InterAdminAbstract
             throw new Exception('This method cannot be used with GROUP BY.');
         }
 
-        if ($this->_parent instanceof InterAdmin) {
+        if ($this->_parent instanceof Record) {
             $options['where'][] =  'parent_id = '.intval($this->_parent->id);
         }
 
@@ -353,15 +357,15 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Returns the number of InterAdmins using COUNT(id).
+     * Returns the number of Records using COUNT(id).
      *
      * @param array $options Default array of options. Available keys: where.
      *
-     * @return int Count of InterAdmins found.
+     * @return int Count of Records found.
      */
     public function count($deprecated, $options = [])
     {
-        if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
+        if ($deprecated != Record::DEPRECATED_METHOD) {
             throw new Exception('Use records()->count() instead.');
         }
         if (empty($options['group'])) {
@@ -389,11 +393,11 @@ class InterAdminTipo extends InterAdminAbstract
     /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, class.
      *
-     * @return InterAdmin First InterAdmin object found.
+     * @return Record First Record object found.
      */
     public function findFirst($deprecated, $options = [])
     {
-        if ($deprecated != InterAdmin::DEPRECATED_METHOD) {
+        if ($deprecated != Record::DEPRECATED_METHOD) {
             throw new Exception('Use records()->first() instead.');
         }
 
@@ -401,9 +405,9 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Retrieves the first records which have this InterAdminTipo's id_tipo.
+     * Retrieves the first records which have this Type's id_tipo.
      *
-     * @return InterAdmin First InterAdmin object found.
+     * @return Record First Record object found.
      */
     public function first()
     {
@@ -419,13 +423,13 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @param array $options Default array of options.
      *
-     * @return InterAdminTipo Model used by this InterAdminTipo.
+     * @return Type Model used by this Type.
      */
     public function getModel()
     {
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
-                $model = new InterAdminTipo($this->model_id_tipo);
+                $model = new self($this->model_id_tipo);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
                 $model = new $className();
@@ -462,9 +466,9 @@ class InterAdminTipo extends InterAdminAbstract
                     }
                     if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
                         $id_tipo = $A[$parameters[0]]['nome'];
-                        $A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, [
+                        $A[$parameters[0]]['nome'] = self::getInstance($id_tipo, [
                             'db' => $this->_db,
-                            'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
+                            'default_class' => static::DEFAULT_NAMESPACE.'Type',
                         ]);
                     }
                 }
@@ -490,7 +494,7 @@ class InterAdminTipo extends InterAdminAbstract
                         $A[$campo]['nome_id'] .= '_id';
                     }
                 } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
-                    if (in_array($array['xtra'], InterAdminField::getSpecialMultiXtras())) {
+                    if (in_array($array['xtra'], FieldUtil::getSpecialMultiXtras())) {
                         $A[$campo]['nome_id'] .= '_ids';
                     } else {
                         $A[$campo]['nome_id'] .= '_id';
@@ -564,12 +568,12 @@ class InterAdminTipo extends InterAdminAbstract
                     }
                     $relationships[$relationship] = [
                         'provider' => $array['nome'],
-                        'type' => in_array($array['xtra'], InterAdminField::getSelectTipoXtras()),
+                        'type' => in_array($array['xtra'], FieldUtil::getSelectTipoXtras()),
                         'multi' => $multi,
                         'special' => false,
                     ];
                 } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
-                    $multi = in_array($array['xtra'], InterAdminField::getSpecialMultiXtras());
+                    $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
                     if ($multi) {
                         $relationship = substr($array['nome_id'], 0, -4);
                     } else {
@@ -577,7 +581,7 @@ class InterAdminTipo extends InterAdminAbstract
                     }
                     $relationships[$relationship] = [
                         'provider' => null, // FIXME
-                        'type' => in_array($array['xtra'], InterAdminField::getSpecialTipoXtras()),
+                        'type' => in_array($array['xtra'], FieldUtil::getSpecialTipoXtras()),
                         'multi' => $multi,
                         'special' => true,
                     ];
@@ -592,18 +596,18 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Returns the InterAdminTipo for a field.
+     * Returns the Type for a field.
      *
      * @param object $campo
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public function getCampoTipo($campo)
     {
         if (is_object($campo['nome'])) {
             return $campo['nome'];
         } elseif ($campo['nome'] == 'all') {
-            return new InterAdminTipo();
+            return new self;
         }
     }
 
@@ -618,7 +622,7 @@ class InterAdminTipo extends InterAdminAbstract
     }
     /**
      * Returns this object´s nome and all the fields marked as 'combo', if the field
-     * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
+     * is an Type such as a select_key, its getStringValue() method is used.
      *
      * @return string For the tipo 'City' with the field 'state' marked as 'combo' it would return: 'City - State'.
      */
@@ -652,14 +656,14 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Saves this InterAdminTipo.
+     * Saves this Type.
      */
     public function save()
     {
         $this->id_slug = to_slug($this->nome);
 
         // log
-        $this->log = date('d/m/Y H:i').' - '.InterAdmin::getLogUser().' - '.
+        $this->log = date('d/m/Y H:i').' - '.Record::getLogUser().' - '.
             Request::ip().chr(13).$this->log;
 
         // Inheritance
@@ -668,8 +672,8 @@ class InterAdminTipo extends InterAdminAbstract
 
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->id_tipo) {
-            $inheritingTipos = InterAdminTipo::findTiposByModel($this->id_tipo, [
-                'class' => 'InterAdminTipo',
+            $inheritingTipos = self::findTiposByModel($this->id_tipo, [
+                'class' => self::class,
             ]);
             foreach ($inheritingTipos as $tipo) {
                 $tipo->syncInheritance();
@@ -690,7 +694,7 @@ class InterAdminTipo extends InterAdminAbstract
         // Atualizando cache com dados do modelo
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
-                $modelo = new InterAdminTipo($this->model_id_tipo);
+                $modelo = new self($this->model_id_tipo);
                 $modelo->loadAttributes(self::$inheritedFields, false);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
@@ -724,11 +728,11 @@ class InterAdminTipo extends InterAdminAbstract
         $this->save();
     }
     /**
-     * Deletes all the InterAdmins.
+     * Deletes all the Records.
      *
      * @param array $options [optional]
      *
-     * @return int Count of deleted InterAdmins.
+     * @return int Count of deleted Records.
      */
     public function deprecated_deleteInterAdmins($options = [])
     {
@@ -741,11 +745,11 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Deletes all the InterAdmins forever.
+     * Deletes all the Records forever.
      *
      * @param array $options [optional]
      *
-     * @return int Count of deleted InterAdmins.
+     * @return int Count of deleted Records.
      */
     public function deprecated_deleteInterAdminsForever($options = [])
     {
@@ -758,12 +762,12 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Updates all the InterAdmins.
+     * Updates all the Records.
      *
      * @param array $attributes Attributes to be updated
      * @param array $options    [optional]
      *
-     * @return int Count of updated InterAdmins.
+     * @return int Count of updated Records.
      */
     public function deprecated_updateInterAdmins($attributes, $options = [])
     {
@@ -817,7 +821,7 @@ class InterAdminTipo extends InterAdminAbstract
         return implode(',', $interadminsOrderBy);
     }
     /**
-     * Returns the table name for the InterAdmins.
+     * Returns the table name for the Records.
      *
      * @return string
      */
@@ -867,7 +871,7 @@ class InterAdminTipo extends InterAdminAbstract
         return $cache->get($varname);
     }
     /**
-     * Returns metadata about the children tipos that the InterAdmins have.
+     * Returns metadata about the children tipos that the Records have.
      *
      * @return array
      */
@@ -895,11 +899,11 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Returns a InterAdminTipo if the $nome_id is found in getInterAdminsChildren().
+     * Returns a Type if the $nome_id is found in getInterAdminsChildren().
      *
      * @param string $nome_id Camel Case name, e.g.: DadosPessoais
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public function getInterAdminsChildrenTipo($nome_id)
     {
@@ -907,9 +911,9 @@ class InterAdminTipo extends InterAdminAbstract
         if (isset($childrenTipos[$nome_id])) {
             $id_tipo = $childrenTipos[$nome_id]['id_tipo'];
 
-            return InterAdminTipo::getInstance($id_tipo, [
+            return self::getInstance($id_tipo, [
                 'db' => $this->_db,
-                'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
+                'default_class' => static::DEFAULT_NAMESPACE.'Type',
             ]);
         }
     }
@@ -939,8 +943,8 @@ class InterAdminTipo extends InterAdminAbstract
             ];
         }
         // As method
-        $optionsInstance = ['default_class' => static::DEFAULT_NAMESPACE.'InterAdmin'];
-        $recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+        $optionsInstance = ['default_class' => static::DEFAULT_NAMESPACE.'Record'];
+        $recordModel = Record::getInstance(0, $optionsInstance, $this);
         if (method_exists($recordModel, $relationship)) {
             return $recordModel->$relationship()->getRelationshipData();
         }
@@ -952,12 +956,12 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @param array $attributes Attributes to be merged into the new record.
      *
-     * @return InterAdmin
+     * @return Record
      */
     public function deprecated_createInterAdmin(array $attributes = [])
     {
-        $options = ['default_class' => static::DEFAULT_NAMESPACE.'InterAdmin'];
-        $record = InterAdmin::getInstance(0, $options, $this);
+        $options = ['default_class' => static::DEFAULT_NAMESPACE.'Record'];
+        $record = Record::getInstance(0, $options, $this);
         if ($mostrar = $this->getCamposAlias('char_key')) {
             $record->$mostrar = 'S';
         }
@@ -966,7 +970,7 @@ class InterAdminTipo extends InterAdminAbstract
         $record->publish = 'S';
         $record->log = '';
 
-        if ($this->_parent instanceof InterAdmin) {
+        if ($this->_parent instanceof Record) {
             $record->setParent($this->_parent);
         }
 
@@ -974,11 +978,11 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
+     * Returns all Type's using this Type as a model (model_id_tipo).
      *
      * @param array $options [optional]
      *
-     * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
+     * @return Type[] Array of Tipos indexed by their id_tipo.
      */
     public function getTiposUsingThisModel($options = [])
     {
@@ -992,10 +996,10 @@ class InterAdminTipo extends InterAdminAbstract
             ];
             $rs = $this->_executeQuery($options2);
 
-            $options['default_class'] = static::DEFAULT_NAMESPACE.'InterAdminTipo';
+            $options['default_class'] = static::DEFAULT_NAMESPACE.'Type';
             $this->_tiposUsingThisModel = [];
             foreach ($rs as $row) {
-                $this->_tiposUsingThisModel[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);
+                $this->_tiposUsingThisModel[$row->id_tipo] = Type::getInstance($row->id_tipo, $options);
             }
             $this->_tiposUsingThisModel[$this->id_tipo] = $this;
         }
@@ -1003,11 +1007,11 @@ class InterAdminTipo extends InterAdminAbstract
         return $this->_tiposUsingThisModel;
     }
     /**
-     * Retrieves the first InterAdminTipo from the database.
+     * Retrieves the first Type from the database.
      *
      * @param array $options [optional]
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public static function findFirstTipo($options = [])
     {
@@ -1016,19 +1020,19 @@ class InterAdminTipo extends InterAdminAbstract
         return empty($tipos) ? null : $tipos[0];
     }
     /**
-     * Retrieves the first InterAdminTipo with the given "model_id_tipo".
+     * Retrieves the first Type with the given "model_id_tipo".
      *
      * @param string|int $model_id_tipo
      * @param array      $options       [optional]
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public static function findFirstTipoByModel($model_id_tipo, $options = [])
     {
         return self::findTiposByModel($model_id_tipo, ['limit' => 1] + $options)[0];
     }
     /**
-     * Retrieves all the InterAdminTipo with the given "model_id_tipo".
+     * Retrieves all the Type with the given "model_id_tipo".
      *
      * @param string|int $model_id_tipo
      * @param array      $options       [optional]
@@ -1046,11 +1050,11 @@ class InterAdminTipo extends InterAdminAbstract
         return self::findTipos($options);
     }
     /**
-     * Retrieves multiple InterAdminTipo's from the database.
+     * Retrieves multiple Type's from the database.
      *
      * @param array $options [optional]
      *
-     * @return InterAdminTipo[]
+     * @return Type[]
      */
     public static function findTipos($options = [])
     {
@@ -1078,7 +1082,7 @@ class InterAdminTipo extends InterAdminAbstract
         $tipos = [];
 
         foreach ($rs as $row) {
-            $tipo = InterAdminTipo::getInstance($row->id_tipo, [
+            $tipo = self::getInstance($row->id_tipo, [
                 'db' => $instance->getDb(),
                 'class' => isset($options['class']) ? $options['class'] : null,
             ]);
@@ -1095,11 +1099,11 @@ class InterAdminTipo extends InterAdminAbstract
 
         $optionsInstance = [
             'class' => isset($options['class']) ? $options['class'] : null,
-            'default_class' => static::DEFAULT_NAMESPACE.'InterAdmin',
+            'default_class' => static::DEFAULT_NAMESPACE.'Record',
         ];
 
-        $recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
-        if ($this->_parent instanceof InterAdmin) {
+        $recordModel = Record::getInstance(0, $optionsInstance, $this);
+        if ($this->_parent instanceof Record) {
             $recordModel->setParent($this->_parent);
         }
 
@@ -1164,17 +1168,17 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
+     * Returns all records having an Type that uses this as a model (model_id_tipo).
      *
      * @param array $options [optional]
      *
-     * @return InterAdmin[]
+     * @return Record[]
      */
     public function modelRecords()
     {
         $tipos = $this->getTiposUsingThisModel();
 
-        $query = new \Jp7\Interadmin\TypelessQuery($this);
+        $query = new TypelessQuery($this);
 
         return $query->whereIn('id_tipo', $tipos);
     }
@@ -1186,9 +1190,9 @@ class InterAdminTipo extends InterAdminAbstract
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $type = InterAdminTipo::getInstance($row->id_tipo);
+            $type = Type::getInstance($row->id_tipo);
 
-            $record = InterAdmin::getInstance($row->id, $optionsInstance, $type);
+            $record = Record::getInstance($row->id, $optionsInstance, $type);
             $this->_getAttributesFromRow($row, $record, $options);
             $records[] = $record;
         }
@@ -1207,7 +1211,7 @@ class InterAdminTipo extends InterAdminAbstract
     /**
      * Returns $_defaultClass.
      *
-     * @see InterAdminTipo::$_defaultClass
+     * @see Type::$_defaultClass
      */
     public static function getDefaultClass()
     {
@@ -1219,7 +1223,7 @@ class InterAdminTipo extends InterAdminAbstract
      *
      * @param object $_defaultClass
      *
-     * @see InterAdminTipo::$_defaultClass
+     * @see Type::$_defaultClass
      */
     public static function setDefaultClass($defaultClass)
     {
@@ -1227,7 +1231,7 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * @see InterAdminAbstract::getAdminAttributes()
+     * @see RecordAbstract::getAdminAttributes()
      */
     public function getAdminAttributes()
     {

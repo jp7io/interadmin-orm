@@ -38,7 +38,7 @@ class CollectionUtil
 
             $tipo = $first->getType();
             $retornos = $tipo->find([
-                'class' => 'InterAdmin',
+                'class' => 'Jp7\\Interadmin\\Record',
                 'fields' => $fields,
                 'fields_alias' => $fields_alias,
                 'where' => ['id IN ('.implode(',', $array).')'],

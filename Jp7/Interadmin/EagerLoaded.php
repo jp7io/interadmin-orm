@@ -2,7 +2,6 @@
 
 namespace Jp7\Interadmin;
 
-use InterAdminTipo;
 use BadMethodCallException;
 
 class EagerLoaded
@@ -11,7 +10,7 @@ class EagerLoaded
     protected $type;
     protected $debug;
 
-    public function __construct(InterAdminTipo $type, $data)
+    public function __construct(Type $type, $data)
     {
         $this->data = $data;
         $this->type = $type;

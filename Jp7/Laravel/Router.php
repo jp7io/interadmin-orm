@@ -4,6 +4,7 @@ namespace Jp7\Laravel;
 
 use Jp7\MethodForwarder;
 use Jp7\Interadmin\ClassMap;
+use Jp7\Interadmin\Type;
 use Route;
 use Cache;
 use Closure;
@@ -90,7 +91,7 @@ class Router extends MethodForwarder
             return;
         }
 
-        return \InterAdminTipo::getInstance($id_tipo);
+        return Type::getInstance($id_tipo);
     }
     
     public function getMapIdTipos()

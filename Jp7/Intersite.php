@@ -1,5 +1,7 @@
 <?php
 
+namespace Jp7;
+
 use Illuminate\Support\Str;
 
 /**
@@ -7,7 +9,7 @@ use Illuminate\Support\Str;
  *
  * @version (2008/07/30)
  */
-class InterSite
+class Intersite
 {
     const QA = 'QA';
     const PRODUCTION = 'Produção';
@@ -84,9 +86,9 @@ class InterSite
     /**
      * Returns the first server which has a given type.
      *
-     * @param string $type Type of the server, such as InterSite::PRODUCAO, InterSite::QA or InterSite::DESENVOLVIMENTO.
+     * @param string $type Type of the server, such as self::PRODUCAO, self::QA or self::DESENVOLVIMENTO.
      *
-     * @return InterAdmin
+     * @return Jp7\Interadmin\Record
      */
     public function getFirstServerByType($type)
     {
@@ -102,7 +104,7 @@ class InterSite
         return self::$instance;
     }
 
-    public static function setConfig(InterSite $instance)
+    public static function setConfig(self $instance)
     {
         self::$instance = $instance;
     }

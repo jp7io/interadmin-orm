@@ -1,16 +1,21 @@
 <?php
 
+namespace Jp7\Interadmin;
+
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Str;
-use Jp7\Interadmin\TipoCache;
 use Jp7\CollectionUtil;
 use Jp7\TryMethod;
+use Serializable;
+use Exception;
+use DB;
+use SqlFormatter;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
-abstract class InterAdminAbstract implements Serializable
+abstract class RecordAbstract implements Serializable
 {
     use TryMethod;
     
@@ -28,9 +33,6 @@ abstract class InterAdminAbstract implements Serializable
      */
     public $attributes = [];
 
-    /**
-     * @var ADOConnection
-     */
     protected $_db = null;
 
     /**
@@ -223,7 +225,7 @@ abstract class InterAdminAbstract implements Serializable
             switch (gettype($value)) {
                 case 'object':
                     $valuesToSave[$key] = (string) $value;
-                    if ($value instanceof InterAdminFieldFile) {
+                    if ($value instanceof FileField) {
                         $valuesToSave[$key.'_text'] = $value->text;
                     }
                     break;
@@ -264,13 +266,13 @@ abstract class InterAdminAbstract implements Serializable
      * @param mixed  $value  Any value.
      * @param string $field  The name of the field.
      * @param string $campos Value from getCampos().
-     * @param InterAdminAbstract Object which will receive the attribute.
+     * @param RecordAbstract Object which will receive the attribute.
      *
      * @return mixed The object created by the key or the value itself.
      */
     protected function _getByForeignKey(&$value, $field, $campo, $object)
     {
-        $interAdminClass = static::DEFAULT_NAMESPACE.'InterAdmin';
+        $interAdminClass = static::DEFAULT_NAMESPACE.'Record';
 
         $options = [];
         if (strpos($field, 'date_') === 0) {
@@ -286,9 +288,9 @@ abstract class InterAdminAbstract implements Serializable
         } else
         */
         if (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
-            $class_name = $interAdminClass.'FieldFile';
+            $class_name = static::DEFAULT_NAMESPACE.'FileField';
             if (!class_exists($class_name)) {
-                $class_name = 'InterAdminFieldFile';
+                $class_name = 'Jp7\\Interadmin\\FileField';
             }
             $file = new $class_name($value);
             $file->setParent($object);
@@ -299,7 +301,7 @@ abstract class InterAdminAbstract implements Serializable
         }
         /*
         $options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
-        if ($object instanceof InterAdminAbstract) {
+        if ($object instanceof RecordAbstract) {
             $tipo = $object->getCampoTipo($campo);
         }
 
@@ -340,7 +342,7 @@ abstract class InterAdminAbstract implements Serializable
         // Temporario enquando specials nao tem id_tipo
         $data = DB::table('')->select('id_tipo')->where('id', $id)->first();
         if ($data) {
-            return InterAdminTipo::getInstance($data->id_tipo);
+            return Type::getInstance($data->id_tipo);
         }
     }
 
@@ -375,7 +377,7 @@ abstract class InterAdminAbstract implements Serializable
         if (array_key_exists('use_published_filters', $options)) {
             $use_published_filters = $options['use_published_filters'];
         } else {
-            $use_published_filters = InterAdmin::isPublishedFiltersEnabled();
+            $use_published_filters = Record::isPublishedFiltersEnabled();
         }
 
         // Resolve Alias and Joins for 'fields' and 'from'
@@ -522,9 +524,9 @@ abstract class InterAdminAbstract implements Serializable
                     $joinNome = studly_case($table);
                     if (isset($childrenArr[$joinNome])) {
                         // Children
-                        $joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], [
+                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db' => $this->_db,
-                            'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
+                            'default_class' => static::DEFAULT_NAMESPACE.'Type',
                         ]);
 
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
@@ -588,9 +590,9 @@ abstract class InterAdminAbstract implements Serializable
                     // Joins com children
                     $joinNome = studly_case($table);
                     if (isset($childrenArr[$joinNome])) {
-                        $joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], [
+                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db' => $this->_db,
-                            'default_class' => static::DEFAULT_NAMESPACE.'InterAdminTipo',
+                            'default_class' => static::DEFAULT_NAMESPACE.'Type',
                         ]);
 
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
@@ -794,7 +796,7 @@ abstract class InterAdminAbstract implements Serializable
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
 
-        if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {
+        if (in_array($campo['xtra'], FieldUtil::getSelectTipoXtras()) || in_array($campo['xtra'], FieldUtil::getSpecialTipoXtras())) {
             $options['from'][] = $joinTipo->getTableName().
                 ' AS '.$alias.' ON '.$table.'.'.$campo['tipo'].' = '.$alias.'.id_tipo';
 
@@ -858,13 +860,13 @@ abstract class InterAdminAbstract implements Serializable
                         $join = $fields[$table.'_id'];
                         $joinTipo = $this->getCampoTipo($campos[$join]);
                         if (!is_object(@$attributes[$table]) && $field === 'id' && $value) {
-                            $attributes[$table] = InterAdmin::getInstance($value, [], $joinTipo);
+                            $attributes[$table] = Record::getInstance($value, [], $joinTipo);
                         }
                     } elseif (!empty($options['joins'][$table])) {
                         // $options['joins']
                         list($_joinType, $joinTipo, $_on) = $options['joins'][$table];
                         if (!is_object(@$attributes[$table])) {
-                            $attributes[$table] = InterAdmin::getInstance(0, [], $joinTipo);
+                            $attributes[$table] = Record::getInstance(0, [], $joinTipo);
                         }
                     }
                 }
@@ -896,9 +898,9 @@ abstract class InterAdminAbstract implements Serializable
      * Resolves '*'.
      *
      * @param array              $fields
-     * @param InterAdminAbstract $object
+     * @param RecordAbstract $object
      */
-    protected function _resolveWildcard(&$fields, InterAdminAbstract $object)
+    protected function _resolveWildcard(&$fields, RecordAbstract $object)
     {
         if ($fields == '*') {
             $fields = [$fields];
@@ -963,11 +965,11 @@ abstract class InterAdminAbstract implements Serializable
     }
 
     /**
-     * Returns the InterAdminTipo for a field.
+     * Returns the Type for a field.
      *
      * @param object $campo
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     abstract public function getCampoTipo($campo);
     abstract public function getAttributesCampos();
@@ -1018,8 +1020,8 @@ abstract class InterAdminAbstract implements Serializable
             return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
         // Registros
         } else {
-            $return = $alias.".date_publish <= '".date('Y-m-d H:i:59', InterAdmin::getTimestamp())."'".
-                ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', InterAdmin::getTimestamp())."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
+            $return = $alias.".date_publish <= '".date('Y-m-d H:i:59', Record::getTimestamp())."'".
+                ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', Record::getTimestamp())."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
                 ' AND '.$alias.".char_key <> ''".
                 ' AND '.$alias.".deleted = ''".
                 ' AND ';
@@ -1041,7 +1043,7 @@ abstract class InterAdminAbstract implements Serializable
     /**
      * Returns the database object.
      *
-     * @return ADOConnection
+     * @return ?
      */
     public function getDb()
     {

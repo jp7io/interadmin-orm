@@ -2,8 +2,6 @@
 
 namespace Jp7\Interadmin;
 
-use InterAdminTipo;
-
 class DynamicLoader
 {
     // Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
@@ -13,12 +11,12 @@ class DynamicLoader
 
         $code = null;
         if ($id_tipo = $cm->getClassIdTipo($class)) {
-            $tipo = new InterAdminTipo($id_tipo);
+            $tipo = new Type($id_tipo);
             $tipo->class = $class;
             
             $code = Util::gerarClasseInterAdmin($tipo, false);
         } elseif ($id_tipo = $cm->getClassTipoIdTipo($class)) {
-            $tipo = new InterAdminTipo($id_tipo);
+            $tipo = new Type($id_tipo);
             $tipo->class_tipo = $class;
             
             $code = Util::gerarClasseInterAdminTipo($tipo, false);

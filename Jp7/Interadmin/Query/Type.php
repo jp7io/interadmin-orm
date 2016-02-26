@@ -2,8 +2,8 @@
 
 namespace Jp7\Interadmin\Query;
 
-use InterAdmin;
-use InterAdminTipo;
+use Jp7\Interadmin\Record;
+use Jp7\Interadmin\Type as InteradminType;
 use BadMethodCallException;
 
 class Type extends Base
@@ -39,7 +39,7 @@ class Type extends Base
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options);
+        return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options);
     }
 
     public function first()
@@ -50,12 +50,12 @@ class Type extends Base
 
         $this->options['limit'] = 1;
 
-        return $this->provider->getChildren(InterAdmin::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options)->first();
     }
 
     public function build(array $attributes = [])
     {
-        $className = InterAdminTipo::getDefaultClass();
+        $className = InteradminType::getDefaultClass();
 
         $child = new $className();
         $child->parent_id_tipo = $this->provider->id_tipo;

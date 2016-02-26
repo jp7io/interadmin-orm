@@ -1,5 +1,7 @@
 <?php
 
+namespace Jp7\Interadmin;
+
 /**
  * JP7's PHP Functions.
  *
@@ -14,7 +16,7 @@
 /**
  * Class representing records on the table interadmin_{client name}_logs.
  */
-class InterAdminLog extends InterAdminAbstract
+class Log extends RecordAbstract
 {
     const ACTION_VIEW = 'view';
     const ACTION_LOGIN = 'login';
@@ -30,15 +32,15 @@ class InterAdminLog extends InterAdminAbstract
      */
     public $db_prefix;
     /**
-     * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
      *
-     * @var InterAdminTipo
+     * @var Type
      */
     protected $_tipo;
     /**
-     * Contains the parent InterAdmin object, i.e. the record with an 'id' equal to this record's 'parent_id'.
+     * Contains the parent Record object, i.e. the record with an 'id' equal to this record's 'parent_id'.
      *
-     * @var InterAdmin
+     * @var Record
      */
     protected $_parent;
     /**
@@ -58,11 +60,11 @@ class InterAdminLog extends InterAdminAbstract
         }
     }
     /**
-     * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
+     * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public function getTipo($options = [])
     {
@@ -70,7 +72,7 @@ class InterAdminLog extends InterAdminAbstract
             if (!$this->id_tipo) {
                 $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_log', $this->id_log, 'id_tipo');
             }
-            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
+            $this->_tipo = Type::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
@@ -80,9 +82,9 @@ class InterAdminLog extends InterAdminAbstract
         return $this->_tipo;
     }
     /**
-     * Sets the InterAdminTipo object for this record, changing the $_tipo property.
+     * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param InterAdminTipo $tipo
+     * @param Type $tipo
      */
     public function setTipo($tipo)
     {
@@ -90,27 +92,27 @@ class InterAdminLog extends InterAdminAbstract
         $this->_tipo = $tipo;
     }
     /**
-     * Gets the parent InterAdmin object for this record, which is then cached on the $_parent property.
+     * Gets the parent Record object for this record, which is then cached on the $_parent property.
      *
      * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class.
      *
-     * @return InterAdmin
+     * @return Record
      */
     public function getParent($options = [])
     {
         if (!$this->_parent) {
             $tipo = $this->getTipo();
             if ($this->id || $this->getFieldsValues('id')) {
-                $this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
+                $this->_parent = Record::getInstance($this->id, $options, $tipo);
             }
         }
 
         return $this->_parent;
     }
     /**
-     * Sets the parent InterAdmin object for this record, changing the $_parent property.
+     * Sets the parent Record object for this record, changing the $_parent property.
      *
-     * @param InterAdmin $parent
+     * @param Record $parent
      */
     public function setParent($parent)
     {
@@ -135,7 +137,7 @@ class InterAdminLog extends InterAdminAbstract
         return $this->db_prefix.'_logs';
     }
     /**
-     * @see InterAdminAbstract::getCampoTipo()
+     * @see RecordAbstract::getCampoTipo()
      */
     public function getCampoTipo($campo)
     {
@@ -146,7 +148,7 @@ class InterAdminLog extends InterAdminAbstract
         return '';
     }
     /**
-     * @see InterAdminAbstract::getAdminAttributes()
+     * @see RecordAbstract::getAdminAttributes()
      */
     public function getAdminAttributes()
     {
@@ -155,7 +157,7 @@ class InterAdminLog extends InterAdminAbstract
     public static function create($attributes = [])
     {
         global $s_user, $lang;
-        $log = new InterAdminLog();
+        $log = new self;
 
         $log->lang = $lang->lang;
         $log->ip = $_SERVER['REMOTE_ADDR'];
@@ -169,7 +171,7 @@ class InterAdminLog extends InterAdminAbstract
 
     public static function countLogs($options = [])
     {
-        $logs = InterAdminLog::findLogs([
+        $logs = self::findLogs([
             'fields' => 'count(id)',
         ] + $options);
 
@@ -178,7 +180,7 @@ class InterAdminLog extends InterAdminAbstract
 
     public static function findLogs($options = [])
     {
-        $instance = new self();
+        $instance = new self;
         if ($options['db']) {
             $instance->setDb($options['db']);
         }
@@ -203,7 +205,7 @@ class InterAdminLog extends InterAdminAbstract
         $logs = [];
 
         while ($row = $rs->FetchNextObj()) {
-            $log = new InterAdminLog($row->id_tipo, [
+            $log = new self($row->id_tipo, [
                 'db_prefix' => $instance->db_prefix,
                 'db' => $instance->getDb(),
             ]);

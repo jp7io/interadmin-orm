@@ -3,7 +3,8 @@
 namespace Jp7\Interadmin\Relation;
 
 use Jp7\Interadmin\Query;
-use InterAdmin;
+use Jp7\Interadmin\Record;
+use InvalidArgumentException;
 
 class HasMany
 {
@@ -13,7 +14,7 @@ class HasMany
     private $local_key;
     private $query;
 
-    public function __construct(InterAdmin $record, $className, $foreign_key, $local_key)
+    public function __construct(Record $record, $className, $foreign_key, $local_key)
     {
         $this->record = $record;
         $this->className = $className;
@@ -27,7 +28,7 @@ class HasMany
         $aliases = $type->getCamposAlias();
         $alias = array_search($this->foreign_key, $aliases);
         if (!$alias) {
-            throw new \InvalidArgumentException('Unknown alias: '.$this->foreign_key);
+            throw new InvalidArgumentException('Unknown alias: '.$this->foreign_key);
         }
 
         $conditions = [

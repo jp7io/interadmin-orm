@@ -1,19 +1,11 @@
 <?php
-/**
- * JP7's PHP Functions.
- *
- * Contains the main custom functions and classes.
- *
- * @author JP7
- * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- *
- * @category JP7
- */
+
+namespace Jp7\Interadmin;
 
 /**
  * Generates the HTML output for a field based on its type, such as varchar, int or text.
  */
-class InterAdminField
+class FieldUtil
 {
     public $id;
     public $id_tipo;
@@ -21,7 +13,7 @@ class InterAdminField
     /**
      * Construtor público.
      *
-     * @param array $field Formato dos campos do InterAdminTipo [optional]
+     * @param array $field Formato dos campos do Type [optional]
      *
      * @return
      */
@@ -80,7 +72,7 @@ class InterAdminField
         } elseif (strpos($key, 'select_') === 0) {
             if ($campo['label']) {
                 return $campo['label'];
-            } elseif ($campo['nome'] instanceof InterAdminTipo) {
+            } elseif ($campo['nome'] instanceof Type) {
                 return $campo['nome']->nome;
             } elseif ($campo['nome'] == 'all') {
                 return 'Tipos';

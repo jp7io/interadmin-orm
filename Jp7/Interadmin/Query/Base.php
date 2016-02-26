@@ -4,8 +4,8 @@ namespace Jp7\Interadmin\Query;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
-use InterAdminTipo;
-use InterAdminAbstract;
+use Jp7\Interadmin\Type as InteradminType;
+use Jp7\Interadmin\RecordAbstract;
 use BadMethodCallException;
 
 abstract class Base
@@ -22,7 +22,7 @@ abstract class Base
         'rlike', 'regexp', 'not regexp',
     ];
 
-    public function __construct(InterAdminAbstract $provider)
+    public function __construct(RecordAbstract $provider)
     {
         $this->provider = $provider;
         $this->options = [
@@ -239,10 +239,10 @@ abstract class Base
         if (is_string($var)) {
             return call_user_func([$var, 'type']);
         }
-        if ($var instanceof InterAdminTipo) {
+        if ($var instanceof InteradminType) {
             return $var;
         }
-        throw new BadMethodCallException('Expected class name or InterAdminTipo, got: '.gettype($var));
+        throw new BadMethodCallException('Expected class name or Type, got: '.gettype($var));
     }
 
     protected function invalidOperatorAndValue($operator, $value)
@@ -282,7 +282,7 @@ abstract class Base
      * Aplica join na query.
      *
      * @param string                $alias
-     * @param string|InterAdminTipo $className
+     * @param string|InteradminType           $className
      * @param array                 $conditions
      * @param string                $_joinType  ex.: INNER, LEFT, RIGHT
      *

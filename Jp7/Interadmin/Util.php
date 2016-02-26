@@ -2,13 +2,11 @@
 
 namespace Jp7\Interadmin;
 
-use InterAdminTipo;
-
 class Util
 {
-    public static function gerarClasseInterAdmin(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '')
+    public static function gerarClasseInterAdmin(Type $tipo, $gerarArquivo = true, $nomeClasse = '')
     {
-        $prefixoClasse = constant(InterAdminTipo::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $prefixoClasse = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
 
         if (!$nomeClasse) {
             $nomeClasse = $tipo->class;
@@ -27,7 +25,7 @@ class Util
 <?php
 
 $phpdoc
-class {$nomeClasse} extends {$prefixoClasse}InterAdmin {
+class {$nomeClasse} extends {$prefixoClasse}Record {
 
 }
 STR;
@@ -38,9 +36,9 @@ STR;
         }
     }
 
-    public static function gerarClasseInterAdminTipo(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '', $nomeClasseInterAdmin = '')
+    public static function gerarClasseInterAdminTipo(Type $tipo, $gerarArquivo = true, $nomeClasse = '', $nomeClasseInterAdmin = '')
     {
-        $prefixoClasse = constant(InterAdminTipo::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $prefixoClasse = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
 
         if (!$nomeClasse) {
             $nomeClasse = $tipo->class_tipo;
@@ -50,11 +48,11 @@ STR;
             $nomeClasseInterAdmin = $tipo->class;
         }
         if (!$nomeClasseInterAdmin) {
-            $constname = InterAdminTipo::getDefaultClass() . '::DEFAULT_NAMESPACE';
+            $constname = Type::getDefaultClass() . '::DEFAULT_NAMESPACE';
             if (defined($constname)) {
-                $nomeClasseInterAdmin = constant($constname) . 'InterAdmin';
+                $nomeClasseInterAdmin = constant($constname) . 'Record';
             } else {
-                $nomeClasseInterAdmin = 'InterAdmin';
+                $nomeClasseInterAdmin = 'Record';
             }
         }
         */
@@ -68,7 +66,7 @@ STR;
 <?php
 
 $phpdoc
-class {$nomeClasse} extends {$prefixoClasse}InterAdminTipo {
+class {$nomeClasse} extends {$prefixoClasse}Type {
 	const ID_TIPO = {$tipo->id_tipo};
 }
 STR;

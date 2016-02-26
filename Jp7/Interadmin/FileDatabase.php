@@ -1,6 +1,8 @@
 <?php
 
-class InterAdminArquivoBanco
+namespace Jp7\Interadmin;
+
+class FileDatabase
 {
     public function __construct($options = [])
     {

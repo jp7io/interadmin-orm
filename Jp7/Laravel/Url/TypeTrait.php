@@ -3,15 +3,15 @@
 namespace Jp7\Laravel\Url;
 
 use Jp7\Interadmin\ClassMap;
+use Jp7\Interadmin\Record;
 use Jp7\Laravel\RouterFacade as Router;
 use BadMethodCallException;
 use URL;
-use InterAdmin;
 
 trait TypeTrait
 {
     /**
-     * Returns the full url for this InterAdminTipo.
+     * Returns the full url for this Type.
      *
      * @param string $action
      * @param array  $parameters
@@ -26,7 +26,7 @@ trait TypeTrait
             list($action, $parameters) = [null, $action];
         }
 
-        if ($this->getParent() instanceof InterAdmin) {
+        if ($this->getParent() instanceof Record) {
             array_unshift($parameters, $this->getParent());
         }
 

@@ -1,16 +1,19 @@
 <?php
 
-use Jp7\Interadmin\Collection;
-use Jp7\Interadmin\ClassMap;
-use Jp7\Interadmin\Query;
+namespace Jp7\Interadmin;
+
 use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
+use BadMethodCallException;
+use Exception;
+use DB;
+use Request;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
-class InterAdmin extends InterAdminAbstract implements Arrayable
+class Record extends RecordAbstract implements Arrayable
 {
     use \Jp7\Laravel\Url\RecordTrait;
      
@@ -20,19 +23,19 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     const DEPRECATED_METHOD = '54dac5afe1fcac2f65c059fc97b44a58';
 
     /**
-     * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
      *
-     * @var InterAdminTipo
+     * @var Type
      */
     protected $_tipo;
     /**
-     * Contains the parent InterAdmin object, i.e. the record with an 'id' equal to this record's 'parent_id'.
+     * Contains the parent Record object, i.e. the record with an 'id' equal to this record's 'parent_id'.
      *
-     * @var InterAdmin
+     * @var Record
      */
     protected $_parent;
     /**
-     * Contains an array of objects (InterAdmin and InterAdminTipo).
+     * Contains an array of objects (Record and Type).
      *
      * @var array
      */
@@ -130,7 +133,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                 if (class_exists('Debugbar')) {
                     $caller = debug_backtrace(false, 2)[1];
                     
-                    Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
+                    \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
                         .get_class($this)
                         .' - ID: '.$this->id
                         .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
@@ -161,7 +164,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                 if ($data['type']) {
                     $multi = [];
                     foreach (array_filter(explode(',', $fks)) as $fk) {
-                        $multi[] = InterAdminTipo::getInstance($fk);
+                        $multi[] = Type::getInstance($fk);
                     }
 
                     return $multi;
@@ -172,7 +175,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             }
         } elseif ($fk = $this->{$name.'_id'}) {
             if ($data['type']) {
-                return InterAdminTipo::getInstance($fk);
+                return Type::getInstance($fk);
             } else {
                 return $data['provider']->records()->find($fk);
             }
@@ -198,7 +201,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     {
         $cm = ClassMap::getInstance();
         if ($id_tipo = $cm->getClassIdTipo(get_called_class())) {
-            return \InterAdminTipo::getInstance($id_tipo);
+            return Type::getInstance($id_tipo);
         }
     }
 
@@ -208,17 +211,17 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
 
     /**
-     * Returns an InterAdmin instance. If $options['class'] is passed,
+     * Returns an Record instance. If $options['class'] is passed,
      * it will be returned an object of the given class, otherwise it will search
      * on the database which class to instantiate.
      *
      * @param int   $id      This record's 'id'.
      * @param array $options Default array of options. Available keys: fields, fields_alias, class, default_class.
-     * @param InterAdminTipo Set the record´s Tipo.
+     * @param Type Set the record´s Tipo.
      *
-     * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
+     * @return Record Returns an Record or a child class in case it's defined on the 'class' property of its Type.
      */
-    public static function getInstance($id, $options = [], InterAdminTipo $tipo)
+    public static function getInstance($id, $options = [], Type $tipo)
     {
         // Classe foi forçada
         if (isset($options['class'])) {
@@ -227,7 +230,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             $cm = ClassMap::getInstance();
             $class_name = $cm->getClass($tipo->id_tipo);
             if (!$class_name) {
-                $class_name = isset($options['default_class']) ? $options['default_class'] : 'InterAdmin';
+                $class_name = isset($options['default_class']) ? $options['default_class'] : self::class;
             }
         }
 
@@ -282,12 +285,12 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         if ($child = $this->_findChild(ucfirst($methodName))) {
             $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
             if (isset($this->_eagerLoad[$methodName])) {
-                return new \Jp7\Interadmin\EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
+                return new EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
             }
 
             return new Query($childrenTipo);
         } elseif ($methodName === 'arquivos' && $this->getType()->arquivos) {
-            return new \Jp7\Interadmin\Query\File($this);
+            return new Query\File($this);
         }
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
@@ -303,11 +306,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         throw new BadMethodCallException($message);
     }
     /**
-     * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
+     * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public function getType($options = [])
     {
@@ -336,7 +339,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
                 $this->id_tipo = $data->id_tipo;
             }
-            $tipo = InterAdminTipo::getInstance($this->id_tipo, [
+            $tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
             ]);
@@ -348,21 +351,21 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
 
     /**
-     * Sets the InterAdminTipo object for this record, changing the $_tipo property.
+     * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param InterAdminTipo $tipo
+     * @param Type $tipo
      */
-    public function setType(InterAdminTipo $tipo = null)
+    public function setType(Type $tipo = null)
     {
         $this->id_tipo = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
     /**
-     * Gets the parent InterAdmin object for this record, which is then cached on the $_parent property.
+     * Gets the parent Record object for this record, which is then cached on the $_parent property.
      *
      * @param array $options Default array of options. Available keys: fields, fields_alias, class.
      *
-     * @return InterAdmin
+     * @return Record
      */
     public function getParent($options = [])
     {
@@ -373,7 +376,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                 if (!$this->parent_id_tipo) {
                     throw new Exception('Field parent_id_tipo is required. Id: '.$this->id);
                 }
-                $parentTipo = InterAdminTipo::getInstance($this->parent_id_tipo);
+                $parentTipo = Type::getInstance($this->parent_id_tipo);
                 $this->_parent = $parentTipo->records()->find($this->parent_id);
                 if ($this->_parent) {
                     $this->getType()->setParent($this->_parent);
@@ -384,11 +387,11 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         return $this->_parent;
     }
     /**
-     * Sets the parent InterAdmin object for this record, changing the $_parent property.
+     * Sets the parent Record object for this record, changing the $_parent property.
      *
-     * @param InterAdmin $parent
+     * @param Record $parent
      */
-    public function setParent(InterAdmin $parent = null)
+    public function setParent(Record $parent = null)
     {
         if (isset($parent)) {
             if (!isset($parent->id)) {
@@ -404,17 +407,17 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
 
     /**
-     * Instantiates an InterAdminTipo object and sets this record as its parent.
+     * Instantiates an Type object and sets this record as its parent.
      *
      * @param int   $id_tipo
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return InterAdminTipo
+     * @return Type
      */
     public function getChildrenTipo($id_tipo, $options = [])
     {
-        $options['default_class'] = static::DEFAULT_NAMESPACE.'InterAdminTipo';
-        $childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
+        $options['default_class'] = static::DEFAULT_NAMESPACE.'Type';
+        $childrenTipo = Type::getInstance($id_tipo, $options);
         $childrenTipo->setParent($this);
 
         return $childrenTipo;
@@ -434,7 +437,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     /**
      * Returns siblings records.
      *
-     * @return InterAdminOptions
+     * @return Query
      */
     public function siblings()
     {
@@ -442,17 +445,17 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
 
     /**
-     * Creates a new InterAdminArquivo with id_tipo, id and mostrar set.
+     * Creates a new FileRecord with id_tipo, id and mostrar set.
      *
      * @param array $attributes [optional]
      *
-     * @return InterAdminArquivo
+     * @return FileRecord
      */
     public function deprecated_createArquivo(array $attributes = [])
     {
-        $className = static::DEFAULT_NAMESPACE.'InterAdminArquivo';
+        $className = static::DEFAULT_NAMESPACE.'FileRecord';
         if (!class_exists($className)) {
-            $className = 'InterAdminArquivo';
+            $className = 'Jp7\\Interadmin\\FileRecord';
         }
         $arquivo = new $className();
         $arquivo->setParent($this);
@@ -466,7 +469,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      *
      * @param array $options Default array of options. Available keys: fields, where, order, limit.
      *
-     * @return array Array of InterAdminArquivo objects.
+     * @return array Array of FileRecord objects.
      *
      * @deprecated
      */
@@ -480,7 +483,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
-            $className = static::DEFAULT_NAMESPACE.'InterAdminArquivo';
+            $className = static::DEFAULT_NAMESPACE.'FileRecord';
         }
         $arquivoModel = new $className(0);
         $arquivoModel->setType($this->getType());
@@ -518,7 +521,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
 
     /**
-     * Deletes all the InterAdminArquivo records related with this record.
+     * Deletes all the FileRecord records related with this record.
      *
      * @param array $options [optional]
      *
@@ -536,7 +539,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
     public function deprecated_createLog(array $attributes = [])
     {
-        $log = InterAdminLog::create($attributes);
+        $log = Type::create($attributes);
         $log->setParent($this);
         $log->setType($this->getType());
 
@@ -558,8 +561,8 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         foreach ($tags as $tag) {
             $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'_tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
-                (($tag instanceof InterAdmin) ? $tag->id : 0).','.
-                (($tag instanceof InterAdmin) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
+                (($tag instanceof Record) ? $tag->id : 0).','.
+                (($tag instanceof Record) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
             $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
         }
     }
@@ -585,7 +588,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
+                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
                     $tag_text = $tag_tipo->getFieldsValues('nome');
                     if ($row->id) {
                         $options = [
@@ -625,8 +628,8 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $this->getFieldsValues(['date_publish', 'date_expire', 'char_key', 'publish', 'deleted']);
 
         return (
-            strtotime($this->date_publish) <= InterAdmin::getTimestamp() &&
-            (strtotime($this->date_expire) >= InterAdmin::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
+            strtotime($this->date_publish) <= Record::getTimestamp() &&
+            (strtotime($this->date_expire) >= Record::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
             $this->char_key &&
             ($this->publish || config('interadmin.preview') || $s_session['preview']) &&
             !$this->deleted
@@ -727,7 +730,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
      * applications and 'site' otherwise.
      *
-     * @see InterAdmin::$log_user
+     * @see Record::$log_user
      *
      * @return string
      */
@@ -743,7 +746,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     /**
      * Sets $log_user and returns the old value.
      *
-     * @see     InterAdmin::$log_user
+     * @see     Record::$log_user
      *
      * @param object $log_user
      *
@@ -826,7 +829,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     }
 
     /**
-     * @see InterAdminAbstract::getAdminAttributes()
+     * @see RecordAbstract::getAdminAttributes()
      */
     public function getAdminAttributes()
     {
@@ -882,7 +885,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     {
         $array = $this->attributes;
         foreach ($array as &$value) {
-            if ($value instanceof ArrayableInterface) {
+            if ($value instanceof Arrayable) {
                 $value = $value->toArray();
             }
         }

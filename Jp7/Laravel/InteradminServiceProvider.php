@@ -4,6 +4,12 @@ namespace Jp7\Laravel;
 
 use Illuminate\Support\ServiceProvider;
 use Jp7\Interadmin\DynamicLoader;
+use Jp7\Interadmin\Type;
+use Schema;
+use App;
+use PDOException;
+use Log;
+use View;
 
 /*
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -39,26 +45,26 @@ class InteradminServiceProvider extends ServiceProvider
     
     private function bootOrm()
     {
-        \InterAdminTipo::setDefaultClass(config('interadmin.namespace') . 'InterAdminTipo');
+        Type::setDefaultClass(config('interadmin.namespace').'Type');
         
         try {
-            if (\Schema::hasTable('_tipos')) {
+            if (Schema::hasTable('_tipos')) {
                 spl_autoload_register([DynamicLoader::class, 'load']);
             }
-        } catch (\PDOException $e) {
-            if (\App::runningInConsole()) {
+        } catch (PDOException $e) {
+            if (App::runningInConsole()) {
                 echo $e->getMessage() . PHP_EOL;
             }
-            \Log::error($e);
+            Log::error($e);
         }
     }
     
     private function shareViewPath()
     {
-        \View::composer('*', function ($view) {
+        View::composer('*', function ($view) {
             $parts = explode('.', $view->getName());
             array_pop($parts);
-            \View::share('viewPath', implode('.', $parts));
+            View::share('viewPath', implode('.', $parts));
         });
     }
     

@@ -1,28 +1,19 @@
 <?php
 
-/**
- * JP7's PHP Functions.
- *
- * Contains the main custom functions and classes.
- *
- * @author JP7
- * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- *
- * @category JP7
- */
+namespace Jp7\Interadmin;
 
 /**
  * Handles the url of uploaded files retrieved from the database.
  */
-class InterAdminFieldFile
+class FileField
 {
-    use \Jp7\Interadmin\Downloadable;
+    use Downloadable;
 
     protected $_parent;
     /**
-     * Cr�ditos/Legenda da imagem.
+     * Creditos/Legenda da imagem.
      *
-     * @var InterAdmin
+     * @var Record
      */
     public $text;
     /**
@@ -61,9 +52,9 @@ class InterAdminFieldFile
     /**
      * Returns $parent.
      *
-     * @see InterAdminFile::$parent
+     * @see FileField::$parent
      *
-     * @return InterAdmin
+     * @return Record
      */
     public function getParent()
     {
@@ -72,9 +63,9 @@ class InterAdminFieldFile
     /**
      * Sets $parent.
      *
-     * @param InterAdmin $parent
+     * @param Record $parent
      *
-     * @see InterAdminFile::$parent
+     * @see FileField::$parent
      */
     public function setParent($parent)
     {

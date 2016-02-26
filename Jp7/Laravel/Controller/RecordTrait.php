@@ -3,7 +3,9 @@
 namespace Jp7\Laravel\Controller;
 
 use Jp7\Laravel\RouterFacade as Router;
-use InterAdmin;
+use Jp7\Interadmin\Record;
+use ReflectionMethod;
+use Exception;
 
 trait RecordTrait
 {
@@ -41,10 +43,9 @@ trait RecordTrait
 
         if ($type = end($breadcrumb)) {
             $parent = $type->getParent();
-            if ($parent instanceof InterAdmin && !$parent->hasChildrenTipo($type->id_tipo)) {
-                throw new \Exception('It seems this route has a'
-                    .' special structure. You need to define a custom '
-                    .'setScope() to handle this.');
+            if ($parent instanceof Record && !$parent->hasChildrenTipo($type->id_tipo)) {
+                throw new Exception('It seems this route has a special structure.'.
+                    ' You need to define a custom setScope() to handle this.');
             }
             $this->scope = $type->records();
         }
@@ -67,7 +68,7 @@ trait RecordTrait
     public function setType()
     {
         if (!$this->scope) {
-            throw new \Exception('setScope() could not resolve the'
+            throw new Exception('setScope() could not resolve the'
                 .' type associated with this URI. You need to map it on routes.php.'
                 .' You can also define a custom setScope() or setType()');
         }
@@ -76,7 +77,7 @@ trait RecordTrait
 
     public function setRecord($route)
     {
-        $reflection = new \ReflectionMethod($this, $this->action);
+        $reflection = new ReflectionMethod($this, $this->action);
         if (count($reflection->getParameters()) > 0) {
             return; // tem parametros -> achar record no controller
         }

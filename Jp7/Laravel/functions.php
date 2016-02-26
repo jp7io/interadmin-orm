@@ -37,7 +37,7 @@ if (!function_exists('interadmin_data')) {
 
     function interadmin_data($record)
     {
-        if ($record instanceof InterAdmin) {
+        if ($record instanceof \Jp7\Interadmin\Record) {
             echo ' data-ia="'.$record->id.':'.$record->id_tipo.'"';
         }
     }

@@ -4,7 +4,7 @@ LARAVEL 4
 */
 namespace Jp7\Former;
 
-use InterAdmin;
+use Jp7\Interadmin\Record;
 use Request;
 use Redirect;
 use Validator;
@@ -22,7 +22,7 @@ class FormRequest
     protected $input;
     protected $model;
 
-    public function __construct(InterAdmin $model)
+    public function __construct(Record $model)
     {
         $this->model = $model;
     }
@@ -30,14 +30,14 @@ class FormRequest
     public function save()
     {
         if (!$this->validator()->fails()) {
-            $backupLogUser = InterAdmin::setLogUser('site - '.Request::header('user-agent'));
+            $backupLogUser = Record::setLogUser('site - '.Request::header('user-agent'));
             
             $saved = $this->model
                 ->fill($this->input())
                 ->save();
             
             // Revert variable
-            InterAdmin::setLogUser($backupLogUser);
+            Record::setLogUser($backupLogUser);
             
             return $saved;
         }

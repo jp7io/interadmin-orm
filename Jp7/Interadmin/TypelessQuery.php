@@ -7,7 +7,7 @@ use BadMethodCallException;
 class TypelessQuery extends Query
 {
     /**
-     * @return InterAdmin[]
+     * @return Record[]
      */
     public function all()
     {

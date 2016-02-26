@@ -2,7 +2,6 @@
 
 namespace Jp7\Interadmin;
 
-use InterAdmin;
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -139,7 +138,7 @@ class Query extends Query\Base
     }
 
     /**
-     * @return InterAdmin[]
+     * @return Record[]
      */
     public function all()
     {
@@ -156,7 +155,7 @@ class Query extends Query\Base
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
+        return $this->provider->findFirst(Record::DEPRECATED_METHOD, $this->options);
     }
 
     public function firstOrFail()
@@ -174,7 +173,7 @@ class Query extends Query\Base
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->count(InterAdmin::DEPRECATED_METHOD, $this->options);
+        return $this->provider->count(Record::DEPRECATED_METHOD, $this->options);
     }
 
     /**
@@ -253,7 +252,7 @@ class Query extends Query\Base
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
         }
 
-        return $this->provider->findFirst(InterAdmin::DEPRECATED_METHOD, $this->options);
+        return $this->provider->findFirst(Record::DEPRECATED_METHOD, $this->options);
     }
 
     public function findMany($ids)
