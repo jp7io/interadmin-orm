@@ -14,12 +14,12 @@ class DynamicLoader
             $tipo = new Type($id_tipo);
             $tipo->class = $class;
             
-            $code = Util::gerarClasseInterAdmin($tipo, false);
+            $code = self::generateRecordClass($tipo);
         } elseif ($id_tipo = $cm->getClassTipoIdTipo($class)) {
             $tipo = new Type($id_tipo);
             $tipo->class_tipo = $class;
             
-            $code = Util::gerarClasseInterAdminTipo($tipo, false);
+            $code = self::generateTypeClass($tipo);
         }
         if ($code) {
             eval('?>'.$code);
@@ -28,5 +28,35 @@ class DynamicLoader
         }
 
         return false;
+    }
+    
+    public static function generateRecordClass(Type $tipo)
+    {
+        $prefixoClasse = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $nomeClasse = $tipo->class;
+
+        $conteudo = <<<STR
+<?php
+
+class {$nomeClasse} extends {$prefixoClasse}Record {
+
+}
+STR;
+        return $conteudo;
+    }
+
+    public static function generateTypeClass(Type $tipo)
+    {
+        $prefixoClasse = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $nomeClasse = $tipo->class_tipo;
+        
+        $conteudo = <<<STR
+<?php
+
+class {$nomeClasse} extends {$prefixoClasse}Type {
+    const ID_TIPO = {$tipo->id_tipo};
+}
+STR;
+        return $conteudo;
     }
 }
