@@ -11,9 +11,7 @@
   ],
   "require": {
     "zendframework/zendframework1": "1.12.0",
-    "adodb/adodb-php": "~5.0",
     "phpoffice/phpexcel": "~1.8.1",
-    "filp/whoops": "~1.1.7",
     "werkint/jsmin": "~1.0.0",
     "jdorn/sql-formatter": "~1.2",
     "illuminate/support": "~5.1",
