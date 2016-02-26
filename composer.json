@@ -1,6 +1,6 @@
 {
   "name": "jp7internet/classes",
-  "description": "Jp7 Classes",
+  "description": "JP7 Classes",
   "keywords": [],
   "license": "proprietary",
   "repositories" : [
@@ -35,7 +35,10 @@
     },
     "psr-0": {
       "Jp7_": ""
-    }
+    },
+    "files": [
+      "Jp7/Laravel/functions.php"
+    ]
   },
   "scripts": {
     
