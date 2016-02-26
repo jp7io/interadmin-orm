@@ -1,6 +1,6 @@
 <?php
 
-use Jp7_InterAdmin_Upload as Upload;
+use Jp7_Interadmin_Upload as Upload;
 
 /**
  * JP7's PHP Functions.

@@ -1,0 +1,8 @@
+<?php
+
+namespace Jp7\Interadmin\Field;
+
+class Int extends ColumnField
+{
+    protected $name = 'int';
+}

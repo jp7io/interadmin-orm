@@ -468,7 +468,7 @@ class InterAdminField
         } elseif (strpos($key, 'file_') === 0) {
             global $c_cliente_physical_path, $c_remote;
 
-            $url = Jp7_InterAdmin_Upload::url($valor);
+            $url = Jp7_Interadmin_Upload::url($valor);
             $ext = jp7_extension($url);
             $url_size = '';
             if (!in_array($ext, ['gif', 'jpg', 'jpeg', 'png', '---'])) {
@@ -550,7 +550,7 @@ class InterAdminField
         // OUTROS CAMPOS
         } elseif (startsWith('file_', $campo['tipo_de_campo'])) {
             if ($campo['value']) {
-                $url = Jp7_InterAdmin_Upload::url($campo['value']);
+                $url = Jp7_Interadmin_Upload::url($campo['value']);
             } else {
                 $url = DEFAULT_PATH.'/img/px.png';
             }
