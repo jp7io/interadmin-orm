@@ -1026,7 +1026,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $aliases = array_flip($this->getTipo()->getCamposAlias());
         $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 
-        if (!startsWith('select_', $nomeCampo)) {
+        if (!starts_with($nomeCampo, 'select_')) {
             throw new Exception('The field '.$attribute.' is not a select. It was expected a select field on setAttributeBySearch.');
         }
 
@@ -1034,7 +1034,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $record = $campoTipo->findFirst([
             'where' => [$searchColumn." = '".$searchValue."'"],
         ]);
-        if (startsWith('select_multi_', $nomeCampo)) {
+        if (starts_with($nomeCampo, 'select_multi_')) {
             $this->$attribute = [$record];
         } else {
             $this->$attribute = $record;

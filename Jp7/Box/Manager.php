@@ -112,7 +112,7 @@ class Jp7_Box_Manager
     {
         foreach (glob($classesPath.'/'.$boxesPath.'/*.php') as $file) {
             $baseName = basename($file, '.php');
-            if (endsWith('Abstract', $baseName)) {
+            if (ends_with($baseName, 'Abstract')) {
                 continue;
             }
             $className = str_replace('/', '_', $boxesPath).'_'.$baseName;

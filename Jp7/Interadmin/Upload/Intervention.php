@@ -8,7 +8,7 @@ class Jp7_Interadmin_Upload_Intervention extends Jp7_Interadmin_Upload_AdapterAb
     {
         global $config;
 
-        $path = jp7_replace_beginning('upload', 'imagecache/'.$template, $path);
+        $path = replace_prefix('upload', 'imagecache/'.$template, $path);
 
         return $this->url($path);
     }

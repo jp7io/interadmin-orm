@@ -28,7 +28,7 @@ class Jp7_Interadmin_Form extends InterAdminField
     public function uploadFiles($record, $key = 0)
     {
         foreach ($this->campos as $campo) {
-            if ($campo['form'] && startsWith('file_', $campo['tipo'])) {
+            if ($campo['form'] && starts_with($campo['tipo'], 'file_')) {
                 $nome_id = $campo['nome_id'];
 
                 $uploader = new Jp7_Uploader($nome_id, '/.*/', '/.*/');

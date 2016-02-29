@@ -218,7 +218,7 @@ class FileCache
         global $c_path;
 
         $request_uri = reset(explode('?', $request_uri)); // Tira Query String
-        $fileName = jp7_replace_beginning('/'.$c_path, '', $request_uri);
+        $fileName = replace_prefix('/'.$c_path, '', $request_uri);
         $fileName = jp7_path($fileName, true);
 
         // Parsing ID for dynamic content

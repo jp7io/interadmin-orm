@@ -530,7 +530,7 @@ class InterAdminField
         include_once jp7_package_path('inc').'/7.form.lib.php';
 
         // Só para CHAR - checkbox
-        if (startsWith('char_', $campo['tipo_de_campo'])) {
+        if (starts_with($campo['tipo_de_campo'], 'char_')) {
             if (!$record->id && $campo['xtra']) {
                 $campo['value'] = 'S';
             }
@@ -548,7 +548,7 @@ class InterAdminField
 			</tr>
 			<?php
         // OUTROS CAMPOS
-        } elseif (startsWith('file_', $campo['tipo_de_campo'])) {
+        } elseif (starts_with($campo['tipo_de_campo'], 'file_')) {
             if ($campo['value']) {
                 $url = Jp7_Interadmin_Upload::url($campo['value']);
             } else {
@@ -594,15 +594,15 @@ class InterAdminField
     {
         // Validação do campo obrigatório
         if ($campo['obrigatorio']) {
-            if (!startsWith('char_', $campo['tipo'])) {
+            if (!starts_with($campo['tipo'], 'char_')) {
                 if (!$record->{$campo['nome_id']}) {
-                    $label = startsWith('select_', $campo['tipo']) ? $campo['label'] : $campo['nome'];
+                    $label = starts_with($campo['tipo'], 'select_') ? $campo['label'] : $campo['nome'];
                     throw new Exception('Favor preencher campo '.$label.'.');
                 }
             }
         }
         // Validação e-mail
-        if (startsWith('varchar_', $campo['tipo']) && $campo['xtra'] == 'email') {
+        if (starts_with($campo['tipo'], 'varchar_') && $campo['xtra'] == 'email') {
             if (!filter_var($record->{$campo['nome_id']}, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception('Valor inválido do campo '.$campo['nome'].'.');
             }

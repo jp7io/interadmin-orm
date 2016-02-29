@@ -178,7 +178,7 @@ class Jp7_Interadmin_Search
             foreach ($words as $word) {
                 $plural = [];
                 $plural[] = $word;
-                if (!endsWith('*', $word)) {
+                if (!ends_with($word, '*')) {
                     $plural[] = Jp7_Inflector::plural($word);
                 }
                 $plural = array_unique($plural);

@@ -169,8 +169,8 @@ class InterAdminArquivo extends InterAdminAbstract
         $filepath = toId($parent->getTipo()->getFieldsValues('nome')).'/'.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
 
         // Movendo arquivo temporário
-        if (startsWith('../../upload', $this->url)) {
-            $oldpath = jp7_replace_beginning('../../', '', $this->url);
+        if (starts_with($this->url, '../../upload')) {
+            $oldpath = replace_prefix('../../', '', $this->url);
             Storage::move($oldpath, $uploadPath.$filepath);
         } else {
             Storage::put($uploadPath.$filepath, file_get_contents($this->url), 'public');
