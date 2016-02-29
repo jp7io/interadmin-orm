@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Field;
 
-class Special extends Func
+class SpecialField extends FuncField
 {
     protected $name = 'special';
 }

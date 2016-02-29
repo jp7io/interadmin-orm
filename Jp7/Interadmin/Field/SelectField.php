@@ -5,7 +5,7 @@ namespace Jp7\Interadmin\Field;
 use InterAdminTipo;
 use ADOFetchObj;
 
-class Select extends ColumnField
+class SelectField extends ColumnField
 {
     const XTRA_BY_TYPE = 'S';
     protected $name = 'select';

@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 use Jp7_Date;
 
-class Date extends ColumnField
+class DateField extends ColumnField
 {
     const XTRA_NORMAL = '0';
     const XTRA_NO_TIME = 'S';

@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 use ADOFetchObj;
 
-class SelectMulti extends Select
+class SelectMultiField extends SelectField
 {
     protected $name = 'select_multi';
     /*

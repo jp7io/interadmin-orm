@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 use ADOFetchObj;
 
-class Password extends ColumnField
+class PasswordField extends ColumnField
 {
     protected $name = 'password';
     

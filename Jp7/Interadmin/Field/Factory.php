@@ -35,7 +35,7 @@ class Factory
     public function makeField(array $campo)
     {
         $prefix = $this->getPrefix($campo['tipo']);
-        $className = $this->namespace.studly_case($prefix);
+        $className = $this->namespace.studly_case($prefix).'Field';
         return new $className($campo);
     }
     

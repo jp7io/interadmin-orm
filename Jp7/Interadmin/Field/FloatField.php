@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Field;
 
-class Float extends ColumnField
+class FloatField extends ColumnField
 {
     protected $name = 'float';
 }

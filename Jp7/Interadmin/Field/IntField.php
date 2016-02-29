@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Field;
 
-class Int extends ColumnField
+class IntField extends ColumnField
 {
     protected $name = 'int';
 }
