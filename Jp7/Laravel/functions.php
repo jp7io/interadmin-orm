@@ -120,16 +120,16 @@ if (!function_exists('interadmin_data')) {
             return $subject;
         }
     }
-
-    // INTERADMIN COMPATIBILITY FUNCTIONS
-    function jp7_debug($msg)
-    {
-        throw new Exception($msg);
-    }
-
     // Laravel 5 functions
     function jp7_collect($arr = null)
     {
         return new \Jp7\Interadmin\Collection($arr);
+    }
+}
+// INTERADMIN COMPATIBILITY FUNCTIONS
+if (!function_exists('jp7_debug')) {
+    function jp7_debug($msg)
+    {
+        throw new Exception($msg);
     }
 }
