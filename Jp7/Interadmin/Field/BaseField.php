@@ -4,15 +4,15 @@ namespace Jp7\Interadmin\Field;
 
 use HtmlObject\Element;
 use Former;
-use ADOFetchObj;
 
 abstract class BaseField implements FieldInterface
 {
     protected $name;
     protected $record;
     
-    public function setRecord(ADOFetchObj $record)
+    public function setRecord($record)
     {
+        assert(is_object($record) || is_null($record));
         $this->record = $record;
     }
     

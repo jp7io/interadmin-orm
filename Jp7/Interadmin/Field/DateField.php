@@ -3,7 +3,6 @@
 namespace Jp7\Interadmin\Field;
 
 use Jp7_Date;
-use ADOFetchObj;
 
 class DateField extends ColumnField
 {

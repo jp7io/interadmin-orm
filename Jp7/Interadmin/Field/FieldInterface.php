@@ -2,7 +2,6 @@
 
 namespace Jp7\Interadmin\Field;
 
-use ADOFetchObj;
 use HtmlObject\Element;
 
 ///////// Hierarchy ////////////////
@@ -15,7 +14,7 @@ use HtmlObject\Element;
 interface FieldInterface
 {
     
-    public function setRecord(ADOFetchObj $record);
+    public function setRecord($record);
     
     /**
      * Returns object for <th> tag

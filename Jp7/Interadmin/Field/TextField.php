@@ -2,8 +2,6 @@
 
 namespace Jp7\Interadmin\Field;
 
-use ADOFetchObj;
-
 class TextField extends ColumnField
 {
     protected $name = 'text';
