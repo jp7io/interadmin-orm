@@ -644,7 +644,7 @@ class Jp7_Deprecated
      * @param string $table_id_name  Name of the key field.
      * @param mixed  $table_id_value Value expected for the key field.
      * @param string $var_prefix     Prefix used when creating the global variables from the result, on the format: prefix + field name, the default value is "".
-     *
+     * @param bool   $returnValues   Will return instead of inserting into GLOBAL scope
      * @global ADOConnection
      * @global bool
      *
@@ -652,30 +652,40 @@ class Jp7_Deprecated
      *
      * @version (2006/08/23)
      */
-    public static function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '')
+    public static function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '', $returnValues = false)
     {
         global $db, $jp7_app;
         $sql = 'SELECT * FROM '.$table.' WHERE '.$table_id_name.'='.$table_id_value;
         $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        
+        if ($returnValues) {
+            $array = [];
+        } else {
+            $array = &$GLOBALS;
+        }
+        
         while ($row = $rs->FetchNextObj()) {
             $meta_cols = $db->MetaColumns($table, false);
             foreach ($meta_cols as $meta) {
                 $name = $meta->name;
                 // Dates
                 if (strpos($meta->type, 'date') !== false) {
-                    $GLOBALS[$var_prefix.$name] = $row->$name;
-                    $GLOBALS[$var_prefix.$name.'_split'] = jp7_date_split($row->$name);
-                    $GLOBALS[$var_prefix.$name.'_time'] = strtotime($row->$name);
+                    $array[$var_prefix.$name] = $row->$name;
+                    $array[$var_prefix.$name.'_split'] = jp7_date_split($row->$name);
+                    $array[$var_prefix.$name.'_time'] = strtotime($row->$name);
                 } else {
                     if ($jp7_app) {
-                        $GLOBALS[$var_prefix.$name] = $row->$name;
+                        $array[$var_prefix.$name] = $row->$name;
                     } else {
-                        $GLOBALS[$var_prefix.$name] = $row->$name;
+                        $array[$var_prefix.$name] = $row->$name;
                     }
                 }
             }
         }
         $rs->Close();
+        if ($returnValues) {
+            return $array;
+        }
     }
 
     /**
