@@ -3,7 +3,6 @@
 namespace Jp7\Interadmin\Field;
 
 use InterAdminTipo;
-use ADOFetchObj;
 
 class SelectField extends ColumnField
 {
@@ -22,13 +21,14 @@ class SelectField extends ColumnField
         throw new Exception('Not implemented');
     }
     
-    public function getCellHtml(ADOFetchObj $record) {
-        return $this->formatText(parent::getCellText($record), true);
+    public function getCellHtml()
+    {
+        return $this->formatText(parent::getText(), true);
     }
 
-    public function getCellText(ADOFetchObj $record)
+    public function getText()
     {
-        return $this->formatText(parent::getCellText($record), false);
+        return $this->formatText(parent::getText(), false);
     }
     
     protected function formatText($id, $html)

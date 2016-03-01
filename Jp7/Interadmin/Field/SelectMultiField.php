@@ -13,18 +13,19 @@ class SelectMultiField extends SelectField
      * "X" Com Busca
      */
     
-    public function getCellHtml(ADOFetchObj $record) {
-        return implode(',<br>', $this->getTextArray($record, true));
+    public function getCellHtml()
+    {
+        return implode(',<br>', $this->getTextArray(true));
     }
     
-    public function getCellText(ADOFetchObj $record)
+    public function getText()
     {
-        return implode(",\n", $this->getTextArray($record, false));
+        return implode(",\n", $this->getTextArray(false));
     }
     
-    protected function getTextArray(ADOFetchObj $record, $html)
+    protected function getTextArray($html)
     {
-        $ids = jp7_explode(',', ColumnField::getCellText($record));
+        $ids = jp7_explode(',', ColumnField::getText());
         $array = [];
         foreach ($ids as $id) {
             $array[] = $this->formatText($id, $html);

@@ -19,10 +19,6 @@ class FormerServiceProvider extends OriginalServiceProvider
         // Extend former
         $former = $app->make('former');
         
-        // Set default options
-        $former->framework('TwitterBootstrap3');
-        $former->setOption('default_form_type', 'vertical');
-        
         $app->singleton('former', function ($app) use ($former) {
             return new FormerExtension($former);
         });

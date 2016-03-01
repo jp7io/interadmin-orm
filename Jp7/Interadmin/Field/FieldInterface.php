@@ -14,6 +14,9 @@ use HtmlObject\Element;
 //
 interface FieldInterface
 {
+    
+    public function setRecord(ADOFetchObj $record);
+    
     /**
      * Returns object for <th> tag
      *
@@ -26,7 +29,7 @@ interface FieldInterface
      *
      * @return Element
      */
-    public function getCellTag(ADOFetchObj $record);
+    public function getCellTag();
 
     /**
      * Return inner HTML for <th> tag
@@ -38,22 +41,28 @@ interface FieldInterface
     /**
      * Return inner HTML for <td> tag
      *
-     * @param ADOFetchObj $record
      * @return Element|string
      */
-    public function getCellHtml(ADOFetchObj $record);
+    public function getCellHtml();
 
     /**
      * Return inner text for header
      *
      * @return string
      */
-    public function getHeaderText();
+    public function getLabel();
 
     /**
      * Return inner text for cell
      *
      * @return string
      */
-    public function getCellText(ADOFetchObj $record);
+    public function getText();
+    
+    /**
+     * Return object for <div class="form-group">...</div>
+     *
+     * @return Element
+     */
+    public function getEditTag();
 }

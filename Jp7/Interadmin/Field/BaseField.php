@@ -3,29 +3,49 @@
 namespace Jp7\Interadmin\Field;
 
 use HtmlObject\Element;
+use Former;
 use ADOFetchObj;
 
 abstract class BaseField implements FieldInterface
 {
     protected $name;
+    protected $record;
     
-    public function getHeaderTag() {
+    public function setRecord(ADOFetchObj $record)
+    {
+        $this->record = $record;
+    }
+    
+    public function getHeaderTag()
+    {
         return Element::th($this->getHeaderHtml())
             ->class($this->name);
     }
 
-    public function getCellTag(ADOFetchObj $record) {
-        return Element::td($this->getCellHtml($record))
+    public function getCellTag()
+    {
+        return Element::td($this->getCellHtml())
             ->class($this->name);
     }
     
     public function getHeaderHtml()
     {
-        return e($this->getHeaderText());
+        return e($this->getLabel());
     }
 
-    public function getCellHtml(ADOFetchObj $record)
+    public function getCellHtml()
     {
-        return nl2br(e($this->getCellText($record)));
+        return nl2br(e($this->getText()));
+    }
+    
+    public function getEditTag()
+    {
+        return $this->getFormerField()
+            ->label($this->getLabel());
+    }
+    
+    protected function getFormerField()
+    {
+        return Former::text($this->name);
     }
 }

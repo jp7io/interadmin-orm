@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Field;
 
-use ADOFetchObj;
+use Former;
 
 class ColumnField extends BaseField
 {
@@ -16,18 +16,34 @@ class ColumnField extends BaseField
         $this->campo = $campo;
     }
 
-    public function getHeaderTag() {
+    public function getHeaderTag()
+    {
         return parent::getHeaderTag()->title($this->campo['tipo']);
     }
     
-    public function getHeaderText()
+    public function getLabel()
     {
         return $this->campo['nome'];
     }
 
-    public function getCellText(ADOFetchObj $record)
+    public function getText()
     {
         $column = $this->campo['tipo'];
-        return $record->$column;
+        return $this->record->$column;
+    }
+    
+    public function getEditTag()
+    {
+        $input = parent::getEditTag();
+        $input->getLabel()->setAttribute('title', $this->campo['tipo']);
+        return $input;
+    }
+    
+    protected function getFormerField()
+    {
+        $column = $this->campo['tipo'];
+        
+        return Former::text($column.'[]')
+            ->value($this->getText());
     }
 }

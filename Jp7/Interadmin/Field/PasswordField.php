@@ -8,8 +8,8 @@ class PasswordField extends ColumnField
 {
     protected $name = 'password';
     
-    public function getCellText(ADOFetchObj $value)
+    public function getText()
     {
-        return parent::getCellText($value) ? '******' : '';
+        return parent::getText() ? '******' : '';
     }
 }

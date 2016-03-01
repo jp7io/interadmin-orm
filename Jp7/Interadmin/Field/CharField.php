@@ -2,14 +2,26 @@
 
 namespace Jp7\Interadmin\Field;
 
-use ADOFetchObj;
+use Former;
 
 class CharField extends ColumnField
 {
     protected $name = 'char';
     
-    public function getCellHtml(ADOFetchObj $value)
+    public function getCellHtml()
     {
-        return $this->getCellText($value) ? '&bull;' : '';
+        return $this->getText() ? '&bull;' : '';
+    }
+    
+    protected function getFormerField()
+    {
+        $column = $this->campo['tipo'];
+        $input = Former::checkbox($column.'[]')
+            ->text('&nbsp;'); // Bootstrap CSS - padding
+        
+        if ($this->getText()) {
+            $input->check();
+        }
+        return $input;
     }
 }

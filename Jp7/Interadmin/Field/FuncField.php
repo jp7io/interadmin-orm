@@ -13,9 +13,9 @@ class FuncField extends ColumnField
         return $this->getFuncHtml('', 'header');
     }
     
-    public function getCellHtml(ADOFetchObj $record)
+    public function getCellHtml()
     {
-        return $this->getFuncHtml($this->getCellText($record), 'list');
+        return $this->getFuncHtml($this->getText(), 'list');
     }
     
     protected function getFuncHtml($value, $parte)
