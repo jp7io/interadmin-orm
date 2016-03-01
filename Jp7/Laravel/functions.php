@@ -126,10 +126,3 @@ if (!function_exists('interadmin_data')) {
         return new \Jp7\Interadmin\Collection($arr);
     }
 }
-// INTERADMIN COMPATIBILITY FUNCTIONS
-if (!function_exists('jp7_debug')) {
-    function jp7_debug($msg)
-    {
-        throw new Exception($msg);
-    }
-}

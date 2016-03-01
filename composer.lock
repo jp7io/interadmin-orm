@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b449ce4c978b44d74bf3977aaf20df95",
-    "content-hash": "a09bc0170383b202b1a09930c0973e4e",
+    "hash": "1366a065f5d118a2f4fe4129d560f711",
+    "content-hash": "b4877483f0a6330815c3beea95796c99",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -412,7 +412,7 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
@@ -461,16 +461,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v2.7.9",
+            "version": "v2.7.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "ad39199e91f2f845a0181b14d459fda13a622138"
+                "reference": "e4fdc92abb3dae0d840f4276af701d58ddc9b733"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/ad39199e91f2f845a0181b14d459fda13a622138",
-                "reference": "ad39199e91f2f845a0181b14d459fda13a622138",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/e4fdc92abb3dae0d840f4276af701d58ddc9b733",
+                "reference": "e4fdc92abb3dae0d840f4276af701d58ddc9b733",
                 "shasum": ""
             },
             "require": {
@@ -516,7 +516,7 @@
                 "debug",
                 "dump"
             ],
-            "time": "2016-01-07 11:12:32"
+            "time": "2016-02-12 17:39:33"
         },
         {
             "name": "true/punycode",
@@ -735,16 +735,16 @@
         },
         {
             "name": "jp7internet/inc",
-            "version": "dev-master",
+            "version": "dev-reunion",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/inc.git",
-                "reference": "1aef4306f7caeea107ee2bc09e602df1df4ca945"
+                "reference": "4d5d4978a6fa8d1e73f98a6d60f3b89173b0d3ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/1aef4306f7caeea107ee2bc09e602df1df4ca945",
-                "reference": "1aef4306f7caeea107ee2bc09e602df1df4ca945",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/4d5d4978a6fa8d1e73f98a6d60f3b89173b0d3ee",
+                "reference": "4d5d4978a6fa8d1e73f98a6d60f3b89173b0d3ee",
                 "shasum": ""
             },
             "require": {
@@ -757,10 +757,10 @@
             ],
             "description": "Jp7 Includes",
             "support": {
-                "source": "https://github.com/jp7internet/inc/tree/master",
+                "source": "https://github.com/jp7internet/inc/tree/reunion",
                 "issues": "https://github.com/jp7internet/inc/issues"
             },
-            "time": "2016-02-23 15:42:31"
+            "time": "2016-02-29 21:13:52"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -1614,16 +1614,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "3cf0709d7fe936e97bee9e954382e449003f1d9a"
+                "reference": "b5ba64cd67ecd6887f63868fa781ca094bd1377c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/3cf0709d7fe936e97bee9e954382e449003f1d9a",
-                "reference": "3cf0709d7fe936e97bee9e954382e449003f1d9a",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/b5ba64cd67ecd6887f63868fa781ca094bd1377c",
+                "reference": "b5ba64cd67ecd6887f63868fa781ca094bd1377c",
                 "shasum": ""
             },
             "require": {
@@ -1659,7 +1659,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-02 13:44:19"
+            "time": "2016-02-23 15:16:06"
         }
     ],
     "aliases": [],
