@@ -556,14 +556,18 @@ class Record extends RecordAbstract implements Arrayable
         kd('not implemented');
         $db = $this->getDb();
         $sql = 'DELETE FROM '.$this->getDb()->getTablePrefix().'_tags WHERE parent_id = '.$this->id;
-        $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        if (!$db->Execute($sql)) {
+            throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
+        }
 
         foreach ($tags as $tag) {
             $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'_tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
                 (($tag instanceof Record) ? $tag->id : 0).','.
                 (($tag instanceof Record) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
-            $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            if (!$db->Execute($sql)) {
+                throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
+            }
         }
     }
     /**
@@ -584,7 +588,9 @@ class Record extends RecordAbstract implements Arrayable
                 'WHERE '.implode(' AND ', $options['where']).
                 (($options['group']) ? ' GROUP BY '.$options['group'] : '').
                 (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            if (!$rs = $db->Execute($sql)) {
+                throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
+            }
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {

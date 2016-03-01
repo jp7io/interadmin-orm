@@ -649,7 +649,7 @@ abstract class RecordAbstract implements Serializable
                                 $options['auto_group_flag'] = true;
                             }
                         } else {
-                            die(jp7_debug('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').'));
+                            throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
                         }
                         $joinAliases = array_flip($joinTipo->getCamposAlias());
                     }
@@ -792,7 +792,7 @@ abstract class RecordAbstract implements Serializable
     {
         $joinTipo = $this->getCampoTipo($campo);
         if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
-            die(jp7_debug('The field "'.$alias.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').'));
+            throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
 
