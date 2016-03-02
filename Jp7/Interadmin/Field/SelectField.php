@@ -9,7 +9,7 @@ class SelectField extends ColumnField
     const XTRA_BY_TYPE = 'S';
     protected $name = 'select';
     
-    public function getHeaderText()
+    public function getLabel()
     {
         if ($this->campo['label']) {
             return $this->campo['label'];

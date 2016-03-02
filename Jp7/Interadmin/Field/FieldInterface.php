@@ -64,4 +64,9 @@ interface FieldInterface
      * @return Element
      */
     public function getEditTag();
+    
+    /**
+     * @return array
+     */
+    public function getRules();
 }

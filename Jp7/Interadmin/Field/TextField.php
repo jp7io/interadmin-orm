@@ -2,6 +2,8 @@
 
 namespace Jp7\Interadmin\Field;
 
+use Former;
+
 class TextField extends ColumnField
 {
     protected $name = 'text';
@@ -16,5 +18,12 @@ class TextField extends ColumnField
             $text = strip_tags($text);
         }
         return $text;
+    }
+    
+    protected function getFormerField()
+    {
+        return Former::textarea($this->getFormerName())
+            ->value($this->getText())
+            ->data_html($this->campo['xtra'] ?: false);
     }
 }

@@ -7,6 +7,7 @@ use Former;
 class ColumnField extends BaseField
 {
     protected $campo;
+    protected $i = 0;
     
     /**
      * @param array $campo
@@ -14,6 +15,11 @@ class ColumnField extends BaseField
     public function __construct(array $campo)
     {
         $this->campo = $campo;
+    }
+    
+    public function setIndex($i)
+    {
+        $this->i = $i;
     }
 
     public function getHeaderTag()
@@ -35,15 +41,32 @@ class ColumnField extends BaseField
     public function getEditTag()
     {
         $input = parent::getEditTag();
+        if ($this->campo['ajuda']) {
+            $input->help($this->campo['ajuda']);
+        }
         $input->getLabel()->setAttribute('title', $this->campo['tipo']);
+        $input->onGroupAddClass($this->name);
         return $input;
     }
     
     protected function getFormerField()
     {
-        $column = $this->campo['tipo'];
-        
-        return Former::text($column.'[]')
+        return Former::text($this->getFormerName())
             ->value($this->getText());
+    }
+    
+    protected function getFormerName()
+    {
+        $column = $this->campo['tipo'];
+        return $column.'['.$this->i.']';
+    }
+    
+    public function getRules()
+    {
+        $rules = [];
+        if ($this->campo['obrigatorio']) {
+            $rules[$this->getFormerName()][] = 'required';
+        }
+        return $rules;
     }
 }

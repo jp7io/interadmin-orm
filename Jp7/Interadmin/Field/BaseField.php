@@ -48,4 +48,9 @@ abstract class BaseField implements FieldInterface
     {
         return Former::text($this->name);
     }
+    
+    public function getRules()
+    {
+        return [];
+    }
 }

@@ -15,8 +15,7 @@ class CharField extends ColumnField
     
     protected function getFormerField()
     {
-        $column = $this->campo['tipo'];
-        $input = Former::checkbox($column.'[]')
+        $input = Former::checkbox($this->getFormerName())
             ->text('&nbsp;'); // Bootstrap CSS - padding
         
         if ($this->getText()) {
