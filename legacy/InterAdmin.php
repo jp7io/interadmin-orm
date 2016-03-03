@@ -723,7 +723,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         return (
             $this->char_key &&
             !$this->deleted &&
-            ((!$this->parent_id || $this->publish) || $s_session['preview'] || !$config->interadmin_preview) &&
+            ($this->parent_id || $this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
             strtotime($this->date_publish) <= self::getTimestamp() &&
             (strtotime($this->date_expire) >= self::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00')
         );
