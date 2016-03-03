@@ -88,8 +88,7 @@ class ColumnField extends BaseField
 
     public function getText()
     {
-        $column = $this->tipo;
-        return $this->record->$column;
+        return $this->getValue();
     }
     
     public function getEditTag()
@@ -109,12 +108,27 @@ class ColumnField extends BaseField
     protected function getFormerField()
     {
         return Former::text($this->getFormerName())
-            ->value($this->getText());
+            ->value($this->getValue());
     }
     
     protected function getFormerName()
     {
         return $this->tipo.'['.$this->i.']';
+    }
+    
+    protected function getValue()
+    {
+        $column = $this->tipo;
+        $value = $this->record->$column;
+        if (!$this->record->id && !$value && $this->default) {
+            $value = $this->getDefaultValue();
+        }
+        return $value;
+    }
+    
+    protected function getDefaultValue()
+    {
+        return $this->default;
     }
     
     public function getRules()

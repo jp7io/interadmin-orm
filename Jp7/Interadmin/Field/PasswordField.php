@@ -8,6 +8,6 @@ class PasswordField extends ColumnField
     
     public function getText()
     {
-        return parent::getText() ? '******' : '';
+        return $this->getValue() ? '******' : '';
     }
 }

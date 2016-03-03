@@ -20,9 +20,11 @@ class SelectField extends ColumnField
     {
         if ($this->label) {
             return $this->label;
-        } elseif ($this->nome instanceof InterAdminTipo) {
+        }
+        if ($this->nome instanceof InterAdminTipo) {
             return $this->nome->getFieldsValues('nome');
-        } elseif ($this->nome === 'all') {
+        }
+        if ($this->nome === 'all') {
             return 'Tipos';
         }
         throw new Exception('Not implemented');
@@ -30,12 +32,12 @@ class SelectField extends ColumnField
     
     public function getCellHtml()
     {
-        return $this->formatText(parent::getText(), true);
+        return $this->formatText($this->getValue(), true);
     }
 
     public function getText()
     {
-        return $this->formatText(parent::getText(), false);
+        return $this->formatText($this->getValue(), false);
     }
     
     protected function formatText($id, $html)
@@ -67,30 +69,89 @@ class SelectField extends ColumnField
         return in_array($this->xtra, [self::XTRA_TYPE, self::XTRA_TYPE_AJAX, self::XTRA_TYPE_RADIO]);
     }
     
-    protected function getFormerField()
+    protected function isRadio()
     {
-        return Former::select($this->getFormerName())
-            ->options($this->getOptions())
-            ->value(parent::getText());
+        return in_array($this->xtra, [self::XTRA_RECORD_RADIO, self::XTRA_TYPE_RADIO]);
     }
     
+    protected function getFormerField()
+    {
+        if ($this->isRadio()) {
+            return Former::radios($this->getFormerName())
+                ->radios($this->getRadios())
+                ->check($this->getValue());
+        }
+        return Former::select($this->getFormerName())
+            ->options($this->getOptions())
+            ->value($this->getValue());
+    }
+    
+    protected function getDefaultValue()
+    {
+        if ($this->default && !is_numeric($this->default) && $this->nome instanceof InterAdminTipo) {
+            $defaultArr = [];
+            foreach (jp7_explode(',', $this->default) as $idString) {
+                $selectedObj = $this->nome->findByIdString($idString);
+                if ($selectedObj) {
+                    $defaultArr[] = $selectedObj->id;
+                }
+            }
+            if ($defaultArr) {
+                $this->default = implode(',', $defaultArr);
+            }
+        }
+        return $this->default;
+    }
+
     protected function getOptions()
     {
-        if ($this->relatesToTipo()) {
-            if ($this->nome instanceof InterAdminTipo) {
-                //
-            } elseif ($this->nome === 'all') {
-                //
-            }
+        if (!$this->relatesToTipo()) {
+            return $this->getRecordOptions();
+        }
+        if ($this->nome instanceof InterAdminTipo) {
+            return $this->getChildrenTipoOptions();
+        }
+        if ($this->nome === 'all') {
+            // interadmin_tipos_combo();
             return [];
         }
-        
-        $keyColumn = array_key_exists('varchar_key', $this->nome->getCampos()) ? 'varchar_key' : 'id';
+        throw new Exception('Not implemented');
+    }
+    
+    protected function getRadios()
+    {
+        $radios = [];
+        if (!$this->obrigatorio) {
+            $radios['(nenhum)'] = ['value' => '', 'checked' => true];
+        }
+        foreach ($this->getOptions() as $key => $value) {
+            $radios[$value] = ['value' => $key];
+        }
+        return $radios;
+    }
+    
+    protected function getChildrenTipoOptions()
+    {
+        $children = $this->nome->getChildren([
+            'where' => "deleted_tipo = ''"
+        ]);
+        $options = [];
+        foreach ($children as $child) {
+            $options[$child->id_tipo] = $child->getNome();
+        }
+        return $options;
+    }
+    
+    protected function getRecordOptions()
+    {
+        $campos = $this->nome->getCampos();
+        $valueColumn = array_key_exists('varchar_key', $campos) ? 'varchar_key' : 'id';
         $records = $this->nome->find([
-            'fields' => $keyColumn,
+            'fields' => $valueColumn,
             'fields_alias' => false,
             'class' => 'InterAdmin',
-            'order' => $keyColumn
+            'where' => ["deleted = ''"],
+            'order' => $valueColumn
         ]);
         $options = [];
         foreach ($records as $record) {

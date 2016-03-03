@@ -18,7 +18,8 @@ class CharField extends ColumnField
         $input = Former::checkbox($this->getFormerName())
             ->text('&nbsp;'); // Bootstrap CSS - padding
         
-        if ($this->getText()) {
+        // TODO marcado xtra
+        if ($this->getValue()) {
             $input->check();
         }
         return $input;

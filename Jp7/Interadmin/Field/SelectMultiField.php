@@ -22,7 +22,7 @@ class SelectMultiField extends SelectField
     
     protected function getTextArray($html)
     {
-        $ids = jp7_explode(',', ColumnField::getText());
+        $ids = jp7_explode(',', $this->getValue());
         $array = [];
         foreach ($ids as $id) {
             $array[] = $this->formatText($id, $html);

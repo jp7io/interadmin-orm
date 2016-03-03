@@ -13,7 +13,7 @@ class TextField extends ColumnField
     
     public function getText()
     {
-        $text = parent::getText();
+        $text = $this->getValue();
         if (in_array($this->campo['xtra'], [self::XTRA_HTML, self::XTRA_HTML_LIGHT])) {
             $text = strip_tags($text);
         }
@@ -23,7 +23,7 @@ class TextField extends ColumnField
     protected function getFormerField()
     {
         return Former::textarea($this->getFormerName())
-            ->value($this->getText())
+            ->value($this->getValue())
             ->data_html($this->campo['xtra'] ?: false);
     }
 }

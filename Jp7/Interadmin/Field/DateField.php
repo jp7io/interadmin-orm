@@ -12,7 +12,7 @@ class DateField extends ColumnField
     
     public function getText()
     {
-        $date = new Jp7_Date(parent::getText());
+        $date = new Jp7_Date($this->getValue());
         $withTime = (ends_with($this->campo['xtra'], '_datetime') || $this->campo['xtra'] === self::XTRA_NORMAL);
         return $date->format('d/m/Y'.($withTime ? ' - H:i' : ''));
     }
