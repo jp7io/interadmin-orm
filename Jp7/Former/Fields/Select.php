@@ -10,14 +10,14 @@ class Select extends \Former\Form\Fields\Select
             throw new \Exception('Use ->lists(attr_name,id)');
         }
         
-        $this->children = [];
+        $this->children = []; // clear previous options
         return parent::options($list, $selected, $valuesAsKeys);
     }
     
     public function render()
     {
         // Use "Selecione" as default placeholder
-        if (is_null($this->getPlaceholder())) {
+        if ($this->getPlaceholder() === null || $this->getPlaceholder() === false) {
             $this->placeholder('Selecione');
         }
         // Remove "disabled" from placeholder <option>
