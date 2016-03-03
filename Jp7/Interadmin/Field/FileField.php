@@ -2,12 +2,11 @@
 
 namespace Jp7\Interadmin\Field;
 
-use Former;
-Use HtmlObject\Element;
+use HtmlObject\Input;
 
 class FileField extends ColumnField
 {
-    protected $name = 'file';
+    protected $id = 'file';
     protected $editCredits = true;
 
     public function getCellHtml()
@@ -28,7 +27,7 @@ class FileField extends ColumnField
     protected function getFormerField()
     {
         $input = parent::getFormerField();
-        $input->append('<input type="button" value="Procurar..." />');
+        $input->append($this->getSearchButton());
         // TODO td.image_preview .image_preview_background
         $input->append($this->getCellHtml()); // thumbnail
         if ($this->editCredits) {
@@ -37,11 +36,14 @@ class FileField extends ColumnField
         return $input;
     }
     
+    protected function getSearchButton()
+    {
+        return Input::button(null, 'Procurar...');
+    }
+    
     protected function getCreditsHtml()
     {
-        $creditsField = new VarcharField([
-            'tipo' => $this->campo['tipo'].'_text'
-        ]);
+        $creditsField = new VarcharField(['tipo' => $this->tipo.'_text']);
         $creditsField->setRecord($this->record);
         $creditsField->setIndex($this->i);
         return '<div class="input-group"><span class="input-group-addon">Legenda:</span>'.

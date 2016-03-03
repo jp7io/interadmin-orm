@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 class VarcharField extends ColumnField
 {
-    protected $name = 'varchar';
+    protected $id = 'varchar';
     
     public function __construct(array $campo)
     {

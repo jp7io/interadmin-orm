@@ -6,7 +6,7 @@ use Former;
 
 class CharField extends ColumnField
 {
-    protected $name = 'char';
+    protected $id = 'char';
     
     public function getCellHtml()
     {

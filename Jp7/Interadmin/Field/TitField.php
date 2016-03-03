@@ -4,5 +4,5 @@ namespace Jp7\Interadmin\Field;
 
 class TitField extends ColumnField
 {
-    protected $name = 'tit';
+    protected $id = 'tit';
 }

@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 class PasswordField extends ColumnField
 {
-    protected $name = 'password';
+    protected $id = 'password';
     
     public function getText()
     {

@@ -61,7 +61,7 @@ interface FieldInterface
     /**
      * Return object for <div class="form-group">...</div>
      *
-     * @return Element
+     * @return Element|string
      */
     public function getEditTag();
     

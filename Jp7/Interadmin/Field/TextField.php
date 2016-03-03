@@ -6,7 +6,7 @@ use Former;
 
 class TextField extends ColumnField
 {
-    protected $name = 'text';
+    protected $id = 'text';
     const XTRA_TEXT = '0';
     const XTRA_HTML = 'S';
     const XTRA_HTML_LIGHT = 'html_light';
@@ -14,7 +14,7 @@ class TextField extends ColumnField
     public function getText()
     {
         $text = parent::getText();
-        if ($this->campo['xtra'] === self::XTRA_HTML || $this->campo['xtra'] === self::XTRA_HTML_LIGHT) {
+        if (in_array($this->campo['xtra'], [self::XTRA_HTML, self::XTRA_HTML_LIGHT])) {
             $text = strip_tags($text);
         }
         return $text;

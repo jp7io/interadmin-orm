@@ -8,7 +8,7 @@ class DateField extends ColumnField
 {
     const XTRA_NORMAL = '0';
     const XTRA_NO_TIME = 'S';
-    protected $name = 'date';
+    protected $id = 'date';
     
     public function getText()
     {

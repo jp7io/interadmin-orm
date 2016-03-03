@@ -4,12 +4,11 @@ namespace Jp7\Interadmin\Field;
 
 class SelectMultiField extends SelectField
 {
-    protected $name = 'select_multi';
-    /*
-     * "0" Por Registros
-     * "S" Por Tipos
-     * "X" Com Busca
-     */
+    protected $id = 'select_multi';
+    
+    const XTRA_RECORD = '0'; // checkboxes
+    const XTRA_TYPE = 'S';   // checkboxes
+    const XTRA_RECORD_SEARCH = 'X';
     
     public function getCellHtml()
     {

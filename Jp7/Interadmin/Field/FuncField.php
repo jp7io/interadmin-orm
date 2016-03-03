@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 class FuncField extends ColumnField
 {
-    protected $name = 'func';
+    protected $id = 'func';
     
     public function getHeaderHtml()
     {

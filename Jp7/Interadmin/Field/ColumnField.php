@@ -4,9 +4,33 @@ namespace Jp7\Interadmin\Field;
 
 use Former;
 
+/**
+ * @property string $tipo
+ * @property InterAdminTipo|string $nome
+ * @property string $ajuda
+ * @property string|int $tamanho
+ * @property string|bool $obrigatorio    'S' or ''
+ * @property string $separador
+ * @property string $xtra
+ * @property string|bool $lista     'S' or ''
+ * @property numeric $orderby
+ * @property string|bool $combo     'S' or ''
+ * @property string|bool $readonly  'S' or ''
+ * @property string|bool $form      'S' or ''
+ * @property string $label
+ * @property mixed $permissoes
+ * @property string $default
+ * @property string $nome_id
+ */
 class ColumnField extends BaseField
 {
+    /**
+     * @var array
+     */
     protected $campo;
+    /**
+     * @var int
+     */
     protected $i = 0;
     
     /**
@@ -17,6 +41,36 @@ class ColumnField extends BaseField
         $this->campo = $campo;
     }
     
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        if (!isset($this->campo[$name])) {
+            return;
+        }
+        return $this->campo[$name];
+    }
+    
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($this->campo[$name]);
+    }
+    
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+        unset($this->campo[$name]);
+    }
+    
     public function setIndex($i)
     {
         $this->i = $i;
@@ -24,28 +78,31 @@ class ColumnField extends BaseField
 
     public function getHeaderTag()
     {
-        return parent::getHeaderTag()->title($this->campo['tipo']);
+        return parent::getHeaderTag()->title($this->tipo);
     }
     
     public function getLabel()
     {
-        return $this->campo['nome'];
+        return $this->nome;
     }
 
     public function getText()
     {
-        $column = $this->campo['tipo'];
+        $column = $this->tipo;
         return $this->record->$column;
     }
     
     public function getEditTag()
     {
         $input = parent::getEditTag();
-        if ($this->campo['ajuda']) {
-            $input->help($this->campo['ajuda']);
+        if ($this->ajuda) {
+            $input->help($this->ajuda);
         }
-        $input->getLabel()->setAttribute('title', $this->campo['tipo']);
-        $input->onGroupAddClass($this->name);
+        $input->getLabel()->setAttribute('title', $this->tipo.' (xtra: '.$this->xtra.')');
+        $input->onGroupAddClass($this->id);
+        if ($this->separador) {
+            $input->onGroupAddClass('has-separator');
+        }
         return $input;
     }
     
@@ -57,14 +114,13 @@ class ColumnField extends BaseField
     
     protected function getFormerName()
     {
-        $column = $this->campo['tipo'];
-        return $column.'['.$this->i.']';
+        return $this->tipo.'['.$this->i.']';
     }
     
     public function getRules()
     {
         $rules = [];
-        if ($this->campo['obrigatorio']) {
+        if ($this->obrigatorio) {
             $rules[$this->getFormerName()][] = 'required';
         }
         return $rules;
