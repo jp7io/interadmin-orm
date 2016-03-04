@@ -10,11 +10,11 @@ class VarcharField extends ColumnField
     {
         $rules = parent::getRules();
         $name = $this->getFormerName();
-        if ($this->campo['xtra'] === 'email') {
+        if ($this->xtra === 'email') {
             $rules[$name][] = 'email';
         }
-        if ($this->campo['tamanho']) {
-            $rules[$name][] = 'max:'.$this->campo['tamanho'];
+        if ($this->tamanho) {
+            $rules[$name][] = 'max:'.$this->tamanho;
         }
         return $rules;
     }

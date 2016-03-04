@@ -18,11 +18,11 @@ class FuncField extends ColumnField
     
     protected function getFuncHtml($value, $parte)
     {
-        if (!is_callable($this->campo['nome'])) {
-            return 'Function '.$this->campo['nome'].' not found.';
+        if (!is_callable($this->nome)) {
+            return 'Function '.$this->nome.' not found.';
         }
         ob_start();
-        $response = call_user_func($this->campo['nome'], $this->campo, $value, $parte);
+        $response = call_user_func($this->nome, $this->campo, $value, $parte);
         $response .= ob_get_clean();
         return $response;
     }

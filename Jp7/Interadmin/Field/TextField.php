@@ -14,7 +14,7 @@ class TextField extends ColumnField
     public function getText()
     {
         $text = $this->getValue();
-        if (in_array($this->campo['xtra'], [self::XTRA_HTML, self::XTRA_HTML_LIGHT])) {
+        if (in_array($this->xtra, [self::XTRA_HTML, self::XTRA_HTML_LIGHT])) {
             $text = strip_tags($text);
         }
         return $text;
@@ -24,6 +24,6 @@ class TextField extends ColumnField
     {
         return Former::textarea($this->getFormerName())
             ->value($this->getValue())
-            ->data_html($this->campo['xtra'] ?: false);
+            ->data_html($this->xtra ?: false);
     }
 }

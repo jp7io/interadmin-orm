@@ -39,10 +39,6 @@ class ColumnField extends BaseField
     public function __construct(array $campo)
     {
         $this->campo = $campo;
-        
-        global $s_user;
-        $s_user['admin'] = false;
-        $s_user['sa'] = false;
     }
     
     /**
