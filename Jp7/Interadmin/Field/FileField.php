@@ -43,11 +43,12 @@ class FileField extends ColumnField
     
     protected function getCreditsHtml()
     {
-        $creditsField = new VarcharField(['tipo' => $this->tipo.'_text']);
-        $creditsField->setRecord($this->record);
-        $creditsField->setIndex($this->i);
+        $field = new VarcharField(['tipo' => $this->tipo.'_text']);
+        $field->setRecord($this->record);
+        $field->setIndex($this->i);
+        $input = $field->getFormerField();
+        $this->handleReadonly($input);
         return '<div class="input-group"><span class="input-group-addon">Legenda:</span>'.
-            $creditsField->getFormerField()->raw().
-            '</div>';
+            $input->raw().'</div>';
     }
 }

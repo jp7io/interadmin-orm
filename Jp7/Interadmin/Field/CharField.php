@@ -8,9 +8,12 @@ class CharField extends ColumnField
 {
     protected $id = 'char';
     
+    const XTRA_UNCHECKED = '0';
+    const XTRA_CHECKED = 'S';
+
     public function getCellHtml()
     {
-        return $this->getText() ? '&bull;' : '';
+        return $this->getValue() ? '&bull;' : '';
     }
     
     protected function getFormerField()
@@ -18,10 +21,19 @@ class CharField extends ColumnField
         $input = Former::checkbox($this->getFormerName())
             ->text('&nbsp;'); // Bootstrap CSS - padding
         
-        // TODO marcado xtra
         if ($this->getValue()) {
             $input->check();
         }
         return $input;
+    }
+    
+    protected function getDefaultValue()
+    {
+        if ($this->default) {
+            return $this->default;
+        }
+        if ($this->xtra === self::XTRA_CHECKED) {
+            return 'S';
+        }
     }
 }

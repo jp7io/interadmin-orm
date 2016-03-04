@@ -39,6 +39,10 @@ class ColumnField extends BaseField
     public function __construct(array $campo)
     {
         $this->campo = $campo;
+        
+        global $s_user;
+        $s_user['admin'] = false;
+        $s_user['sa'] = false;
     }
     
     /**
@@ -102,6 +106,7 @@ class ColumnField extends BaseField
         if ($this->separador) {
             $input->onGroupAddClass('has-separator');
         }
+        $this->handleReadonly($input);
         return $input;
     }
     
@@ -120,7 +125,7 @@ class ColumnField extends BaseField
     {
         $column = $this->tipo;
         $value = $this->record->$column;
-        if (!$this->record->id && !$value && $this->default) {
+        if (!$this->record->id && !$value) {
             $value = $this->getDefaultValue();
         }
         return $value;
@@ -129,6 +134,29 @@ class ColumnField extends BaseField
     protected function getDefaultValue()
     {
         return $this->default;
+    }
+    
+    protected function handleReadonly($input)
+    {
+        if ($this->readonly || !$this->hasPermissions()) {
+            $input->disabled();
+        }
+    }
+    
+    protected function hasPermissions()
+    {
+        global $s_user;
+        if (!$this->permissoes || $s_user['sa']) {
+            return true;
+        }
+        if ((string) $this->permissoes === (string) $s_user['tipo']) {
+            // By select with the user type, used by CI Intercambio
+            return true;
+        }
+        if ($this->permissoes === 'admin' && $s_user['admin']) {
+            return true;
+        }
+        return false;
     }
     
     public function getRules()

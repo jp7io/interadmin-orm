@@ -6,11 +6,6 @@ class VarcharField extends ColumnField
 {
     protected $id = 'varchar';
     
-    public function __construct(array $campo)
-    {
-        $this->campo = $campo;
-    }
-    
     public function getRules()
     {
         $rules = parent::getRules();
