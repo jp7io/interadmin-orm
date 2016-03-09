@@ -35,6 +35,13 @@ class Factory
     public function makeField(array $campo)
     {
         $prefix = $this->getPrefix($campo['tipo']);
+        if ($prefix === 'select') {
+            if (in_array($campo['xtra'], [SelectField::XTRA_RECORD_AJAX, SelectField::XTRA_TYPE_AJAX])) {
+                $prefix .= '_ajax';
+            } elseif (in_array($campo['xtra'], [SelectField::XTRA_RECORD_RADIO, SelectField::XTRA_TYPE_RADIO])) {
+                $prefix .= '_radio';
+            }
+        }
         $className = $this->namespace.studly_case($prefix).'Field';
         return new $className($campo);
     }

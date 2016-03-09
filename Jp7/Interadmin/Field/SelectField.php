@@ -22,7 +22,7 @@ class SelectField extends ColumnField
             return $this->label;
         }
         if ($this->nome instanceof InterAdminTipo) {
-            return $this->nome->getFieldsValues('nome');
+            return $this->nome->getNome();
         }
         if ($this->nome === 'all') {
             return 'Tipos';
@@ -54,7 +54,7 @@ class SelectField extends ColumnField
         if (!$id) {
             return ['', true];
         }
-        if ($this->relatesToTipo()) {
+        if ($this->hasTipo()) {
             return [interadmin_tipos_nome($id), true];
         }
         $related = $this->nome->findById($id);
@@ -64,26 +64,16 @@ class SelectField extends ColumnField
         return [$id, false];
     }
     
-    protected function relatesToTipo()
+    public function hasTipo()
     {
         return in_array($this->xtra, [self::XTRA_TYPE, self::XTRA_TYPE_AJAX, self::XTRA_TYPE_RADIO]);
     }
     
-    protected function isRadio()
-    {
-        return in_array($this->xtra, [self::XTRA_RECORD_RADIO, self::XTRA_TYPE_RADIO]);
-    }
-    
     protected function getFormerField()
     {
-        if ($this->isRadio()) {
-            return Former::radios($this->getFormerName())
-                ->radios($this->getRadios())
-                ->check($this->getValue());
-        }
         return Former::select($this->getFormerName())
-            ->options($this->getOptions())
-            ->value($this->getValue());
+            ->value($this->getValue())
+            ->options($this->getOptions());
     }
     
     protected function getDefaultValue()
@@ -102,61 +92,89 @@ class SelectField extends ColumnField
         }
         return $this->default;
     }
-
+    
     protected function getOptions()
     {
-        if (!$this->relatesToTipo()) {
+        if (!$this->hasTipo()) {
             return $this->getRecordOptions();
         }
         if ($this->nome instanceof InterAdminTipo) {
-            return $this->getChildrenTipoOptions();
+            return $this->getTipoOptions([
+                'parent_id_tipo = '.$this->nome->id_tipo
+            ]);
         }
         if ($this->nome === 'all') {
-            // interadmin_tipos_combo();
-            return [];
+            return $this->getTipoTreeOptions();
         }
         throw new Exception('Not implemented');
     }
     
-    protected function getRadios()
+    protected function getTipoOptions($where = [])
     {
-        $radios = [];
-        if (!$this->obrigatorio) {
-            $radios['(nenhum)'] = ['value' => '', 'checked' => true];
-        }
-        foreach ($this->getOptions() as $key => $value) {
-            $radios[$value] = ['value' => $key];
-        }
-        return $radios;
-    }
-    
-    protected function getChildrenTipoOptions()
-    {
-        $children = $this->nome->getChildren([
-            'where' => "deleted_tipo = ''"
-        ]);
+        $tipos = $this->findTipos($where);
         $options = [];
-        foreach ($children as $child) {
-            $options[$child->id_tipo] = $child->getNome();
+        foreach ($tipos as $tipo) {
+            $options[$tipo->id_tipo] = $tipo->getNome();
         }
         return $options;
     }
     
-    protected function getRecordOptions()
+    protected function getRecordOptions($where = [])
     {
-        $campos = $this->nome->getCampos();
-        $valueColumn = array_key_exists('varchar_key', $campos) ? 'varchar_key' : 'id';
-        $records = $this->nome->find([
-            'fields' => $valueColumn,
-            'fields_alias' => false,
-            'class' => 'InterAdmin',
-            'where' => ["deleted = ''"],
-            'order' => $valueColumn
-        ]);
+        $records = $this->findRecords($where);
         $options = [];
         foreach ($records as $record) {
             $options[$record->id] = $record->getStringValue();
         }
         return $options;
+    }
+    
+    protected function findRecords($where = [])
+    {
+        $campos = $this->nome->getCampos();
+        $valueColumn = array_key_exists('varchar_key', $campos) ? 'varchar_key' : 'id';
+        return $this->nome->find([
+            'fields' => $valueColumn,
+            'fields_alias' => false,
+            'class' => 'InterAdmin',
+            'where' => array_merge(["deleted = ''"], $where),
+            'order' => $valueColumn,
+        ]);
+    }
+    
+    protected function findTipos($where = [])
+    {
+        global $lang;
+        
+        return InterAdminTipo::findTipos([
+            'fields' => ['nome'.$lang->prefix, 'parent_id_tipo'],
+            'class' => 'InterAdminTipo',
+            'use_published_filters' => true,
+            'where' => $where,
+            'order' => 'admin,ordem,nome'
+        ]);
+    }
+    
+    protected function getTipoTreeOptions($where = [])
+    {
+        $map = [];
+        $tipos = $this->findTipos($where);
+        
+        foreach ($tipos as $tipo) {
+            $map[$tipo->parent_id_tipo][] = $tipo;
+        }
+        $options = [];
+        $this->addTipoTreeOptions($options, $map, 0);
+        return $options;
+    }
+    
+    protected function addTipoTreeOptions(&$options, $map, $parent_id_tipo, $level = 0)
+    {
+        if ($map[$parent_id_tipo]) {
+            foreach ($map[$parent_id_tipo] as $tipo) {
+                $options[$tipo->id_tipo] = ($level ? str_repeat('--', $level) . '> ' : '').$tipo->getNome();
+                $this->addTipoTreeOptions($options, $map, $tipo->id_tipo, $level + 1);
+            }
+        }
     }
 }
