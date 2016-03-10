@@ -33,6 +33,8 @@ trait DateFieldTrait
     
     protected function getUpdateButton()
     {
-        return Input::button(null, 'Atualizar');
+        $input = Input::button(null, 'Atualizar');
+        $this->handleReadonly($input);
+        return $input;
     }
 }

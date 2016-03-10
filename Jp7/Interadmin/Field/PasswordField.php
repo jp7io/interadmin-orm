@@ -2,6 +2,8 @@
 
 namespace Jp7\Interadmin\Field;
 
+use Former;
+
 class PasswordField extends ColumnField
 {
     protected $id = 'password';
@@ -10,4 +12,16 @@ class PasswordField extends ColumnField
     {
         return $this->getValue() ? '******' : '';
     }
+    
+    protected function getFormerField()
+    {
+        $input = Former::password($this->getFormerName());
+        if ($this->getValue()) {
+            // Disabled so it won't force the user to change the password
+            $input->disabled()
+                ->data_filled();
+        }
+        return $input;
+    }
+
 }

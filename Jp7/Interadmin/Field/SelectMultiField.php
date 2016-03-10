@@ -2,8 +2,12 @@
 
 namespace Jp7\Interadmin\Field;
 
-class SelectMultiField extends SelectField
+use Former;
+
+class SelectMultiField extends ColumnField
 {
+    use SelectFieldTrait;
+    
     protected $id = 'select_multi';
     
     const XTRA_RECORD = '0'; // checkboxes
@@ -28,5 +32,33 @@ class SelectMultiField extends SelectField
             $array[] = $this->formatText($id, $html);
         }
         return $array;
+    }
+    
+    public function hasTipo()
+    {
+        return $this->xtra === self::XTRA_TYPE;
+    }
+    
+    protected function getFormerField()
+    {
+        return Former::checkboxes($this->getFormerName())
+                ->checkboxes($this->getCheckboxes());
+    }
+    
+    protected function getCheckboxes()
+    {
+        $checkboxes = [];
+        $name = $this->getFormerName().'[]';
+        $ids = jp7_explode(',', $this->getValue());
+        // $checkboxes['(todos)'] = ['value' => '', 'checked' => true];
+        foreach ($this->getOptions() as $key => $value) {
+            $checkboxes[$value] = [
+                'name' => $name,
+                'value' => $key, // ID
+                'checked' => in_array($key, $ids),
+                'required' => false // HTML5 validation can't handle multiple checkboxes
+            ];
+        }
+        return $checkboxes;
     }
 }
