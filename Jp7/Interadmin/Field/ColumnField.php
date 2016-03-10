@@ -28,10 +28,6 @@ class ColumnField extends BaseField
      * @var array
      */
     protected $campo;
-    /**
-     * @var int
-     */
-    protected $i = 0;
     
     /**
      * @param array $campo
@@ -71,11 +67,6 @@ class ColumnField extends BaseField
         unset($this->campo[$name]);
     }
     
-    public function setIndex($i)
-    {
-        $this->i = $i;
-    }
-
     public function getHeaderTag()
     {
         return parent::getHeaderTag()->title($this->tipo);
@@ -114,7 +105,7 @@ class ColumnField extends BaseField
     
     protected function getFormerName()
     {
-        return $this->tipo.'['.$this->i.']';
+        return $this->tipo.'['.$this->index.']';
     }
     
     protected function getValue()

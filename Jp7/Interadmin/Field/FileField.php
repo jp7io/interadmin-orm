@@ -45,7 +45,7 @@ class FileField extends ColumnField
     {
         $field = new VarcharField(['tipo' => $this->tipo.'_text']);
         $field->setRecord($this->record);
-        $field->setIndex($this->i);
+        $field->setIndex($this->index);
         $input = $field->getFormerField();
         $this->handleReadonly($input);
         return '<div class="input-group"><span class="input-group-addon">Legenda:</span>'.

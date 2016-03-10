@@ -15,6 +15,10 @@ abstract class BaseField implements FieldInterface
      * @var object
      */
     protected $record;
+    /**
+     * @var int
+     */
+    protected $index = 0;
     
     public function setRecord($record)
     {
@@ -22,6 +26,11 @@ abstract class BaseField implements FieldInterface
         $this->record = $record;
     }
     
+    public function setIndex($index)
+    {
+        $this->index = $index;
+    }
+
     public function getHeaderTag()
     {
         return Element::th($this->getHeaderHtml())
@@ -64,7 +73,18 @@ abstract class BaseField implements FieldInterface
      */
     protected function getFormerField()
     {
-        return Former::text($this->id);
+        return Former::text($this->getFormerName());
+    }
+    
+    protected function getFormerName()
+    {
+        return $this->id.'['.$this->index.']';
+    }
+    
+    protected function getValue()
+    {
+        $column = $this->id;
+        return $this->record->$column;
     }
     
     public function getRules()

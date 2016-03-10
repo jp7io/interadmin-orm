@@ -2,11 +2,12 @@
 
 namespace Jp7\Interadmin\Field;
 
-use Jp7_Date;
-use Former;
+use Jp7_Date as Date;
 
 class DateField extends ColumnField
 {
+    use DateFieldTrait;
+    
     const XTRA_NORMAL = '0';
     const XTRA_NO_TIME = 'S';
     protected $id = 'date';
@@ -20,25 +21,9 @@ class DateField extends ColumnField
     $S_form_xtra_arr['calendar_nocombo_datetime']="Calendário S/ Combo";
     $S_form_xtra_arr['calendar_nocombo_date']="Calendário S/ Combo S/ Hora";
     */
-    public function getText()
-    {
-        $date = new Jp7_Date($this->getValue());
-        return $date->format('d/m/Y'.($this->isDatetime() ? ' - H:i' : ''));
-    }
     
     protected function isDatetime()
     {
         return (ends_with($this->xtra, '_datetime') || $this->xtra === self::XTRA_NORMAL);
     }
-    
-    protected function getFormerField()
-    {
-        $input = Former::date($this->getFormerName())
-            ->value($this->getValue());
-        if ($this->isDatetime()) {
-            $input->type('datetime-local');
-        }
-        return $input;
-    }
-
 }

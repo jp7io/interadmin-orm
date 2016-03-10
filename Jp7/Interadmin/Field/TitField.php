@@ -14,7 +14,7 @@ class TitField extends ColumnField
         $class = $this->xtra === self::XTRA_VISIBLE ? 'in' : '';
         return '<div class="panel panel-default '.$this->id.'">'.
                     $this->getEditTag().
-                    '<div id="collapse'.$this->tipo.$this->i.'" class="panel-collapse collapse '.$class.'" role="tabpanel">
+                    '<div id="collapse'.$this->tipo.$this->index.'" class="panel-collapse collapse '.$class.'" role="tabpanel">
                         <div class="panel-body">';
     }
     
@@ -22,8 +22,8 @@ class TitField extends ColumnField
     {
         return '<div class="panel-heading">'.
             '<h4 class="panel-title">'.
-                '<a role="button" data-toggle="collapse" href="#collapse'.$this->tipo.$this->i.'" aria-expanded="true" '.
-                    'aria-controls="collapse'.$this->tipo.$this->i.'" title="'.$this->tipo.'">'.
+                '<a role="button" data-toggle="collapse" href="#collapse'.$this->tipo.$this->index.'" aria-expanded="true" '.
+                    'aria-controls="collapse'.$this->tipo.$this->index.'" title="'.$this->tipo.'">'.
                     $this->getLabel().
                 '</a>'.
             '</h4>'.
