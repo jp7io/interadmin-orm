@@ -41,6 +41,10 @@ class Factory
             } elseif (in_array($campo['xtra'], [SelectField::XTRA_RECORD_RADIO, SelectField::XTRA_TYPE_RADIO])) {
                 $prefix .= '_radio';
             }
+        } elseif ($prefix === 'select_multi') {
+            if ($campo['xtra'] === SelectMultiField::XTRA_RECORD_SEARCH) {
+                $prefix .= '_ajax';
+            }
         }
         $className = $this->namespace.studly_case($prefix).'Field';
         return new $className($campo);

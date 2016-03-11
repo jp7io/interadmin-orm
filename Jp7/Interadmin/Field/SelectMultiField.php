@@ -42,7 +42,8 @@ class SelectMultiField extends ColumnField
     protected function getFormerField()
     {
         return Former::checkboxes($this->getFormerName())
-                ->checkboxes($this->getCheckboxes());
+                ->checkboxes($this->getCheckboxes())
+                ->onGroupAddClass('has-checkboxes');
     }
     
     protected function getCheckboxes()
@@ -50,7 +51,6 @@ class SelectMultiField extends ColumnField
         $checkboxes = [];
         $name = $this->getFormerName().'[]';
         $ids = jp7_explode(',', $this->getValue());
-        // $checkboxes['(todos)'] = ['value' => '', 'checked' => true];
         foreach ($this->getOptions() as $key => $value) {
             $checkboxes[$value] = [
                 'name' => $name,

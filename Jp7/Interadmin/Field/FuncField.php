@@ -13,7 +13,7 @@ class FuncField extends ColumnField
     
     public function getCellHtml()
     {
-        return $this->getFuncHtml($this->getText(), 'list');
+        return $this->getFuncHtml($this->getValue(), 'list');
     }
     
     protected function getFuncHtml($value, $parte)
@@ -25,5 +25,15 @@ class FuncField extends ColumnField
         $response = call_user_func($this->nome, $this->campo, $value, $parte);
         $response .= ob_get_clean();
         return $response;
+    }
+    
+    public function getEditTag()
+    {
+        $html = trim($this->getFuncHtml($this->getValue(), 'edit'));
+        
+        if (starts_with($html, '<tr') || ends_with($html, '</tr>')) {
+             $html = '<table class="special-shim">'.$html.'</table>';
+        }
+        return $html;
     }
 }
