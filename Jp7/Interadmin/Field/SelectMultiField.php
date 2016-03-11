@@ -39,9 +39,17 @@ class SelectMultiField extends ColumnField
         return $this->xtra === self::XTRA_TYPE;
     }
     
+    public function getEditTag()
+    {
+        // Push checkbox / Former can't handle this on multiple checkboxes
+        return '<input type="hidden" value="" name="'.$this->getFormerName().'" />'.
+            parent::getEditTag();
+    }
+    
     protected function getFormerField()
     {
         return Former::checkboxes($this->getFormerName())
+                ->push(false)
                 ->checkboxes($this->getCheckboxes())
                 ->onGroupAddClass('has-checkboxes');
     }

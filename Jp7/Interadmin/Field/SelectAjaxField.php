@@ -20,23 +20,24 @@ class SelectAjaxField extends SelectField
      */
     protected function getOptions()
     {
+        global $db;
         if (!$value = $this->getValue()) {
             return []; // evita query inutil
         }
         if (!$this->hasTipo()) {
             return $this->getRecordOptions([
-                'id = '.$value
+                'id = '.$db->qstr($value)
             ]);
         }
         if ($this->nome instanceof InterAdminTipo) {
             return $this->getTipoOptions([
                 'parent_id_tipo = '.$this->nome->id_tipo,
-                'id_tipo = '.$value
+                'id_tipo = '.$db->qstr($value)
             ]);
         }
         if ($this->nome === 'all') {
             return $this->getTipoOptions([
-                'id_tipo = '.$value
+                'id_tipo = '.$db->qstr($value)
             ]);
         }
         throw new Exception('Not implemented');

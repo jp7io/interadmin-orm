@@ -34,7 +34,8 @@ class Factory
      */
     public function makeField(array $campo)
     {
-        $prefix = $this->getPrefix($campo['tipo']);
+		  // tipo_de_campo -> only used in a few specials / xtra_disabledfields
+        $prefix = $this->getPrefix($campo['tipo_de_campo'] ? $campo['tipo_de_campo'].'_' : $campo['tipo']);
         if ($prefix === 'select') {
             if (in_array($campo['xtra'], [SelectField::XTRA_RECORD_AJAX, SelectField::XTRA_TYPE_AJAX])) {
                 $prefix .= '_ajax';

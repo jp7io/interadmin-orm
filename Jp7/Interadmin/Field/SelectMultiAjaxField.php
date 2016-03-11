@@ -8,7 +8,7 @@ class SelectMultiAjaxField extends SelectMultiField
 {
     protected function getFormerField()
     {
-        return Former::select($this->getFormerName())
+        return Former::select($this->getFormerName().'[]') // multiple requires []
             ->options($this->getOptions())
             ->multiple()
             ->data_ajax()
@@ -24,12 +24,13 @@ class SelectMultiAjaxField extends SelectMultiField
      */
     protected function getOptions()
     {
+        global $db;
         if (!$value = $this->getValue()) {
             return []; // evita query inutil
         }
         if (!$this->hasTipo()) {
             return $this->getRecordOptions([
-                'id IN ('.$value.')'
+                'id IN ('.$db->qstr($value).')'
             ]);
         }
         /*
@@ -46,5 +47,15 @@ class SelectMultiAjaxField extends SelectMultiField
         }
         */
         throw new Exception('Not implemented');
+    }
+    
+    protected function getRecordOptions($where = [])
+    {
+        $records = $this->findRecords($where);
+        $options = [];
+        foreach ($records as $record) {
+            $options[$record->getStringValue()] = ['value' => $record->id, 'selected' => true];
+        }
+        return $options;
     }
 }
