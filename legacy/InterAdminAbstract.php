@@ -389,6 +389,7 @@ abstract class InterAdminAbstract implements Serializable
             // Resolve Alias and Joins for 'where', 'group' and 'order';
             $clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
 
+        $filters = '';
         if ($use_published_filters) {
             foreach ($options['from'] as $key => $from) {
                 list($table, $alias) = explode(' AS ', $from);
