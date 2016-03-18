@@ -364,4 +364,13 @@ STR;
 
         return $avisos;
     }
+    
+    public static function getTiposChecksum()
+    {
+        global $db, $db_prefix;
+        
+        $rs = $db->Execute("CHECKSUM TABLE ".$db_prefix."_tipos");
+        $row = $rs->FetchNextObj();
+        return $row->Checksum;
+    }
 }
