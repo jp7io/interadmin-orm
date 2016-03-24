@@ -30,6 +30,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         }
 
         if ($this->_getParam('controller') == 'interadmin-remote') {
+            // !!Ver Jp7_Controller_InteradminController, migrar assim que possivel
             if ($interadmin_remote = reset($config->server->interadmin_remote)) {
                 $this->_redirect('http://'.$interadmin_remote.'/'.$config->name_id);
             }
