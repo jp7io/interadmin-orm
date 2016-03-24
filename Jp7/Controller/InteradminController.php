@@ -28,6 +28,7 @@ class Jp7_Controller_InteradminController extends Jp7_Controller_Action
                 'user' => $_GET['user']
             ];
         }
+        header('Access-Control-Allow-Origin: *');
         setcookie($config->name_id.'[interadmin]', serialize($s_cookie), strtotime('+1 month'), '/');
         echo 'ok';
         exit;
