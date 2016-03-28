@@ -74,7 +74,7 @@
       *
       * @see Zend/Cache/Frontend/Zend_Cache_Frontend_Page#start()
       */
-     public function start(/* Dynamic args*/)
+     public function start($id = null, $doNotTestCacheValidity = false, $echoData = true) /* FIXME dynamic args */
      {
          if (!self::$_enabled) {
              return false;
