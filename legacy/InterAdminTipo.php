@@ -637,6 +637,14 @@ class InterAdminTipo extends InterAdminAbstract
 
         return $fields;
     }
+    
+    public function getCamposCombo()
+    {
+        return array_keys(array_filter($this->getCampos(), function ($campo) {
+            return (bool) $campo['combo'] || $campo['tipo'] === 'varchar_key';
+        }));
+    }
+    
     /**
      * Gets the alias for a given field name.
      *

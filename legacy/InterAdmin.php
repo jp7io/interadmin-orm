@@ -770,32 +770,22 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function getStringValue()
     {
-        $campos = $this->getTipo()->getCampos();
-        $camposCombo = [];
-        if (key_exists('varchar_key', $campos)) {
-            $campos['varchar_key']['combo'] = 'S';
-        } elseif (key_exists('select_key', $campos)) {
-            $campos['select_key']['combo'] = 'S';
+        $camposCombo = $this->getTipo()->getCamposCombo();
+        if (!$camposCombo) {
+            return $this->id;
         }
-        foreach ($campos as $key => $campo) {
-            if ($campo['combo']) {
-                $camposCombo[] = $campo['tipo'];
+        $valoresCombo = $this->getFieldsValues($camposCombo);
+        $stringValue = [];
+        foreach ($valoresCombo as $value) {
+            if ($value instanceof InterAdminFieldFile) {
+                continue;
+            } elseif ($value instanceof InterAdminAbstract) {
+                $value = $value->getStringValue();
             }
+            $stringValue[] = $value;
         }
-        if ($camposCombo) {
-            $valoresCombo = $this->getFieldsValues($camposCombo);
-            $stringValue = [];
-            foreach ($valoresCombo as $key => $value) {
-                if ($value instanceof InterAdminFieldFile) {
-                    continue;
-                } elseif ($value instanceof InterAdminAbstract) {
-                    $value = $value->getStringValue();
-                }
-                $stringValue[] = $value;
-            }
-
-            return implode(' - ', $stringValue);
-        }
+        
+        return implode(' - ', $stringValue);
     }
     /**
      * Saves this record and updates date_modify.

@@ -3,6 +3,10 @@
 namespace Jp7\Interadmin\Field;
 
 use InterAdminTipo;
+use InterAdmin;
+use UnexpectedValueException;
+use InterAdminOptions;
+use InterAdminOptionsTipos;
 
 trait SelectFieldTrait
 {
@@ -17,7 +21,7 @@ trait SelectFieldTrait
         if ($this->nome === 'all') {
             return 'Tipos';
         }
-        throw new Exception('Not implemented');
+        throw new UnexpectedValueException('Not implemented');
     }
         
     protected function formatText($id, $html)
@@ -64,70 +68,72 @@ trait SelectFieldTrait
     protected function getOptions()
     {
         if (!$this->hasTipo()) {
-            return $this->getRecordOptions();
+            return $this->toOptions($this->records()->all());
         }
         if ($this->nome instanceof InterAdminTipo) {
-            return $this->getTipoOptions([
-                'parent_id_tipo = '.$this->nome->id_tipo
-            ]);
+            return $this->toOptions($this->tipos()->all());
         }
         if ($this->nome === 'all') {
-            return $this->getTipoTreeOptions();
+            return $this->toTreeOptions($this->tipos()->all());
         }
-        throw new Exception('Not implemented');
+        throw new UnexpectedValueException('Not implemented');
     }
     
-    protected function getTipoOptions($where = [])
+    protected function records()
     {
-        $tipos = $this->findTipos($where);
-        $options = [];
-        foreach ($tipos as $tipo) {
-            $options[$tipo->id_tipo] = $tipo->getNome();
-        }
-        return $options;
-    }
-    
-    protected function getRecordOptions($where = [])
-    {
-        $records = $this->findRecords($where);
-        $options = [];
-        foreach ($records as $record) {
-            $options[$record->id] = $record->getStringValue();
-        }
-        return $options;
-    }
-    
-    protected function findRecords($where = [])
-    {
-        $campos = $this->nome->getCampos();
-        $valueColumn = array_key_exists('varchar_key', $campos) ? 'varchar_key' : 'id';
-        return $this->nome->find([
-            'fields' => $valueColumn,
+        $camposCombo = $this->nome->getCamposCombo();
+        
+        $query = new InterAdminOptions($this->nome);
+        $query->setOptionsArray([
+            'fields' => $camposCombo,
             'fields_alias' => false,
             'class' => 'InterAdmin',
-            'where' => array_merge(["deleted = ''"], $where),
-            'order' => $valueColumn,
+            'where' => ["deleted = ''"],
+            'order' => implode(', ', $camposCombo)
         ]);
+        return $query;
     }
-    
-    protected function findTipos($where = [])
+        
+    protected function tipos()
     {
         global $lang;
         
-        return InterAdminTipo::findTipos([
+        $query = new InterAdminOptionsTipos(new InterAdminTipo);
+        $query->setOptionsArray([
             'fields' => ['nome'.$lang->prefix, 'parent_id_tipo'],
+            'fields_alias' => false,
             'class' => 'InterAdminTipo',
             'use_published_filters' => true,
-            'where' => $where,
-            'order' => 'admin,ordem,nome'
+            'where' => [],
+            'order' => 'admin,ordem,nome'.$lang->prefix
         ]);
+        // only children tipos
+        if ($this->nome instanceof InterAdminTipo) {
+            $query->where('parent_id_tipo', $this->nome->id_tipo);
+        }
+        return $query;
     }
     
-    protected function getTipoTreeOptions($where = [])
+    protected function toOptions(array $array)
+    {
+        $options = [];
+        if ($array[0] instanceof InterAdminTipo) {
+            foreach ($array as $tipo) {
+                $options[$tipo->id_tipo] = $tipo->getNome();
+            }
+        } elseif ($array[0] instanceof InterAdmin) {
+            foreach ($array as $record) {
+                $options[$record->id] = $record->getStringValue();
+            }
+        } elseif ($array) {
+            throw new UnexpectedValueException('Should be an array of InterAdminTipo or InterAdmin');
+        }
+        return $options;
+    }
+    
+    protected function toTreeOptions(array $tipos)
     {
         $map = [];
-        $tipos = $this->findTipos($where);
-        
         foreach ($tipos as $tipo) {
             $map[$tipo->parent_id_tipo][] = $tipo;
         }
@@ -140,7 +146,8 @@ trait SelectFieldTrait
     {
         if ($map[$parent_id_tipo]) {
             foreach ($map[$parent_id_tipo] as $tipo) {
-                $options[$tipo->id_tipo] = ($level ? str_repeat('--', $level) . '> ' : '').$tipo->getNome();
+                $prefix = ($level ? str_repeat('--', $level) . '> ' : ''); // ----> Nome
+                $options[$tipo->id_tipo] = $prefix.$tipo->getNome();
                 $this->addTipoTreeOptions($options, $map, $tipo->id_tipo, $level + 1);
             }
         }

@@ -38,7 +38,8 @@ class FileField extends ColumnField
     
     protected function getSearchButton()
     {
-        $input = Input::button(null, 'Procurar...');
+        $input = Input::button(null, 'Procurar...')
+            ->class('choose-file');
         $this->handleReadonly($input);
         return $input;
     }

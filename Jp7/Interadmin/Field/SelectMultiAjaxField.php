@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin\Field;
 
 use Former;
+use UnexpectedValueException;
 
 class SelectMultiAjaxField extends SelectMultiField
 {
@@ -29,9 +30,11 @@ class SelectMultiAjaxField extends SelectMultiField
             return []; // evita query inutil
         }
         if (!$this->hasTipo()) {
-            return $this->getRecordOptions([
-                'id IN ('.$db->qstr($value).')'
-            ]);
+            $ids = jp7_explode(',', $value);
+            $records = $this->records()
+                ->whereIn('id', $ids)
+                ->all();
+            return $this->toOptions($records);
         }
         /*
         if ($this->nome instanceof InterAdminTipo) {
@@ -46,15 +49,18 @@ class SelectMultiAjaxField extends SelectMultiField
             ]);
         }
         */
-        throw new Exception('Not implemented');
+        throw new UnexpectedValueException('Not implemented');
     }
     
-    protected function getRecordOptions($where = [])
+    // Extends to add attributes to options
+    protected function toOptions(array $array)
     {
-        $records = $this->findRecords($where);
         $options = [];
-        foreach ($records as $record) {
-            $options[$record->getStringValue()] = ['value' => $record->id, 'selected' => true];
+        foreach ($array as $record) {
+            $options[$record->getStringValue()] = [
+                'value' => $record->id,
+                'selected' => true // We are assuming only selected records were found
+            ];
         }
         return $options;
     }

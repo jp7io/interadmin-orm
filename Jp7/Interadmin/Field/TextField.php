@@ -24,6 +24,7 @@ class TextField extends ColumnField
     {
         return Former::textarea($this->getFormerName())
             ->value($this->getValue())
+            ->id($this->tipo.'_'.$this->index)
             ->data_html($this->xtra ?: false);
     }
 }
