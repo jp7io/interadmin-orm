@@ -31,9 +31,7 @@ class SelectMultiAjaxField extends SelectMultiField
         }
         if (!$this->hasTipo()) {
             $ids = jp7_explode(',', $value);
-            $records = $this->records()
-                ->whereIn('id', $ids)
-                ->all();
+            $records = $this->records()->whereIn('id', $ids)->all();
             return $this->toOptions($records);
         }
         /*
@@ -52,7 +50,7 @@ class SelectMultiAjaxField extends SelectMultiField
         throw new UnexpectedValueException('Not implemented');
     }
     
-    // Extends to add attributes to options
+    // We have more than one option selected, so we need to add the selected attribute to options
     protected function toOptions(array $array)
     {
         $options = [];

@@ -22,7 +22,10 @@ class FieldGroup
         }
         
         $html .= implode(PHP_EOL, array_map(function ($field) {
-            return ($field instanceof TitField) ? '' : $field->getEditTag();
+            // (string) is needed to force render
+            // Former wants object to be created and rendered before creating next object
+            // Without (string) the group doesn't get the class "required"
+            return ($field instanceof TitField) ? '' : (string) $field->getEditTag();
         }, $this->fields));
         
         if ($this->fields[0] instanceof TitField) {

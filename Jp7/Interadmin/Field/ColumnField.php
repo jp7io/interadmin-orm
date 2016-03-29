@@ -88,7 +88,7 @@ class ColumnField extends BaseField
         if ($this->ajuda) {
             $input->help($this->ajuda);
         }
-        $input->getLabel()->setAttribute('title', $this->tipo.' (xtra: '.$this->xtra.')');
+        $input->getLabel()->setAttribute('title', $this->nome_id.' ('.$this->tipo.', xtra: '.$this->xtra.')');
         $input->onGroupAddClass($this->id);
         if ($this->separador) {
             $input->onGroupAddClass('has-separator');

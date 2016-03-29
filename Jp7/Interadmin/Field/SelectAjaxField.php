@@ -21,7 +21,7 @@ class SelectAjaxField extends SelectField
      * @return array
      * @throws Exception
      */
-    public function getOptions()
+    protected function getOptions()
     {
         global $db;
         if (!$value = $this->getValue()) {
@@ -41,25 +41,26 @@ class SelectAjaxField extends SelectField
     public function searchOptions($search)
     {
         if (!$this->hasTipo()) {
-            $records = $this->buildSearch($this->records(), $this->getSearchableFields(), $search)
-                ->all();
-            return $this->toJsonOptions($records);
+            $query = $this->buildSearch($this->records(), $this->getSearchableFields(), $search, false);
+            return $this->toJsonOptions($query->all());
         }
         if ($this->nome instanceof InterAdminTipo || $this->nome === 'all') {
-            $tipos = $this->buildSearch($this->tipos(), ['nome'], $search)
-                ->all();
-            return $this->toJsonOptions($tipos);
+            $query = $this->buildSearch($this->tipos(), ['nome'], $search, 'id_tipo');
+            return $this->toJsonOptions($query->all());
         }
         throw new UnexpectedValueException('Not implemented');
     }
     
-    protected function buildSearch($query, $fields, $search)
+    protected function buildSearch($query, $fields, $search, $primary_key)
     {
         global $db;
         $pattern = '%'.str_replace(' ', '%', $search).'%';
         $whereOr = [];
         foreach ($fields as $field) {
             $whereOr[] = $field.' LIKE '.$db->qstr($pattern);
+        }
+        if (is_numeric($search)) {
+            $whereOr[] = 'id_tipo = '.intval($search);
         }
         $query->whereRaw('('.implode(' OR ', $whereOr).')');
 
