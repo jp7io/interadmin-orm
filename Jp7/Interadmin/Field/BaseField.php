@@ -4,6 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 use HtmlObject\Element;
 use Former;
+use InterAdminTipo;
 
 abstract class BaseField implements FieldInterface
 {
@@ -16,14 +17,23 @@ abstract class BaseField implements FieldInterface
      */
     protected $record;
     /**
-     * @var int
+     * @var InterAdminTipo
      */
-    protected $index = 0;
+    protected $type;
+    /**
+     * @var int|null
+     */
+    protected $index = null;
     
     public function setRecord($record)
     {
         assert(is_object($record) || is_null($record));
         $this->record = $record;
+    }
+    
+    public function setType(InterAdminTipo $type)
+    {
+        $this->type = $type;
     }
     
     public function setIndex($index)
@@ -80,12 +90,22 @@ abstract class BaseField implements FieldInterface
     
     protected function getFormerName()
     {
-        return $this->id.'['.$this->index.']';
+        return $this->id.(is_null($this->index) ? '' : '['.$this->index.']');
     }
     
     protected function getFormerId()
     {
-        return $this->id.'_'.$this->index;
+        return $this->id.(is_null($this->index) ? '' : '_'.$this->index);
+    }
+    
+    protected function getRuleName()
+    {
+        $name = str_replace( // same replace Laravel and Former do
+            ['[', ']'],
+            ['.', ''],
+            $this->getFormerName()
+        );
+        return trim($name, '.');
     }
     
     protected function getValue()

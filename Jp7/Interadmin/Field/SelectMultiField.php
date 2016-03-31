@@ -48,21 +48,24 @@ class SelectMultiField extends ColumnField
     
     protected function getFormerField()
     {
-        return Former::checkboxes($this->getFormerName())
-                // ->id($this->getFormerId()) // TODO test this
-                ->push(false)
-                ->checkboxes($this->getCheckboxes())
+        $field = Former::checkboxes($this->getFormerName().'[]'); // [] makes it "grouped"
+        return $field->push(false)
+                ->checkboxes($this->getCheckboxes($field))
                 ->onGroupAddClass('has-checkboxes');
+                // ->id($this->getFormerId()) // Wont work with checkboxes
     }
     
-    protected function getCheckboxes()
+    protected function getCheckboxes($field)
     {
         $checkboxes = [];
-        $name = $this->getFormerName().'[]';
-        $ids = jp7_explode(',', $this->getValue());
+        // Problem with populate from POST: https://github.com/formers/former/issues/364
+        $ids = $field->getValue();
+        if (!$ids) {
+            $ids = jp7_explode(',', $this->getValue());
+        }
+        
         foreach ($this->getOptions() as $key => $value) {
             $checkboxes[$value] = [
-                'name' => $name,
                 'value' => $key, // ID
                 'checked' => in_array($key, $ids),
                 'required' => false // HTML5 validation can't handle multiple checkboxes

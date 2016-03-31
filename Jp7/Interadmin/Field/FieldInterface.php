@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin\Field;
 
 use HtmlObject\Element;
+use InterAdminTipo;
 
 ///////// Hierarchy ////////////////
 // Tag          <td>{!! $Html !!}</td>
@@ -15,6 +16,8 @@ interface FieldInterface
 {
     
     public function setRecord($record);
+    
+    public function setType(InterAdminTipo $type);
     
     /**
      * Returns object for <th> tag

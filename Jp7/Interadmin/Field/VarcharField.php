@@ -21,7 +21,11 @@ class VarcharField extends ColumnField
     public function getRules()
     {
         $rules = parent::getRules();
-        $name = $this->getFormerName();
+        $name = $this->getRuleName();
+        
+        if ($this->isUnique()) {
+            $rules[$name][] = $this->getUniqueRule();
+        }
         if ($this->isEmail()) {
             $rules[$name][] = 'email';
         } elseif ($this->isNumeric()) {
@@ -35,6 +39,16 @@ class VarcharField extends ColumnField
             $rules[$name][] = 'max:'.$this->tamanho;
         }
         return $rules;
+    }
+    
+    protected function isUnique() {
+        return $this->xtra === 'id' || $this->xtra === 'id_email';
+    }
+    
+    protected function getUniqueRule() {
+        // unique:table,column,except,idColumn
+        $table = str_replace($this->type->db_prefix, '', $this->type->getInterAdminsTableName()); // FIXME
+        return 'unique:'.$table.','.$this->tipo.','.$this->record->id;
     }
     
     protected function isEmail()

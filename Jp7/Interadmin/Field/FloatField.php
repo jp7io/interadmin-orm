@@ -9,7 +9,7 @@ class FloatField extends ColumnField
     public function getRules()
     {
         $rules = parent::getRules();
-        $rules[$this->getFormerName()][] = 'numeric';
+        $rules[$this->getRuleName()][] = 'numeric';
         return $rules;
     }
 }

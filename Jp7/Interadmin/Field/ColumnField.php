@@ -99,12 +99,12 @@ class ColumnField extends BaseField
         
     protected function getFormerName()
     {
-        return $this->tipo.'['.$this->index.']';
+        return $this->tipo.(is_null($this->index) ? '' : '['.$this->index.']');
     }
     
     protected function getFormerId()
     {
-        return $this->tipo.'_'.$this->index;
+        return $this->tipo.(is_null($this->index) ? '' : '_'.$this->index);
     }
     
     protected function getValue()
@@ -149,7 +149,7 @@ class ColumnField extends BaseField
     {
         $rules = [];
         if ($this->obrigatorio) {
-            $rules[$this->getFormerName()][] = 'required';
+            $rules[$this->getRuleName()][] = 'required';
         }
         return $rules;
     }
