@@ -35,6 +35,7 @@ class SelectField extends ColumnField
     protected function getFormerField()
     {
         return Former::select($this->getFormerName())
+            ->id($this->getFormerId())
             ->value($this->getValue())
             ->options($this->getOptions());
     }

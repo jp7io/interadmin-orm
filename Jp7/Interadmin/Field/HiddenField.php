@@ -11,6 +11,7 @@ class HiddenField extends ColumnField
     protected function getFormerField()
     {
         return Former::hidden($this->getFormerName())
+            ->id($this->getFormerId())
             ->value($this->getValue());
     }
 }

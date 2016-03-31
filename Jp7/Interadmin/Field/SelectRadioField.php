@@ -9,6 +9,7 @@ class SelectRadioField extends SelectField
     protected function getFormerField()
     {
         return Former::radios($this->getFormerName())
+                // ->id($this->getFormerId()) // TODO test this
                 ->radios($this->getRadios())
                 ->check($this->getValue());
     }

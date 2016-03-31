@@ -49,6 +49,7 @@ class SelectMultiField extends ColumnField
     protected function getFormerField()
     {
         return Former::checkboxes($this->getFormerName())
+                // ->id($this->getFormerId()) // TODO test this
                 ->push(false)
                 ->checkboxes($this->getCheckboxes())
                 ->onGroupAddClass('has-checkboxes');

@@ -100,12 +100,18 @@ class ColumnField extends BaseField
     protected function getFormerField()
     {
         return Former::text($this->getFormerName())
+            ->id($this->getFormerId())
             ->value($this->getValue());
     }
     
     protected function getFormerName()
     {
         return $this->tipo.'['.$this->index.']';
+    }
+    
+    protected function getFormerId()
+    {
+        return $this->tipo.'_'.$this->index;
     }
     
     protected function getValue()

@@ -73,12 +73,18 @@ abstract class BaseField implements FieldInterface
      */
     protected function getFormerField()
     {
-        return Former::text($this->getFormerName());
+        return Former::text($this->getFormerName())
+            ->id($this->getFormerId());
     }
     
     protected function getFormerName()
     {
         return $this->id.'['.$this->index.']';
+    }
+    
+    protected function getFormerId()
+    {
+        return $this->id.'_'.$this->index;
     }
     
     protected function getValue()

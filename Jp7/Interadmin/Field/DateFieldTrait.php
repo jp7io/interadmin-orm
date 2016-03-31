@@ -10,19 +10,28 @@ trait DateFieldTrait
 {
     public function getText()
     {
-        $date = new Date(parent::getValue());
-        return $date->format('d/m/Y'.($this->isDatetime() ? ' - H:i' : ''));
+        return $this->formatValue('d/m/Y'.($this->isDatetime() ? ' - H:i' : ''));
     }
     
     protected function getValue()
     {
-        $date = new Date(parent::getValue());
-        return $date->format('Y-m-d'.($this->isDatetime() ? '\TH:i' : ''));
+        return $this->formatValue('Y-m-d'.($this->isDatetime() ? '\TH:i' : ''));
+    }
+    
+    protected function formatValue($format)
+    {
+        $value = parent::getValue();
+        if (!$value) {
+            return $value;
+        }
+        $date = new Date($value);
+        return $date->format($format);
     }
     
     protected function getFormerField()
     {
         $input = Former::date($this->getFormerName())
+            ->id($this->getFormerId())
             ->value($this->getValue())
             ->append($this->getUpdateButton());
         if ($this->isDatetime()) {

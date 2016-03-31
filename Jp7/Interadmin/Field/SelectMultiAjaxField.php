@@ -10,6 +10,7 @@ class SelectMultiAjaxField extends SelectMultiField
     protected function getFormerField()
     {
         return Former::select($this->getFormerName().'[]') // multiple requires []
+            ->id($this->getFormerId())
             ->options($this->getOptions())
             ->multiple()
             ->data_ajax()

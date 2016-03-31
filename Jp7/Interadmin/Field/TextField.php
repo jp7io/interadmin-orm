@@ -23,8 +23,8 @@ class TextField extends ColumnField
     protected function getFormerField()
     {
         return Former::textarea($this->getFormerName())
+            ->id($this->getFormerId())
             ->value($this->getValue())
-            ->id($this->tipo.'_'.$this->index)
             ->data_html($this->xtra ?: false);
     }
 }

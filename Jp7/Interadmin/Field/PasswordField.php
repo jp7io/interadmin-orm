@@ -15,7 +15,9 @@ class PasswordField extends ColumnField
     
     protected function getFormerField()
     {
-        $input = Former::password($this->getFormerName());
+        $input = Former::password($this->getFormerName())
+            ->id($this->getFormerId());
+        
         if ($this->getValue()) {
             // Disabled so it won't force the user to change the password
             $input->disabled()
