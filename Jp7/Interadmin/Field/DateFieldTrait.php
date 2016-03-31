@@ -22,9 +22,12 @@ trait DateFieldTrait
     {
         $value = parent::getValue();
         if (!$value) {
-            return $value;
+            return '';
         }
         $date = new Date($value);
+        if (!$date->isValid()) {
+            return '';
+        }
         return $date->format($format);
     }
     

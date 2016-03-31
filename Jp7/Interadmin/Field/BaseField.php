@@ -74,7 +74,8 @@ abstract class BaseField implements FieldInterface
     protected function getFormerField()
     {
         return Former::text($this->getFormerName())
-            ->id($this->getFormerId());
+            ->id($this->getFormerId())
+            ->value($this->getValue());
     }
     
     protected function getFormerName()
@@ -90,7 +91,16 @@ abstract class BaseField implements FieldInterface
     protected function getValue()
     {
         $column = $this->id;
-        return $this->record->$column;
+        $value = $this->record->$column;
+        if (!$this->record->id && !$value) {
+            $value = $this->getDefaultValue();
+        }
+        return $value;
+    }
+    
+    protected function getDefaultValue()
+    {
+        return null;
     }
     
     public function getRules()

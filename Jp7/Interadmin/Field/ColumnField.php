@@ -96,14 +96,7 @@ class ColumnField extends BaseField
         $this->handleReadonly($input);
         return $input;
     }
-    
-    protected function getFormerField()
-    {
-        return Former::text($this->getFormerName())
-            ->id($this->getFormerId())
-            ->value($this->getValue());
-    }
-    
+        
     protected function getFormerName()
     {
         return $this->tipo.'['.$this->index.']';
