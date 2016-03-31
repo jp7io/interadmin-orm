@@ -57,7 +57,7 @@ class Jp7_Interadmin_User extends InterAdmin
     // Special - Disparo
     public static function disparo($from, $id, $id_tipo)
     {
-        if ($from != 'insert' || !$_POST['char_send_link'][0]) {
+        if ($from !== 'insert' || empty($_POST['char_send_link'][0])) {
             return;
         }
         $userTipo = (new Interadmin_Login)->getUsuarioTipo();
@@ -93,41 +93,6 @@ class Jp7_Interadmin_User extends InterAdmin
             }
         } catch (Exception $e) {
             $msg->addMessage('Link para cadastro de senha não enviado: ' . $e->getMessage());
-        }
-    }
-    
-    // Special - Campo
-    public static function specialPassword($campo, $value, $parte = 'edit')
-    {
-        switch ($parte) {
-            case 'header':
-                return $campo['label'];
-            case 'list':
-                return $value;
-            case 'edit':
-                global $id;
-                
-                // Remove custom keys
-                $campo['nome'] = $campo['nome_original'];
-                unset($campo['tipo_de_campo']);
-                unset($campo['nome_original']);
-                
-                if (!$id) {
-                    // New user shows checkbox to send link
-                    $campo['tipo'] = 'char_send_link';
-                }
-                $interAdminField = new InterAdminField($campo);
-                ob_start();
-                $interAdminField->getHtml();
-                $html = ob_get_clean();
-                
-                if (!$id) {
-                    // New user shows checkbox to send link
-                    $end = '</td><td></td></tr>';
-                    $label = '<label for="jp7_db_checkbox_char_send_link[0]">Enviar link para cadastro de senha</label>';
-                    $html = str_replace($end, $label.$end, $html);
-                }
-                return $html;
         }
     }
 }
