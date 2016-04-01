@@ -41,10 +41,10 @@ class Jp7_Interadmin_User extends InterAdmin
     public function resetPassword($password, $confirm_password)
     {
         if (strlen($password) < 6) {
-            throw new Exception('Senha deve conter no mínimo 6 caracteres');
+            throw new UnexpectedValueException('Senha deve conter no mínimo 6 caracteres');
         }
         if ($password !== $confirm_password) {
-            throw new Exception('Confirmação de senha deve ser igual à nova senha');
+            throw new UnexpectedValueException('Confirmação de senha deve ser igual à nova senha');
         }
         
         $this->senha = md5($password);
@@ -67,17 +67,13 @@ class Jp7_Interadmin_User extends InterAdmin
             'class' => Jp7_Interadmin_User::class
         ]);
         
-        // Flash msg
-        Zend_Session::$_unitTestEnabled = true;
-        $msg = new Zend_Controller_Action_Helper_FlashMessenger();
-        
         try {
             if (!$user->isPublished()) {
-                throw new Exception('Usuário está despublicado');
+                throw new LogicException('Usuário está despublicado');
             } elseif (!$user->leitura) {
-                throw new Exception('Usuário sem acesso de leitura');
+                throw new LogicException('Usuário sem acesso de leitura');
             } elseif (!$user->email) {
-                throw new Exception('Usuário não possui e-mail cadastrado');
+                throw new LogicException('Usuário não possui e-mail cadastrado');
             } else {
                 // User starts without password
                 $user->updateAttributes([
@@ -88,11 +84,12 @@ class Jp7_Interadmin_User extends InterAdmin
                 $mailer = new Interadmin_Mailer_PasswordRegistration($user);
                 $mailer->handle();
                 
-                $msg->setNamespace('success');
-                $msg->addMessage('Enviado e-mail com link para cadastro de senha');
+                Session::push('flash.new', 'flash.success');
+                Session::push('flash.success', 'Enviado e-mail com link para cadastro de senha.');
             }
-        } catch (Exception $e) {
-            $msg->addMessage('Link para cadastro de senha não enviado: ' . $e->getMessage());
+        } catch (LogicException $e) {
+            Session::push('flash.new', 'flash.error');
+            Session::push('flash.error', $e->getMessage());
         }
     }
 }
