@@ -19,6 +19,10 @@ class FieldGroup
         $html = '';
         if ($this->fields[0] instanceof TitField) {
             $html .= $this->fields[0]->openPanel();
+        } else {
+            $html .= '<div class="panel panel-default">'.
+                        '<div class="panel-body">';
+            
         }
         
         $html .= implode(PHP_EOL, array_map(function ($field) {
@@ -30,6 +34,9 @@ class FieldGroup
         
         if ($this->fields[0] instanceof TitField) {
             $html .= $this->fields[0]->closePanel();
+        } else {
+            $html .= '</div>'.
+                        '</div>';
         }
         
         return $html;

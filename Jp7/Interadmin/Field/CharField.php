@@ -37,4 +37,12 @@ class CharField extends ColumnField
             return 'S';
         }
     }
+    
+    public function hasMassEdit()
+    {
+        return true;
+    }
 }
+
+
+
