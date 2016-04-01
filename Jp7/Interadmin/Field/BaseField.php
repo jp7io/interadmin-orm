@@ -75,6 +75,14 @@ abstract class BaseField implements FieldInterface
     }
     
     /**
+     * @return Element|string
+     */
+    public function getMassEditTag()
+    {
+        return $this->getCellTag();
+    }
+
+    /**
      * Former field. A Former field has 3 parts: element, label and group.
      * Group and label attributes should be changed on getEditTag().
      *

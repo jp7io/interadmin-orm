@@ -67,6 +67,13 @@ interface FieldInterface
      * @return Element|string
      */
     public function getEditTag();
+
+    /**
+     * Return input for mass edit
+     *
+     * @return Element|string
+     */
+    public function getMassEditTag();
     
     /**
      * @return array

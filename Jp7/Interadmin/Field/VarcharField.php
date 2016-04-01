@@ -2,6 +2,8 @@
 
 namespace Jp7\Interadmin\Field;
 
+use HtmlObject\Element;
+
 class VarcharField extends ColumnField
 {
     protected $id = 'varchar';
@@ -94,6 +96,11 @@ class VarcharField extends ColumnField
         return $input->data_type($this->xtra ?: false);
     }
     
+    public function getMassEditTag()
+    {
+        return Element::td($this->getEditTag());
+    }
+
     protected function getColorpickerHtml()
     {
         return '<div class="colorpicker-button"></div>';
