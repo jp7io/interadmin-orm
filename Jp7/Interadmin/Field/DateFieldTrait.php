@@ -4,6 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 use Former;
 use HtmlObject\Input;
+use HtmlObject\Element;
 use Jp7_Date as Date;
 
 trait DateFieldTrait
@@ -43,6 +44,12 @@ trait DateFieldTrait
         return $input;
     }
     
+    public function getMassEditTag()
+    {
+        return Element::td($this->getFormerField())
+            ->class('date');
+    }
+
     protected function getUpdateButton()
     {
         $input = Input::button(null, 'Atualizar');

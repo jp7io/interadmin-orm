@@ -98,7 +98,8 @@ class VarcharField extends ColumnField
     
     public function getMassEditTag()
     {
-        return Element::td($this->getEditTag());
+        return Element::td($this->getFormerField()->raw())
+            ->class($this->id);
     }
 
     protected function getColorpickerHtml()

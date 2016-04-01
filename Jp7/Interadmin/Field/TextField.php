@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin\Field;
 
 use Former;
+use HtmlObject\Element;
 
 class TextField extends ColumnField
 {
@@ -26,5 +27,14 @@ class TextField extends ColumnField
             ->id($this->getFormerId())
             ->value($this->getValue())
             ->data_html($this->xtra ?: false);
+    }
+
+    public function getMassEditTag()
+    {
+        $text = $this->getText();
+        if (mb_strlen($text) > 100) {
+            $text = mb_substr($text, 0, 100).'...';
+        }
+        return Element::td($text);
     }
 }
