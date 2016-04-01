@@ -46,8 +46,14 @@ trait DateFieldTrait
     
     public function getMassEditTag()
     {
-        return Element::td($this->getFormerField())
-            ->class('date');
+        $input = $this->getFormerField();
+        $this->handleReadonly($input);
+        return Element::td((string) $input)->class('date');
+    }
+    
+    public function hasMassEdit()
+    {
+        return true;
     }
 
     protected function getUpdateButton()

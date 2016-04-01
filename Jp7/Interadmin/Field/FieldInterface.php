@@ -69,6 +69,11 @@ interface FieldInterface
     public function getEditTag();
 
     /**
+     * @return bool
+     */
+    public function hasMassEdit();
+    
+    /**
      * Return input for mass edit
      *
      * @return Element|string

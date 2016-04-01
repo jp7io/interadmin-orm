@@ -12,4 +12,9 @@ class FloatField extends ColumnField
         $rules[$this->getRuleName()][] = 'numeric';
         return $rules;
     }
+    
+    public function hasMassEdit()
+    {
+        return true;
+    }
 }

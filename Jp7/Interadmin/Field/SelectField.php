@@ -39,4 +39,9 @@ class SelectField extends ColumnField
             ->value($this->getValue())
             ->options($this->getOptions());
     }
+    
+    public function hasMassEdit()
+    {
+        return true;
+    }
 }

@@ -28,7 +28,7 @@ class TextField extends ColumnField
             ->value($this->getValue())
             ->data_html($this->xtra ?: false);
     }
-
+    /*
     public function getMassEditTag()
     {
         $text = $this->getText();
@@ -37,4 +37,5 @@ class TextField extends ColumnField
         }
         return Element::td($text);
     }
+    */
 }

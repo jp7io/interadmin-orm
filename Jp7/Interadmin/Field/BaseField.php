@@ -79,7 +79,15 @@ abstract class BaseField implements FieldInterface
      */
     public function getMassEditTag()
     {
-        return $this->getCellTag();
+        $input = $this->getFormerField()->raw();
+        $this->handleReadonly($input);
+        return Element::td($input)->class($this->id);
+    }
+
+    
+    public function hasMassEdit()
+    {
+        return false;
     }
 
     /**

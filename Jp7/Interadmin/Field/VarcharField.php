@@ -96,12 +96,11 @@ class VarcharField extends ColumnField
         return $input->data_type($this->xtra ?: false);
     }
     
-    public function getMassEditTag()
+    public function hasMassEdit()
     {
-        return Element::td($this->getFormerField()->raw())
-            ->class($this->id);
+        return true;
     }
-
+    
     protected function getColorpickerHtml()
     {
         return '<div class="colorpicker-button"></div>';
