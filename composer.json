@@ -6,7 +6,7 @@
   "repositories" : [
     {
         "type": "vcs",
-        "url": "https://github.com/jp7internet/inc"
+        "url": "git@github.com:jp7internet/inc"
     }    
   ],
   "require": {
