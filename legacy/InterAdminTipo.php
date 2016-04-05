@@ -320,14 +320,6 @@ class InterAdminTipo extends InterAdminAbstract
     }
 
     /**
-     * @return InterAdmin[] Array of InterAdmin objects.
-     */
-    public function all()
-    {
-        return $this->find();
-    }
-
-    /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
      *
      * @return InterAdmin[] Array of InterAdmin objects.
@@ -468,17 +460,6 @@ class InterAdminTipo extends InterAdminAbstract
     public function findFirst($options = [])
     {
         $result = $this->find(['limit' => 1] + $options);
-        return reset($result);
-    }
-
-    /**
-     * Retrieves the first records which have this InterAdminTipo's id_tipo.
-     *
-     * @return InterAdmin First InterAdmin object found.
-     */
-    public function first()
-    {
-        $result = $this->limit(1)->all();
         return reset($result);
     }
 
@@ -1415,5 +1396,21 @@ class InterAdminTipo extends InterAdminAbstract
     public function published($filters = true)
     {
         return (new InterAdminOptions($this))->published($filters);
+    }
+    
+    public function all()
+    {
+        return (new InterAdminOptions($this))->all();
+    }
+    
+    /**
+     * Retrieves the first records which have this InterAdminTipo's id_tipo.
+     *
+     * @return InterAdmin First InterAdmin object found.
+     */
+    public function first()
+    {
+        $result = $this->limit(1)->all();
+        return reset($result);
     }
 }
