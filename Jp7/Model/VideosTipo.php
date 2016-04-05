@@ -104,7 +104,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
             $registro->updateAttributes([
                 'thumb' => Jp7_YouTube::getThumbnail($registro->video),
             ]);
-        } elseif (startsWith('http://vimeo.com', $registro->video)) {
+        } elseif (starts_with($registro->video, 'http://vimeo.com')) {
             $registro->updateAttributes([
                 'thumb' => Jp7_Vimeo::getThumbnailLarge($registro->video),
             ]);

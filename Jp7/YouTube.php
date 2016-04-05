@@ -82,7 +82,7 @@ class Jp7_YouTube
      */
     public static function getHtml($youTubeVideoUrl, $width = 310, $height = 230)
     {
-        if (startsWith(self::SHORT_URL_PREFIX, $youTubeVideoUrl)) {
+        if (starts_with($youTubeVideoUrl, self::SHORT_URL_PREFIX)) {
             $youTubeVideoUrl = str_replace(self::SHORT_URL_PREFIX, self::URL_PREFIX, $youTubeVideoUrl);
         }
 

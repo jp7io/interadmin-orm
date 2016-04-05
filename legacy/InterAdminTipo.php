@@ -601,6 +601,21 @@ class InterAdminTipo extends InterAdminAbstract
                     }
                 }
             }
+            // Alias
+            foreach ($A as $campo => $array) {
+                if (!empty($array['nome_id'])) {
+                    continue;
+                }
+                $alias = $A[$campo]['nome'];
+                if (is_object($alias)) {
+                    if ($A[$campo]['label']) {
+                        $alias = $A[$campo]['label'];
+                    } else {
+                        $alias = $alias->getFieldsValues('nome');
+                    }
+                }
+                $A[$campo]['nome_id'] = $alias ? toId($alias) : $campo;
+            }
             $this->_setMetadata('campos', $A);
         }
 
@@ -622,6 +637,14 @@ class InterAdminTipo extends InterAdminAbstract
 
         return $fields;
     }
+    
+    public function getCamposCombo()
+    {
+        return array_keys(array_filter($this->getCampos(), function ($campo) {
+            return (bool) $campo['combo'] || $campo['tipo'] === 'varchar_key';
+        }));
+    }
+    
     /**
      * Gets the alias for a given field name.
      *
@@ -636,28 +659,8 @@ class InterAdminTipo extends InterAdminAbstract
             $fields = array_keys($campos);
         }
         $aliases = [];
-        $update = false;
         foreach ((array) $fields as $field) {
-            if ($campos[$field]['nome_id']) {
-                $aliases[$field] = $campos[$field]['nome_id'];
-            } else {
-                $alias = $campos[$field]['nome'];
-                if (is_object($alias)) {
-                    if ($campos[$field]['label']) {
-                        $alias = $campos[$field]['label'];
-                    } else {
-                        $alias = $alias->getFieldsValues('nome');
-                    }
-                }
-                $alias = ($alias) ? toId($alias) : $field;
-                $aliases[$field] = $alias;
-                // Cache
-                $update = true;
-                $campos[$field]['nome_id'] = $alias;
-            }
-        }
-        if ($update) {
-            $this->_setMetadata('campos', $campos);
+            $aliases[$field] = $campos[$field]['nome_id'];
         }
         if (is_array($fields)) {
             return $aliases;

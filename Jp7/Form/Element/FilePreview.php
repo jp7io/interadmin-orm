@@ -62,7 +62,7 @@ class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
             // windows fix
             $this->_value = str_replace('\\', '/', $this->_value);
             // necessário por enquanto
-            $this->_value = jp7_replace_beginning('upload/', '../../upload/', $this->_value);
+            $this->_value = replace_prefix('upload/', '../../upload/', $this->_value);
             $className = $this->getFileClass();
             $this->_value = new $className($this->_value);
             $this->_value->addToArquivosBanco();

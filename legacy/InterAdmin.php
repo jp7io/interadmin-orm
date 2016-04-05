@@ -718,14 +718,14 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     public function isPublished()
     {
         global $config, $s_session;
-        $this->getFieldsValues(['date_publish', 'date_expire', 'char_key', 'publish', 'deleted']);
+        $this->getFieldsValues(['date_publish', 'date_expire', 'char_key', 'publish', 'deleted', 'parent_id']);
 
         return (
-            strtotime($this->date_publish) <= self::getTimestamp() &&
-            (strtotime($this->date_expire) >= self::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
             $this->char_key &&
-            ($this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
-            !$this->deleted
+            !$this->deleted &&
+            ($this->parent_id || $this->publish || $s_session['preview'] || !$config->interadmin_preview) &&
+            strtotime($this->date_publish) <= self::getTimestamp() &&
+            (strtotime($this->date_expire) >= self::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00')
         );
     }
     /**
@@ -770,32 +770,22 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
      */
     public function getStringValue()
     {
-        $campos = $this->getTipo()->getCampos();
-        $camposCombo = [];
-        if (key_exists('varchar_key', $campos)) {
-            $campos['varchar_key']['combo'] = 'S';
-        } elseif (key_exists('select_key', $campos)) {
-            $campos['select_key']['combo'] = 'S';
+        $camposCombo = $this->getTipo()->getCamposCombo();
+        if (!$camposCombo) {
+            return $this->id;
         }
-        foreach ($campos as $key => $campo) {
-            if ($campo['combo']) {
-                $camposCombo[] = $campo['tipo'];
+        $valoresCombo = $this->getFieldsValues($camposCombo);
+        $stringValue = [];
+        foreach ($valoresCombo as $value) {
+            if ($value instanceof InterAdminFieldFile) {
+                continue;
+            } elseif ($value instanceof InterAdminAbstract) {
+                $value = $value->getStringValue();
             }
+            $stringValue[] = $value;
         }
-        if ($camposCombo) {
-            $valoresCombo = $this->getFieldsValues($camposCombo);
-            $stringValue = [];
-            foreach ($valoresCombo as $key => $value) {
-                if ($value instanceof InterAdminFieldFile) {
-                    continue;
-                } elseif ($value instanceof InterAdminAbstract) {
-                    $value = $value->getStringValue();
-                }
-                $stringValue[] = $value;
-            }
-
-            return implode(' - ', $stringValue);
-        }
+        
+        return implode(' - ', $stringValue);
     }
     /**
      * Saves this record and updates date_modify.
@@ -1026,7 +1016,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $aliases = array_flip($this->getTipo()->getCamposAlias());
         $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 
-        if (!startsWith('select_', $nomeCampo)) {
+        if (!starts_with($nomeCampo, 'select_')) {
             throw new Exception('The field '.$attribute.' is not a select. It was expected a select field on setAttributeBySearch.');
         }
 
@@ -1034,7 +1024,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $record = $campoTipo->findFirst([
             'where' => [$searchColumn." = '".$searchValue."'"],
         ]);
-        if (startsWith('select_multi_', $nomeCampo)) {
+        if (starts_with($nomeCampo, 'select_multi_')) {
             $this->$attribute = [$record];
         } else {
             $this->$attribute = $record;

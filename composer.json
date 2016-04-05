@@ -1,6 +1,6 @@
 {
   "name": "jp7internet/classes",
-  "description": "Jp7 Classes",
+  "description": "JP7 Classes",
   "keywords": [],
   "license": "proprietary",
   "repositories" : [
@@ -10,27 +10,35 @@
     }    
   ],
   "require": {
-    "zendframework/zendframework1": "1.12.0",
-    "phpoffice/phpexcel": "~1.8.1",
-    "werkint/jsmin": "~1.0.0",
     "jdorn/sql-formatter": "~1.2",
-    "illuminate/support": "~5.1",
     "symfony/var-dumper": "~2.7.3",
-    "league/url": "^3.3",
+    "illuminate/support": "~5.1",
     "illuminate/filesystem": "~5.1",
+    "league/url": "^3.3",
     "league/flysystem": "~1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8",
-    "jp7internet/inc": "dev-master"
+    "jp7internet/inc": "dev-reunion"
+  },
+  "suggest": {
+    "zendframework/zendframework1": "1.12.0 (Deprecated) For legacy ZF1 applications",
+    "adodb/adodb-php": "~5.0 (Deprecated) For legacy ORM v2 without Laravel",
+    "werkint/jsmin": "~1.0.0 (Deprecated) JS Minification library"
   },
   "autoload": {
     "classmap": [
       "legacy"
     ],
+    "psr-4": {
+      "Jp7\\": "Jp7/"
+    },
     "psr-0": {
       "Jp7_": ""
-    }
+    },
+    "files": [
+      "Jp7/Laravel/functions.php"
+    ]
   },
   "scripts": {
     

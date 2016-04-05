@@ -8,10 +8,10 @@ class Jp7_JSMin extends JsMin\Minify
 
         foreach ($files as $key => $file) {
             // Descobrindo localização como se fosse client side
-            if (startsWith('/', $file)) {
+            if (starts_with($file, '/')) {
                 // /_default/js/interdyn.js
                 $files[$key] = $_SERVER['DOCUMENT_ROOT'].$file;
-            } elseif (!startsWith('http://', $file)) {
+            } elseif (!starts_with($file, 'http://')) {
                 $files[$key] = APPLICATION_PATH.'/../'.$file;
             }
         }
@@ -25,7 +25,7 @@ class Jp7_JSMin extends JsMin\Minify
             // Somente verifica os timestamp localmente, para não atrapalhar desenvolvimento
             if (strpos($_SERVER['HTTP_HOST'], '.') === false) {
                 foreach ($files as $key => $file) {
-                    if (startsWith('http://', $file)) {
+                    if (starts_with($file, 'http://')) {
                         continue;
                     }
                     $file_mtime = filemtime($file);
