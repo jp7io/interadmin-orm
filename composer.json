@@ -11,7 +11,7 @@
   ],
   "require": {
     "jdorn/sql-formatter": "~1.2",
-    "symfony/var-dumper": "~2.7.3",
+    "symfony/var-dumper": "~2.7.3|~3.0.4",
     "illuminate/support": "~5.1",
     "illuminate/filesystem": "~5.1",
     "league/url": "^3.3",
