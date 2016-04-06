@@ -53,7 +53,14 @@ class VarcharField extends ColumnField
     {
         // unique:table,column,except,idColumn
         $table = str_replace(DB::getTablePrefix(), '', $this->type->getInterAdminsTableName()); // FIXME
-        return 'unique:'.$table.','.$this->tipo.','.$this->record->id;
+        return 'unique:'.implode(',', [
+            $table,             // table
+            $this->tipo,        // column
+            $this->record->id,  // except
+            'id',               // idColumn
+            // WHERE:
+            'id_tipo', $this->type->id_tipo
+        ]);
     }
     
     protected function isEmail()
