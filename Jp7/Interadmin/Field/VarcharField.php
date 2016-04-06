@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin\Field;
 
 use HtmlObject\Element;
+use DB;
 
 class VarcharField extends ColumnField
 {
@@ -43,13 +44,15 @@ class VarcharField extends ColumnField
         return $rules;
     }
     
-    protected function isUnique() {
+    protected function isUnique()
+    {
         return $this->xtra === 'id' || $this->xtra === 'id_email';
     }
     
-    protected function getUniqueRule() {
+    protected function getUniqueRule()
+    {
         // unique:table,column,except,idColumn
-        $table = str_replace($this->type->db_prefix, '', $this->type->getInterAdminsTableName()); // FIXME
+        $table = str_replace(DB::getTablePrefix(), '', $this->type->getInterAdminsTableName()); // FIXME
         return 'unique:'.$table.','.$this->tipo.','.$this->record->id;
     }
     

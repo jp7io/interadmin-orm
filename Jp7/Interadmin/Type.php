@@ -827,7 +827,7 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsTableName()
     {
-        return $this->_getTableLang().(($this->tabela) ? '_'.$this->tabela : '');
+        return $this->_getTableLang().($this->tabela ?: 'registros');
     }
     /**
      * Returns the table name for the files.

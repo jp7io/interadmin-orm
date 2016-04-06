@@ -966,7 +966,7 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public function getInterAdminsTableName()
     {
-        return $this->_getTableLang().(($this->tabela) ? '_'.$this->tabela : '');
+        return $this->_getTableLang().($this->tabela ?: 'registros');
     }
     /**
      * Returns the table name for the files.
@@ -975,7 +975,7 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public function getArquivosTableName()
     {
-        return $this->_getTableLang().'_arquivos';
+        return $this->_getTableLang().'arquivos';
     }
     /**
      * Returns $db_prefix OR $db_prefix + $lang->prefix.
@@ -993,7 +993,7 @@ class InterAdminTipo extends InterAdminAbstract
             $table .= $lang->prefix;
         }
 
-        return $table;
+        return $table.'_';
     }
     protected function _setMetadata($varname, $value)
     {
