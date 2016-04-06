@@ -555,13 +555,13 @@ class Record extends RecordAbstract implements Arrayable
     {
         kd('not implemented');
         $db = $this->getDb();
-        $sql = 'DELETE FROM '.$this->getDb()->getTablePrefix().'_tags WHERE parent_id = '.$this->id;
+        $sql = 'DELETE FROM '.$this->getDb()->getTablePrefix().'tags WHERE parent_id = '.$this->id;
         if (!$db->Execute($sql)) {
             throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
         }
 
         foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'_tags (parent_id, id, id_tipo) VALUES
+            $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
                 (($tag instanceof Record) ? $tag->id : 0).','.
                 (($tag instanceof Record) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
@@ -584,7 +584,7 @@ class Record extends RecordAbstract implements Arrayable
             $db = $this->getDb();
 
             $options['where'][] = 'parent_id = '.$this->id;
-            $sql = 'SELECT * FROM '.$this->getDb()->getTablePrefix().'_tags '.
+            $sql = 'SELECT * FROM '.$this->getDb()->getTablePrefix().'tags '.
                 'WHERE '.implode(' AND ', $options['where']).
                 (($options['group']) ? ' GROUP BY '.$options['group'] : '').
                 (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
@@ -727,6 +727,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         if (empty($this->attributes['id_tipo'])) {
             // Compatibilidade, tenta encontrar na tabela global
+            throw new Exception('Not implemented');
             return $this->getDb()->getTablePrefix(). (isset($this->attributes['table']) ? $this->attributes['table'] : '');
         } else {
             return $this->getType()->getInterAdminsTableName();

@@ -535,7 +535,7 @@ abstract class RecordAbstract implements Serializable
                         (($existsMatches[4]) ? ' AND ' : '');
                     } elseif ($table == 'tags') {
                         // Tags
-                        $existsMatches[2] = 'SELECT id_tag FROM '.$this->getDb()->getTablePrefix().'_tags AS '.$table.
+                        $existsMatches[2] = 'SELECT id_tag FROM '.$this->getDb()->getTablePrefix().'tags AS '.$table.
                         ' WHERE '.$table.'.parent_id = main.id'.(($existsMatches[4]) ? ' AND ' : '');
                     } elseif (isset($options['joins'][$table])) {
                         // Joins custom
@@ -608,7 +608,7 @@ abstract class RecordAbstract implements Serializable
                     } elseif ($table == 'tags') {
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
-                            $options['from'][] = $this->getDb()->getTablePrefix().'_tags AS '.$table.
+                            $options['from'][] = $this->getDb()->getTablePrefix().'tags AS '.$table.
                                 ' ON '.$table.'.parent_id = main.id';
 
                             $options['auto_group_flag'] = true;

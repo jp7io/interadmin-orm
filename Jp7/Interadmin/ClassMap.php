@@ -37,7 +37,7 @@ class ClassMap
 
     private static function loadMap($attr)
     {
-        $tipos = \DB::table('_tipos')
+        $tipos = \DB::table('tipos')
             ->select($attr, 'id_tipo', 'inherited')
             ->where($attr, '<>', '')
             ->where('deleted_tipo', '=', '')

@@ -794,7 +794,7 @@ class Type extends RecordAbstract
     }
     public function getTableName()
     {
-        return $this->getDb()->getTablePrefix().'_tipos';
+        return $this->getDb()->getTablePrefix().'tipos';
     }
     public function getInterAdminsOrder()
     {
@@ -836,7 +836,7 @@ class Type extends RecordAbstract
      */
     public function getArquivosTableName()
     {
-        return $this->_getTableLang().'_arquivos';
+        return $this->_getTableLang().'arquivos';
     }
     /**
      * Returns $db_prefix OR $db_prefix + $lang->prefix.
