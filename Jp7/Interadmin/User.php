@@ -92,4 +92,42 @@ class Jp7_Interadmin_User extends InterAdmin
             Session::push('flash.error', $e->getMessage());
         }
     }
+    
+    // Special - Campo
+    /**
+     * @deprecated Use Interadmin\Fields\PasswordLinkButton
+     */
+    public static function specialPassword($campo, $value, $parte = 'edit')
+    {
+        switch ($parte) {
+            case 'header':
+                return $campo['label'];
+            case 'list':
+                return $value;
+            case 'edit':
+                global $id;
+                
+                // Remove custom keys
+                $campo['nome'] = $campo['nome_original'];
+                unset($campo['tipo_de_campo']);
+                unset($campo['nome_original']);
+                
+                if (!$id) {
+                    // New user shows checkbox to send link
+                    $campo['tipo'] = 'char_send_link';
+                }
+                $interAdminField = new InterAdminField($campo);
+                ob_start();
+                $interAdminField->getHtml();
+                $html = ob_get_clean();
+                
+                if (!$id) {
+                    // New user shows checkbox to send link
+                    $end = '</td><td></td></tr>';
+                    $label = '<label for="jp7_db_checkbox_char_send_link[0]">Enviar link para cadastro de senha</label>';
+                    $html = str_replace($end, $label.$end, $html);
+                }
+                return $html;
+        }
+    }
 }
