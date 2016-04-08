@@ -21,9 +21,19 @@ class FuncField extends ColumnField
         if (!is_callable($this->nome)) {
             return 'Function '.$this->nome.' not found.';
         }
+        $globalIsset = isset($GLOBALS[$this->tipo]);
+        if (!$globalIsset) {
+            // Some specials depend on globals
+            $GLOBALS[$this->tipo] = $value;
+        }
+        
         ob_start();
         $response = call_user_func($this->nome, $this->campo, $value, $parte);
         $response .= ob_get_clean();
+        
+        if (!$globalIsset) {
+            unset($GLOBALS[$this->tipo]);
+        }
         return $response;
     }
     
