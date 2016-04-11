@@ -34,39 +34,46 @@ class Factory
      */
     public function makeField(array $campo)
     {
-		// tipo_de_campo -> only used in a few specials / xtra_disabledfields
-        $prefix = $this->getPrefix($campo['tipo_de_campo'] ? $campo['tipo_de_campo'].'_' : $campo['tipo']);
-        if ($prefix === 'select') {
-            if (in_array($campo['xtra'], [SelectField::XTRA_RECORD_AJAX, SelectField::XTRA_TYPE_AJAX])) {
-                $prefix .= '_ajax';
-            } elseif (in_array($campo['xtra'], [SelectField::XTRA_RECORD_RADIO, SelectField::XTRA_TYPE_RADIO])) {
-                $prefix .= '_radio';
-            }
-        } elseif ($prefix === 'select_multi') {
-            if ($campo['xtra'] === SelectMultiField::XTRA_RECORD_SEARCH) {
-                $prefix .= '_ajax';
-            }
-        } elseif ($prefix === 'special' || $prefix === 'func') {
-            // Special as object
+        // tipo_de_campo -> only used in a few specials / xtra_disabledfields
+        $tipo = $campo['tipo_de_campo'] ? $campo['tipo_de_campo'].'_' : $campo['tipo'];
+        $prefix = $this->getPrefix($tipo, $campo['xtra']);
+        $class = $this->getFieldClass($prefix, $campo);
+        return new $class($campo);
+    }
+    
+    protected function getFieldClass($prefix, array $campo)
+    {
+        if ($prefix === 'special' || $prefix === 'func') {
+            // Special as object implements FieldInterface
             // Special as callable should be deprecated in favor of object
             if (str_contains($campo['nome'], '\\')) {
-                $className = $campo['nome'];
-                return new $className($campo);
+                return $campo['nome'];
             }
         }
-        $className = $this->namespace.studly_case($prefix).'Field';
-        return new $className($campo);
+        return $this->namespace.studly_case($prefix).'Field';
     }
     
     /**
      * @param string
      */
-    protected function getPrefix($tipoDeCampo)
+    protected function getPrefix($tipo, $xtra)
     {
-        assert(is_string($tipoDeCampo));
-        $tipoParts = explode('_', $tipoDeCampo);
-        array_pop($tipoParts);
-        return implode('_', $tipoParts);
+        $prefix = explode('_', $tipo)[0];
+        if ($prefix === 'select') {
+            if (starts_with($tipo, 'select_multi_')) {
+                $prefix .= '_multi'; // SelectMultiField
+                if ($campo['xtra'] === SelectMultiField::XTRA_RECORD_SEARCH) {
+                    $prefix .= '_ajax'; // SelectMultiAjaxField
+                }
+            } else {
+                if (in_array($xtra, [SelectField::XTRA_RECORD_AJAX, SelectField::XTRA_TYPE_AJAX])) {
+                    $prefix .= '_ajax'; // SelectAjaxField
+                } elseif (in_array($xtra, [SelectField::XTRA_RECORD_RADIO, SelectField::XTRA_TYPE_RADIO])) {
+                    $prefix .= '_radio'; // SelectRadioField
+                }
+            }
+        }
+        return $prefix;
     }
 }
 
