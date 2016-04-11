@@ -90,6 +90,7 @@ class ColumnField extends BaseField
         }
         $input->getLabel()->setAttribute('title', $this->nome_id.' ('.$this->tipo.', xtra: '.$this->xtra.')');
         $input->onGroupAddClass($this->id);
+        $input->onGroupAddClass($this->nome_id.'-group');
         if ($this->separador) {
             $input->onGroupAddClass('has-separator');
         }
@@ -104,7 +105,7 @@ class ColumnField extends BaseField
     
     protected function getFormerId()
     {
-        return $this->tipo.(is_null($this->index) ? '' : '_'.$this->index);
+        return $this->nome_id.(is_null($this->index) ? '' : '_'.$this->index);
     }
     
     protected function getValue()
