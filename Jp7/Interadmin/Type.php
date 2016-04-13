@@ -460,7 +460,7 @@ class Type extends RecordAbstract
                 $parameters = explode('{,}', $campos[$i]);
                 if ($parameters[0]) {
                     $A[$parameters[0]]['ordem'] = ($i+1);
-                    $isSelect = (strpos($parameters[0], 'select_') !== false);
+                    $isSelect = strpos($parameters[0], 'select_') === 0;
                     for ($j = 0; $j < count($parameters); $j++) {
                         $A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
                     }
