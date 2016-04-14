@@ -26,7 +26,8 @@ class TextField extends ColumnField
         return Former::textarea($this->getFormerName())
             ->id($this->getFormerId())
             ->value($this->getValue())
-            ->data_html($this->xtra ?: false);
+            ->data_html($this->xtra ?: false)
+            ->rows($this->tamanho ?: 5);
     }
     /*
     public function getMassEditTag()
