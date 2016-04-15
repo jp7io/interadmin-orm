@@ -108,7 +108,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
         $optionsWithoutFields = array_merge($options, ['fields' => []]);
 
         // Default Class
-        if (!$options['default_class']) {
+        if (empty($options['default_class'])) {
             $options['default_class'] = 'InterAdmin';
         }
         // Classe não foi forçada, descobrir a classe do Tipo

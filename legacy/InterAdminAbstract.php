@@ -367,10 +367,10 @@ abstract class InterAdminAbstract implements Serializable
         if (!is_array($options['fields'])) {
             $options['fields'] = (array) $options['fields'];
         }
-        if ($options['fields_alias']) {
-            $options['aliases'] = array_flip($options['aliases']);
-        } else {
+        if (empty($options['fields_alias'])) {
             $options['aliases'] = [];
+        } else {
+            $options['aliases'] = array_flip($options['aliases']);
         }
         if (array_key_exists('use_published_filters', $options)) {
             $use_published_filters = $options['use_published_filters'];
@@ -769,7 +769,7 @@ abstract class InterAdminAbstract implements Serializable
     {
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
-        if (!$options['fields_alias']) {
+        if (empty($options['fields_alias'])) {
             $aliases = [];
         }
         if ($aliases) {

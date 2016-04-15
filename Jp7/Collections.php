@@ -186,9 +186,9 @@ class Jp7_Collections
             } else {
                 $attr = explode('->', $k);
                 $valor = reset($array)->{$attr[0]};
-                if ($attr[2]) {
+                if (!empty($attr[2])) {
                     $valor = $valor->{$attr[1]}->{$attr[2]};
-                } elseif ($attr[1]) {
+                } elseif (!empty($attr[1])) {
                     $valor = $valor->{$attr[1]};
                 }
             }

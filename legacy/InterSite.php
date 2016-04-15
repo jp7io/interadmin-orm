@@ -199,7 +199,7 @@ class InterSite
         $host = mb_strtolower($host);
 
         // This server is a main host
-        $this->server = $this->servers[$host];
+        $this->server = isset($this->servers[$host]) ? $this->servers[$host] : null;
         $this->hostType = self::HOST_MAIN;
 
         // Not Found, searching aliases
@@ -209,7 +209,7 @@ class InterSite
                 if ($jp7_app) {
                     $remotes = $server->interadmin_remote;
                     if (in_array($host, $remotes) || in_array('www.'.$host, $remotes)) {
-                        if ($server->vars['check_dns'] && !self::hasDnsRecord($server->host) && $server->alias_domains) {
+                        if (!empty($server->vars['check_dns']) && !self::hasDnsRecord($server->host) && $server->alias_domains) {
                             $server->host = $server->alias_domains[0];
                         }
                         $this->server = $this->servers[$host] = $server;

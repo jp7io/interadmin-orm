@@ -131,7 +131,7 @@ class InterAdminTipo extends InterAdminAbstract
 
                 return $this->attributes[$attributeName];
             } else {
-                return;
+                return $null; // Needs to be variable to be returned as reference
             }
         }
     }
@@ -147,13 +147,10 @@ class InterAdminTipo extends InterAdminAbstract
      */
     public static function getInstance($id_tipo, $options = [])
     {
-        if (!$options['default_class']) {
+        if (empty($options['default_class'])) {
             $options['default_class'] = self::$_defaultClass;
         }
-        if (!empty($options['class'])) {
-            // Classe foi forçada
-            $class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
-        } else {
+        if (empty($options['class'])) {
             // Classe não foi forçada, cria uma instância temporária para acessar o DB e verificar a classe correta
             $instance = new $options['default_class']($id_tipo, array_merge($options, [
                 'fields' => ['model_id_tipo', 'class_tipo'],
@@ -167,6 +164,9 @@ class InterAdminTipo extends InterAdminAbstract
 
                 return $instance;
             }
+        } else {
+            // Classe foi forçada
+            $class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
         }
         // Classe foi encontrada, instanciar o objeto
         return new $class_name($id_tipo, $options);

@@ -50,10 +50,10 @@ class InterAdminLog extends InterAdminAbstract
     public function __construct($id_log = 0, $options = [])
     {
         $this->id_log = $id_log;
-        $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-        $this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
+        $this->db_prefix = !empty($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+        $this->_db = !empty($options['db']) ? $options['db'] : $GLOBALS['db'];
 
-        if ($options['fields']) {
+        if (!empty($options['fields'])) {
             $this->getFieldsValues($options['fields']);
         }
     }
@@ -73,7 +73,7 @@ class InterAdminLog extends InterAdminAbstract
             $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
-                'class' => $options['class'],
+                'class' => isset($options['class']) ? $options['class'] : null,
             ]);
         }
 
@@ -179,20 +179,20 @@ class InterAdminLog extends InterAdminAbstract
     public static function findLogs($options = [])
     {
         $instance = new self();
-        if ($options['db']) {
+        if (!empty($options['db'])) {
             $instance->setDb($options['db']);
         }
-        if ($options['db_prefix']) {
+        if (!empty($options['db_prefix'])) {
             $instance->db_prefix = $options['db_prefix'];
         }
 
         $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
         $options['from'] = $instance->getTableName().' AS main';
 
-        if (!$options['where']) {
+        if (empty($options['where'])) {
             $options['where'][] = '1 = 1';
         }
-        if (!$options['order']) {
+        if (empty($options['order'])) {
             $options['order'] = 'date_insert DESC';
         }
         // Internal use
@@ -203,7 +203,7 @@ class InterAdminLog extends InterAdminAbstract
         $logs = [];
 
         while ($row = $rs->FetchNextObj()) {
-            $log = new self($row->id_tipo, [
+            $log = new self($row->id_log, [
                 'db_prefix' => $instance->db_prefix,
                 'db' => $instance->getDb(),
             ]);
