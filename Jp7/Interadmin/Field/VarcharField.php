@@ -32,7 +32,7 @@ class VarcharField extends ColumnField
         if ($this->isEmail()) {
             $rules[$name][] = 'email';
         } elseif ($this->isNumeric()) {
-            $rules[$name][] = 'numeric';
+            $rules[$name][] = 'pseudonumeric';
         } elseif ($this->isCep()) {
             $rules[$name][] = 'cep';
         } elseif ($this->isCpf()) {
@@ -98,6 +98,10 @@ class VarcharField extends ColumnField
         $input = parent::getFormerField();
         if ($this->isEmail()) {
             $input->type('email');
+        } elseif ($this->isNumeric()) {
+            // Remove Former HTML5 Validation
+            // Because we accept numbers in Brazilian format: 1,99 instead of 1.99
+            $input->pattern('[+-]?[0-9]+([0-9,.]*[0-9]+)?');
         } elseif ($this->isTel()) {
             $input->type('tel');
         } elseif ($this->isColor()) {
