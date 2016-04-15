@@ -51,6 +51,13 @@ class SelectMultiAjaxField extends SelectMultiField
         throw new UnexpectedValueException('Not implemented');
     }
     
+    public function getFilterTag()
+    {
+        $selectField = new SelectAjaxField($this->campo);
+        $selectField->setRecord($this->record);
+        return $selectField->getFilterTag();
+    }
+
     // We have more than one option selected, so we need to add the selected attribute to options
     protected function toOptions(array $array)
     {

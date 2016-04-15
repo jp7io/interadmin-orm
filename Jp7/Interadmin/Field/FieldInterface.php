@@ -69,6 +69,13 @@ interface FieldInterface
     public function getEditTag();
 
     /**
+     * Return object for filter
+     *
+     * @return Element|string
+     */
+    public function getFilterTag();
+    
+    /**
      * @return bool
      */
     public function hasMassEdit();

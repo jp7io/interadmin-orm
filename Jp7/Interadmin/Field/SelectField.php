@@ -31,6 +31,11 @@ class SelectField extends ColumnField
     {
         return in_array($this->xtra, [self::XTRA_TYPE, self::XTRA_TYPE_AJAX, self::XTRA_TYPE_RADIO]);
     }
+        
+    public function hasMassEdit()
+    {
+        return true;
+    }
     
     protected function getFormerField()
     {
@@ -40,8 +45,21 @@ class SelectField extends ColumnField
             ->options($this->getOptions());
     }
     
-    public function hasMassEdit()
+    protected function getFilterField()
     {
-        return true;
+        return $this->getFormerField();
+    }
+    
+    public function getFilterTag()
+    {
+        $options = ['blank' => '(vazio)'] + $this->getOptions();
+        
+        return $this->getFilterField()
+            ->name('filtro_'.$this->getFormerName())
+            ->options($options)
+            ->removeClass('form-control')
+            ->addClass('filter-select')
+            ->data_allow_blank()
+            ->raw();
     }
 }

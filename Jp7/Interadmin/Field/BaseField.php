@@ -84,6 +84,10 @@ abstract class BaseField implements FieldInterface
         return Element::td($input)->class($this->id);
     }
 
+    public function getFilterTag()
+    {
+        return '';
+    }
     
     public function hasMassEdit()
     {

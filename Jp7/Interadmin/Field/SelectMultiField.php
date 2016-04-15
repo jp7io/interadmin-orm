@@ -55,6 +55,13 @@ class SelectMultiField extends ColumnField
                 // ->id($this->getFormerId()) // Wont work with checkboxes
     }
     
+    public function getFilterTag()
+    {
+        $selectField = new SelectField($this->campo);
+        $selectField->setRecord($this->record);
+        return $selectField->getFilterTag();
+    }
+    
     protected function getCheckboxes($field)
     {
         $checkboxes = [];

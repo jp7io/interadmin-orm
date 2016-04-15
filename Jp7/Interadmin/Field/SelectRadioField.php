@@ -25,4 +25,9 @@ class SelectRadioField extends SelectField
         }
         return $radios;
     }
+    
+    protected function getFilterField()
+    {
+        return parent::getFormerField();
+    }
 }

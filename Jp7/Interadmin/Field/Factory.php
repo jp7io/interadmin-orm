@@ -62,7 +62,7 @@ class Factory
         if ($prefix === 'select') {
             if (starts_with($tipo, 'select_multi_')) {
                 $prefix .= '_multi'; // SelectMultiField
-                if ($campo['xtra'] === SelectMultiField::XTRA_RECORD_SEARCH) {
+                if ($xtra === SelectMultiField::XTRA_RECORD_SEARCH) {
                     $prefix .= '_ajax'; // SelectMultiAjaxField
                 }
             } else {
