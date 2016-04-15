@@ -20,6 +20,7 @@ class CharField extends ColumnField
     {
         $input = Former::checkbox($this->getFormerName())
             ->id($this->getFormerId())
+            ->setAttribute('value', 'S')
             ->text('&nbsp;'); // Bootstrap CSS - padding
         // initial check status
         if ($input->getValue() === null && $this->getValue()) {
