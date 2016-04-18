@@ -266,13 +266,16 @@ abstract class InterAdminAbstract implements Serializable
             }
         }
 
+        $table = $this->getTableName();
         $pk = $this->_primary_key;
         if ($this->$pk) {
-            $db->AutoExecute($this->getTableName(), $valuesToSave, 'UPDATE', $pk.' = '.$this->$pk)
-                or die(jp7_debug('Error while updating values in `'.$this->getTableName().'` '.$db->ErrorMsg(), print_r($valuesToSave, true)));
+            if (!$db->AutoExecute($table, $valuesToSave, 'UPDATE', $pk.' = '.$this->$pk)) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
         } else {
-            $db->AutoExecute($this->getTableName(), $valuesToSave, 'INSERT')
-                or die(jp7_debug('Error while inserting data into `'.$this->getTableName().'` '.$db->ErrorMsg(), print_r($valuesToSave, true)));
+            if (!$db->AutoExecute($table, $valuesToSave, 'INSERT')) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
             $this->$pk = $db->Insert_ID();
         }
         return $this;
@@ -905,7 +908,9 @@ abstract class InterAdminAbstract implements Serializable
         if ($this->$pk) {
             $sql = 'DELETE FROM '.$this->getTableName().
                 ' WHERE '.$this->_primary_key.' = '.$this->$pk;
-            $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            if (!$db->Execute($sql)) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
         }
         $this->attributes = [];
         $this->_deleted = true;

@@ -93,7 +93,10 @@ function interadmin_select_multi_item_down(campo) {
                 <?php
                 $sql = "SELECT campos, tabela FROM " . $db_prefix . "_tipos" .
                     " WHERE id_tipo=" . $campo_nome;
-                $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs = $db->Execute($sql);
+                if ($rs === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
                 while ($row = $rs->FetchNextObj()) {
                     $campos = interadmin_tipos_campos($row->campos);
                     $selectMultiTabela = $row->tabela;
@@ -125,17 +128,23 @@ function interadmin_select_multi_item_down(campo) {
                         $sql_where .
                         " AND deleted=''" .
                         " ORDER BY FIND_IN_SET(id,'" . trim($valor, ', ') . "')";
-                    $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                    $rs = $db->Execute($sql);
+                    if ($rs === false) {
+                        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                    }
                     $S = '';
                     for ($i = 0; $i < $nivel * 5; $i++) {
-                        if ($i < $nivel * 5 - 1) $S .= '-';
-                        else $S .= '> ';
+                        if ($i < $nivel * 5 - 1) {
+                            $S .= '-';
+                        } else {
+                            $S .= '> ';
+                        }
                     }
                     while ($row = $rs->FetchNextObj()) {
                         if(is_array($current_id)) $selected = in_array($row->id, $current_id);
                         else $selected = ($row->id == $current_id);
                         if ($row->select_key && !in_array("select_key", $select_campos_2_array)){
-                            if ($campos[select_key][xtra]) $row->varchar_key = interadmin_tipos_nome($row->select_key);
+                            if ($campos['select_key']['xtra']) $row->varchar_key = interadmin_tipos_nome($row->select_key);
                             else $row->varchar_key = jp7_fields_values($row->select_key);
                         }
                         // Combo Fields

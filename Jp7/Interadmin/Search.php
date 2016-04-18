@@ -16,7 +16,10 @@ class Jp7_Interadmin_Search
         global $db;
 
         $sql = $this->getSql($search, $date_filter, $exclude_tables);
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         //krumo($sql);
 
         $rows = [];

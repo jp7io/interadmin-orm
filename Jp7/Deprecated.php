@@ -31,7 +31,10 @@ class Jp7_Deprecated
         }
         // Update Concatenado (_)
         $sql = 'SELECT '.implode(',', $fields_arr_db).' FROM '.$table.' WHERE '.$table_id_name.'='.$table_id_value;
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         if ($row = (array) $rs->FetchNextObj()) {
             foreach ($fields_arr as $field) {
                 if (strpos($field, '_') === 0) {
@@ -43,7 +46,7 @@ class Jp7_Deprecated
         $rs->Close();
         // Update
         $sql = 'UPDATE '.$table.' SET ';
-        for ($i = 0;$i < count($fields_arr_db);$i++) {
+        for ($i = 0; $i < count($fields_arr_db); $i++) {
             eval("\$field_value=\$".$fields_arr_db[$i].';');
             $sql .= $fields_arr_db[$i]."='".$field_value."'";
             if ($i != count($fields_arr_db) - 1) {
@@ -51,7 +54,10 @@ class Jp7_Deprecated
             }
         }
         $sql .= ' WHERE '.$table_id_name.'='.$table_id_value;
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
     }
 
     /**
@@ -164,15 +170,27 @@ class Jp7_Deprecated
         }
         if ($sql_db) {
             if (isset($numrows) && isset($offset)) {
-                $rs_pre = $sql_db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs_pre = $sql_db->SelectLimit($sql, $numrows, $offset);
+                if ($rs_pre === false) {
+                    throw new Jp7_Interadmin_Exception($sql_db->ErrorMsg());
+                }
             } else {
-                $rs_pre = $sql_db->Execute($sql) or die(jp7_debug($sql_db->ErrorMsg(), $sql));
+                $rs_pre = $sql_db->Execute($sql);
+                if ($rs_pre === false) {
+                    throw new Jp7_Interadmin_Exception($sql_db->ErrorMsg());
+                }
             }
         } else {
             if (isset($numrows) && isset($offset)) {
-                $rs_pre = $db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs_pre = $db->SelectLimit($sql, $numrows, $offset);
+                if ($rs_pre === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
             } else {
-                $rs_pre = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs_pre = $db->Execute($sql);
+                if ($rs_pre === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
             }
         }
         if ($debugger->debugSql) {
@@ -228,7 +246,10 @@ class Jp7_Deprecated
         " AND date_publish<='".date('Y/m/d H:i:s')."'".
         $sql_where.
         ' ORDER BY '.$order;
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         while ($row = $rs->FetchNextObj()) {
             if ($seo) {
                 if ($type == 'combo') {
@@ -326,7 +347,10 @@ class Jp7_Deprecated
                         " AND date_publish <= '".date('Y/m/d H:i:s')."'";
             }
             if ($GLOBALS['db_type']) {
-                $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs = $db->Execute($sql);
+                if ($rs === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
                 if ($row = $rs->FetchNextObj()) {
                     if (count($fields_arr) > 1 || $OOP) {
                         if (!$O) {
@@ -656,7 +680,10 @@ class Jp7_Deprecated
     {
         global $db, $jp7_app;
         $sql = 'SELECT * FROM '.$table.' WHERE '.$table_id_name.'='.$table_id_value;
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         
         if ($returnValues) {
             $array = [];
@@ -739,7 +766,10 @@ class Jp7_Deprecated
                 }
             }
             $sql .= ' WHERE '.$table_id_name.'='.$table_id_value;
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
 
             return ($rs) ? $table_id_value : 0;
         } else {
@@ -765,7 +795,10 @@ class Jp7_Deprecated
                 $i++;
             }
             $sql = 'INSERT INTO '.$table.' ('.$sql_campos.'VALUES ('.$valores;//echo $sql ."<br /><hr /><br />";
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
 
             // Last ID
             if (!is_array($var_prefix)) {

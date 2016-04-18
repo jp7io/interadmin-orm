@@ -23,7 +23,10 @@ class Jp7_Interadmin_Tagcloud
             ' ORDER BY DATE(registros.date_hit) DESC, HOUR(registros.date_hit) DESC, registros.hits DESC'.
             ' LIMIT '.$this->limit * 2;
 
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         while ($row = $rs->FetchNextObj()) {
             $interadminCloud = new $class($row->id);
             $interadminCloud->hits = $row->hits;

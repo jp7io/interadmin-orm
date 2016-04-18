@@ -95,7 +95,10 @@ class Pagination
 
         if ($sql) {
             if ($GLOBALS['jp7_app']) {
-                $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs = $db->Execute($sql);
+                if ($rs === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
             } else {
                 $rs = interadmin_query($sql);
             }

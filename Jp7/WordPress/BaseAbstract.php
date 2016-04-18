@@ -54,7 +54,10 @@ abstract class Jp7_WordPress_BaseAbstract
     public static function retrieveObjects($db, $options, $className)
     {
         $sql = self::formatQuery($options);
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Exception($db->ErrorMsg());
+        }
 
         $array = [];
         while ($row = $rs->FetchNextObj()) {

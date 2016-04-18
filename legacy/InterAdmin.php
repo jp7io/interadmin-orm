@@ -290,7 +290,10 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             if (!$id_tipo = $this->id_tipo) {
                 global $db;
                 $sql = 'SELECT id_tipo FROM '.$this->getTableName().' WHERE id = '.intval($this->id);
-                $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs = $db->Execute($sql);
+                if ($rs === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
                 if ($row = $rs->FetchNextObj()) {
                     $id_tipo = $row->id_tipo;
                 }
@@ -651,14 +654,18 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
     {
         $db = $this->getDb();
         $sql = 'DELETE FROM '.$this->db_prefix.'_tags WHERE parent_id = '.$this->id;
-        $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        if (!$db->Execute($sql)) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
 
         foreach ($tags as $tag) {
             $sql = 'INSERT INTO '.$this->db_prefix.'_tags (parent_id, id, id_tipo) VALUES
 				('.$this->id.','.
                 (($tag instanceof self) ? $tag->id : 0).','.
                 (($tag instanceof self) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
-            $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            if (!$db->Execute($sql)) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
         }
     }
     /**
@@ -678,7 +685,10 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                 'WHERE '.implode(' AND ', $options['where']).
                 (($options['group']) ? ' GROUP BY '.$options['group'] : '').
                 (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
