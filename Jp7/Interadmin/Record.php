@@ -41,6 +41,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     protected $_tags;
 
+    protected $_loadedRelationships;
     protected $_eagerLoad;
 
     /**
@@ -161,24 +162,40 @@ class Record extends RecordAbstract implements Arrayable
 
         if ($data['multi']) {
             if ($fks = $this->{$name.'_ids'}) {
-                if ($data['type']) {
-                    $multi = [];
-                    foreach (array_filter(explode(',', $fks)) as $fk) {
-                        $multi[] = Type::getInstance($fk);
-                    }
-
-                    return $multi;
-                } else {
-                    return $data['provider']->records()
-                        ->findMany(array_filter(explode(',', $fks)));
+                $loaded = &$this->_loadedRelationships[$name.'_ids'];
+                if (!$loaded) {
+                    $loaded = (object) ['fks' => null];
                 }
+                if ($loaded->fks != $fks) {
+                    $loaded->fks = $fks;
+                    if ($data['type']) {
+                        $multi = [];
+                        foreach (array_filter(explode(',', $fks)) as $fk) {
+                            $multi[] = Type::getInstance($fk);
+                        }
+
+                        $loaded->values = $multi;
+                    } else {
+                        $loaded->values = $data['provider']->records()
+                            ->findMany(array_filter(explode(',', $fks)));
+                    }
+                }
+                return $loaded->values;
             }
         } elseif ($fk = $this->{$name.'_id'}) {
-            if ($data['type']) {
-                return Type::getInstance($fk);
-            } else {
-                return $data['provider']->records()->find($fk);
+            $loaded = &$this->_loadedRelationships[$name.'_id'];
+            if (!$loaded) {
+                $loaded = (object) ['fk' => null];
             }
+            if ($loaded->fk != $fk) {
+                $loaded->fk = $fk;
+                if ($data['type']) {
+                    $loaded->value = Type::getInstance($fk);
+                } else {
+                    $loaded->value = $data['provider']->records()->find($fk);
+                }
+            }
+            return $loaded->value;
         }
     }
 
