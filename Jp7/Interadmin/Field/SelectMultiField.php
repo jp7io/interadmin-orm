@@ -72,7 +72,7 @@ class SelectMultiField extends ColumnField
         }
         
         foreach ($this->getOptions() as $key => $value) {
-            $checkboxes[$value] = [
+            $checkboxes[$value.'<s>'.$key.'</s>'] = [ // s = avoid collision
                 'value' => $key, // ID
                 'checked' => in_array($key, $ids),
                 'required' => false // HTML5 validation can't handle multiple checkboxes

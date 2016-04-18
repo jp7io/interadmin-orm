@@ -12,6 +12,7 @@
 
 /**
  * Generates the HTML output for a field based on its type, such as varchar, int or text.
+ * @deprecated
  */
 class InterAdminField
 {
