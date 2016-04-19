@@ -124,16 +124,13 @@ class InterAdminTipo extends InterAdminAbstract
     {
         if (isset($this->attributes[$attributeName])) {
             return $this->attributes[$attributeName];
-        } else {
-            $inheritArr = ['class', 'class_tipo', 'tabela', 'template', 'language', 'layout', 'layout_registros'];
-            if (in_array($attributeName, $inheritArr)) {
-                $this->getFieldsValues($attributeName);
-
-                return $this->attributes[$attributeName];
-            } else {
-                return $null; // Needs to be variable to be returned as reference
-            }
         }
+        if (in_array($attributeName, $this->getColumns())) {
+            $this->getFieldsValues($attributeName);
+
+            return $this->attributes[$attributeName];
+        }
+        return $null; // Needs to be variable to be returned as reference
     }
     /**
      * Returns an InterAdminTipo instance. If $options['class'] is passed,
