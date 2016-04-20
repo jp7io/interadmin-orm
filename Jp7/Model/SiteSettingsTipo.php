@@ -78,10 +78,12 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
 					<tr>
 						<th title="css_template (template)"></th>
 						<td colspan="3">
+                            <?php /*
 							<input type="button" value="Abrir Editor de Cores"
 							onclick="window.open('<?php echo $c_cliente_url;
                     ?>interadmin/site/<?php echo $s_interadmin_cliente;
                     ?>/theme_editor.php')" />
+                    */?>
 						</td>
 					</tr>
 					<tr><td height="10" style="padding:0px" colspan="4"></td></tr>
