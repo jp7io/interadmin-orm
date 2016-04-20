@@ -14,6 +14,14 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
     {
     }
 
+    public function &__get($attributeName)
+    {
+        if (isset($this->attributes[$attributeName])) {
+            return $this->attributes[$attributeName];
+        }
+        return $null; // Needs to be variable to be returned as reference
+    }
+    
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
     {
         if (is_string($fields)) {
