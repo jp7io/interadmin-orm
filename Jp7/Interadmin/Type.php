@@ -847,10 +847,10 @@ class Type extends RecordAbstract
     {
         $table = $this->getDb()->getTablePrefix();
         if ($this->language) {
-            if (!Lang::has('interadmin.suffix')) {
-                throw new Exception('You need to add interadmin.suffix to app/lang/'.App::getLocale().'/interadmin.php');
+            if (!Lang::has('interadmin.prefix')) {
+                throw new Exception('You need to add interadmin.prefix to app/lang/'.App::getLocale().'/interadmin.php');
             }
-            $table .= Lang::get('interadmin.suffix');
+            $table .= Lang::get('interadmin.prefix');
         }
 
         return $table;
