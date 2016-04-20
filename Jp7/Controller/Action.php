@@ -87,7 +87,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
                 if ($config->template->template) {
                     $this->view->headLink()->removeStylesheet('css/main.css');
                     // @filemtime(jp7_absolute_path(APPLICATION_PATH . '/../interadmin/dynamic.css'));
-                    $this->view->headLink()->appendStylesheet($config->path.'/vendor/jp7internet'.$config->template->template.'/css/main.css?clientePath='.$config->name_id); // . '&update=' . $dynamicTime
+                    $this->view->headLink()->appendStylesheet('css/'.basename($config->template->template).'/main.css');
                     // Necessário para mudar a ordem
                     $this->view->headLink()->appendStylesheet('css/main.css');
                 }
