@@ -91,6 +91,11 @@ trait SelectFieldTrait
             'where' => ["deleted = ''"],
             'order' => implode(', ', $camposCombo)
         ]);
+        
+        if ($this->where) {
+            // From xtra_disabledfields
+            $query->whereRaw('1=1'.$this->where);
+        }
         return $query;
     }
         
