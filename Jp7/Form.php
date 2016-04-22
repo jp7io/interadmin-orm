@@ -264,7 +264,7 @@ class Jp7_Form extends Zend_Form
         return $element;
     }
 
-    public function populate($values, $prefix = '')
+    public function populate(array $values, $prefix = '')
     {
         if ($values instanceof InterAdmin) {
             $values = $values->attributes;
