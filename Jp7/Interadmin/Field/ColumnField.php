@@ -125,9 +125,14 @@ class ColumnField extends BaseField
     
     protected function handleReadonly($input)
     {
-        if ($this->readonly || !$this->hasPermissions()) {
+        if ($this->isReadonly()) {
             $input->disabled();
         }
+    }
+    
+    protected function isReadonly()
+    {
+        return $this->readonly || !$this->hasPermissions();
     }
     
     protected function hasPermissions()
@@ -149,7 +154,9 @@ class ColumnField extends BaseField
     public function getRules()
     {
         $rules = [];
-        if ($this->obrigatorio) {
+        if ($this->isReadonly()) {
+            $rules[$this->getRuleName()][] = 'in:'.$this->getValue();
+        } elseif ($this->obrigatorio) {
             $rules[$this->getRuleName()][] = 'required';
         }
         return $rules;
