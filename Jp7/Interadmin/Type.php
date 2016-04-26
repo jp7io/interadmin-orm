@@ -38,6 +38,7 @@ class Type extends RecordAbstract
     private static $inheritedFields = [
         'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
         'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo', 'xtra_disabledfields', 'xtra_disabledchildren',
+        'arquivos'
     ];
     private static $privateFields = ['children', 'campos'];
 

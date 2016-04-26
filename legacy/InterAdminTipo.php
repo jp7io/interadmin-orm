@@ -25,7 +25,7 @@ class InterAdminTipo extends InterAdminAbstract
     private static $inheritedFields = [
         'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
         'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo',
-        'visualizar', 'xtra_disabledfields', 'xtra_disabledchildren',
+        'visualizar', 'xtra_disabledfields', 'xtra_disabledchildren', 'arquivos'
     ];
     private static $privateFields = ['children', 'campos'];
 
