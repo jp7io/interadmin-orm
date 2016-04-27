@@ -10,7 +10,7 @@ class QaAuth
     // Asks password for qa.* or alt.*
     public function handle($request, Closure $next)
     {
-        if (App::environment('staging') && !$request->wantsJson()) {
+        if (App::environment('staging') && !$request->ajax()) {
             $name = config('app.name');
             if (empty($_SERVER['PHP_AUTH_USER']) || $_SERVER['PHP_AUTH_USER'] != $name || $_SERVER['PHP_AUTH_PW'] != $name) {
                 header('WWW-Authenticate: Basic realm="'.$name.'"');
