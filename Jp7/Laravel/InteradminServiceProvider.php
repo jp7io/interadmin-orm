@@ -49,11 +49,11 @@ class InteradminServiceProvider extends ServiceProvider
         
         try {
             if (Schema::hasTable('tipos')) {
-                spl_autoload_register([DynamicLoader::class, 'load']);
+                DynamicLoader::register();
             }
         } catch (PDOException $e) {
             if (App::runningInConsole()) {
-                echo $e->getMessage() . PHP_EOL;
+                echo 'Interadmin DB not connected: '.$e->getMessage().PHP_EOL;
             }
             Log::error($e);
         }

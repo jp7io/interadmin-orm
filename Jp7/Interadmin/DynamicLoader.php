@@ -4,6 +4,19 @@ namespace Jp7\Interadmin;
 
 class DynamicLoader
 {
+    private static $registered = false;
+    
+    public static function register()
+    {
+        spl_autoload_register([DynamicLoader::class, 'load']);
+        self::$registered = true;
+    }
+    
+    public static function isRegistered()
+    {
+        return self::$registered;
+    }
+    
     // Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
     public static function load($class)
     {
