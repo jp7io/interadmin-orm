@@ -29,6 +29,7 @@ class Collection extends BaseCollection
 
     /**
      * Just like ->lists(), but chainable.
+     * @deprecated
      */
     public function collect($value, $key = null)
     {
