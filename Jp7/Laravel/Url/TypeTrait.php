@@ -4,7 +4,7 @@ namespace Jp7\Laravel\Url;
 
 use Jp7\Interadmin\ClassMap;
 use Jp7\Interadmin\Record;
-use Jp7\Laravel\RouterFacade as Router;
+use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use URL;
 
@@ -36,7 +36,7 @@ trait TypeTrait
                 ', action: '.$action.'. Called on '.get_class($this));
         }
 
-        $variables = Router::getVariablesFromRoute($route);
+        $variables = r::getVariablesFromRoute($route);
 
         if (count($parameters) != count($variables)) {
             throw new BadMethodCallException('Route "'.$route->getUri().'" has '.count($variables).
@@ -54,6 +54,11 @@ trait TypeTrait
         return URL::route($route->getName(), $parameters);
     }
 
+    /**
+     * Gets the route for this type.
+     * @param  string $action Default to 'index'
+     * @return 
+     */
     public function getRoute($action = 'index')
     {
         $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
@@ -61,9 +66,15 @@ trait TypeTrait
             throw new BadMethodCallException('Invalid action "'.$action.'", valid actions: '.implode(', ', $validActions));
         }
 
-        return Router::getRouteByIdTipo($this->id_tipo, $action);
+        return r::getRouteByTypeId($this->id_tipo, $action);
     }
 
+    /**
+     * List of actions for this type. Only used when routes are dynamic.
+     * 
+     * @see Jp7\Laravel\Router::createDynamicRoutes
+     * @return array
+     */
     public function getRouteActions()
     {
         $class = ClassMap::getInstance()->getClass($this->id_tipo);
