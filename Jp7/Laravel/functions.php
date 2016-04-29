@@ -125,4 +125,18 @@ if (!function_exists('interadmin_data')) {
     {
         return new \Jp7\Interadmin\Collection($arr);
     }
+    
+    function trans_route($name, $parameters = [], $absolute = true)
+    {
+        $locale = LaravelLocalization::getCurrentLocale();
+        if ($locale === LaravelLocalization::getDefaultLocale()) {
+            $prefix = '';
+        } else {
+            $prefix = $locale.'.';
+            if ($name === 'index') {
+                $prefix .= '.'; // :/
+            }
+        }
+        return route($prefix.$name, $parameters, $absolute);
+    }
 }
