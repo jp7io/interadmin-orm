@@ -6,7 +6,7 @@ use Former\Former as OriginalFormer;
 use Debugbar;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\FieldUtil;
-use App;
+use Lang;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -113,7 +113,7 @@ class FormerExtension
         $campo = $campos[$name];
 
         // Set label
-        if (App::getLocale() === 'pt-BR') {
+        if (!Lang::has('validation.attributes.'.$alias)) {
             $label = FieldUtil::getCampoHeader($campo);
             $field->label($label);
         }
