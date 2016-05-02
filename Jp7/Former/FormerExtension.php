@@ -6,6 +6,7 @@ use Former\Former as OriginalFormer;
 use Debugbar;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\FieldUtil;
+use App;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -112,8 +113,10 @@ class FormerExtension
         $campo = $campos[$name];
 
         // Set label
-        $label = FieldUtil::getCampoHeader($campo);
-        $field->label($label);
+        if (App::getLocale() === 'pt-BR') {
+            $label = FieldUtil::getCampoHeader($campo);
+            $field->label($label);
+        }
 
         // Populate options
         if (starts_with($name, 'select_')) {
