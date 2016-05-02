@@ -92,7 +92,7 @@ class Router extends MethodForwarder
     }
     /**
      * @param  string $routeBasename
-     * 
+     *
      * @return Type
      */
     public function getTypeByRouteBasename($routeBasename)
@@ -101,7 +101,7 @@ class Router extends MethodForwarder
         $map = $map ?: [];
         $id_tipo = array_search($routeBasename, $map);
         if ($id_tipo) {
-            return Type::getInstance($id_tipo);    
+            return Type::getInstance($id_tipo);
         }
     }
     /**
@@ -128,7 +128,7 @@ class Router extends MethodForwarder
     
     /**
      * Adds conventions for controllers and 'only' option:
-     *     r::resource('places') 
+     *     r::resource('places')
      * Will behave like:
      *     r::resource('places', 'PlacesController', ['only' => ['index', 'show']])
      *
@@ -139,17 +139,18 @@ class Router extends MethodForwarder
     public function resource($name, $controller = null, array $options = [])
     {
         if (!is_string($controller) && empty($options)) {
+            // Called like resource($name, $options)
             $options = $controller;
             $controller = null;
         }
-        if (empty($options['only'])) {
-            $options['only'] = ['index', 'show'];
-        }
-        if (isset($options['id_tipo'])) {
-            $this->addType($options['id_tipo'], $name); // Maps [id_tipo => route.name]
-        }
         if (is_null($controller)) {
             $controller = $this->getControllerClass($name);
+        }
+        if (empty($options['only'])) {
+            $options['only'] = $this->getControllerActions($controller);
+        }
+        if (isset($options['id_tipo'])) {
+            $this->addType($options['id_tipo'], $name); // Maps [id_tipo => route basename]
         }
         return parent::resource($name, $controller, $options);
     }
@@ -171,14 +172,23 @@ class Router extends MethodForwarder
         return $controller;
     }
     
+    protected function getControllerActions($class)
+    {
+        $stack = $this->getGroupStack();
+        $namespace = end($stack)['namespace'];
+        $methods = get_class_methods($namespace.'\\'.$class);
+        $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
+        return array_intersect($methods, $validActions);
+    }
+    
     /**
      * Adds conventions for 'namespace':
      *     r::group(['prefix' => 'contact'], $callback)
      * Will behave like:
-     *     r::group(['prefix' => 'contact', 'namespace' => 'Contact'], $callback) 
-     *     
-     * @param  array   $attributes 
-     * @param  Closure $callback           
+     *     r::group(['prefix' => 'contact', 'namespace' => 'Contact'], $callback)
+     *
+     * @param  array   $attributes
+     * @param  Closure $callback
      */
     public function group(array $attributes, Closure $callback)
     {
@@ -196,11 +206,11 @@ class Router extends MethodForwarder
     protected function getLocale()
     {
         // route creation: $this->locale
-        // route resolution: App::getLocale() 
-        return is_null($this->locale) ? App::getLocale() : $this->locale; 
+        // route resolution: App::getLocale()
+        return is_null($this->locale) ? App::getLocale() : $this->locale;
     }
     
-    public function languages(Closure $callback) 
+    public function languages(Closure $callback)
     {
         foreach (LaravelLocalization::getSupportedLanguagesKeys() as $locale) {
             $this->locale = $locale; // Used as map key
@@ -221,7 +231,7 @@ class Router extends MethodForwarder
     /**
      * Creates routes automatically from InterAdmin's sections.
      * Only creates routes if Type has 'menu' checked.
-     * 
+     *
      * @param  Type     $section        Should use trait Jp7\Laravel\Routable
      * @param  array    $currentPath    Used for recursivity
      * @return void
@@ -250,9 +260,10 @@ class Router extends MethodForwarder
             $slug = $section->getSlug();
         
             if ($this->addType($section->id_tipo, $slug)) {
-                // won't override type route
-                Route::resource($slug, $section->getControllerBasename(), [
-                    'only' => $section->getRouteActions()
+                // won't enter here if there is already a route for this type
+                $controllerClass = $section->getControllerBasename();
+                Route::resource($slug, $controllerClass, [
+                    'only' => $this->getControllerActions($controllerClass)
                 ]);
             }
         }
@@ -266,7 +277,7 @@ class Router extends MethodForwarder
      * Returns a list of variable placeholders from routes.
      * Route: schools/{schools}/courses/{courses}
      * Variables: ['schools', 'courses']
-     * 
+     *
      * @param  Route $route
      * @return array
      */
@@ -280,10 +291,10 @@ class Router extends MethodForwarder
     
     /**
      * Parses route basename
-     * 
+     *
      * Route: 'services.contact.index'
      * Basename: 'services.contact'
-     * 
+     *
      * @param Route $route
      * @return string
      */

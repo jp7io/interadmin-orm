@@ -68,21 +68,4 @@ trait TypeTrait
 
         return r::getRouteByTypeId($this->id_tipo, $action);
     }
-
-    /**
-     * List of actions for this type. Only used when routes are dynamic.
-     * 
-     * @see Jp7\Laravel\Router::createDynamicRoutes
-     * @return array
-     */
-    public function getRouteActions()
-    {
-        $class = ClassMap::getInstance()->getClass($this->id_tipo);
-
-        if ($class && method_exists($class, 'getRouteActions')) {
-            return call_user_func([$class, 'getRouteActions']);
-        }
-
-        return ['index', 'show'];
-    }
 }
