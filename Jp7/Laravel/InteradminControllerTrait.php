@@ -9,7 +9,7 @@ use Artisan;
 trait InteradminControllerTrait
 {
     // Redirect to remote interadmin
-    public function index(Request $request)
+    public function index()
     {
         return redirect('http://'.config('interadmin.host').'/'.config('app.name'));
     }
@@ -28,7 +28,6 @@ trait InteradminControllerTrait
     // Access should be validated elsewhere
     public function session(Request $request)
     {
-        $name = config('app.name');
         $s_cookie = ['user' => $request->user];
         // You can get it later with => Cookie::get('interadmin')
         $cookie = Cookie::forever('interadmin', $s_cookie);
