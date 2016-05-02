@@ -172,13 +172,23 @@ class Router extends MethodForwarder
         return $controller;
     }
     
-    protected function getControllerActions($class)
+    protected function getControllerActions($classBasename)
     {
         $stack = $this->getGroupStack();
         $namespace = end($stack)['namespace'];
-        $methods = get_class_methods($namespace.'\\'.$class);
+        $class = $namespace.'\\'.$classBasename;
+        if (!class_exists($class)) {
+            echo 'Controller not found: '.$class.PHP_EOL;
+            /*
+            Create all controllers:
+            \Artisan::call('make:controller', [
+                'name' => str_replace('App\Http\Controllers\\', '', $class)
+            ]);
+            */
+            return [];
+        }
         $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
-        return array_intersect($methods, $validActions);
+        return array_intersect(get_class_methods($class), $validActions);
     }
     
     /**
