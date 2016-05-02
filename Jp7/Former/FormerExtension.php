@@ -38,12 +38,11 @@ class FormerExtension
     {
         $result = call_user_func_array([$this->former, $method], $arguments);
 
-        if ($result instanceof \Former\Traits\Field) {
-            $this->decorateField($result);
-
-            if ($this->model) {
-                $this->decorateFieldInterAdmin($result);
-            }
+        if ($result instanceof \Former\Form\Form) {
+            $this->decorateFormInterAdmin($result);
+        } elseif ($result instanceof \Former\Traits\Field) {
+            $this->decorateField($result); // DecoratorTrait
+            $this->decorateFieldInterAdmin($result);
         }
 
         return $result;
@@ -68,28 +67,25 @@ class FormerExtension
 
         return $this->former->populate($model);
     }
+  
+    public function close()
+    {
+        $this->model = null;
 
+        return $this->former->close();
+    }
+    
     /**
      * Add "rules" and "action" from InterAdmin.
      */
-    public function open()
+    private function decorateFormInterAdmin($form)
     {
-        $form = $this->former->open();
         if ($this->model) {
             $form->rules($this->rules);
             if ($this->model->getRoute('store')) {
                 $form->action($this->model->getUrl('store'));
             }
         }
-
-        return $form;
-    }
-
-    public function close()
-    {
-        $this->model = null;
-
-        return $this->former->close();
     }
 
     /**
@@ -97,7 +93,7 @@ class FormerExtension
      */
     private function decorateFieldInterAdmin($field)
     {
-        if (!$alias = $field->getName()) {
+        if (!$this->model || (!$alias = $field->getName())) {
             return;
         }
 
