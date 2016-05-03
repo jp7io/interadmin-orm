@@ -182,12 +182,13 @@ class Router extends MethodForwarder
         $class = $namespace.'\\'.$classBasename;
         if (!class_exists($class)) {
             echo 'Controller not found: '.$class.PHP_EOL;
-            /*
-            Create all controllers:
-            \Artisan::call('make:controller', [
-                'name' => str_replace('App\Http\Controllers\\', '', $class)
-            ]);
-            */
+            // Create all controllers:
+            if (env('CREATE_CONTROLLERS')) {
+                \Artisan::call('make:controller', [
+                    'name' => str_replace('App\Http\Controllers\\', '', $class),
+                    '--resource' => true
+                ]);
+            }
             return [];
         }
         $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
