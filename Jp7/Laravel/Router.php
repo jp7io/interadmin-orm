@@ -67,6 +67,9 @@ class Router extends MethodForwarder
         $groupRoute = str_replace('/', '.', trim($this->getLastGroupPrefix(), '/'));
         // Avoid setting same id_tipo twice
         if (!array_key_exists($id_tipo, $map)) {
+            if ($slug === '/') {
+                $slug = ''; // special case for index
+            }
             $map[$id_tipo] = ($groupRoute ? $groupRoute . '.' : '') . $slug;
             return true; // map entry set
         }
