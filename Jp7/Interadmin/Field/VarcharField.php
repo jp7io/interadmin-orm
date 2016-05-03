@@ -46,7 +46,7 @@ class VarcharField extends ColumnField
     
     protected function isUnique()
     {
-        return $this->xtra === 'id' || $this->xtra === 'id_email';
+        return $this->xtra === 'id' || $this->xtra === 'id_email' || $this->xtra === 'cpf';
     }
     
     protected function getUniqueRule()
