@@ -901,7 +901,9 @@ class Record extends RecordAbstract implements Arrayable
     public function getName()
     {
         $varchar_key_alias = $this->getType()->getCamposAlias('varchar_key');
-
+        if (!$varchar_key_alias) {
+            throw new Exception('There is no varchar_key field for Type ID: '.$this->id_tipo);
+        }
         return $this->$varchar_key_alias;
     }
 
