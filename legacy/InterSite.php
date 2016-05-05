@@ -209,9 +209,6 @@ class InterSite
                 if ($jp7_app) {
                     $remotes = $server->interadmin_remote;
                     if (in_array($host, $remotes) || in_array('www.'.$host, $remotes)) {
-                        if (!empty($server->vars['check_dns']) && !self::hasDnsRecord($server->host) && $server->alias_domains) {
-                            $server->host = $server->alias_domains[0];
-                        }
                         $this->server = $this->servers[$host] = $server;
                         $this->interadmin_remote = $host;
                         $this->hostType = self::HOST_REMOTE;
@@ -388,19 +385,5 @@ class InterSite
         $code = str_replace('stdClass::__set_state', '(object)', $code);
 
         return $code;
-    }
-
-    /**
-     * Cacheando verificação, porque chega a demorar 1 segundo.
-     */
-    public static function hasDnsRecord($domain)
-    {
-        $cacheFile = sys_get_temp_dir().'__dns_'.$domain;
-        if (is_file($cacheFile) && filemtime($cacheFile) > strtotime('-2 minute')) {
-            return file_get_contents($cacheFile);
-        } else {
-            $dns = dns_get_record($domain);
-            @file_put_contents($cacheFile, (bool) $dns);
-        }
     }
 }
