@@ -7,6 +7,7 @@ use Debugbar;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\FieldUtil;
 use Lang;
+use UnexpectedValueException;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -138,7 +139,10 @@ class FormerExtension
         } elseif ($field->getType() === 'radios') {
             $radios = [];
             foreach ($campoType->records()->all() as $record) {
-                $radios[$record->getName()] = ['value' => $record->id];
+                if (!$name = $record->getName()) {
+                    throw new UnexpectedValueException('getName() returned empty value for Record ID: '.$record->id);
+                }
+                $radios[$name] = ['value' => $record->id];
             }
             $field->radios($radios);
         }
