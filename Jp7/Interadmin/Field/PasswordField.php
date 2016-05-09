@@ -31,7 +31,9 @@ class PasswordField extends ColumnField
         $rules = parent::getRules();
         if ($this->getValue()) {
             // Remove required
-            $rules[$this->getRuleName()] = array_diff($rules[$this->getRuleName()], ['required']);
+            if (isset($rules[$this->getRuleName()])) {
+                $rules[$this->getRuleName()] = array_diff($rules[$this->getRuleName()], ['required']);
+            }
         }
         return $rules;
     }
