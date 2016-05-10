@@ -20,7 +20,7 @@ abstract class RecordAbstract implements Serializable
     use TryMethod;
     
     const DEFAULT_FIELDS_ALIAS = true;
-    const DEFAULT_NAMESPACE = '';
+    const DEFAULT_NAMESPACE = 'Jp7\Interadmin\\';
     const DEFAULT_FIELDS = '*';
 
     protected static $unguarded = false;

@@ -26,6 +26,10 @@ class ImgResize extends BaseImgResize
 
     protected static function getAllTemplates()
     {
-        return array_keys(config('imgix.templates'));
+        $templates = config('imgix.templates');
+        if (!$templates) {
+            return [];
+        }
+        return array_keys($templates);
     }
 }

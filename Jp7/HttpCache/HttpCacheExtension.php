@@ -24,6 +24,9 @@ class HttpCacheExtension extends HttpCache
     public function matchesBlacklist(Request $request)
     {
         $blacklist = config('httpcache.blacklist');
+        if (!$blacklist) {
+            return false;
+        }
         $pattern = '/^(' . addcslashes(implode('|', $blacklist), '/') . ').*/';
         return preg_match($pattern, $request->path());
     }
