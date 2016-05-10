@@ -59,9 +59,10 @@ class InteradminServiceProvider extends ServiceProvider
                 DynamicLoader::register();
             }
         } catch (PDOException $e) {
-            if (App::runningInConsole()) {
-                echo 'Interadmin DB not connected: '.$e->getMessage().PHP_EOL;
+            if (!App::runningInConsole()) {
+                throw $e;
             }
+            echo 'Interadmin DB not connected: '.$e->getMessage().PHP_EOL;
             Log::error($e);
         }
     }
