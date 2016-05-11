@@ -25,7 +25,11 @@ class TypelessQuery extends Query
 
     public function count()
     {
-        throw new BadMethodCallException('Not implemented.');
+        $options = $this->options;
+        $options['fields'] = "COUNT(*)";
+        $options['limit'] = 1;
+        $result = $this->provider->deprecatedTypelessFind($options)->first();
+        return $result->count;
     }
 
     public function find($id)
