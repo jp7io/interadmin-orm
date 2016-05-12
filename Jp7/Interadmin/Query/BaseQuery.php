@@ -4,11 +4,11 @@ namespace Jp7\Interadmin\Query;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Jp7\Interadmin\Type as InteradminType;
+use Jp7\Interadmin\Type;
 use Jp7\Interadmin\RecordAbstract;
 use BadMethodCallException;
 
-abstract class Base
+abstract class BaseQuery
 {
     protected $provider;
     protected $options;
@@ -239,7 +239,7 @@ abstract class Base
         if (is_string($var)) {
             return call_user_func([$var, 'type']);
         }
-        if ($var instanceof InteradminType) {
+        if ($var instanceof Type) {
             return $var;
         }
         throw new BadMethodCallException('Expected class name or Type, got: '.gettype($var));
@@ -282,11 +282,11 @@ abstract class Base
      * Aplica join na query.
      *
      * @param string                $alias
-     * @param string|InteradminType           $className
+     * @param string|Type           $className
      * @param array                 $conditions
      * @param string                $_joinType  ex.: INNER, LEFT, RIGHT
      *
-     * @return \Jp7\Interadmin\Query\Base
+     * @return \Jp7\Interadmin\Query\BaseQuery
      */
     public function join($alias, $className, $conditions, $_joinType = 'INNER')
     {

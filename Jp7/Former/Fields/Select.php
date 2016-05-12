@@ -6,7 +6,7 @@ class Select extends \Former\Form\Fields\Select
 {
     public function options($list, $selected = null, $valuesAsKeys = false)
     {
-        if ($list instanceof \Jp7\Interadmin\Query\Base) {
+        if ($list instanceof \Jp7\Interadmin\Query\BaseQuery) {
             throw new \Exception('Use ->lists(attr_name,id)');
         }
         

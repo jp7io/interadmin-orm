@@ -307,7 +307,7 @@ class Record extends RecordAbstract implements Arrayable
 
             return new Query($childrenTipo);
         } elseif ($methodName === 'arquivos' && $this->getType()->arquivos) {
-            return new Query\File($this);
+            return new Query\FileQuery($this);
         }
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";

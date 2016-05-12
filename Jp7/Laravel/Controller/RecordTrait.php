@@ -10,7 +10,7 @@ use Exception;
 trait RecordTrait
 {
     /**
-     * @var \Jp7\Interadmin\Query\Base
+     * @var \Jp7\Interadmin\Query\BaseQuery
      */
     protected $scope = null;
     protected $recordActions = ['show', 'edit', 'update', 'destroy'];

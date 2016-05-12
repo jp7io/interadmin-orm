@@ -5,7 +5,7 @@ namespace Jp7\Interadmin;
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class Query extends Query\Base
+class Query extends Query\BaseQuery
 {
     protected $model = null;
 

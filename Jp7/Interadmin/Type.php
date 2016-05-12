@@ -241,7 +241,7 @@ class Type extends RecordAbstract
 
     public function children()
     {
-        return new Query\Type($this);
+        return new Query\TypeQuery($this);
     }
 
     public function childrenByModel($model_id_tipo)

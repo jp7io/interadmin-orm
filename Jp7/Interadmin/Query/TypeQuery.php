@@ -3,10 +3,10 @@
 namespace Jp7\Interadmin\Query;
 
 use Jp7\Interadmin\Record;
-use Jp7\Interadmin\Type as InteradminType;
+use Jp7\Interadmin\Type;
 use BadMethodCallException;
 
-class Type extends Base
+class TypeQuery extends BaseQuery
 {
     protected function _isChar($field)
     {
@@ -52,10 +52,23 @@ class Type extends Base
 
         return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options)->first();
     }
-
+    
+    public function count()
+    {
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+        }
+        $options = $this->options;
+        $options['limit'] = 1;
+        $options['fields'] = "COUNT(*)";
+        
+        $result = $this->provider->getChildren(Record::DEPRECATED_METHOD, $options)->first();
+        return $result->count;
+    }
+    
     public function build(array $attributes = [])
     {
-        $className = InteradminType::getDefaultClass();
+        $className = Type::getDefaultClass();
 
         $child = new $className();
         $child->parent_id_tipo = $this->provider->id_tipo;

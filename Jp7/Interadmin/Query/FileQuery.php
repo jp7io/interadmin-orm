@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Query;
 
 use Jp7\Interadmin\Record;
 
-class File extends Base
+class FileQuery extends BaseQuery
 {
     protected function _isChar($field)
     {
