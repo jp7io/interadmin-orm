@@ -3,7 +3,7 @@
 namespace Jp7\Laravel;
 
 use Jp7\MethodForwarder;
-use Jp7\Interadmin\ClassMap;
+use Jp7\Interadmin\RecordClassMap;
 use Jp7\Interadmin\Type;
 use LaravelLocalization;
 use Route;
@@ -64,7 +64,7 @@ class Router extends MethodForwarder
         $map = $map ?: [];
         if (!is_numeric($id_tipo)) {
             // Get id_tipo from class
-            $id_tipo = ClassMap::getInstance()->getClassIdTipo($id_tipo);
+            $id_tipo = RecordClassMap::getInstance()->getClassIdTipo($id_tipo);
         }
         // Saving routes for each id_tipo
         $groupRoute = str_replace('/', '.', trim($this->getLastGroupPrefix(), '/'));

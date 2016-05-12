@@ -128,8 +128,7 @@ class Type extends RecordAbstract
             $classTipo = $options['class'];
         } else {
             // Classe não foi forçada, verificar classMap
-            $cm = ClassMap::getInstance();
-            $classTipo = $cm->getClassTipo($id_tipo);
+            $classTipo = TypeClassMap::getInstance()->getClass($id_tipo);
             if (!$classTipo) {
                 $classTipo = isset($options['default_class']) ? $options['default_class'] : self::$_defaultClass;
             }

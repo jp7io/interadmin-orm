@@ -216,8 +216,7 @@ class Record extends RecordAbstract implements Arrayable
 
     public static function type()
     {
-        $cm = ClassMap::getInstance();
-        if ($id_tipo = $cm->getClassIdTipo(get_called_class())) {
+        if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
             return Type::getInstance($id_tipo);
         }
     }
@@ -244,8 +243,7 @@ class Record extends RecordAbstract implements Arrayable
         if (isset($options['class'])) {
             $class_name = $options['class'];
         } else {
-            $cm = ClassMap::getInstance();
-            $class_name = $cm->getClass($tipo->id_tipo);
+            $class_name = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
             if (!$class_name) {
                 $class_name = isset($options['default_class']) ? $options['default_class'] : self::class;
             }
