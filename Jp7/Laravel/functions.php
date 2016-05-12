@@ -10,10 +10,10 @@ if (!function_exists('interadmin_data')) {
      */
     function human_size($bytes, $decimals = 2)
     {
-        $size = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
+        $size = ['B','KB','MB','GB','TB','PB','EB','ZB','YB'];
         $factor = floor((strlen($bytes) - 1) / 3);
 
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$size[$factor];
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).' '.@$size[$factor];
     }
     /**
      * Converts "1 hour" to 3600
