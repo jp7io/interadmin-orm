@@ -11,6 +11,9 @@ use Cache;
 use Closure;
 use App;
 
+/**
+ * Maps Interadmin sections to Laravel routes
+ */
 class Router extends MethodForwarder
 {
     /**
