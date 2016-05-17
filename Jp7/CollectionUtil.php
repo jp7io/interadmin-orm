@@ -71,7 +71,7 @@ class CollectionUtil
                 $rows = $data['tipo']
                     ->records()
                     ->whereIn('id', array_keys($indexed))
-                    ->all();
+                    ->get();
 
                 if ($relationships) {
                     self::eagerLoad($rows, $relationships);
@@ -87,7 +87,7 @@ class CollectionUtil
                 $data['tipo']->setParent(null);
                 $children = $data['tipo']
                     ->whereIn('parent_id', $records)
-                    ->all();
+                    ->get();
                 if ($relationships) {
                     self::eagerLoad($children, $relationships);
                 }

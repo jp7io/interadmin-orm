@@ -132,13 +132,13 @@ class FormerExtension
     {
         if ($field->getType() === 'select') {
             $options = [];
-            foreach ($campoType->records()->all() as $record) {
+            foreach ($campoType->records()->get() as $record) {
                 $options[$record->id] = $record->getName();
             }
             $field->options($options);
         } elseif ($field->getType() === 'radios') {
             $radios = [];
-            foreach ($campoType->records()->all() as $record) {
+            foreach ($campoType->records()->get() as $record) {
                 if (!$name = $record->getName()) {
                     throw new UnexpectedValueException('getName() returned empty value for Record ID: '.$record->id);
                 }

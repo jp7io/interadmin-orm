@@ -496,7 +496,7 @@ class Record extends RecordAbstract implements Arrayable
     public function getArquivos($deprecated, $options = [])
     {
         if ($deprecated != self::DEPRECATED_METHOD) {
-            throw new Exception('Use arquivos()->all() instead.');
+            throw new Exception('Use arquivos()->get() instead.');
         }
 
         $arquivos = [];

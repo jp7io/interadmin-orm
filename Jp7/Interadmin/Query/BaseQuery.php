@@ -428,7 +428,7 @@ abstract class BaseQuery
         
         $items = $this->skip(($page - 1) * $perPage)
             ->take($perPage)
-            ->all();
+            ->get();
 
         return new LengthAwarePaginator($items->all(), $totalItems, $perPage, $page, [
             'path' => LengthAwarePaginator::resolveCurrentPath(),

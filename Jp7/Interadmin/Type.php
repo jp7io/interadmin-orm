@@ -100,7 +100,7 @@ class Type extends RecordAbstract
         $message = 'Call to undefined method '.get_class($this).'->'.
             $methodName.'(). Available magic methods: '."\n";
 
-        foreach ($this->children()->all() as $child) {
+        foreach ($this->children()->get() as $child) {
             $message .= "\t\t- ".lcfirst(camel_case($child->id_slug))."()\n";
         }
         throw new BadMethodCallException($message);
@@ -202,7 +202,7 @@ class Type extends RecordAbstract
     public function getChildren($deprecated, $options = [])
     {
         if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use children()->all() instead.');
+            throw new Exception('Use children()->get() instead.');
         }
 
         $this->_whereArrayFix($options['where']); // FIXME
@@ -415,7 +415,7 @@ class Type extends RecordAbstract
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->limit(1)->all()->first();
+        return $this->limit(1)->get()->first();
     }
 
     /**

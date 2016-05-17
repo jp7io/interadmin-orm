@@ -9,7 +9,7 @@ class TypelessQuery extends Query
     /**
      * @return Record[]
      */
-    public function all()
+    public function get()
     {
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
@@ -44,7 +44,7 @@ class TypelessQuery extends Query
 
     public function delete()
     {
-        $records = $this->all();
+        $records = $this->get();
         foreach ($records as $record) {
             $record->delete();
         }
@@ -57,7 +57,7 @@ class TypelessQuery extends Query
      */
     public function forceDelete()
     {
-        $records = $this->all();
+        $records = $this->get();
         foreach ($records as $record) {
             $record->forceDelete();
         }

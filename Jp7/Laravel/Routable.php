@@ -54,6 +54,6 @@ trait Routable
 
     public function getChildrenMenu()
     {
-        return $this->children()->where('menu', true)->all();
+        return $this->children()->where('menu', true)->get();
     }
 }
