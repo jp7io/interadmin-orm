@@ -32,7 +32,11 @@ class InterAdminHandler
     protected function renderWithWhoops($e)
     {
         $whoops = new \Whoops\Run;
-        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+        if (php_sapi_name() === 'cli') {
+            $whoops->pushHandler(new \Whoops\Handler\PlainTextHandler());
+        } else {
+            $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+        }
         $whoops->handleException($e);
     }
 
