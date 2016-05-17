@@ -18,7 +18,7 @@ class FileQuery extends BaseQuery
         return in_array($field, $chars);
     }
 
-    public function all()
+    public function get()
     {
         return $this->provider->getArquivos(Record::DEPRECATED_METHOD, $this->options);
     }

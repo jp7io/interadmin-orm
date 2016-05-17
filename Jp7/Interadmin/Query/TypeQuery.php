@@ -33,7 +33,7 @@ class TypeQuery extends BaseQuery
         return in_array($field, $chars);
     }
 
-    public function all()
+    public function get()
     {
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');

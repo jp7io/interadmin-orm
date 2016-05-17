@@ -47,6 +47,18 @@ abstract class BaseQuery
         throw new BadMethodCallException('Unsupported method '.$method_name);
     }
 
+    /**
+     * @deprecated use get() instead.
+     * @return Collection
+     */
+    public function all()
+    {
+        if (env('APP_DEBUG')) {
+            trigger_error('all() is deprecated, use get() instead', E_USER_DEPRECATED);
+        }
+        return $this->get();
+    }
+
     public function where($column, $operator = null, $value = null)
     {
         if (is_array($column)) {

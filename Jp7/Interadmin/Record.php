@@ -201,15 +201,20 @@ class Record extends RecordAbstract implements Arrayable
 
     public static function __callStatic($name, array $arguments)
     {
-        if ($query = self::query()) {
+        if ($query = static::query()) {
             return call_user_func_array([$query, $name], $arguments);
         }
         throw new BadMethodCallException('Call to undefined method '.get_called_class().'::'.$name);
     }
 
+    public static function all()
+    {
+        return static::query()->get();
+    }
+
     public static function query()
     {
-        if ($type = self::type()) {
+        if ($type = static::type()) {
             return new Query($type);
         }
     }
