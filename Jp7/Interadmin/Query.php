@@ -20,7 +20,7 @@ class Query extends Query\BaseQuery
     public function getModel()
     {
         if (is_null($this->model)) {
-            if ($classname = $this->provider->class) {
+            if ($classname = $this->provider->getRecordClass()) {
                 $this->model = new $classname;
                 $this->model->setType($this->provider);
             }

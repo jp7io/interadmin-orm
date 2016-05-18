@@ -838,6 +838,23 @@ class Type extends RecordAbstract
     {
         return $this->_getTableLang().'arquivos';
     }
+
+    public function getRecordClass()
+    {
+        if (config('interadmin.psr-4')) {
+            return str_replace('_', '\\', $this->class);
+        }
+        return $this->class;
+    }
+
+    public function getTypeClass()
+    {
+        if (config('interadmin.psr-4')) {
+            return str_replace('_', '\\', $this->class_tipo);
+        }
+        return $this->class_tipo;
+    }
+
     /**
      * Returns $db_prefix OR $db_prefix + $lang->prefix.
      *
