@@ -31,9 +31,12 @@ class BaseClassMap
 
         $arr = [];
         foreach ($tipos as $tipo) {
-            $arr[$tipo->id_tipo] = $tipo->$attr;
+            if (config('interadmin.psr-4')) {
+                $arr[$tipo->id_tipo] = str_replace('_', '\\', $tipo->$attr);
+            } else {
+                $arr[$tipo->id_tipo] = $tipo->$attr;
+            }
         }
-
         return $arr;
     }
 
