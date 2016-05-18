@@ -53,7 +53,7 @@ abstract class BaseQuery
      */
     public function all()
     {
-        if (env('APP_DEBUG')) {
+        if (env('APP_DEBUG') && env('APP_ENV') === 'local') {
             trigger_error('all() is deprecated, use get() instead', E_USER_DEPRECATED);
         }
         return $this->get();
