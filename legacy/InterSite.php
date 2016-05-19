@@ -191,165 +191,118 @@ class InterSite
      *
      * @param string $host
      */
-    public function init($host)
+    public function init($env)
     {
-        global $jp7_app;
+        switch ($env) {
+            case 'local':
+                $type = self::DEVELOPMENT;
+                break;
+            case 'staging':
+                $type = self::QA;
+                break;
+            case 'production':
+                $type = self::PRODUCTION;
+                break;
+            default:
+                throw new UnexpectedValueException('Invalid APP_ENV: '.$env);
+        }
 
-        // Browsers não fazem isso, mas alguns User Agents estranhos podem vir em maiúscula
-        $host = mb_strtolower($host);
-
-        // This server is a main host
-        $this->server = isset($this->servers[$host]) ? $this->servers[$host] : null;
+        $this->server = $this->getFirstServerByType($type);
+        if (!$this->server) {
+            throw new UnexpectedValueException('Unable to find server for APP_ENV: '.$env);
+        }
         $this->hostType = self::HOST_MAIN;
-
-        // Not Found, searching aliases
-        while (!$this->server) {
-            foreach ($this->servers as $serverHost => $server) {
-                // InterAdmin Remote
-                if ($jp7_app) {
-                    $remotes = $server->interadmin_remote;
-                    if (in_array($host, $remotes) || in_array('www.'.$host, $remotes)) {
-                        $this->server = $this->servers[$host] = $server;
-                        $this->interadmin_remote = $host;
-                        $this->hostType = self::HOST_REMOTE;
-                        break 2;  // Exit foreach and while.
-                    }
-                }
-                // Domínios Alternativos - Não redirecionam
-                if (is_array($server->alias_domains) && in_array($host, $server->alias_domains)) {
-                    $this->server = $this->servers[$host] = $server;
-                    $this->server->host = $host;
-                    break 2;  // Exit foreach and while.
-                }
-                // Aliases - Redirecionam
-                if (in_array($host, $server->aliases)) {
-                    $this->server = $this->servers[$host] = $server;
-                    $this->hostType = self::HOST_ALIAS;
-                    break 2;  // Exit foreach and while.
-                }
-            }
-            // Dev Local
-            if (self::isAtLocalhost()) {
-                if ($this->servers['localhost']) {
-                    $this->server = $this->servers['localhost'];
-                    $this->servers[$host] = $this->server;
-                    $this->server->host = $host;
-                }
-            }
-            break;
+        // Check if it's an alias
+        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+        if ($type === self::PRODUCTION && in_array($host, $this->server->aliases)) {
+            $this->hostType = self::HOST_ALIAS;
         }
+        // InterAdmin Remote
+        if ($jp7_app) {
+            $this->interadmin_remote = $host;
+        }
+        // DB
+        $this->db = (object) [
+            'host' => getenv('DB_HOST'),
+            'host_internal' => '',
+            'name' =>  getenv('DB_DATABASE'),
+            'user' =>  getenv('DB_USERNAME'),
+            'flags' => '',
+            'pass' =>  getenv('DB_PASSWORD'),
+            'type' => 'mysql',
+            'prefix' => ($jp7_app ?: 'interadmin').'_'.$this->name_id
+        ];
+        // Vars
+        foreach ((array) $this->server->vars as $var => $value) {
+            $this->$var = $value;
+        }
+        // URL
+        $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
+        $this->url = jp7_path($host ? $protocol.'://'.$host : getenv('APP_URL'));
 
-        if ($this->server) {
-            $this->db = clone $this->server->db;
-            // Exceção para funcionamento do InterAdmin Remote nos sites Express
-            /*
-            if ($this->db->host == 'mysql.jp7.com.br' && $this->hostType == self::HOST_REMOTE) {
-                $this->db->host = 'localhost';
-            }
-            */
-            if ($this->db->host_internal && $this->hostType != self::HOST_REMOTE) {
-                $this->db->host = $this->db->host_internal;
-            }
-            foreach ((array) $this->server->vars as $var => $value) {
-                $this->$var = $value;
-            }
-            $this->url = (empty($_SERVER['HTTPS']) ? 'http' : 'https').'://'.$this->server->host.'/'.jp7_path($this->server->path);
-
-            foreach ($this->langs as $sigla => $lang) {
-                if ($lang->default) {
-                    $this->lang_default = $sigla;
-                    break;
-                }
-            }
-
-            // Storage
-            if (!$this->storage) {
-                $this->storage = [
-                    'host' => $this->server->host,
-                    'path' => $this->server->path
-                ];
-
-                if ($jp7_app && $jp7_app != 'interadmin') {
-                    $this->storage['path'] .= '/'.$jp7_app;
-                }
+        // Langs
+        foreach ($this->langs as $sigla => $lang) {
+            if ($lang->default) {
+                $this->lang_default = $sigla;
+                break;
             }
         }
+        // Storage
+        $this->filesystems = [
+            'filesystems.default' => getenv('FILESYSTEM_DISK'),
+            'filesystems.disks.local' => [
+                'driver' => 'local',
+                'root'   => BASE_PATH.'/'.($jp7_app ?: 'interadmin'),
+            ],
+            'filesystems.disks.s3' => [
+                'driver' => 's3',
+                'key'    => getenv('AWS_KEY'),
+                'secret' => getenv('AWS_SECRET'),
+                'region' => getenv('S3_REGION'),
+                'bucket' => getenv('S3_BUCKET'),
+            ],
+        ];
+        $this->storage = [
+            'host' => getenv('STORAGE_HOST'),
+            'path' => getenv('STORAGE_PATH'),
+        ];
     }
 
     public function start()
     {
-        global $debugger, $jp7_app;
+        global $jp7_app;
 
         if (!self::isWakeupEnabled()) {
             return;
         }
 
-        $host = $_SERVER['HTTP_HOST'];
-        // O browser não envia a porta junto com o host, mas alguns bots enviam
-        $host = preg_replace('/:80$/', '', $host);
-        if ($host != trim($host, '. ')) {
-            // Corrigindo hosts inválidos, com . no final
+        if (!getenv('APP_ENV')) {
+            throw new UnexpectedValueException('There is no APP_ENV');
+        }
+        $this->init(getenv('APP_ENV'));
+
+        if ($this->hostType === self::HOST_ALIAS) {
             header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
-            header('Location: http://'.trim($host, '. ').$_SERVER['REQUEST_URI']);
+            header('Location: http://'.$this->server->host.$_SERVER['REQUEST_URI']);
             exit;
         }
-        $this->init($host);
-
-        switch ($this->hostType) {
-            case self::HOST_ALIAS:
-                header($_SERVER['SERVER_PROTOCOL'].' 301 Moved Permanently');
-                header('Location: http://'.$this->server->host.$_SERVER['REQUEST_URI']);
-                exit;
-            case !$this->server:
-                $message = 'Host não está presente nas configurações: '.$_SERVER['HTTP_HOST'];
-                //jp7_mail('debug@jp7.com.br', $message, $debugger->getBacktrace($message));
-                $message .= '.<br /><br />Você pode ter digitado um endereço inválido.<br /><br />';
-                if ($this->servers) {
-                    if ($siteProducao = $this->getFirstServerByType(self::PRODUCAO)) {
-                        $urlProducao = 'http://'.jp7_implode('/', [$siteProducao->host, $siteProducao->path]);
-                        $messageLink = 'Acesse o site: <a href="'.$urlProducao.'">'.$urlProducao.'</a>';
-                    }
-                }
-                die($message.$messageLink);
-            }
 
         /* @todo TEMP - Creating old globals */
-        $oldtypes = [
-            self::PRODUCAO => 'Principal',
-            self::QA => 'QA',
-            self::DESENVOLVIMENTO => 'Local',
-        ];
         $GLOBALS['c_url'] = $this->url;
-        $GLOBALS['c_server_type'] = $oldtypes[$this->server->type];
         $GLOBALS['c_site'] = $this->name_id;
         $GLOBALS['c_menu'] = @$this->menu;
         $GLOBALS['c_cache'] = $this->cache;
         $GLOBALS['c_cache_delay'] = @$this->cache_delay;
-        $GLOBALS['db_prefix'] = ($jp7_app ?: 'interadmin').'_'.$this->name_id;
+        $GLOBALS['db_prefix'] = $this->db->prefix;
         $GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
         $GLOBALS['c_analytics'] = @$this->google_analytics;
         $GLOBALS['googlemaps_key'] = @$this->google_maps;
         $GLOBALS['c_w3c'] = true;
-        $GLOBALS['c_doc_root'] = jp7_doc_root();
-        // DB
-        $GLOBALS['db_type'] = $this->db->type;
-        $GLOBALS['db_host'] = $this->db->host;
-        $GLOBALS['db_name'] = $this->db->name;
-        $GLOBALS['db_user'] = $this->db->user;
-        $GLOBALS['db_pass'] = $this->db->pass;
-        // FTP
-        $GLOBALS['ftp']['host'] = $this->server->ftp;
-        $GLOBALS['ftp']['user'] = $this->server->user;
-        $GLOBALS['ftp']['pass'] = $this->server->pass;
         // InterAdmin
         $GLOBALS['c_publish'] = @$this->interadmin_preview;
         $GLOBALS['c_remote'] = @$this->interadmin_remote;
         $GLOBALS['c_cliente_title'] = $this->name;
         $GLOBALS['c_nobackup'] = @$this->nobackup;
-        foreach ($this->servers as $host => $server) {
-            $GLOBALS['c_cliente_domains'][] = $host;
-            $GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
-        }
         foreach ($this->langs as $sigla => $lang) {
             $GLOBALS['c_lang'][] = [$sigla, $lang->name, (bool) $lang->multibyte];
         }
