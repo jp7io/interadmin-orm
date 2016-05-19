@@ -30,7 +30,7 @@ class Cdn
 
     private static function getVersion()
     {
-        // Using timestamp of the git folder as version number
-        return filemtime(base_path('.git'));
+        // Using contents of .version as version number
+        return trim(file_get_contents(base_path('.version')));
     }
 }
