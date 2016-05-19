@@ -99,7 +99,8 @@ class InterAdminFieldFile
      */
     public function getExtension()
     {
-        $url = reset(explode('?', $this->url));
+        $parts = explode('?', $this->url);
+        $url = reset($parts);
 
         return preg_replace('/(.*)\.(.*)$/', '\2', $url);
     }
