@@ -346,41 +346,25 @@ class Jp7_Deprecated
                         " AND (deleted = '' OR deleted IS NULL)".
                         " AND date_publish <= '".date('Y/m/d H:i:s')."'";
             }
-            if ($GLOBALS['db_type']) {
-                $rs = $db->Execute($sql);
-                if ($rs === false) {
-                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-                }
-                if ($row = $rs->FetchNextObj()) {
-                    if (count($fields_arr) > 1 || $OOP) {
-                        if (!$O) {
-                            $O = new stdClass();
-                        }
-                        foreach ($fields_arr as $field) {
-                            $O->$field = $row->$field;
-                        }
-                    } else {
-                        $O = $row->$fields;
-                    }
-                }
-                $rs->Close();
-
-                return $O;
-            } else {
-                $rs = ($GLOBALS['jp7_app'] == 'intermail') ? $db - Execute($sql) : interadmin_mysql_query($sql);
-                if ($row = $rs->FetchNextObj()) {
-                    if (count($fields_arr) > 1) {
-                        foreach ($fields_arr as $field) {
-                            $O->$field = $row->$field;
-                        }
-                    } else {
-                        $O = $row->$fields;
-                    }
-                }
-                $rs->Close();
-
-                return $O;
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
+            if ($row = $rs->FetchNextObj()) {
+                if (count($fields_arr) > 1 || $OOP) {
+                    if (!$O) {
+                        $O = new stdClass();
+                    }
+                    foreach ($fields_arr as $field) {
+                        $O->$field = $row->$field;
+                    }
+                } else {
+                    $O = $row->$fields;
+                }
+            }
+            $rs->Close();
+
+            return $O;
         }
     }
     // moveFiles (2003/03/21)
