@@ -216,8 +216,8 @@ class FileCache
     public static function getFileName($request_uri, $storeId = null, $cachePath = '')
     {
         global $c_path;
-
-        $request_uri = reset(explode('?', $request_uri)); // Tira Query String
+        $request_uri = explode('?', $request_uri);
+        $request_uri = reset($request_uri); // Tira Query String
         $fileName = replace_prefix('/'.$c_path, '', $request_uri);
         $fileName = jp7_path($fileName, true);
 
