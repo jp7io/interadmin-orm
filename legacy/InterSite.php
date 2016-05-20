@@ -268,7 +268,7 @@ class InterSite
         ];
         $this->storage = [
             'host' => getenv('STORAGE_HOST'),
-            'path' => getenv('STORAGE_PATH'),
+            'path' => getenv('STORAGE_PATH') ?: '',
         ];
     }
 
