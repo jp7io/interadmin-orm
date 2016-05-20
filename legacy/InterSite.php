@@ -253,17 +253,19 @@ class InterSite
         }
         // Storage
         $this->filesystems = [
-            'filesystems.default' => getenv('FILESYSTEM_DISK'),
-            'filesystems.disks.local' => [
-                'driver' => 'local',
-                'root'   => BASE_PATH,
-            ],
-            'filesystems.disks.s3' => [
-                'driver' => 's3',
-                'key'    => getenv('AWS_KEY'),
-                'secret' => getenv('AWS_SECRET'),
-                'region' => getenv('S3_REGION'),
-                'bucket' => getenv('S3_BUCKET'),
+            'default' => getenv('FILESYSTEM_DISK'),
+            'disks' => [
+                'local' => [
+                    'driver' => 'local',
+                    'root'   => BASE_PATH,
+                ],
+                's3' => [
+                    'driver' => 's3',
+                    'key'    => getenv('AWS_KEY'),
+                    'secret' => getenv('AWS_SECRET'),
+                    'region' => getenv('S3_REGION'),
+                    'bucket' => getenv('S3_BUCKET'),
+                ]
             ]
         ];
         $this->storage = [
@@ -271,7 +273,7 @@ class InterSite
             'path' => getenv('STORAGE_PATH') ?: '',
         ];
     }
-
+    
     public function start()
     {
         if (!self::isWakeupEnabled()) {
