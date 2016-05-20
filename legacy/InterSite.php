@@ -193,6 +193,7 @@ class InterSite
      */
     public function init($env)
     {
+        global $jp7_app;
         switch ($env) {
             case 'local':
                 $type = self::DEVELOPMENT;
@@ -217,10 +218,6 @@ class InterSite
         if ($type === self::PRODUCTION && in_array($host, $this->server->aliases)) {
             $this->hostType = self::HOST_ALIAS;
         }
-        // InterAdmin Remote
-        if ($jp7_app) {
-            $this->interadmin_remote = $host;
-        }
         // DB
         $this->db = (object) [
             'host' => getenv('DB_HOST'),
@@ -238,7 +235,14 @@ class InterSite
         }
         // URL
         $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
-        $this->url = jp7_path($host ? $protocol.'://'.$host : getenv('APP_URL'));
+        if ($jp7_app) {
+            // InterAdmin Remote
+            $this->interadmin_remote = $host;
+            // APP_URL is already used by InterAdmin
+            $this->url = $protocol.'://'.$this->server->host.'/'.jp7_path($this->server->path);
+        } else {
+            $this->url = jp7_path($host ? $protocol.'://'.$host : getenv('APP_URL'));
+        }
 
         // Langs
         foreach ($this->langs as $sigla => $lang) {
@@ -270,14 +274,15 @@ class InterSite
 
     public function start()
     {
-        global $jp7_app;
-
         if (!self::isWakeupEnabled()) {
             return;
         }
 
         if (!getenv('APP_ENV')) {
             throw new UnexpectedValueException('There is no APP_ENV');
+        }
+        if (!getenv('APP_URL')) {
+            throw new UnexpectedValueException('There is no APP_URL');
         }
         $this->init(getenv('APP_ENV'));
 
