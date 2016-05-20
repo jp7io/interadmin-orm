@@ -140,3 +140,10 @@ if (!function_exists('interadmin_data')) {
         return route($prefix.$name, $parameters, $absolute);
     }
 }
+// Laravel 5.2
+if (!function_exists('resource_path')) {
+    function resource_path($path = '')
+    {
+        return base_path('resources/'.$path);
+    }
+}
