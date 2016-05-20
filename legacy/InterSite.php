@@ -256,7 +256,7 @@ class InterSite
             'filesystems.default' => getenv('FILESYSTEM_DISK'),
             'filesystems.disks.local' => [
                 'driver' => 'local',
-                'root'   => BASE_PATH.'/'.($jp7_app ?: 'interadmin'),
+                'root'   => BASE_PATH,
             ],
             'filesystems.disks.s3' => [
                 'driver' => 's3',
@@ -264,7 +264,7 @@ class InterSite
                 'secret' => getenv('AWS_SECRET'),
                 'region' => getenv('S3_REGION'),
                 'bucket' => getenv('S3_BUCKET'),
-            ],
+            ]
         ];
         $this->storage = [
             'host' => getenv('STORAGE_HOST'),
