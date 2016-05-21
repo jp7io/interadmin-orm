@@ -1,6 +1,6 @@
 ## master
 * Branch laravel was reintegrated to master
-* Dependencies removed classes, each client must require them as needed:
+* Dependencies removed from classes, each client must require them as needed:
  * "zendframework/zendframework1": "1.12.0"
  * "phpoffice/phpexcel": "~1.8.1"
  * "werkint/jsmin": "~1.0.0”
@@ -21,7 +21,7 @@
  * InterAdminLog -> Jp7\Interadmin\Log
  * InterAdminField -> Jp7\Interadmin\FieldUtil
  * InterAdminFieldFile -> Jp7\Interadmin\FileField
- * Change config suffix in resources/lang/en/interadmin.php from "_en" to "en_"
+ * Change config suffix in resources/lang/en/interadmin.php from \_en to en\_
 
 ## 2.6
 * TODO
