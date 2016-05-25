@@ -21,9 +21,14 @@ trait RecordTrait
 
     public function constructRecordTrait()
     {
-        $this->beforeFilter('@setScope');
-        $this->beforeFilter('@setType');
-        $this->beforeFilter('@setRecord', ['only' => $this->recordActions]);
+        $route = \Route::getCurrentRoute();
+        if ($route) {
+            $this->setScope($route);
+            $this->setType();
+            if ($this->isRecordAction()) {
+                $this->setRecord($route);
+            }
+        }
     }
 
     public function getScope()

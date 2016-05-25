@@ -18,9 +18,9 @@ trait DynamicViewTrait
 
     public function constructDynamicViewTrait()
     {
-        $this->_view = new stdClass();
+        $this->_view = new stdClass;
 
-        $this->beforeFilter('@checkAjax');
+        $this->checkAjax();
     }
     
     public function checkAjax()

@@ -22,8 +22,8 @@ class Controller extends BaseController
             $this->action = explode('@', $route->getActionName())[1];
         }
         
-        $this->constructRecordTrait();
         $this->constructDynamicViewTrait();
+        $this->constructRecordTrait();
     }
 
     /* Temporary solution - Avoid using this as much as possible */
