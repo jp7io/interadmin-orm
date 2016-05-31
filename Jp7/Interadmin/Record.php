@@ -86,10 +86,16 @@ class Record extends RecordAbstract implements Arrayable
         if (array_key_exists($name, $this->attributes)) {
             $value = &$this->attributes[$name];
         } else {
-            // returned as reference
-            $value = $this->_lazyLoadAttribute($name);
+            $aliases = $this->getAttributesAliases();
+            // Fixes fields that have alias
+            if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+                $name = $aliases[$name];
+                $value = &$this->attributes[$name];
+            } else {
+                // returned as reference
+                $value = $this->_lazyLoadAttribute($name);
+            }
         }
-        
         // Mutators
         if ($name !== 'id') {
             $mutator = 'get' . Str::studly($name) . 'Attribute';
@@ -130,10 +136,11 @@ class Record extends RecordAbstract implements Arrayable
 
             // Lazy loading
             $columns = $this->getColumns();
-            if (in_array($name, $columns) || in_array($name, $this->getAttributesAliases())) {
+            $aliases = $this->getAttributesAliases();
+            if (in_array($name, $columns) || in_array($name, $aliases)) {
                 if (class_exists('Debugbar')) {
                     $caller = debug_backtrace(false, 2)[1];
-                    
+
                     \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
                         .get_class($this)
                         .' - ID: '.$this->id
@@ -146,7 +153,10 @@ class Record extends RecordAbstract implements Arrayable
                 ));
 
                 $this->loadAttributes($attributes);
-
+                // Fixes lazy loading of fields that are not aliases
+                if (isset($aliases[$name])) {
+                    $name = $aliases[$name];
+                }
                 return $this->attributes[$name];
             }
         }
@@ -650,16 +660,12 @@ class Record extends RecordAbstract implements Arrayable
     public function isPublished()
     {
         global $s_session;
-        
-        $this->getFieldsValues(['date_publish', 'date_expire', 'char_key', 'publish', 'deleted']);
 
-        return (
+        return $this->char_key &&
+            !$this->deleted &&
+            ($this->parent_id || $this->publish || $s_session['preview'] || !config('interadmin.preview')) &&
             strtotime($this->date_publish) <= Record::getTimestamp() &&
-            (strtotime($this->date_expire) >= Record::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00') &&
-            $this->char_key &&
-            ($this->publish || config('interadmin.preview') || $s_session['preview']) &&
-            !$this->deleted
-        );
+            (strtotime($this->date_expire) >= Record::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00');
     }
 
     /**
