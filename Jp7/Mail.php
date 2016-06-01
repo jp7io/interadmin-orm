@@ -159,6 +159,6 @@ class Jp7_Mail extends Zend_Mail
         
         $object->setBodyHtml($message_html);
         $object->setBodyText($message_text);
-        return $object;
+        return $object->send();
     }
 }
