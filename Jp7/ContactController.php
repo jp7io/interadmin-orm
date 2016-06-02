@@ -34,6 +34,7 @@ class Jp7_ContactController extends __Controller_Action
                     $this->_sendEmail($record);
                     $this->_redirect($contactTipo->getUrl().'/ok');
                 } catch (Exception $e2) {
+                    Log::error($e2);
                     throw new Exception('Problema ao enviar a mensagem. Por favor, tente novamente.');
                 }
             } catch (Exception $e) {

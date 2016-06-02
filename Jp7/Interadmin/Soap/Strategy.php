@@ -25,6 +25,7 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                     return parent::addComplexType($type);
                 } catch (Zend_Soap_Wsdl_Exception $e) {
                     // Possibly a class was set but was not created a file for it
+                    Log::error($e);
                 }
             }
 
