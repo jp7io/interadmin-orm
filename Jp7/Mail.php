@@ -38,6 +38,9 @@ class Jp7_Mail extends Zend_Mail
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function setReturnPathAndTransport($email)
     {
         $tr = new Zend_Mail_Transport_Sendmail('-f'.$email);
@@ -49,6 +52,9 @@ class Jp7_Mail extends Zend_Mail
         ini_set('sendmail_from', $email);
     }
 
+    /**
+     * @deprecated
+     */
     public function restoreReturnPath()
     {
         self::clearDefaultTransport();
