@@ -211,7 +211,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         $subject = $issuer.' Token';
         $headers = 'From: '.$issuer." <no-reply@jp7.com.br>\r\n";
         
-        jp7_mail($this->email, $subject, $message, $headers);
+        Jp7_Mail::legacy($this->email, $subject, $message, $headers);
     }
 
     public function createGoogleSecret()
