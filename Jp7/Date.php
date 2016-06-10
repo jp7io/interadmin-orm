@@ -71,7 +71,7 @@ class Jp7_Date extends DateTime
      *
      * @return string
      */
-    public function humanDiff($timeStamp = false)
+    public static function humanDiff($timeStamp = false)
     {
         global $lang;
         switch ($lang->lang) {
