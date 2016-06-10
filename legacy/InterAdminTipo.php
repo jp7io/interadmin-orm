@@ -1032,6 +1032,15 @@ class InterAdminTipo extends InterAdminAbstract
         return $children;
     }
 
+    public function getInterAdminsChildrenTipos()
+    {
+        $tipos = [];
+        foreach ($this->getInterAdminsChildren() as $nome_id => $metadata) {
+            $tipos[] = $this->getInterAdminsChildrenTipo($nome_id);
+        }
+        return $tipos;
+    }
+
     /**
      * Returns a InterAdminTipo if the $nome_id is found in getInterAdminsChildren().
      *
