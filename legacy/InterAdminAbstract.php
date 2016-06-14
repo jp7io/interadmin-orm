@@ -437,7 +437,7 @@ abstract class InterAdminAbstract implements Serializable
             if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
                 $erro .= ". Available fields: \n\t\t- ".implode("\n\t\t- ", array_keys($options['aliases']));
             }
-            die(jp7_debug($erro, $sql));
+            jp7_debug($erro, $sql);
         }
 
         if ($debugger->debugSql || !empty($options['debug'])) {
@@ -749,7 +749,7 @@ abstract class InterAdminAbstract implements Serializable
     {
         $joinTipo = $this->getCampoTipo($campo);
         if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
-            die(jp7_debug('The field "'.$alias.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').'));
+            jp7_debug('The field "'.$alias.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
         // @todo testar

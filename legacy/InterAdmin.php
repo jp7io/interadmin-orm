@@ -258,7 +258,7 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
                 $message .= "\t\t- ".str_replace('{ChildName}', $childName, $pattern)."\n";
             }
         }
-        die(jp7_debug($message));
+        jp7_debug($message);
     }
     /**
      * Gets fields values by their alias.

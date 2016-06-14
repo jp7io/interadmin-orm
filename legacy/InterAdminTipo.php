@@ -89,7 +89,7 @@ class InterAdminTipo extends InterAdminAbstract
             }
         }
         // Default error when method doesn´t exist
-        die(jp7_debug('Call to undefined method '.get_class($this).'->'.$method.'()'));
+        jp7_debug('Call to undefined method '.get_class($this).'->'.$method.'()');
     }
 
     /**
