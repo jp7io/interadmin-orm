@@ -195,7 +195,11 @@ class Router extends MethodForwarder
             return [];
         }
         $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
-        return array_intersect(get_class_methods($class), $validActions);
+        $actions = array_intersect(get_class_methods($class), $validActions);
+        if (!$actions) {
+            echo 'Controller has no actions: '.$class.PHP_EOL;
+        }
+        return $actions;
     }
     
     /**
