@@ -100,7 +100,11 @@ class FormerExtension
         }
         if (str_contains($alias, '[')) {
             // Nested models: socios[0][nome]
-            list($childName, $i, $childAlias) = explode('.', $this->toDots($alias));
+            $aliasParts = explode('.', $this->toDots($alias));
+            if (count($aliasParts) !== 3) {
+                return;
+            }
+            list($childName, $i, $childAlias) = $aliasParts;
             try {
                 $childType = $this->model->$childName()->type();
                 $this->decorateFieldByTypeAndAlias($field, $childType, $childAlias);
