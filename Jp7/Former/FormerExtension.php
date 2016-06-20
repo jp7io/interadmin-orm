@@ -8,6 +8,7 @@ use Jp7\Interadmin\Record;
 use Jp7\Interadmin\FieldUtil;
 use Lang;
 use UnexpectedValueException;
+use BadMethodCallException;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -97,8 +98,23 @@ class FormerExtension
         if (!$this->model || (!$alias = $field->getName())) {
             return;
         }
-
+        if (str_contains($alias, '[')) {
+            // Nested models: socios[0][nome]
+            list($childName, $i, $childAlias) = explode('.', $this->toDots($alias));
+            try {
+                $childType = $this->model->$childName()->type();
+                $this->decorateFieldByTypeAndAlias($field, $childType, $childAlias);
+            } catch (BadMethodCallException $e) {
+                // no child type with this name
+            }
+            return;
+        }
         $type = $this->model->getType();
+        $this->decorateFieldByTypeAndAlias($field, $type, $alias);
+    }
+
+    private function decorateFieldByTypeAndAlias($field, $type, $alias)
+    {
         $campos = $type->getCampos();
         $aliases = array_flip($type->getCamposAlias());
 
@@ -126,6 +142,16 @@ class FormerExtension
                     ->title('Preencha nome e sobrenome');
             }
         }
+    }
+
+    protected function toDots($name)
+    {
+        $name = str_replace( // same replace Laravel and Former do
+            ['[', ']'],
+            ['.', ''],
+            $name
+        );
+        return trim($name, '.');
     }
 
     private function populateOptions($field, $campoType)
