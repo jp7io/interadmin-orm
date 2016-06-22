@@ -351,32 +351,20 @@ class Record extends RecordAbstract implements Arrayable
         if (empty($this->attributes['id_tipo'])) {
             $this->id_tipo = 0;
         }
-        
+        // Record::type() -> Classes that have name
         $tipo = static::type();
-        if (!$tipo || $this->id_tipo != $tipo->id_tipo) {
+        if (!$tipo || ($this->id_tipo && $this->id_tipo != $tipo->id_tipo)) {
+            // Anonymous classes or instance has different id_tipo
             if (!$this->id_tipo) {
-                $db = $this->getDb();
-                $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
-
-                $data = DB::table($table)
-                    ->select('id_tipo')
-                    ->where('id', $this->id)
-                    ->first();
-
-                if (!$data || !$data->id_tipo) {
-                    throw new Exception('Could not find id_tipo for record with id: ' . $this->id);
-                }
-
-                $this->id_tipo = $data->id_tipo;
+                // Instance was not brought from DB, id_tipo is empty
+                throw new Exception('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
             $tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
             ]);
         }
-        
         $this->setType($tipo);
-
         return $this->_tipo;
     }
 
@@ -751,13 +739,7 @@ class Record extends RecordAbstract implements Arrayable
     }
     public function getTableName()
     {
-        if (empty($this->attributes['id_tipo'])) {
-            // Compatibilidade, tenta encontrar na tabela global
-            throw new Exception('Not implemented');
-            return $this->getDb()->getTablePrefix(). (isset($this->attributes['table']) ? $this->attributes['table'] : '');
-        } else {
-            return $this->getType()->getInterAdminsTableName();
-        }
+        return $this->getType()->getInterAdminsTableName();
     }
     /**
      * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
