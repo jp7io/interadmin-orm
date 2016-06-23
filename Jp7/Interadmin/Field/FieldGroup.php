@@ -17,12 +17,13 @@ class FieldGroup
     public function getEditTag()
     {
         $html = '';
-        if ($this->fields[0] instanceof TitField) {
-            $html .= $this->fields[0]->openPanel();
+        $first = $this->fields[0];
+        if ($first instanceof TitField) {
+            $html .= $first->openPanel();
         } else {
-            $html .= '<div class="panel panel-default">'.
+            $firstClass = (isset($first->nome_id) ? $first->nome_id.'-panel' : $first->id.'-panel');
+            $html .= '<div class="panel panel-default '.$firstClass.'">'.
                         '<div class="panel-body">';
-            
         }
         
         $html .= implode(PHP_EOL, array_map(function ($field) {
@@ -32,8 +33,8 @@ class FieldGroup
             return ($field instanceof TitField) ? '' : (string) $field->getEditTag();
         }, $this->fields));
         
-        if ($this->fields[0] instanceof TitField) {
-            $html .= $this->fields[0]->closePanel();
+        if ($first instanceof TitField) {
+            $html .= $first->closePanel();
         } else {
             $html .= '</div>'.
                         '</div>';
