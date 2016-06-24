@@ -21,7 +21,7 @@ class FieldGroup
         if ($first instanceof TitField) {
             $html .= $first->openPanel();
         } else {
-            $firstClass = (isset($first->nome_id) ? $first->nome_id.'-panel' : $first->id.'-panel');
+            $firstClass = (isset($first->nome_id) ? $first->nome_id.'-panel' : '');
             $html .= '<div class="panel panel-default '.$firstClass.'">'.
                         '<div class="panel-body">';
         }
