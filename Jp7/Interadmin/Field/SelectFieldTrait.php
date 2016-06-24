@@ -30,7 +30,7 @@ trait SelectFieldTrait
         if ($html) {
             return ($status ? e($value) : '<del>'.e($value).'</del>');
         }
-        return $value.($status ? '' : ' [deleted]');
+        return $value.($status ? '' : ' [unpublished]');
     }
     
     protected function valueAndStatus($id)
@@ -41,6 +41,7 @@ trait SelectFieldTrait
         if ($this->hasTipo()) {
             return [interadmin_tipos_nome($id), true];
         }
+        /* @var $related InterAdmin */
         $related = $this->nome->findById($id);
         if ($related) {
             return [$related->getStringValue(), $related->isPublished()];
