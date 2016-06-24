@@ -261,7 +261,7 @@ class Type extends RecordAbstract
 
         $options['where'][] = 'id_tipo = '.$this->id_tipo;
         if ($this->_parent instanceof Record) {
-            $options['where'][] =  'parent_id = '.intval($this->_parent->id);
+            $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
         }
 
         $rs = $this->_executeQuery($options, $select_multi_fields);
