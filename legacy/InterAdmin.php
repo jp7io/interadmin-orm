@@ -835,7 +835,14 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
         return parent::save();
     }
-
+    /**
+     * Saves without logs and triggers.
+     */
+    public function saveRaw()
+    {
+    	 return parent::save();
+    }
+    
     public function generateSlug()
     {
         if (isset($this->varchar_key)) {
