@@ -86,6 +86,7 @@ class CollectionUtil
                 // child.parent_id = parent.id
                 $data['tipo']->setParent(null);
                 $children = $data['tipo']
+                    ->records()
                     ->whereIn('parent_id', $records)
                     ->get();
                 if ($relationships) {
