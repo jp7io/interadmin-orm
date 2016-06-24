@@ -133,6 +133,9 @@ class Record extends RecordAbstract implements Arrayable
 
                 return $related; // returned as reference
             }
+            if ($query = $this->_loadManyRelationship($name)) {
+                return $query->get();
+            }
 
             // Lazy loading
             $columns = $this->getColumns();
@@ -311,16 +314,8 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function __call($methodName, $args)
     {
-        // childName() - relacionamento
-        if ($child = $this->_findChild(ucfirst($methodName))) {
-            $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-            if (isset($this->_eagerLoad[$methodName])) {
-                return new EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
-            }
-
-            return new Query($childrenTipo);
-        } elseif ($methodName === 'arquivos' && $this->getType()->arquivos) {
-            return new Query\FileQuery($this);
+        if ($query = $this->_loadManyRelationship($methodName)) {
+            return $query;
         }
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
@@ -335,6 +330,22 @@ class Record extends RecordAbstract implements Arrayable
 
         throw new BadMethodCallException($message);
     }
+
+    protected function _loadManyRelationship($name)
+    {
+        // childName() - relacionamento
+        if ($child = $this->_findChild(ucfirst($name))) {
+            $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
+            if (isset($this->_eagerLoad[$name])) {
+                return new EagerLoaded($childrenTipo, $this->_eagerLoad[$name]);
+            }
+
+            return new Query($childrenTipo);
+        } elseif ($name === 'arquivos' && $this->getType()->arquivos) {
+            return new Query\FileQuery($this);
+        }
+    }
+
     /**
      * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
