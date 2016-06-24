@@ -29,6 +29,11 @@ class FuncField extends ColumnField
         return $response;
     }
     
+    public function getLabel()
+    {
+        return $this->label;
+    }
+    
     public function getEditTag()
     {
         $html = trim($this->getFuncHtml($this->getValue(), 'edit'));
