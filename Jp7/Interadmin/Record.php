@@ -231,7 +231,12 @@ class Record extends RecordAbstract implements Arrayable
             return new Query($type);
         }
     }
-
+    // called by EloquentUserProvider
+    public function newQuery()
+    {
+        return self::query();
+    }
+    
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
