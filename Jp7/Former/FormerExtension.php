@@ -171,11 +171,13 @@ class FormerExtension
     private function populateOptions($field, $campoType)
     {
         if ($field->getType() === 'select') {
-            $options = [];
-            foreach ($campoType->records()->get() as $record) {
-                $options[$record->id] = $record->getName();
-            }
-            $field->options($options);
+            $field->options(function () use ($campoType) {
+                $options = [];
+                foreach ($campoType->records()->get() as $record) {
+                    $options[$record->id] = $record->getName();
+                }
+                return $options;
+            });
         } elseif ($field->getType() === 'radios') {
             $radios = [];
             foreach ($campoType->records()->get() as $record) {
