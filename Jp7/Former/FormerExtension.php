@@ -10,6 +10,7 @@ use Jp7\Interadmin\FieldUtil;
 use Lang;
 use UnexpectedValueException;
 use BadMethodCallException;
+use DateTime;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -144,7 +145,11 @@ class FormerExtension
         if (starts_with($name, 'select_')) {
             $this->populateOptions($field, $campo['nome']);
         }
-
+        // Fix date format
+        if ($field->getType() === 'date' && $field->getValue() instanceof DateTime) {
+            $field->setValue($field->getValue()->format('Y-m-d'));
+        }
+        
         if (isset($this->rules[$alias])) {
             if (in_array('name_and_surname', $this->rules[$alias])) {
                 $field->pattern('\S+ +\S.*')
