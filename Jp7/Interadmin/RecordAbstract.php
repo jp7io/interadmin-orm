@@ -156,6 +156,13 @@ abstract class RecordAbstract implements Serializable
     {
         return [];
     }
+    
+    // Used by ResetsPasswords
+    public function forceFill(array $attributes)
+    {
+        $this->setRawAttributes($attributes);
+        return $this;
+    }
 
     public function fill(array $attributes)
     {
