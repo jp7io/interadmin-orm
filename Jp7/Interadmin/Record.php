@@ -125,44 +125,46 @@ class Record extends RecordAbstract implements Arrayable
     
     private function _lazyLoadAttribute($name)
     {
-        if ($this->id) {
-            // relationship
-            $relationships = $this->getType()->getRelationships();
-            if (isset($relationships[$name])) {
-                $related = $this->_loadRelationship($relationships, $name);
-
-                return $related; // returned as reference
-            }
-            if ($query = $this->_loadManyRelationship($name)) {
-                return $query->get();
-            }
-
-            // Lazy loading
-            $columns = $this->getColumns();
-            $aliases = $this->getAttributesAliases();
-            if (in_array($name, $columns) || in_array($name, $aliases)) {
-                if (class_exists('Debugbar')) {
-                    $caller = debug_backtrace(false, 2)[1];
-
-                    \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
-                        .get_class($this)
-                        .' - ID: '.$this->id
-                        .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
-                }
-
-                $attributes = array_intersect($columns, array_merge(
-                    $this->getAttributesNames(),
-                    $this->getAdminAttributes()
-                ));
-
-                $this->loadAttributes($attributes);
-                // Fixes lazy loading of fields that are not aliases
-                if (isset($aliases[$name])) {
-                    $name = $aliases[$name];
-                }
-                return $this->attributes[$name];
-            }
+        if (!$this->id) {
+            return;
         }
+        // relationship
+        $relationships = $this->getType()->getRelationships();
+        if (isset($relationships[$name])) {
+            $related = $this->_loadRelationship($relationships, $name);
+
+            return $related; // returned as reference
+        }
+        if ($query = $this->_loadManyRelationship($name)) {
+            return $query->get();
+        }
+
+        // Lazy loading
+        $columns = $this->getColumns();
+        $aliases = $this->getAttributesAliases();
+        if (!in_array($name, $columns) && !in_array($name, $aliases)) {
+            return;
+        }
+        if (class_exists('Debugbar')) {
+            $caller = debug_backtrace(false, 2)[1];
+
+            \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
+                .get_class($this)
+                .' - ID: '.$this->id
+                .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
+        }
+
+        $attributes = array_intersect($columns, array_merge(
+            $this->getAttributesNames(),
+            $this->getAdminAttributes()
+        ));
+
+        $this->loadAttributes($attributes);
+        // Fixes lazy loading of fields that are not aliases
+        if (isset($aliases[$name])) {
+            $name = $aliases[$name];
+        }
+        return $this->attributes[$name];
     }
         
     private function _loadRelationship($relationships, $name)
