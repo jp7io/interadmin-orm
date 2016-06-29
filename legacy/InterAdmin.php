@@ -92,6 +92,58 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
             $this->getFieldsValues($options['fields'], false, $options['fields_alias']);
         }
     }
+    
+    
+    public function &__get($name)
+    {
+        $value = null;
+        if (array_key_exists($name, $this->attributes)) {
+            $value = &$this->attributes[$name];
+        } elseif ($name !== 'id_tipo') {
+            $aliases = $this->getAttributesAliases();
+            // Fixes fields that have alias
+            if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+                // alias is present, column requested
+                $name = $aliases[$name];
+                $value = &$this->attributes[$name];
+            } elseif (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
+                // column is present, alias requested
+                $name = array_search($name, $aliases);
+                $value = &$this->attributes[$name];
+            } else {
+                // returned as reference
+                $value = $this->_lazyLoadAttribute($name);
+            }
+        }
+        return $value;
+    }
+    
+    public function __isset($name)
+    {
+        if (array_key_exists($name, $this->attributes) || $this->_lazyLoadAttribute($name)) {
+            return true;
+        }
+        return false;
+    }
+    
+    private function _lazyLoadAttribute($name)
+    {
+        if (!$this->id) {
+            return;
+        }
+        $columns = $this->getColumns();
+        $aliases = $this->getAttributesAliases();
+        if (!in_array($name, $columns) && !in_array($name, $aliases)) {
+            return;
+        }
+        $this->getFieldsValues($name, false, true);
+        // Fixes lazy loading of fields that are not aliases
+        if (isset($aliases[$name])) {
+            $name = $aliases[$name];
+        }
+        return $this->attributes[$name];
+    }
+    
     /**
      * Returns an InterAdmin instance. If $options['class'] is passed,
      * it will be returned an object of the given class, otherwise it will search

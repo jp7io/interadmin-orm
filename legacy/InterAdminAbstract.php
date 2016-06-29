@@ -18,7 +18,7 @@ abstract class InterAdminAbstract implements Serializable
 {
     const DEFAULT_FIELDS_ALIAS = false;
     const DEFAULT_NAMESPACE = '';
-    const DEFAULT_FIELDS = null;
+    const DEFAULT_FIELDS = '*';
 
     private static $_cache = false;
     private static $_columns = [];
@@ -822,7 +822,7 @@ abstract class InterAdminAbstract implements Serializable
                     $alias = ($aliases && $joinAlias) ? $joinAlias : $field;
                     $value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $attributes[$table]);
 
-                    if (is_object($attributes[$table]->$alias)) {
+                    if (is_object($attributes[$table]->attributes[$alias])) {
                         continue;
                     }
                     $attributes[$table]->$alias = $value;
