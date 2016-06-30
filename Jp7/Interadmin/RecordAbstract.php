@@ -349,7 +349,7 @@ abstract class RecordAbstract implements Serializable
         // Temporario enquando specials nao tem id_tipo
         $data = DB::table('')->select('id_tipo')->where('id', $id)->first();
         if ($data) {
-            return Type::getInstance($data->id_tipo);
+            return Type::getInstance($data->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
         }
     }
 
@@ -587,7 +587,7 @@ abstract class RecordAbstract implements Serializable
                     @list($table, $termo, $subtermo) = explode('.', $termo);
                 }
                 if ($table === 'main') {
-                    $campo = isset($aliases[$termo]) ? $aliases[$termo] : $termo;
+                    $campo = $this->_aliasToColumn($termo, $aliases);
                 } else {
                     if (!isset($childrenArr)) {
                         $childrenArr = $this->getInterAdminsChildren();

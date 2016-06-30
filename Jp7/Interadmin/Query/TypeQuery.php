@@ -50,7 +50,7 @@ class TypeQuery extends BaseQuery
 
         $this->options['limit'] = 1;
 
-        return $this->provider->deprecatedGetChildren(Record::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->deprecatedGetChildren($this->options)->first();
     }
     
     public function count()
@@ -62,7 +62,7 @@ class TypeQuery extends BaseQuery
         $options['limit'] = 1;
         $options['fields'] = "COUNT(*)";
         
-        $result = $this->provider->deprecatedGetChildren(Record::DEPRECATED_METHOD, $options)->first();
+        $result = $this->provider->deprecatedGetChildren($options)->first();
         return $result->count;
     }
     

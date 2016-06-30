@@ -186,7 +186,7 @@ class Record extends RecordAbstract implements Arrayable
                     if ($data['type']) {
                         $multi = [];
                         foreach (array_filter(explode(',', $fks)) as $fk) {
-                            $multi[] = Type::getInstance($fk);
+                            $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                         }
 
                         $loaded->values = $multi;
@@ -205,7 +205,7 @@ class Record extends RecordAbstract implements Arrayable
             if ($loaded->fk != $fk) {
                 $loaded->fk = $fk;
                 if ($data['type']) {
-                    $loaded->value = Type::getInstance($fk);
+                    $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                 } else {
                     $loaded->value = $data['provider']->records()->find($fk);
                 }
@@ -242,7 +242,7 @@ class Record extends RecordAbstract implements Arrayable
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
-            return Type::getInstance($id_tipo);
+            return Type::getInstance($id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
         }
     }
 
@@ -630,7 +630,7 @@ class Record extends RecordAbstract implements Arrayable
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
+                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type'])) {
                     $tag_text = $tag_tipo->getFieldsValues('nome');
                     if ($row->id) {
                         $options = [

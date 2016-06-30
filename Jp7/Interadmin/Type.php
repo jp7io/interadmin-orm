@@ -1202,7 +1202,7 @@ class Type extends RecordAbstract
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $type = Type::getInstance($row->id_tipo);
+            $type = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
 
             $record = Record::getInstance($row->id, $optionsInstance, $type);
             $this->_getAttributesFromRow($row, $record, $options);
