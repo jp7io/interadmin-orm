@@ -427,7 +427,6 @@ abstract class RecordAbstract implements Serializable
             ($options['from'] ? ' LEFT JOIN '.implode(' LEFT JOIN ', $options['from']) : '').
             ' WHERE '.$filters.$clauses.
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
-
         $rs = $db->select($sql);
 
         if (!$rs && !is_array($rs)) {
@@ -679,7 +678,7 @@ abstract class RecordAbstract implements Serializable
                         $termo = $subtermo;
                         $joinAliases = array_flip($subJoinTipo->getCamposAlias());
                     }
-                    $campo = isset($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
+                    $campo = $this->_aliasToColumn($termo, $joinAliases);
                 }
                 $termo = $table.'.'.$campo;
                 $clause = substr_replace($clause, $termo, $pos, $len);
@@ -776,7 +775,7 @@ abstract class RecordAbstract implements Serializable
                 $fields[$join] = $this->_resolveSql($campo, $options, true).' AS `'.$table.$aggregateAlias.'`';
             // Sem join
             } else {
-                $nome = isset($aliases[$campo]) ? $aliases[$campo] : $campo;
+                $nome = $this->_aliasToColumn($campo, $aliases);
                 if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
                     if (strpos($campo, 'file_') === 0) {
                         // necessário para quando o parametro fields está sem alias, mas o retorno está com alias
@@ -792,6 +791,21 @@ abstract class RecordAbstract implements Serializable
         }
         $options['fields'] = $fields;
     }
+    
+    protected function _aliasToColumn($alias, $aliases)
+    {
+        if (isset($aliases[$alias])) {
+            return $aliases[$alias];
+        }
+        if (isset($aliases[$alias.'_id'])) {
+            return $aliases[$alias.'_id'];
+        }
+        if (isset($aliases[$alias.'_ids'])) {
+            return $aliases[$alias.'_ids'];
+        }
+        return $alias;
+    }
+    
     /**
      * Helper function to add a join.
      */

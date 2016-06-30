@@ -199,12 +199,8 @@ class Type extends RecordAbstract
      *
      * @deprecated
      */
-    public function getChildren($deprecated, $options = [])
+    public function deprecatedGetChildren($options = [])
     {
-        if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use children()->get() instead.');
-        }
-
         $this->_whereArrayFix($options['where']); // FIXME
 
         if (empty($options['fields'])) {
@@ -258,7 +254,6 @@ class Type extends RecordAbstract
     public function deprecatedFind($options = [])
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
-
         $options['where'][] = 'id_tipo = '.$this->id_tipo;
         if ($this->_parent instanceof Record) {
             $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
