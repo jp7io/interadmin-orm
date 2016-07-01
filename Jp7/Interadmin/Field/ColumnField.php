@@ -114,6 +114,12 @@ class ColumnField extends BaseField
         if (!$this->record->id && !$value) {
             $value = $this->getDefaultValue();
         }
+        // FIXME - after branch merge-orm
+        if (is_array($value)) {
+            $value = implode(',', $value);
+        } elseif (is_object($value)) {
+            $value = (string) $value;
+        }
         return $value;
     }
     
