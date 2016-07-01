@@ -95,6 +95,11 @@ class InterAdminTipo extends Type
         return $this->deprecatedGetChildren($options);
     }
     
+    public function getNome()
+    {
+        return $this->getName();
+    }
+    
     /**
      * Returns the full url for this InterAdminTipo.
      *

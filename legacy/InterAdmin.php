@@ -1,6 +1,8 @@
 <?php
 
 use Jp7\Interadmin\Record;
+use Jp7\Interadmin\RecordAbstract;
+use Jp7\Interadmin\FileField;
 
 /**
  * JP7's PHP Functions.
@@ -22,6 +24,42 @@ class InterAdmin extends Record
 {
     const DEFAULT_NAMESPACE = '';
     
+    public static function getInstanceFromAttributes(array $attributes, InterAdminTipo $tipo = null)
+    {
+        $instance = static::getInstance($attributes['id'], [], $tipo);
+        //$instance->attributes = $attributes;
+        $instance->_getAttributesFromRow($attributes, $instance, [
+            'campos' => $instance->getTipo()->getCampos()
+        ]);
+        return $instance;
+    }
+    
+    /**
+     * Returns this object´s varchar_key and all the fields marked as 'combo', if the field
+     * is an InterAdmin such as a select_key, its getStringValue() method is used.
+     *
+     * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
+     */
+    public function getStringValue()
+    {
+        $camposCombo = $this->getTipo()->getCamposCombo();
+        if (!$camposCombo) {
+            return $this->id;
+        }
+        $valoresCombo = $this->getFieldsValues($camposCombo);
+        $stringValue = [];
+        foreach ($valoresCombo as $value) {
+            if ($value instanceof FileField) {
+                continue;
+            } elseif ($value instanceof RecordAbstract) {
+                $value = $value->getStringValue();
+            }
+            $stringValue[] = $value;
+        }
+        
+        return implode(' - ', $stringValue);
+    }
+
     /**
      * Magic method calls.
      *

@@ -531,6 +531,13 @@ class Type extends RecordAbstract
         return isset($aliases[$fields]) ? $aliases[$fields] : null;
     }
 
+    public function getCamposCombo()
+    {
+        return array_keys(array_filter($this->getCampos(), function ($campo) {
+            return (bool) $campo['combo'] || $campo['tipo'] === 'varchar_key';
+        }));
+    }
+
     public function getRelationships()
     {
         $this->_camposMetadata();
