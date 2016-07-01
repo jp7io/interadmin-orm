@@ -192,6 +192,17 @@ class InterAdmin extends InterAdminAbstract implements Arrayable
 
         return $finalInstance;
     }
+    
+    public static function getInstanceFromAttributes(array $attributes, InterAdminTipo $tipo = null)
+    {
+        $instance = static::getInstance($attributes['id'], [], $tipo);
+        //$instance->attributes = $attributes;
+        $instance->_getAttributesFromRow($attributes, $instance, [
+            'campos' => $instance->getTipo()->getCampos()
+        ]);
+        return $instance;
+    }
+    
     /**
      * Finds a Child Tipo by a camelcase keyword.
      *
