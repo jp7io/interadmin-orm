@@ -155,7 +155,7 @@ class Query extends Query\BaseQuery
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->findFirst(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedFindFirst($this->options);
     }
 
     public function firstOrFail()
@@ -252,7 +252,7 @@ class Query extends Query\BaseQuery
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
         }
 
-        return $this->provider->findFirst(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedFindFirst($this->options);
     }
 
     public function findMany($ids)

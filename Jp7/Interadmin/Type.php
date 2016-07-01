@@ -358,11 +358,8 @@ class Type extends RecordAbstract
      *
      * @return int Count of Records found.
      */
-    public function count($deprecated, $options = [])
+    public function deprecatedCount($options = [])
     {
-        if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use records()->count() instead.');
-        }
         if (empty($options['group'])) {
             $options['fields'] = ['COUNT(id) AS count_id'];
         } elseif ($options['group'] == 'id') {
@@ -390,12 +387,8 @@ class Type extends RecordAbstract
      *
      * @return Record First Record object found.
      */
-    public function findFirst($deprecated, $options = [])
+    public function deprecatedFindFirst($options = [])
     {
-        if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use records()->first() instead.');
-        }
-
         return $this->deprecatedFind(['limit' => 1] + $options)->first();
     }
 
@@ -424,7 +417,8 @@ class Type extends RecordAbstract
     {
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
-                $model = new self($this->model_id_tipo);
+                $className = static::DEFAULT_NAMESPACE.'Type';
+                $model = new $className($this->model_id_tipo);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
                 $model = new $className();

@@ -34,7 +34,18 @@ class InterAdminTipo extends Type
     public function findById($id, $options = [])
     {
         $options['where'][] = 'id = '.intval((string) $id);
-        return $this->findFirst(Record::DEPRECATED_METHOD, $options);
+        return $this->deprecatedFindFirst($options);
+    }
+    
+    /**
+     * @param array $options Default array of options. Available keys: fields, where, order, group, class.
+     *
+     * @return InterAdmin First InterAdmin object found.
+     */
+    public function findFirst($options = [])
+    {
+        $result = $this->find(['limit' => 1] + $options);
+        return reset($result);
     }
     
     /**
@@ -45,6 +56,31 @@ class InterAdminTipo extends Type
     public function find($options = [])
     {
         return $this->deprecatedFind($options)->all();
+    }
+   
+    /**
+     * Returns the number of InterAdmins using COUNT(id).
+     *
+     * @param array $options Default array of options. Available keys: where.
+     *
+     * @return int Count of InterAdmins found.
+     */
+    public function count($options = [])
+    {
+        if ($options['group'] == 'id') {
+            // O COUNT() precisa trazer a contagem total em 1 linha
+            // Caso exista GROUP BY id, ele traria em várias linhas
+            // Esse é um tratamento especial apenas para o ID
+            $options['fields'] = ['COUNT(DISTINCT id) AS count_id'];
+            unset($options['group']);
+        } elseif ($options['group']) {
+            // Se houver GROUP BY com outro campo, retornará a contagem errada
+            throw new Exception('GROUP BY is not supported when using count().');
+        } else {
+            $options['fields'] = ['COUNT(id) AS count_id'];
+        }
+        $retorno = $this->deprecatedFindFirst($options);
+        return intval($retorno->count_id);
     }
     
     /**
@@ -145,5 +181,70 @@ class InterAdminTipo extends Type
             return $retorno;
         }
         return $this->$fields;
+    }
+    
+     /**
+     * Gets the first child.
+     *
+     * @param array $options [optional]
+     *
+     * @return InterAdminTipo
+     */
+    public function getFirstChild($options = [])
+    {
+        $retorno = $this->getChildren(['limit' => 1] + $options);
+        return $retorno[0];
+    }
+    
+    /**
+     * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
+     *
+     * @param string|int $model_id_tipo
+     * @param array      $options       Default array of options. Available keys: fields, where, order, class.
+     *
+     * @return InterAdminTipo
+     */
+    public function getFirstChildByModel($model_id_tipo, $options = [])
+    {
+        $retorno = $this->getChildrenByModel($model_id_tipo, ['limit' => 1] + $options);
+        return $retorno[0];
+    }
+    /**
+     * Retrieves the first child of this InterAdminTipo with the given "nome".
+     *
+     * @param array $options Default array of options. Available keys: fields, where, order, class.
+     *
+     * @return InterAdminTipo
+     */
+    public function getFirstChildByNome($nome, $options = [])
+    {
+        $options['where'][] = "nome = '".$nome."'";
+        return $this->getFirstChild($options);
+    }
+    /**
+     * Retrieves the children of this InterAdminTipo which have the given model_id_tipo.
+     *
+     * @param array $options Default array of options. Available keys: fields, where, order, class.
+     *
+     * @return Array of InterAdminTipo objects.
+     */
+    public function getChildrenByModel($model_id_tipo, $options = [])
+    {
+        $options['where'][] = "model_id_tipo = '".$model_id_tipo."'";
+        // Necessário enquanto algumas tabelas ainda tem esse campo numérico
+        $options['where'][] = "model_id_tipo != '0'";
+        return $this->getChildren($options);
+    }
+    
+    /**
+     * Creates a record with id_tipo, mostrar, date_insert and date_publish filled.
+     *
+     * @param array $attributes Attributes to be merged into the new record.
+     *
+     * @return InterAdmin
+     */
+    public function createInterAdmin(array $attributes = [])
+    {
+        return $this->deprecated_createInterAdmin($attributes);
     }
 }

@@ -44,13 +44,13 @@ class InterAdmin extends Record
             // getFirst{ChildName}
             if (strpos($methodName, 'getFirst') === 0) {
                 $nome_id = mb_substr($methodName, mb_strlen('getFirst'));
-                if ($child = $this->_findChild($nome_id)) {
+                if ($child = $this->_deprecatedFindChild($nome_id)) {
                     return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
                 }
             // get{ChildName}ById
             } elseif (mb_substr($methodName, -4) == 'ById') {
                 $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('ById'));
-                if ($child = $this->_findChild($nome_id)) {
+                if ($child = $this->_deprecatedFindChild($nome_id)) {
                     $options = (array) $args[1];
                     $options['where'][] = 'id = '.intval($args[0]);
                     return $this->getFirstChild($child['id_tipo'], $options);
@@ -58,7 +58,7 @@ class InterAdmin extends Record
             // get{ChildName}ByIdString
             } elseif (mb_substr($methodName, -10) == 'ByIdString') {
                 $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('ByStringId'));
-                if ($child = $this->_findChild($nome_id)) {
+                if ($child = $this->_deprecatedFindChild($nome_id)) {
                     $options = (array) $args[1];
                     $options['where'][] = "id_string = '".$args[0]."'";
                     return $this->getFirstChild($child['id_tipo'], $options);
@@ -66,29 +66,29 @@ class InterAdmin extends Record
             // get{ChildName}Count
             } elseif (mb_substr($methodName, -5) == 'Count') {
                 $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('Count'));
-                if ($child = $this->_findChild($nome_id)) {
+                if ($child = $this->_deprecatedFindChild($nome_id)) {
                     return $this->getChildrenCount($child['id_tipo'], (array) $args[0]);
                 }
             // get{ChildName}
             } else {
                 $nome_id = mb_substr($methodName, mb_strlen('get'));
-                if ($child = $this->_findChild($nome_id)) {
+                if ($child = $this->_deprecatedFindChild($nome_id)) {
                     return $this->getChildren($child['id_tipo'], (array) $args[0]);
                 }
             }
         // create{ChildName}
         } elseif (strpos($methodName, 'create') === 0) {
             $nome_id = mb_substr($methodName, mb_strlen('create'));
-            if ($child = $this->_findChild($nome_id)) {
+            if ($child = $this->_deprecatedFindChild($nome_id)) {
                 return $this->createChild($child['id_tipo'], (array) @$args[0]);
             }
         // delete{ChildName}
         } elseif (strpos($methodName, 'delete') === 0) {
             $nome_id = mb_substr($methodName, mb_strlen('delete'));
-            if ($child = $this->_findChild($nome_id)) {
+            if ($child = $this->_deprecatedFindChild($nome_id)) {
                 return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
             }
-        } elseif ($child = $this->_findChild(ucfirst($methodName))) {
+        } elseif ($child = $this->_deprecatedFindChild(ucfirst($methodName))) {
             return $this->getChildrenTipo($child['id_tipo']);
         }
         // Default error when method doesn´t exist
@@ -109,6 +109,40 @@ class InterAdmin extends Record
             }
         }
         jp7_debug($message);
+    }
+    
+    /**
+     * Finds a Child Tipo by a camelcase keyword.
+     *
+     * @param string $nome_id CamelCase
+     *
+     * @return array
+     */
+    protected function _deprecatedFindChild($nome_id)
+    {
+        $children = $this->getTipo()->getInterAdminsChildren();
+        if (empty($children[$nome_id])) {
+            $nome_id = explode('_', Jp7_Inflector::underscore($nome_id));
+            $nome_id[0] = Jp7_Inflector::plural($nome_id[0]);
+            $nome_id = Jp7_Inflector::camelize(implode('_', $nome_id));
+        }
+        if (empty($children[$nome_id])) {
+            $nome_id = Jp7_Inflector::plural($nome_id);
+        }
+        return $children[$nome_id];
+    }
+    
+    /**
+     * Creates and returns a child record.
+     *
+     * @param int   $id_tipo
+     * @param array $attributes Attributes to be merged into the new record.
+     *
+     * @return
+     */
+    public function createChild($id_tipo, array $attributes = [])
+    {
+        return $this->getChildrenTipo($id_tipo)->createInterAdmin($attributes);
     }
     
     /**
@@ -204,5 +238,16 @@ class InterAdmin extends Record
             return $retorno;
         }
         return $this->$fields;
+    }
+    
+    /**
+     * Updates all the attributes from the passed-in array and saves the record.
+     *
+     * @param array $attributes Array with fields names and values.
+     */
+    public function updateAttributes($attributes)
+    {
+        $this->setRawAttributes($attributes);
+        $this->_update($attributes);
     }
 }

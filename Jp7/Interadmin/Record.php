@@ -637,7 +637,7 @@ class Record extends RecordAbstract implements Arrayable
                             'fields' => ['varchar_key'],
                             'where' => ['id = '.$row->id],
                         ];
-                        if ($tag_registro = $tag_tipo->findFirst($options)) {
+                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
@@ -889,7 +889,7 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         $campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
-        $record = $campoTipo->findFirst([
+        $record = $campoTipo->deprecatedFindFirst([
             'where' => [$searchColumn." = '".$searchValue."'"],
         ]);
         if (starts_with($nomeCampo, 'select_multi_')) {
