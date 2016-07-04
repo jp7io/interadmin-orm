@@ -79,8 +79,11 @@ class Type extends RecordAbstract
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
-            $this->loadAttributes($this->getAttributesNames(), false);
-
+            $cacheKey = 'Type::__get,'.$this->id_tipo;
+            $this->attributes = \Cache::remember($cacheKey, 60, function () {
+                $this->loadAttributes($this->getAttributesNames(), false);
+                return $this->attributes;
+            });
             return $this->attributes[$name];
         }
 
