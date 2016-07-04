@@ -173,7 +173,7 @@ class Query extends Query\BaseQuery
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->count(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedCount($this->options);
     }
 
     /**

@@ -22,11 +22,10 @@ trait TypeTrait
      */
     public function getUrl() // FIXME - $action = 'index', array $parameters = []
     {
+        $action = 'index';
+        $parameters = [];
         if (func_num_args() === 2) {
             list($action, $parameters) = func_get_args(); // FIXME
-        }
-        if (func_num_args() === 1 && is_array($action)) {
-            list($action, $parameters) = [null, $action];
         }
 
         if ($this->getParent() instanceof Record) {

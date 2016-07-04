@@ -18,11 +18,6 @@ class Record extends RecordAbstract implements Arrayable
     use \Jp7\Laravel\Url\RecordTrait;
      
     /**
-     * To be used temporarily with deprecated methods.
-     */
-    const DEPRECATED_METHOD = '54dac5afe1fcac2f65c059fc97b44a58';
-
-    /**
      * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
      *
      * @var Type
