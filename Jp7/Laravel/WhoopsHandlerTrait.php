@@ -3,12 +3,13 @@
 namespace Jp7\Laravel;
 
 use Exception;
+use ErrorException;
 
 trait WhoopsHandlerTrait
 {
     protected function convertExceptionToResponse(Exception $e)
     {
-        if (config('app.debug')) {
+        if (config('app.debug') && !$e instanceof ErrorException) {
             return $this->renderExceptionWithWhoops($e);
         }
         return parent::convertExceptionToResponse($e);
