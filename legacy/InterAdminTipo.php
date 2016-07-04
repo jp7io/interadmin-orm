@@ -49,6 +49,19 @@ class InterAdminTipo extends Type
     }
     
     /**
+     * Retrieves the first record which have this id_string.
+     *
+     * @param string $id_string Search value.
+     *
+     * @return InterAdmin First InterAdmin object found.
+     */
+    public function findByIdString($id_string, $options = [])
+    {
+        $options['where'][] = "id_string = '".$id_string."'";
+        return $this->findFirst($options);
+    }
+    
+    /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
      *
      * @return InterAdmin[] Array of InterAdmin objects.

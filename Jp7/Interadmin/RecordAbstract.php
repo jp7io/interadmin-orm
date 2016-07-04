@@ -223,9 +223,32 @@ abstract class RecordAbstract implements Serializable
     {
         $db = $this->getDb();
 
-        $valuesToSave = [];
         $aliases = array_flip($this->getAttributesAliases());
+        $valuesToSave = $this->_convertForDatabase($attributes, $aliases);
+        
+        $pk = $this->_primary_key;
+        $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
+        if ($this->$pk) {
+            if ($db->table($table)->where($pk, $this->$pk)->update($valuesToSave) === false) {
+                throw new Exception('Error while updating values in `'.$this->getTableName().'` '.
+                    $db->getPdo()->errorCode(), print_r($valuesToSave, true));
+            }
+        } else {
+            if ($db->table($table)->insert($valuesToSave) === false) {
+                throw new Exception('Error while inserting data into `'.$this->getTableName().'` '.
+                    $db->getPdo()->errorCode(), print_r($valuesToSave, true));
+            }
+
+            $this->$pk = $db->getPdo()->lastInsertId();
+        }
+
+        return $this;
+    }
+    
+    protected function _convertForDatabase($attributes, $aliases)
+    {
+        $valuesToSave = [];
         foreach ($attributes as $key => $value) {
             $key = isset($aliases[$key]) ? $aliases[$key] : $key;
             switch (gettype($value)) {
@@ -246,26 +269,9 @@ abstract class RecordAbstract implements Serializable
                     break;
             }
         }
-
-        $pk = $this->_primary_key;
-        $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
-
-        if ($this->$pk) {
-            if ($db->table($table)->where($pk, $this->$pk)->update($valuesToSave) === false) {
-                throw new Exception('Error while updating values in `'.$this->getTableName().'` '.
-                    $db->getPdo()->errorCode(), print_r($valuesToSave, true));
-            }
-        } else {
-            if ($db->table($table)->insert($valuesToSave) === false) {
-                throw new Exception('Error while inserting data into `'.$this->getTableName().'` '.
-                    $db->getPdo()->errorCode(), print_r($valuesToSave, true));
-            }
-
-            $this->$pk = $db->getPdo()->lastInsertId();
-        }
-
-        return $this;
+        return $valuesToSave;
     }
+    
     /**
      * Gets an object by its key, which may be its 'id' or 'id_tipo', and then returns it.
      *
@@ -594,7 +600,9 @@ abstract class RecordAbstract implements Serializable
 
                     // Joins com children
                     $joinNome = studly_case($table);
-                    if (isset($childrenArr[$joinNome])) {
+                    // Support for old join alias: ChildrenLojas => Lojas
+                    $joinNome = replace_prefix('Children', '', $joinNome);
+                    if (isset($childrenArr[$joinNome]) || isset($childrenArr[$joinNome])) {
                         $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db' => $this->_db,
                             'default_class' => static::DEFAULT_NAMESPACE.'Type',
@@ -856,6 +864,9 @@ abstract class RecordAbstract implements Serializable
             }
             if ($table == 'main') {
                 $alias = isset($aliases[$field]) ? $aliases[$field] : $field;
+                if (isset($attributes[$alias])) {
+                    continue; // avoid overwrite, fix problem with fields having aliases
+                }
                 $campo = isset($campos[$field]) ? $campos[$field] : null;
                 $value = $this->_getByForeignKey($value, $field, $campo, $object);
                 if (isset($attributes[$alias]) && is_object($attributes[$alias])) {

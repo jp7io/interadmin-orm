@@ -557,29 +557,29 @@ class Type extends RecordAbstract
                 }
                 if (strpos($campo, 'select_') === 0) {
                     $multi = strpos($campo, 'select_multi_') === 0;
+                    $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
                     if ($multi) {
-                        $relationship = substr($array['nome_id'], 0, -4);
+                        $relationship = substr($array['nome_id'], 0, -4); // _ids = 4 chars
                     } else {
-                        $relationship = substr($array['nome_id'], 0, -3);
+                        $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
                     }
                     $relationships[$relationship] = [
-                        'provider' => $array['nome'],
-                        'type' => in_array($array['xtra'], FieldUtil::getSelectTipoXtras()),
+                        'query' => $hasType ? $array['nome'] : $array['nome']->records(),
+                        'type' => $hasType,
                         'multi' => $multi,
-                        'special' => false,
                     ];
                 } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
                     $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
+                    $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
                     if ($multi) {
-                        $relationship = substr($array['nome_id'], 0, -4);
+                        $relationship = substr($array['nome_id'], 0, -4); // _ids = 4 chars
                     } else {
-                        $relationship = substr($array['nome_id'], 0, -3);
+                        $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
                     }
                     $relationships[$relationship] = [
-                        'provider' => null, // FIXME
-                        'type' => in_array($array['xtra'], FieldUtil::getSpecialTipoXtras()),
+                        'query' => new TypelessQuery($this),
+                        'type' => $hasType,
                         'multi' => $multi,
-                        'special' => true,
                     ];
                 }
 
@@ -940,7 +940,7 @@ class Type extends RecordAbstract
 
             return [
                 'type' => 'select',
-                'tipo' => $data['provider'],
+                'tipo' => $data['query']->type(),
                 'name' => $relationship,
                 'alias' => true,
             ];

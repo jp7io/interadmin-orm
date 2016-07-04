@@ -3,6 +3,7 @@
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\RecordAbstract;
 use Jp7\Interadmin\FileField;
+use Illuminate\Support\Collection;
 
 /**
  * JP7's PHP Functions.
@@ -149,6 +150,15 @@ class InterAdmin extends Record
         jp7_debug($message);
     }
     
+    protected function _loadRelationship($relationships, $name)
+    {
+        $result = parent::_loadRelationship($relationships, $name);
+        if ($result && $result instanceof Collection) {
+            return $result->all();
+        }
+        return $result;
+    }
+    
     /**
      * Finds a Child Tipo by a camelcase keyword.
      *
@@ -287,5 +297,44 @@ class InterAdmin extends Record
     {
         $this->setRawAttributes($attributes);
         $this->_update($attributes);
+    }
+    
+    protected function _convertForDatabase($attributes, $aliases)
+    {
+        $valuesToSave = parent::_convertForDatabase($attributes, $aliases);
+        foreach ($this->getTipo()->getRelationships() as $name => $data) {
+            if (isset($valuesToSave[$name])) {
+                if ($data['multi']) {
+                    $alias = $aliases[$name.'_ids'];
+                } else {
+                    $alias = $aliases[$name.'_id'];
+                }
+                if ($alias) {
+                    $valuesToSave[$alias] = $valuesToSave[$name];
+                    unset($valuesToSave[$name]);
+                }
+            }
+        }
+        return $valuesToSave;
+    }
+    
+    /**
+     * Reloads all the attributes.
+     *
+     * @todo Not implemented yet. Won't work with recursive objects and alias.
+     */
+    public function reload($fields = null)
+    {
+        if (is_null($fields)) {
+            $fields = array_keys($this->attributes);
+            $existingFields = array_merge($this->getAttributesAliases(), $this->getAttributesNames(), $this->getAdminAttributes());
+            $fields = array_intersect($fields, $existingFields);
+        }
+        // Esvaziando valores para forçar atualização
+        foreach ($fields as $key) {
+            unset($this->attributes[$key]);
+        }
+        $isAliased = static::DEFAULT_FIELDS_ALIAS;
+        $this->getFieldsValues($fields, false, $isAliased);
     }
 }

@@ -167,14 +167,9 @@ class Record extends RecordAbstract implements Arrayable
         return $this->attributes[$name];
     }
         
-    private function _loadRelationship($relationships, $name)
+    protected function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];
-
-        if ($data['special']) {
-            throw new Exception('Not implemented: '.$name);
-        }
-
         if ($data['multi']) {
             if ($fks = $this->{$name.'_ids'}) {
                 $loaded = &$this->_loadedRelationships[$name.'_ids'];
@@ -183,16 +178,15 @@ class Record extends RecordAbstract implements Arrayable
                 }
                 if ($loaded->fks != $fks) {
                     $loaded->fks = $fks;
+                    $fksArray = array_filter(explode(',', $fks));
                     if ($data['type']) {
                         $multi = [];
-                        foreach (array_filter(explode(',', $fks)) as $fk) {
+                        foreach ($fksArray as $fk) {
                             $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                         }
-
                         $loaded->values = $multi;
                     } else {
-                        $loaded->values = $data['provider']->records()
-                            ->findMany(array_filter(explode(',', $fks)));
+                        $loaded->values = $data['query']->findMany($fksArray);
                     }
                 }
                 return $loaded->values;
@@ -207,7 +201,7 @@ class Record extends RecordAbstract implements Arrayable
                 if ($data['type']) {
                     $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                 } else {
-                    $loaded->value = $data['provider']->records()->find($fk);
+                    $loaded->value = $data['query']->find($fk);
                 }
             }
             return $loaded->value;
