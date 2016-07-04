@@ -21,9 +21,11 @@ use Illuminate\Support\Collection;
  *
  * @deprecated use Record instead
  */
-class InterAdmin extends Record
+class InterAdmin extends Record implements InterAdminAbstract
 {
     const DEFAULT_NAMESPACE = '';
+    
+    protected static $unguarded = true;
     
     public static function getInstanceFromAttributes(array $attributes, InterAdminTipo $tipo = null)
     {
@@ -159,6 +161,20 @@ class InterAdmin extends Record
         return $result;
     }
     
+    protected function _aliasToColumn($alias, $aliases)
+    {
+        if (isset($aliases[$alias])) {
+            return $aliases[$alias];
+        }
+        if (isset($aliases[$alias.'_id'])) {
+            return $aliases[$alias.'_id'];
+        }
+        if (isset($aliases[$alias.'_ids'])) {
+            return $aliases[$alias.'_ids'];
+        }
+        return $alias;
+    }
+    
     /**
      * Finds a Child Tipo by a camelcase keyword.
      *
@@ -233,7 +249,20 @@ class InterAdmin extends Record
             return $this->$fields;
         }
     }
-    
+    /**
+     * Returns the number of children using COUNT(id).
+     *
+     * @param int   $id_tipo
+     * @param array $options Default array of options. Available keys: where.
+     *
+     * @return int Count of InterAdmins found.
+     */
+    public function getChildrenCount($id_tipo, $options = [])
+    {
+        $options['fields'] = ['COUNT(DISTINCT id)'];
+        $retorno = $this->getFirstChild($id_tipo, $options);
+        return intval($retorno->count_distinct_id);
+    }
     /**
      * Returns the first Child.
      *
@@ -247,7 +276,105 @@ class InterAdmin extends Record
         $retorno = $this->getChildren($id_tipo, ['limit' => 1] + $options);
         return $retorno[0];
     }
+    /**
+     * Returns the first Child by ID.
+     *
+     * @param int   $id_tipo
+     * @param int   $id
+     * @param array $options [optional]
+     *
+     * @return InterAdmin
+     */
+    public function getChildById($id_tipo, $id, $options = [])
+    {
+        $options['limit'] = 1;
+        $options['where'][] = 'id = '.intval($id);
+        $retorno = $this->getChildren($id_tipo, $options);
+        return $retorno[0];
+    }
+    /**
+     * Deletes all the children of a given $id_tipo.
+     *
+     * @param int   $id_tipo
+     * @param array $options [optional]
+     *
+     * @return int Number of deleted children.
+     */
+    public function deleteChildren($id_tipo, $options = [])
+    {
+        $children = $this->getChildren($id_tipo, $options);
+        foreach ($children as $child) {
+            $child->delete();
+        }
+        return count($children);
+    }
+    /**
+     *  Deletes the children of a given $id_tipo forever.
+     *
+     * @param int   $id_tipo
+     * @param array $options [optional]
+     *
+     * @return int Count of deleted InterAdmins.
+     */
+    public function deleteChildrenForever($id_tipo, $options = [])
+    {
+        if ($id_tipo) {
+            $tipo = $this->getChildrenTipo($id_tipo);
+            return $tipo->deleteInterAdminsForever($options);
+        }
+    }
+    /**
+     * Creates a new InterAdminArquivo with id_tipo, id and mostrar set.
+     *
+     * @param array $attributes [optional]
+     *
+     * @return InterAdminArquivo
+     */
+    public function createArquivo(array $attributes = [])
+    {
+        $className = static::DEFAULT_NAMESPACE.'InterAdminArquivo';
+        if (!class_exists($className)) {
+            $className = 'InterAdminArquivo';
+        }
+        $arquivo = new $className();
+        $arquivo->setParent($this);
+        $arquivo->setTipo($this->getTipo());
+        $arquivo->mostrar = 'S';
+        $arquivo->setAttributes($attributes);
+        return $arquivo;
+    }
+    /**
+     * Retrieves the uploaded files of this record.
+     *
+     * @param array $options Default array of options. Available keys: fields, where, order, limit.
+     *
+     * @return array Array of InterAdminArquivo objects.
+     */
+    public function getArquivos($options = [])
+    {
+        return $this->deprecated_getArquivos($options)->all();
+    }
     
+    public function getFirstArquivo($options = [])
+    {
+        $retorno = $this->getArquivos($options + ['limit' => 1]);
+        return $retorno[0];
+    }
+    /**
+     * Deletes all the InterAdminArquivo records related with this record.
+     *
+     * @param array $options [optional]
+     *
+     * @return int Number of deleted arquivos.
+     */
+    public function deleteArquivos($options = [])
+    {
+        $arquivos = $this->getArquivos($options);
+        foreach ($arquivos as $arquivo) {
+            $arquivo->delete();
+        }
+        return count($arquivos);
+    }
     /**
      * Retrieves this record´s children for the given $id_tipo.
      *
@@ -336,5 +463,19 @@ class InterAdmin extends Record
         }
         $isAliased = static::DEFAULT_FIELDS_ALIAS;
         $this->getFieldsValues($fields, false, $isAliased);
+    }
+    
+    /**
+     * Creates a object of the given Class name with the same attributes.
+     *
+     * @param object $className
+     *
+     * @return InterAdminAbstract An instance of the given Class name.
+     */
+    public function becomes($className)
+    {
+        $newobject = new $className();
+        $newobject->attributes = $this->attributes;
+        return $newobject;
     }
 }

@@ -804,12 +804,6 @@ abstract class RecordAbstract implements Serializable
         if (isset($aliases[$alias])) {
             return $aliases[$alias];
         }
-        if (isset($aliases[$alias.'_id'])) {
-            return $aliases[$alias.'_id'];
-        }
-        if (isset($aliases[$alias.'_ids'])) {
-            return $aliases[$alias.'_ids'];
-        }
         return $alias;
     }
     

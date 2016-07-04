@@ -186,7 +186,8 @@ class Record extends RecordAbstract implements Arrayable
                         }
                         $loaded->values = $multi;
                     } else {
-                        $loaded->values = $data['query']->findMany($fksArray);
+                        $query = clone $data['query'];
+                        $loaded->values = $query->findMany($fksArray);
                     }
                 }
                 return $loaded->values;
@@ -201,7 +202,8 @@ class Record extends RecordAbstract implements Arrayable
                 if ($data['type']) {
                     $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                 } else {
-                    $loaded->value = $data['query']->find($fk);
+                    $query = clone $data['query'];
+                    $loaded->value = $query->find($fk);
                 }
             }
             return $loaded->value;
@@ -503,12 +505,8 @@ class Record extends RecordAbstract implements Arrayable
      *
      * @deprecated
      */
-    public function getArquivos($deprecated, $options = [])
+    public function deprecated_getArquivos($options = [])
     {
-        if ($deprecated != self::DEPRECATED_METHOD) {
-            throw new Exception('Use arquivos()->get() instead.');
-        }
-
         $arquivos = [];
         if (isset($options['class'])) {
             $className = $options['class'];
@@ -559,7 +557,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_deleteArquivos($options = [])
     {
-        $arquivos = $this->getArquivos($options);
+        $arquivos = $this->deprecated_getArquivos($options);
         foreach ($arquivos as $arquivo) {
             $arquivo->delete();
         }

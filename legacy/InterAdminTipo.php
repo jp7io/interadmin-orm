@@ -19,7 +19,7 @@ use Jp7\Interadmin\Record;
  *
  * @deprecated use Type instead
  */
-class InterAdminTipo extends Type
+class InterAdminTipo extends Type implements InterAdminAbstract
 {
     const DEFAULT_NAMESPACE = '';
     
@@ -181,6 +181,20 @@ class InterAdminTipo extends Type
         return $records;
     }
     
+    protected function _aliasToColumn($alias, $aliases)
+    {
+        if (isset($aliases[$alias])) {
+            return $aliases[$alias];
+        }
+        if (isset($aliases[$alias.'_id'])) {
+            return $aliases[$alias.'_id'];
+        }
+        if (isset($aliases[$alias.'_ids'])) {
+            return $aliases[$alias.'_ids'];
+        }
+        return $alias;
+    }
+    
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
     {
         if ($forceAsString) {
@@ -264,5 +278,19 @@ class InterAdminTipo extends Type
     public function createInterAdmin(array $attributes = [])
     {
         return $this->deprecated_createInterAdmin($attributes);
+    }
+    
+    /**
+     * Creates a object of the given Class name with the same attributes.
+     *
+     * @param object $className
+     *
+     * @return InterAdminAbstract An instance of the given Class name.
+     */
+    public function becomes($className)
+    {
+        $newobject = new $className();
+        $newobject->attributes = $this->attributes;
+        return $newobject;
     }
 }

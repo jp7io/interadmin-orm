@@ -1,5 +1,6 @@
 <?php
 
+use Jp7\Interadmin\RecordAbstract;
 use Jp7_Interadmin_Upload as Upload;
 
 /**
@@ -16,7 +17,7 @@ use Jp7_Interadmin_Upload as Upload;
 /**
  * Class which represents records on the table interadmin_{client name}_arquivos.
  */
-class InterAdminArquivo extends InterAdminAbstract
+class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
 {
     protected $_primary_key = 'id_arquivo';
 
@@ -47,9 +48,7 @@ class InterAdminArquivo extends InterAdminAbstract
     public function __construct($id_arquivo = 0, $options = [])
     {
         $this->id_arquivo = $id_arquivo;
-        $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-        $this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
-
+        
         if ($options['fields']) {
             $this->getFieldsValues($options['fields']);
         }
@@ -86,6 +85,21 @@ class InterAdminArquivo extends InterAdminAbstract
         $this->id_tipo = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
+    
+    public function getType($options = [])
+    {
+        return $this->getTipo($options);
+    }
+    /**
+     * Sets the Type object for this record, changing the $_tipo property.
+     *
+     * @param Type $tipo
+     */
+    public function setType($tipo)
+    {
+        $this->setTipo($tipo);
+    }
+    
     /**
      * Gets the parent InterAdmin object for this record, which is then cached on the $_parent property.
      *
