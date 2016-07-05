@@ -19,6 +19,7 @@ use Jp7_Interadmin_Upload as Upload;
  */
 class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
 {
+    const DEFAULT_NAMESPACE = '';
     protected $_primary_key = 'id_arquivo';
 
     /**

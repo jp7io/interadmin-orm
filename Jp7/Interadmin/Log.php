@@ -77,11 +77,11 @@ class Log extends RecordAbstract
     public function getType($options = [])
     {
         if (!$this->_tipo) {
-            dd($this);
             $this->_tipo = Type::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
+                'default_class' => static::DEFAULT_NAMESPACE.'Type'
             ]);
         }
 
@@ -107,7 +107,7 @@ class Log extends RecordAbstract
     public function getParent($options = [])
     {
         if (!$this->_parent) {
-            $tipo = $this->getTipo();
+            $tipo = $this->getType();
             if ($this->id || $this->getFieldsValues('id')) {
                 $this->_parent = Record::getInstance($this->id, $options, $tipo);
             }
@@ -186,8 +186,11 @@ class Log extends RecordAbstract
     public static function findLogs($options = [])
     {
         $instance = new self;
-        
-        $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
+        if (isset($options['fields'])) {
+            $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
+        } else {
+            $options['fields'] = static::DEFAULT_FIELDS;
+        }
         $options['from'] = $instance->getTableName().' AS main';
 
         if (!$options['where']) {
@@ -199,12 +202,12 @@ class Log extends RecordAbstract
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();
         $options['campos'] = $instance->getAttributesCampos();
-
+        
         $rs = $instance->_executeQuery($options);
         $logs = [];
 
         foreach ($rs as $row) {
-            $log = new self(['id_log' => $row->id_log]);
+            $log = new static(['id_log' => $row->id_log]);
             $instance->_getAttributesFromRow($row, $log, $options);
             $logs[] = $log;
         }

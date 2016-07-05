@@ -18,5 +18,5 @@ use Jp7\Interadmin\Log;
  */
 class InterAdminLog extends Log
 {
-    
+    const DEFAULT_NAMESPACE = '';
 }
