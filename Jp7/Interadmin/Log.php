@@ -215,6 +215,11 @@ class Log extends RecordAbstract
         return $logs;
     }
 
+    public static function findFirstLog($options = [])
+    {
+        return static::findLogs($options)[0];
+    }
+    
     public static function getPublishedFilters($table, $alias)
     {
         // N￣o precisa

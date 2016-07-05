@@ -31,7 +31,7 @@ abstract class RecordAbstract implements Serializable
      *
      * @var array
      */
-    public $attributes = [];
+    protected $attributes = [];
 
     protected $_db = null;
 
@@ -42,10 +42,10 @@ abstract class RecordAbstract implements Serializable
      *
      * @return mixed
      */
-    public function &__get($attributeName)
+    public function &__get($name)
     {
-        if (isset($this->attributes[$attributeName])) {
-            return $this->attributes[$attributeName];
+        if (array_key_exists($name, $this->attributes)) {
+            return $this->attributes[$name];
         } else {
             return $null;
         }
@@ -62,7 +62,13 @@ abstract class RecordAbstract implements Serializable
         if (method_exists($this, $mutator)) {
             return $this->$mutator($value);
         }
-
+        if (is_string($value)) {
+            $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+            $value = $this->getMutatedAttribute($column, $value);
+        }
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected");
+        }
         $this->attributes[$name] = $value;
     }
     /**
@@ -152,6 +158,30 @@ abstract class RecordAbstract implements Serializable
         }
     }
 
+    /**
+     * Converts to date or file
+     *
+     * @param string $name  The name of the field.
+     *
+     * @return mixed
+     */
+    protected function getMutatedAttribute($name, $value)
+    {
+        if (strpos($name, 'date_') === 0) {
+            return new \Date($value);
+        }
+        if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
+            $class_name = static::DEFAULT_NAMESPACE.'FileField';
+            if (!class_exists($class_name)) {
+                $class_name = 'Jp7\\Interadmin\\FileField';
+            }
+            $file = new $class_name($value);
+            $file->setParent($this);
+            return $file;
+        }
+        return $value;
+    }
+    
     public function getFillable()
     {
         return [];
@@ -273,99 +303,13 @@ abstract class RecordAbstract implements Serializable
     }
     
     /**
-     * Gets an object by its key, which may be its 'id' or 'id_tipo', and then returns it.
-     *
-     * @param mixed  $value  Any value.
-     * @param string $field  The name of the field.
-     * @param string $campos Value from getCampos().
-     * @param RecordAbstract Object which will receive the attribute.
-     *
-     * @return mixed The object created by the key or the value itself.
-     */
-    protected function _getByForeignKey(&$value, $field, $campo, $object)
-    {
-        $interAdminClass = static::DEFAULT_NAMESPACE.'Record';
-
-        $options = [];
-        if (strpos($field, 'date_') === 0) {
-            return new \Date($value);
-        }
-        /*
-        if (strpos($field, 'select_multi') === 0) {
-            //$isMulti = (strpos($field, 'select_multi') === 0);
-            $isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
-        } elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
-            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
-            $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
-        } else
-        */
-        if (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
-            $class_name = static::DEFAULT_NAMESPACE.'FileField';
-            if (!class_exists($class_name)) {
-                $class_name = 'Jp7\\Interadmin\\FileField';
-            }
-            $file = new $class_name($value);
-            $file->setParent($object);
-
-            return $file;
-        } else {
-            return $value;
-        }
-        /*
-        $options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
-        if ($object instanceof RecordAbstract) {
-            $tipo = $object->getCampoTipo($campo);
-        }
-
-        if ($isMulti) {
-            $value_arr = array_filter(explode(',', $value));
-            foreach ($value_arr as $key2 => $value2) {
-                if ($value2 && is_numeric($value2)) {
-                    if ($isTipo) {
-                        $value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
-                    } else {
-                        if (!$tipo instanceof InterAdminTipo) {
-                            $tipo = $this->_getSpecialTipo($value2);
-                        }
-                        if ($tipo instanceof InterAdminTipo) {
-                            $value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
-                        }
-                    }
-                } else {
-                    //FIXME Retirar quando 7.form.lib parar de salvar N no special
-                    unset($value_arr[$key2]);
-                }
-            }
-            $value = $value_arr;
-        } elseif ($value && is_numeric($value)) {
-            if ($isTipo) {
-                $value = InterAdminTipo::getInstance($value, $options);
-            } else {
-                $value = InterAdmin::getInstance($value, $options, $tipo);
-            }
-        }
-        */
-
-        return $value;
-    }
-
-    protected function _getSpecialTipo($id)
-    {
-        // Temporario enquando specials nao tem id_tipo
-        $data = DB::table('')->select('id_tipo')->where('id', $id)->first();
-        if ($data) {
-            return Type::getInstance($data->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
-        }
-    }
-
-    /**
      * Executes a SQL Query based on the values passed by $options.
      *
      * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
      *
      * @return ADORecordSet
      */
-    protected function _executeQuery($options, &$select_multi_fields = [])
+    protected function _executeQuery($options) // , &$select_multi_fields = []
     {
         //global $debugger;
         $db = $this->getDb();
@@ -447,8 +391,7 @@ abstract class RecordAbstract implements Serializable
             // $time = $debugger->getTime($options['debug']);
             echo SqlFormatter::format($sql);
         }
-        $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
-
+        // $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
         return $rs;
     }
     /**
@@ -730,6 +673,8 @@ abstract class RecordAbstract implements Serializable
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
                     $joinTipo = $options['joins'][$join][1];
                 } elseif (isset($campos[$nome]) && strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
+                    throw new \LogicException('[Thumbstone] should never land here');
+                    /*
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                     // Processamento dos campos do select_multi é feito depois
                     $joinTipo = null;
@@ -737,6 +682,7 @@ abstract class RecordAbstract implements Serializable
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
                     ];
+                    */
                 } else {
                     // Select
                     $nome = $aliases[$join.'_id'];
@@ -858,14 +804,12 @@ abstract class RecordAbstract implements Serializable
             }
             if ($table == 'main') {
                 $alias = isset($aliases[$field]) ? $aliases[$field] : $field;
-                if (isset($attributes[$alias])) {
-                    continue; // avoid overwrite, fix problem with fields having aliases
-                }
-                $campo = isset($campos[$field]) ? $campos[$field] : null;
-                $value = $this->_getByForeignKey($value, $field, $campo, $object);
+                $value = $object->getMutatedAttribute($field, $value);
                 if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
+                    throw new \LogicException('[Thumbstone] Should never land here');
                     continue;
                 }
+                /*
                 if (!empty($options['select_multi_fields'])) {
                     if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
                         $multi_options = $options['select_multi_fields'][$alias];
@@ -874,6 +818,7 @@ abstract class RecordAbstract implements Serializable
                         }
                     }
                 }
+                */
                 $attributes[$alias] = $value;
             } else {
                 $joinAlias = '';
@@ -908,10 +853,9 @@ abstract class RecordAbstract implements Serializable
                 if (isset($attributes[$table]) && is_object($attributes[$table])) {
                     $subobject = $attributes[$table];
                     $alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-                    $campo = isset($joinCampos[$field]) ? $joinCampos[$field] : null;
-                    $value = $this->_getByForeignKey($value, $field, $campo, $subobject);
-
-                    if (isset($subobject->$alias) && is_object($subobject->$alias)) {
+                    $value = $object->getMutatedAttribute($field, $value);
+                    if (isset($subobject->attributes[$alias]) && is_object($subobject->attributes[$alias])) {
+                        throw new \LogicException('[Thumbstone] Should never land here');
                         continue;
                     }
                     $subobject->$alias = $value;
@@ -1002,7 +946,12 @@ abstract class RecordAbstract implements Serializable
     abstract public function getAttributesAliases();
     abstract public function getAdminAttributes();
     abstract public function getTableName();
-
+    
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+    
     public function getColumns()
     {
         $dbName = $this->getDb()->getDatabaseName();

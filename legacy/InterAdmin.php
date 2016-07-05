@@ -27,16 +27,6 @@ class InterAdmin extends Record implements InterAdminAbstract
     
     protected static $unguarded = true;
     
-    public static function getInstanceFromAttributes(array $attributes, InterAdminTipo $tipo = null)
-    {
-        $instance = static::getInstance($attributes['id'], [], $tipo);
-        //$instance->attributes = $attributes;
-        $instance->_getAttributesFromRow($attributes, $instance, [
-            'campos' => $instance->getTipo()->getCampos()
-        ]);
-        return $instance;
-    }
-    
     /**
      * Returns this object´s varchar_key and all the fields marked as 'combo', if the field
      * is an InterAdmin such as a select_key, its getStringValue() method is used.

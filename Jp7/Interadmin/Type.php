@@ -76,7 +76,7 @@ class Type extends RecordAbstract
 
     public function &__get($name)
     {
-        if (isset($this->attributes[$name])) {
+        if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $cacheKey = 'Type::__get,'.$this->id_tipo;
@@ -262,8 +262,7 @@ class Type extends RecordAbstract
             $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
         }
 
-        $rs = $this->_executeQuery($options, $select_multi_fields);
-        $options['select_multi_fields'] = $select_multi_fields;
+        $rs = $this->_executeQuery($options);
 
         $records = [];
         foreach ($rs as $row) {

@@ -84,11 +84,19 @@ class Record extends RecordAbstract implements Arrayable
             $aliases = $this->getAttributesAliases();
             // Fixes fields that have alias
             if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+                // alias is present, column requested
                 $name = $aliases[$name];
+                $value = &$this->attributes[$name];
+            } elseif (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
+                // column is present, alias requested
+                $name = array_search($name, $aliases);
                 $value = &$this->attributes[$name];
             } else {
                 // returned as reference
                 $value = $this->_lazyLoadAttribute($name);
+            }
+            if ($name === 'attributes') {
+                throw new Exception("attributes is protected");
             }
         }
         // Mutators
@@ -98,7 +106,6 @@ class Record extends RecordAbstract implements Arrayable
                 $value = $this->$mutator($value);
             }
         }
-        
         return $value;
     }
     
@@ -384,7 +391,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function setType(Type $tipo = null)
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
     /**
