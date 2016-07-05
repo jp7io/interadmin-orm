@@ -175,7 +175,7 @@ class Record extends RecordAbstract implements Arrayable
                     $loaded->fks = $fks;
                     $fksArray = array_filter(explode(',', $fks));
                     if ($data['type']) {
-                        $multi = [];
+                        $multi = collect([]);
                         foreach ($fksArray as $fk) {
                             $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                         }
