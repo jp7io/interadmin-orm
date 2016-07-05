@@ -328,4 +328,14 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         return '(tags.id_tipo = '.$this->id_tipo.' AND tags.id = 0)';
     }
+    
+    public function getBreadcrumb()
+    {
+        $parents = [];
+        $parent = $this;
+        do {
+            $parents[] = $parent;
+        } while (($parent = $parent->getParent()) && $parent->id_tipo);
+        return array_reverse($parents);
+    }
 }
