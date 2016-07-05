@@ -161,6 +161,19 @@ class InterAdmin extends Record implements InterAdminAbstract
         return $result;
     }
     
+    public function relationFromColumn($column)
+    {
+        $alias = $this->getType()->getCamposAlias($column);
+        if (starts_with($column, 'select_multi_')) {
+            $relationship = substr($alias, 0, -4); // _ids = 4 chars
+        } elseif (starts_with($column, 'select_')) {
+            $relationship = substr($alias, 0, -3); // _id = 3 chars
+        } else {
+            throw InvalidArgumentException('$column must start with select_ or select_multi_.');
+        }
+        return $this->$relationship;
+    }
+    
     protected function _aliasToColumn($alias, $aliases)
     {
         if (isset($aliases[$alias])) {
