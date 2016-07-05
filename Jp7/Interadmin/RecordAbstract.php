@@ -804,11 +804,10 @@ abstract class RecordAbstract implements Serializable
             }
             if ($table == 'main') {
                 $alias = isset($aliases[$field]) ? $aliases[$field] : $field;
-                $value = $object->getMutatedAttribute($field, $value);
                 if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
-                    throw new \LogicException('[Thumbstone] Should never land here');
                     continue;
                 }
+                $attributes[$alias] = $object->getMutatedAttribute($field, $value);
                 /*
                 if (!empty($options['select_multi_fields'])) {
                     if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
@@ -819,7 +818,6 @@ abstract class RecordAbstract implements Serializable
                     }
                 }
                 */
-                $attributes[$alias] = $value;
             } else {
                 $joinAlias = '';
                 $join = isset($fields[$table]) ? $fields[$table] : $table;
@@ -853,12 +851,10 @@ abstract class RecordAbstract implements Serializable
                 if (isset($attributes[$table]) && is_object($attributes[$table])) {
                     $subobject = $attributes[$table];
                     $alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-                    $value = $object->getMutatedAttribute($field, $value);
                     if (isset($subobject->attributes[$alias]) && is_object($subobject->attributes[$alias])) {
-                        throw new \LogicException('[Thumbstone] Should never land here');
                         continue;
                     }
-                    $subobject->$alias = $value;
+                    $subobject->$alias = $object->getMutatedAttribute($field, $value);
                 }
             }
         }
