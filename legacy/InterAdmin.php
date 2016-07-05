@@ -519,4 +519,9 @@ class InterAdmin extends Record implements InterAdminAbstract
         $newobject->attributes = $this->attributes;
         return $newobject;
     }
+    
+    public function getTagFilters()
+    {
+        return '(tags.id = '.$this->id." AND tags.id_tipo = '".$this->getTipo()->id_tipo."')";
+    }
 }

@@ -323,4 +323,9 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $newobject->attributes = $this->attributes;
         return $newobject;
     }
+    
+    public function getTagFilters()
+    {
+        return '(tags.id_tipo = '.$this->id_tipo.' AND tags.id = 0)';
+    }
 }
