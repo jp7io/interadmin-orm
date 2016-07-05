@@ -148,11 +148,8 @@ class InterAdminTipo extends Type implements InterAdminAbstract
      *
      * @return string
      */
-    public function getUrl($action = 'index', array $parameters = [])
+    public function getUrl()
     {
-        if (func_num_args() > 0) {
-            throw new \InvalidArgumentException('No arguments should be passed. They are here just for compatibility with Type.');
-        }
         if ($this->_url) {
             return $this->_url;
         }
