@@ -119,27 +119,8 @@ class InterAdmin extends Record implements InterAdminAbstract
             if ($child = $this->_deprecatedFindChild($nome_id)) {
                 return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
             }
-        } elseif ($child = $this->_deprecatedFindChild(ucfirst($methodName))) {
-            return $this->getChildrenTipo($child['id_tipo']);
         }
-        // Default error when method doesn´t exist
-        $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
-        $children = $this->getTipo()->getInterAdminsChildren();
-        $patterns = [
-            'get{ChildName}',
-            'getFirst{ChildName}',
-            'get{ChildName}ById',
-            'get{ChildName}ByIdString',
-            'get{ChildName}Count',
-            'create{ChildName}',
-            'delete{ChildName}',
-        ];
-        foreach (array_keys($children) as $childName) {
-            foreach ($patterns as $pattern) {
-                $message .= "\t\t- ".str_replace('{ChildName}', $childName, $pattern)."\n";
-            }
-        }
-        jp7_debug($message);
+        return parent::__call($methodName, $args);
     }
     
     protected function _loadRelationship($relationships, $name)

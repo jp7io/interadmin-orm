@@ -24,6 +24,36 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     const DEFAULT_NAMESPACE = '';
     
     /**
+     * Magic method calls(On Development).
+     *
+     * Available magic methods:
+     * - findBy{Field}(mixed $value, array $options = array())
+     * - findFirstBy{Field}(mixed $value, array $options = array())
+     *
+     * @param string $method
+     *
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        if (strpos($method, 'find') === 0) {
+            if (preg_match('/find(First)?By(?<args>.*)/', $method, $match)) {
+                $termos = explode('And', $match['args']);
+                $options = $args[count($termos)];
+                foreach ($termos as $key => $termo) {
+                    $options['where'][] = Jp7_Inflector::underscore($termo)." = '".addslashes($args[$key])."'";
+                }
+                if ($match[1]) {
+                    $options['limit'] = 1;
+                }
+                $retorno = $this->deprecatedFind($options);
+                return ($match[1]) ? reset($retorno) : $retorno;
+            }
+        }
+        return parent::__call($method, $args);
+    }
+    
+    /**
      * Retrieves the unique record which have this id.
      *
      * @param int   $id      Search value.
