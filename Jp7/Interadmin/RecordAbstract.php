@@ -673,7 +673,7 @@ abstract class RecordAbstract implements Serializable
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
                     $joinTipo = $options['joins'][$join][1];
                 } elseif (isset($campos[$nome]) && strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
-                    throw new \LogicException('[Thumbstone] should never land here');
+                    $joinTipo = null; // Just ignore select_multi used on legacy code, lazy load them
                     /*
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                     // Processamento dos campos do select_multi é feito depois
@@ -685,7 +685,7 @@ abstract class RecordAbstract implements Serializable
                     */
                 } else {
                     // Select
-                    $nome = $aliases[$join.'_id'];
+                    $nome = isset($aliases[$join.'_id']) ? $aliases[$join.'_id'] : $join;
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                     // Join e Recursividade
                     if (empty($options['from_alias']) || !in_array($join, (array) $options['from_alias'])) {
