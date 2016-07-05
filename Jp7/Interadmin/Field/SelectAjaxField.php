@@ -28,11 +28,11 @@ class SelectAjaxField extends SelectField
             return []; // evita query inutil
         }
         if (!$this->hasTipo()) {
-            $records = $this->records()->where('id', $value)->all();
+            $records = $this->records()->where('id', $value)->get();
             return $this->toOptions($records);
         }
         if ($this->nome instanceof InterAdminTipo || $this->nome === 'all') {
-            $tipos = $this->tipos()->where('id_tipo', $value)->all();
+            $tipos = $this->tipos()->where('id_tipo', $value)->get();
             return $this->toOptions($tipos);
         }
         throw new UnexpectedValueException('Not implemented');

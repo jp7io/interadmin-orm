@@ -69,13 +69,13 @@ trait SelectFieldTrait
     protected function getOptions()
     {
         if (!$this->hasTipo()) {
-            return $this->toOptions($this->records()->all());
+            return $this->toOptions($this->records()->get());
         }
         if ($this->nome instanceof InterAdminTipo) {
-            return $this->toOptions($this->tipos()->all());
+            return $this->toOptions($this->tipos()->get());
         }
         if ($this->nome === 'all') {
-            return $this->toTreeOptions($this->tipos()->all());
+            return $this->toTreeOptions($this->tipos()->get());
         }
         throw new UnexpectedValueException('Not implemented');
     }
@@ -83,7 +83,6 @@ trait SelectFieldTrait
     protected function records()
     {
         $camposCombo = $this->nome->getCamposCombo();
-        
         $query = new InterAdminOptions($this->nome);
         $query->setOptionsArray([
             'fields' => $camposCombo,
