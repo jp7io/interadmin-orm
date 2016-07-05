@@ -672,7 +672,7 @@ abstract class RecordAbstract implements Serializable
                 // Join e Recursividade
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
                     $joinTipo = $options['joins'][$join][1];
-                } elseif (isset($campos[$nome]) && strpos($campos[$nome]['tipo'], 'select_multi_') === 0) {
+                } elseif (isset($aliases[$join.'_ids']) || strpos($join, 'select_multi_') === 0) {
                     $joinTipo = null; // Just ignore select_multi used on legacy code, lazy load them
                     /*
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
