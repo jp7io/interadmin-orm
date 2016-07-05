@@ -9,6 +9,7 @@ use Exception;
 use Lang;
 use Request;
 use App;
+use Cache;
 
 /**
  * JP7's PHP Functions.
@@ -80,9 +81,10 @@ class Type extends RecordAbstract
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $cacheKey = 'Type::__get,'.$this->id_tipo;
-            $this->attributes = \Cache::remember($cacheKey, 60, function () {
-                $this->loadAttributes($this->getAttributesNames(), false);
-                return $this->attributes;
+            $this->attributes += Cache::remember($cacheKey, 60, function () {
+                $columns = $this->getAttributesNames();
+                $this->loadAttributes($columns, false);
+                return array_intersect_key($this->attributes, array_flip($columns));
             });
             return $this->attributes[$name];
         }
