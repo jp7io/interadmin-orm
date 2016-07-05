@@ -20,14 +20,8 @@ trait TypeTrait
      *
      * @return string
      */
-    public function getUrl() // FIXME - $action = 'index', array $parameters = []
+    public function getUrl($action = 'index', array $parameters = [])
     {
-        $action = 'index';
-        $parameters = [];
-        if (func_num_args() === 2) {
-            list($action, $parameters) = func_get_args(); // FIXME
-        }
-
         if ($this->getParent() instanceof Record) {
             array_unshift($parameters, $this->getParent());
         }

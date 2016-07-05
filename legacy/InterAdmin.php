@@ -28,6 +28,63 @@ class InterAdmin extends Record implements InterAdminAbstract
     protected static $unguarded = true;
     
     /**
+     * Returns the full url for this record.
+     *
+     * @return string
+     */
+    public function getUrl($sep = null)
+    {
+        global $seo, $seo_sep;
+        if ($seo && $this->getParent()->id) {
+            $link = $this->_parent->getUrl().'/'.toSeo($this->getTipo()->getFieldsValues('nome'));
+        } else {
+            $link = $this->getTipo()->getUrl();
+        }
+        if ($seo) {
+            $aliases = $this->getTipo()->getCamposAlias();
+            if (array_key_exists('varchar_key', $aliases)) {
+                $alias = $aliases['varchar_key'];
+                if (isset($this->$alias)) {
+                    $nome = $this->$alias;
+                } else {
+                    $nome = $this->getFieldsValues('varchar_key');
+                }
+            }
+            if (is_null($sep)) {
+                $sep = $seo_sep;
+            }
+            $link .= $sep.toSeo($nome);
+        } else {
+            $link .= '?id='.$this->id;
+        }
+        return $link;
+    }
+    
+    /**
+     * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
+     *
+     * @param array $attributes
+     */
+    public function setAttributesSafely(array $attributes)
+    {
+        $editableFields = array_flip($this->getAttributesAliases());
+        $filteredAttributes = array_intersect_key($attributes, $editableFields);
+        return $this->setAttributes($filteredAttributes);
+    }
+    
+    /**
+     * Sets this object´s attributes with the given array keys and values.
+     *
+     * @param array $attributes
+     */
+    public function setAttributes(array $attributes)
+    {
+        foreach ($attributes as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+    
+    /**
      * Returns this object´s varchar_key and all the fields marked as 'combo', if the field
      * is an InterAdmin such as a select_key, its getStringValue() method is used.
      *
