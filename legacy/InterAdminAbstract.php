@@ -855,6 +855,12 @@ abstract class InterAdminAbstract implements Serializable
             $this->$key = $value;
         }
     }
+    
+    public function getAttributes()
+    {
+        return $this->attributes;    
+    }
+    
     /**
      * Reloads all the attributes.
      *
