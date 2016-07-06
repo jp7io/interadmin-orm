@@ -936,7 +936,6 @@ abstract class RecordAbstract implements Serializable
      *
      * @return Type
      */
-    abstract public function getCampoTipo($campo);
     abstract public function getAttributesCampos();
     abstract public function getAttributesNames();
     abstract public function getAttributesAliases();

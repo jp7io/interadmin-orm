@@ -580,8 +580,13 @@ class Type extends RecordAbstract
                     } else {
                         $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
                     }
+                    if ($specialTipo = $this->getCampoTipo($array)) {
+                        $query = $specialTipo->records();
+                    } else {
+                        $query = new TypelessQuery(static::getInstance(0));
+                    }
                     $relationships[$relationship] = [
-                        'query' => new TypelessQuery($this),
+                        'query' => $query,
                         'type' => $hasType,
                         'multi' => $multi,
                     ];

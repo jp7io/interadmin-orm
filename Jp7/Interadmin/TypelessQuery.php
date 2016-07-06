@@ -48,7 +48,7 @@ class TypelessQuery extends Query
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
         }
 
-        return $this->provider->deprecatedTypelessFind($this->options);
+        return $this->first();
     }
     
     public function findMany($ids)

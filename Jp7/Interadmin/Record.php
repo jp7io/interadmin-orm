@@ -741,7 +741,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         return $this->getType()->getCampos();
     }
-    public function getCampoTipo($campo)
+    private function getCampoTipo($campo)
     {
         return $this->getType()->getCampoTipo($campo);
     }
