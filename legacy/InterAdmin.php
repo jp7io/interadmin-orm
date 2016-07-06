@@ -590,4 +590,9 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         return '(tags.id = '.$this->id." AND tags.id_tipo = '".$this->getTipo()->id_tipo."')";
     }
+    
+    public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')
+    {
+        return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);
+    }
 }
