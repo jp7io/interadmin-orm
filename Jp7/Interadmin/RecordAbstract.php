@@ -143,16 +143,21 @@ abstract class RecordAbstract implements Serializable
      */
     public function loadAttributes($attributes, $fieldsAlias = true)
     {
-        $fieldsToLoad = array_diff($attributes, array_keys($this->attributes));
+        $aliases = $this->getAttributesAliases();
+        $fieldsSet = array_keys($this->attributes);
+        $aliasesSet = array_keys(array_intersect($aliases, $fieldsSet));
+        
+        $attributes = array_diff($attributes, $fieldsSet, $aliasesSet);
+        
         // Retrieving data
-        if ($fieldsToLoad) {
+        if ($attributes) {
             $options = [
-                'fields' => (array) $fieldsToLoad,
+                'fields' => (array) $attributes,
                 'fields_alias' => $fieldsAlias,
                 'from' => $this->getTableName().' AS main',
                 'where' => [$this->_primary_key.' = '.intval($this->{$this->_primary_key})],
                 // Internal use
-                'aliases' => $this->getAttributesAliases(),
+                'aliases' => $aliases,
                 'campos' => $this->getAttributesCampos(),
             ];
             $rs = $this->_executeQuery($options);
