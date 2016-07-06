@@ -25,8 +25,6 @@ class InterAdmin extends Record implements InterAdminAbstract
 {
     const DEFAULT_NAMESPACE = '';
     
-    protected static $unguarded = true;
-    
     /**
      * Returns the full url for this record.
      *

@@ -307,7 +307,21 @@ class InterAdminTipo extends Type implements InterAdminAbstract
      */
     public function createInterAdmin(array $attributes = [])
     {
-        return $this->deprecated_createInterAdmin($attributes);
+        $options = ['default_class' => static::DEFAULT_NAMESPACE.'Record'];
+        $record = Record::getInstance(0, $options, $this);
+        if ($mostrar = $this->getCamposAlias('char_key')) {
+            $record->$mostrar = 'S';
+        }
+        $record->date_publish = date('c');
+        $record->date_insert = date('c');
+        $record->publish = 'S';
+        $record->log = '';
+
+        if ($this->_parent instanceof Record) {
+            $record->setParent($this->_parent);
+        }
+
+        return $record->setAttributes($attributes);
     }
     
     /**
