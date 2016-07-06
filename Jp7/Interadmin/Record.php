@@ -6,6 +6,7 @@ use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use BadMethodCallException;
+use UnexpectedValueException;
 use Exception;
 use DB;
 use Request;
@@ -373,7 +374,7 @@ class Record extends RecordAbstract implements Arrayable
             // Anonymous classes or instance has different id_tipo
             if (!$this->id_tipo) {
                 // Instance was not brought from DB, id_tipo is empty
-                throw new Exception('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
+                throw new UnexpectedValueException('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
             $tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,

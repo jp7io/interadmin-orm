@@ -76,7 +76,7 @@ class Jp7_Interadmin_Util
 
     protected static function _importAttributeFromIdString($record, $bind_children = false)
     {
-        foreach ($record->attributes as $attributeName => $attribute) {
+        foreach ($record->getAttributes() as $attributeName => $attribute) {
             if ($attribute instanceof InterAdmin && $attribute->id_string) {
                 $attributeTipo = InterAdminTipo::getInstance($attribute->id_tipo);
                 //$attribute->setTipo($attributeTipo);
@@ -108,8 +108,10 @@ class Jp7_Interadmin_Util
         $returnIds = [];
         foreach ($records as $record) {
             $returnId = ['id' => $record->id];
-            unset($record->id);
+            $children = $record->_children;
+            $record->id = 0;
             unset($record->id_slug);
+            unset($record->_children);
 
             $record->setParent($parent);
             $record->setTipo($tipoObj);
@@ -122,6 +124,7 @@ class Jp7_Interadmin_Util
             $returnId['new_id'] = $record->id;
 
             if ($import_children) {
+                $record->_children = $children;
                 self::_importChildren($record, $use_id_string, $bind_children);
             }
             $returnIds[] = $returnId;
@@ -137,8 +140,10 @@ class Jp7_Interadmin_Util
             $childTipo->setParent($record);
 
             foreach ($tipo_children as $child) {
-                unset($child->id);
+                $grandChildren = $child->_children;
+                $child->id = 0;
                 unset($child->id_slug);
+                unset($child->_children);
 
                 $child->setParent($record);
                 $child->setTipo($childTipo);
@@ -148,6 +153,7 @@ class Jp7_Interadmin_Util
                 }
 
                 $child->save();
+                $child->_children = $grandChildren;
                 self::_importChildren($child, $use_id_string, $bind_children);
             }
         }

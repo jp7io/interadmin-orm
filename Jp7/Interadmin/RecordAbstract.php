@@ -9,6 +9,7 @@ use Jp7\CollectionUtil;
 use Jp7\TryMethod;
 use Serializable;
 use Exception;
+use UnexpectedValueException;
 use DB;
 use SqlFormatter;
 
@@ -63,7 +64,11 @@ abstract class RecordAbstract implements Serializable
             return $this->$mutator($value);
         }
         if (is_string($value)) {
-            $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+            try {
+                $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+            } catch (UnexpectedValueException $e) {
+                $column = $name;
+            }
             $value = $this->getMutatedAttribute($column, $value);
         }
         if ($name === 'attributes') {
