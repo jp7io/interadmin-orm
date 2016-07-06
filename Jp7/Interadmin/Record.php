@@ -268,7 +268,7 @@ class Record extends RecordAbstract implements Arrayable
         } else {
             $class_name = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
             if (!$class_name) {
-                $class_name = isset($options['default_class']) ? $options['default_class'] : self::class;
+                $class_name = isset($options['default_class']) ? $options['default_class'] : static::DEFAULT_NAMESPACE.'Record';
             }
         }
 
