@@ -338,4 +338,14 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         } while (($parent = $parent->getParent()) && $parent->id_tipo);
         return array_reverse($parents);
     }
+    
+    public function deleteInterAdminsForever($options = [])
+    {
+        $this->deprecated_deleteInterAdminsForever($options);
+    }
+    
+    public function deleteInterAdmins($options = [])
+    {
+        $this->deprecated_deleteInterAdmins($options);
+    }
 }
