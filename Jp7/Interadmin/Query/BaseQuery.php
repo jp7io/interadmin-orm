@@ -185,6 +185,13 @@ abstract class BaseQuery
         return $this->_addWhere($where);
     }
 
+    public function whereDate($column, $value)
+    {
+        $where =  $this->_parseComparison('DATE('.$column.')', '=', $value);
+
+        return $this->_addWhere($where);
+    }
+    
     public function whereDoesntHave($relationship, $conditions = null)
     {
         return $this->whereHas($relationship, $conditions, true);

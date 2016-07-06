@@ -203,6 +203,11 @@ abstract class RecordAbstract implements Serializable
         return $this->setRawAttributes($attributes);
     }
 
+    /**
+     * @param array $attributes
+     * @return self
+     * @throws MassAssignmentException
+     */
     public function fill(array $attributes)
     {
         if (!$attributes) {
