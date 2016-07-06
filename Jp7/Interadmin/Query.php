@@ -241,9 +241,8 @@ class Query extends Query\BaseQuery
         if (func_num_args() != 1) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 1.');
         }
-
         if (is_array($id)) {
-            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
+            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use get() instead of find().');
         }
 
         if (is_string($id) && !is_numeric($id)) {
