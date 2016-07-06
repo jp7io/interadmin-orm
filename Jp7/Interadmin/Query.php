@@ -149,6 +149,20 @@ class Query extends Query\BaseQuery
         return $this->provider->deprecatedFind($this->options);
     }
 
+    /**
+     * Get a single column's value from the first result of a query.
+     *
+     * @param  string  $column
+     * @return mixed
+     */
+    public function value($column)
+    {
+        $result = $this->select($column)->first();
+        if ($result) {
+            return $result->{$column};
+        }
+    }
+
     public function first()
     {
         if (func_num_args() > 0) {
