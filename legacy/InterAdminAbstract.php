@@ -16,5 +16,5 @@
  */
 interface InterAdminAbstract
 {
-    
+
 }
