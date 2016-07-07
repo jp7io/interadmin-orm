@@ -20,7 +20,7 @@ class TypelessQuery extends Query
 
     public function first()
     {
-        return $this->provider->deprecatedTypelessFind($this->options + ['limit' => 1])->first();
+        return $this->provider->deprecatedTypelessFind(['limit' => 1] + $this->options)->first();
     }
 
     public function count()
