@@ -82,7 +82,7 @@ class TypeQuery extends BaseQuery
             $this->options['where'][] = $this->_parseComparison('id_tipo', '=', $id);
         }
 
-        return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->deprecatedGetChildren($this->options)->first();
     }
 
     public function findOrFail($id)
