@@ -148,13 +148,12 @@ class Record extends RecordAbstract implements Arrayable
         if (!in_array($name, $columns) && !in_array($name, $aliases)) {
             return;
         }
-        if (class_exists('Debugbar')) {
+        if (getenv('APP_DEBUG')) {
             $caller = debug_backtrace(false, 2)[1];
-
-            \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
-                .get_class($this)
-                .' - ID: '.$this->id
-                .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
+            \Log::notice('N+1 query: Loading attribute "'.$name.'".'.PHP_EOL.
+                '- Class: '.get_class($this).PHP_EOL.
+                '- ID: '.$this->id.PHP_EOL.
+                '- File: '.$caller['file'].' - Line: '.$caller['line']);
         }
 
         $attributes = array_intersect($columns, array_merge(

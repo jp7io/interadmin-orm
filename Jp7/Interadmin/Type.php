@@ -702,19 +702,13 @@ class Type extends RecordAbstract
                 $modelo = new self($this->model_id_tipo);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
-                if (class_exists($className)) {
-                    $modelo = new $className();
-                } else {
-                    echo 'Erro: Class '.$className.' not found';
-                }
+                $modelo = new $className();
             }
-            if ($modelo) {
-                foreach (self::$inheritedFields as $field) {
-                    if ($modelo->$field) {
-                        if (!$this->$field || in_array($field, self::$privateFields)) {
-                            $this->inherited[] = $field;
-                            $this->$field = $modelo->$field;
-                        }
+            foreach (self::$inheritedFields as $field) {
+                if ($modelo->$field) {
+                    if (!$this->$field || in_array($field, self::$privateFields)) {
+                        $this->inherited[] = $field;
+                        $this->$field = $modelo->$field;
                     }
                 }
             }

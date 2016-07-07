@@ -3,7 +3,7 @@
 namespace Jp7\Former;
 
 use Former\Former as OriginalFormer;
-use Debugbar;
+use Log;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\EloquentProxy;
 use Jp7\Interadmin\FieldUtil;
@@ -25,10 +25,10 @@ class FormerExtension
 
     public function __construct(OriginalFormer $former)
     {
-        // Send missing validations to Debugbar
-        if ($errors = app()['session']->get('errors')) {
-            if (class_exists('Debugbar')) {
-                Debugbar::error($errors->all());
+        // Send missing validations to Log
+        if (getenv('APP_DEBUG')) {
+            if ($errors = app()['session']->get('errors')) {
+                Log::notice('Validation error', $errors->all());
             }
         }
 
