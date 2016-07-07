@@ -688,15 +688,7 @@ class Record extends RecordAbstract implements Arrayable
         // date_modify
         $this->date_modify = date('c');
 
-        return parent::save();
-    }
-
-    /**
-     * Saves without logs and triggers.
-     */
-    public function saveRaw()
-    {
-        return parent::save();
+        return $this->saveRaw();
     }
 
     public function generateSlug()

@@ -246,8 +246,17 @@ abstract class RecordAbstract implements Serializable
      */
     public function save()
     {
+        return $this->saveRaw();
+    }
+    
+    /**
+     * Saves without logs and triggers.
+     */
+    public function saveRaw()
+    {
         return $this->_update($this->attributes);
     }
+    
     /**
      * Increments a numeric attribute.
      *

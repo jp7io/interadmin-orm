@@ -673,7 +673,7 @@ class Type extends RecordAbstract
 
         // Inheritance
         $this->syncInheritance();
-        $retorno = parent::save();
+        $retorno = $this->saveRaw();
 
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->id_tipo) {
@@ -682,7 +682,7 @@ class Type extends RecordAbstract
             ]);
             foreach ($inheritingTipos as $tipo) {
                 $tipo->syncInheritance();
-                $tipo->updateAttributes($tipo->attributes);
+                $tipo->saveRaw();
             }
         }
 
@@ -700,7 +700,6 @@ class Type extends RecordAbstract
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
                 $modelo = new self($this->model_id_tipo);
-                $modelo->loadAttributes(self::$inheritedFields, false);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
                 if (class_exists($className)) {
