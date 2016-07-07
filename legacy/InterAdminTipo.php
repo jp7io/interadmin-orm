@@ -321,7 +321,8 @@ class InterAdminTipo extends Type implements InterAdminAbstract
             $record->setParent($this->_parent);
         }
 
-        return $record->setAttributes($attributes);
+        $record->setAttributes($attributes);
+        return $record;
     }
     
     /**
