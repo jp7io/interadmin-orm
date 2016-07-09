@@ -266,7 +266,12 @@ abstract class RecordAbstract implements Serializable
     public function increment($attribute, $by = 1)
     {
         $this->$attribute += $by;
-        $this->_update([$attribute => $this->$attribute]);
+        $pk = $this->_primary_key;
+        if ($this->$pk) {
+            $this->_update([$attribute => $this->$attribute]);
+        } else {
+            $this->saveRaw();
+        }
     }
     /**
      * Updates using SQL.
