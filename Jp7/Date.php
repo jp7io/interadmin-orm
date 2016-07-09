@@ -19,6 +19,7 @@ class Jp7_Date extends DateTime
     const DURATION_LOWERISO = 0;
     const DURATION_ISO = 1;
     const DURATION_HUMAN = 2;
+    const EMPTY_DATE = '0000-00-00 00:00:00';
 
     /**
      * Returns new Jp7_Date object formatted according to the specified format.
@@ -226,22 +227,15 @@ class Jp7_Date extends DateTime
      */
     public function format($format)
     {
-        // Bug PHP para datas zeradas
-        if (parent::format('Y') === '-0001') {
-            // Switch usado para performance, default: é o tratamento completo do erro
-            switch ($format) {
-                case 'd':
-                    return '00';
-                case 'm':
-                    return '00';
-                case 'Y':
-                    return '0000';
-                case 'Y-m-d H:i:s':
-                    return  '0000-00-00 00:00:00';
-                default:
-                    $format = preg_replace('/(?<!\\\\)Y/', '0000', $format);
-                    $format = preg_replace('/(?<!\\\\)(d|m|y)/', '00', $format);
-                    $format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
+        // InterAdmin trabalha com data zerada
+        if (!$this->isValid()) {
+            // If usado para performance
+            if ($format === 'Y-m-d H:i:s') {
+                return self::EMPTY_DATE;
+            } else {
+                $format = preg_replace('/(?<!\\\\)Y/', '0000', $format);
+                $format = preg_replace('/(?<!\\\\)(d|m|y)/', '00', $format);
+                $format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
             }
         }
         // Tratamento de nomes para múltiplas línguas
@@ -264,7 +258,7 @@ class Jp7_Date extends DateTime
     public function short()
     {
         global $lang;
-        if ($lang->lang == 'en') {
+        if ($lang->lang === 'en') {
             return $this->format('m/d/Y');
         } else {
             return $this->format('d/m/Y');
@@ -274,7 +268,7 @@ class Jp7_Date extends DateTime
     public function long()
     {
         global $lang;
-        if ($lang->lang == 'en') {
+        if ($lang->lang === 'en') {
             return $this->format('F d, Y');
         } else {
             return $this->format('d \d\e F \d\e Y');

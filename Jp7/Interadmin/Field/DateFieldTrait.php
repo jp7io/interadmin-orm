@@ -5,7 +5,7 @@ namespace Jp7\Interadmin\Field;
 use Former;
 use HtmlObject\Input;
 use HtmlObject\Element;
-use Date;
+use Jp7_Date as Date;
 
 trait DateFieldTrait
 {
@@ -22,16 +22,13 @@ trait DateFieldTrait
     protected function formatValue($format)
     {
         $value = parent::getValue();
-        if (!$value || !$value->isValid()) {
+        if (!$value instanceof Date) {
+            $value = new Date($value ?: Date::EMPTY_DATE);
+        }
+        if (!$value->isValid()) {
             return '';
         }
         return $value->format($format);
-    }
-    
-    protected function getDefaultValue()
-    {
-        $default = parent::getDefaultValue();
-        return $default ? new Date($default) : $default;
     }
     
     protected function getFormerField()
