@@ -28,6 +28,7 @@ abstract class BaseQuery
         $this->options = [
             'fields' => [],
             'where' => [],
+            'having' => [],
             'order' => null,
             'group' => null,
             'limit' => null,
@@ -184,6 +185,13 @@ abstract class BaseQuery
         return $this->_addWhere($where);
     }
 
+    public function whereDate($column, $value)
+    {
+        $where =  $this->_parseComparison('DATE('.$column.')', '=', $value);
+
+        return $this->_addWhere($where);
+    }
+    
     public function whereDoesntHave($relationship, $conditions = null)
     {
         return $this->whereHas($relationship, $conditions, true);
@@ -373,6 +381,13 @@ abstract class BaseQuery
     public function groupByRaw($group)
     {
         $this->options['group'] = implode(',', array_filter([$this->options['group'], $group]));
+
+        return $this;
+    }
+
+    public function havingRaw($sql)
+    {
+        $this->options['having'][] = $sql;
 
         return $this;
     }

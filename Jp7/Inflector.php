@@ -13,6 +13,7 @@
 
 /**
  * Inflector, used to generate names for classes, tables and others.
+ * @deprecated
  */
 class Jp7_Inflector
 {

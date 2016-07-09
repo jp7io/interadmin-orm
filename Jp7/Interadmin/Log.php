@@ -2,6 +2,9 @@
 
 namespace Jp7\Interadmin;
 
+use Date;
+use Request;
+
 /**
  * JP7's PHP Functions.
  *
@@ -32,7 +35,7 @@ class Log extends RecordAbstract
      */
     public $db_prefix;
     /**
-     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'id_tipo' equal to this recordï¾´s 'id_tipo'.
      *
      * @var Type
      */
@@ -46,19 +49,24 @@ class Log extends RecordAbstract
     /**
      * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
      *
-     * @param int   $id_log  This record's 'id_log'.
-     * @param array $options Default array of options. Available keys: db_prefix, db, fields.
      */
-    public function __construct($id_log = 0, $options = [])
+    public function __construct(array $attributes = [])
     {
-        $this->id_log = $id_log;
-        $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-        $this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
-
-        if ($options['fields']) {
-            $this->getFieldsValues($options['fields']);
-        }
+        $this->attributes = $attributes + ['id_log' => 0];
     }
+    
+    public function &__get($name)
+    {
+        if (isset($this->attributes[$name])) {
+            return $this->attributes[$name];
+        } elseif (in_array($name, $this->getAttributesNames())) {
+            $this->loadAttributes($this->getAttributesNames(), false);
+            return $this->attributes[$name];
+        }
+
+        return $null; // Needs to be variable to be returned as reference
+    }
+    
     /**
      * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
@@ -66,16 +74,14 @@ class Log extends RecordAbstract
      *
      * @return Type
      */
-    public function getTipo($options = [])
+    public function getType($options = [])
     {
         if (!$this->_tipo) {
-            if (!$this->id_tipo) {
-                $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_log', $this->id_log, 'id_tipo');
-            }
             $this->_tipo = Type::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
+                'default_class' => static::DEFAULT_NAMESPACE.'Type'
             ]);
         }
 
@@ -86,7 +92,7 @@ class Log extends RecordAbstract
      *
      * @param Type $tipo
      */
-    public function setTipo($tipo)
+    public function setType($tipo)
     {
         $this->id_tipo = $tipo->id_tipo;
         $this->_tipo = $tipo;
@@ -101,7 +107,7 @@ class Log extends RecordAbstract
     public function getParent($options = [])
     {
         if (!$this->_parent) {
-            $tipo = $this->getTipo();
+            $tipo = $this->getType();
             if ($this->id || $this->getFieldsValues('id')) {
                 $this->_parent = Record::getInstance($this->id, $options, $tipo);
             }
@@ -134,7 +140,7 @@ class Log extends RecordAbstract
     }
     public function getTableName()
     {
-        return $this->db_prefix.'_logs';
+        return $this->getDb()->getTablePrefix().'logs';
     }
     /**
      * @see RecordAbstract::getCampoTipo()
@@ -160,11 +166,10 @@ class Log extends RecordAbstract
         $log = new self;
 
         $log->lang = $lang->lang;
-        $log->ip = $_SERVER['REMOTE_ADDR'];
+        $log->ip = Request::ip();
         $log->select_user = $s_user['id'];
-        $log->date_insert = date('c');
-
-        $log->setAttributes($attributes);
+        $log->date_insert = new Date;
+        $log->fill($attributes);
 
         return $log;
     }
@@ -181,14 +186,11 @@ class Log extends RecordAbstract
     public static function findLogs($options = [])
     {
         $instance = new self;
-        if ($options['db']) {
-            $instance->setDb($options['db']);
+        if (isset($options['fields'])) {
+            $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
+        } else {
+            $options['fields'] = static::DEFAULT_FIELDS;
         }
-        if ($options['db_prefix']) {
-            $instance->db_prefix = $options['db_prefix'];
-        }
-
-        $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
         $options['from'] = $instance->getTableName().' AS main';
 
         if (!$options['where']) {
@@ -200,24 +202,26 @@ class Log extends RecordAbstract
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();
         $options['campos'] = $instance->getAttributesCampos();
-
+        
         $rs = $instance->_executeQuery($options);
         $logs = [];
 
-        while ($row = $rs->FetchNextObj()) {
-            $log = new self($row->id_tipo, [
-                'db_prefix' => $instance->db_prefix,
-                'db' => $instance->getDb(),
-            ]);
+        foreach ($rs as $row) {
+            $log = new static(['id_log' => $row->id_log]);
             $instance->_getAttributesFromRow($row, $log, $options);
             $logs[] = $log;
         }
-
+        
         return $logs;
     }
 
+    public static function findFirstLog($options = [])
+    {
+        return static::findLogs($options)[0];
+    }
+    
     public static function getPublishedFilters($table, $alias)
     {
-        // Não precisa
+        // Nï¿£o precisa
     }
 }

@@ -6,6 +6,7 @@ use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use BadMethodCallException;
+use UnexpectedValueException;
 use Exception;
 use DB;
 use Request;
@@ -17,11 +18,6 @@ class Record extends RecordAbstract implements Arrayable
 {
     use \Jp7\Laravel\Url\RecordTrait;
      
-    /**
-     * To be used temporarily with deprecated methods.
-     */
-    const DEPRECATED_METHOD = '54dac5afe1fcac2f65c059fc97b44a58';
-
     /**
      * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
      *
@@ -89,11 +85,19 @@ class Record extends RecordAbstract implements Arrayable
             $aliases = $this->getAttributesAliases();
             // Fixes fields that have alias
             if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+                // alias is present, column requested
                 $name = $aliases[$name];
+                $value = &$this->attributes[$name];
+            } elseif (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
+                // column is present, alias requested
+                $name = array_search($name, $aliases);
                 $value = &$this->attributes[$name];
             } else {
                 // returned as reference
                 $value = $this->_lazyLoadAttribute($name);
+            }
+            if ($name === 'attributes') {
+                throw new Exception("attributes is protected");
             }
         }
         // Mutators
@@ -103,7 +107,6 @@ class Record extends RecordAbstract implements Arrayable
                 $value = $this->$mutator($value);
             }
         }
-        
         return $value;
     }
     
@@ -145,13 +148,12 @@ class Record extends RecordAbstract implements Arrayable
         if (!in_array($name, $columns) && !in_array($name, $aliases)) {
             return;
         }
-        if (class_exists('Debugbar')) {
+        if (getenv('APP_DEBUG')) {
             $caller = debug_backtrace(false, 2)[1];
-
-            \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
-                .get_class($this)
-                .' - ID: '.$this->id
-                .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
+            \Log::notice('N+1 query: Loading attribute "'.$name.'".'.PHP_EOL.
+                '- Class: '.get_class($this).PHP_EOL.
+                '- ID: '.$this->id.PHP_EOL.
+                '- File: '.$caller['file'].' - Line: '.$caller['line']);
         }
 
         $attributes = array_intersect($columns, array_merge(
@@ -167,14 +169,9 @@ class Record extends RecordAbstract implements Arrayable
         return $this->attributes[$name];
     }
         
-    private function _loadRelationship($relationships, $name)
+    protected function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];
-
-        if ($data['special']) {
-            throw new Exception('Not implemented: '.$name);
-        }
-
         if ($data['multi']) {
             if ($fks = $this->{$name.'_ids'}) {
                 $loaded = &$this->_loadedRelationships[$name.'_ids'];
@@ -183,16 +180,16 @@ class Record extends RecordAbstract implements Arrayable
                 }
                 if ($loaded->fks != $fks) {
                     $loaded->fks = $fks;
+                    $fksArray = array_filter(explode(',', $fks));
                     if ($data['type']) {
-                        $multi = [];
-                        foreach (array_filter(explode(',', $fks)) as $fk) {
-                            $multi[] = Type::getInstance($fk);
+                        $multi = collect([]);
+                        foreach ($fksArray as $fk) {
+                            $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                         }
-
                         $loaded->values = $multi;
                     } else {
-                        $loaded->values = $data['provider']->records()
-                            ->findMany(array_filter(explode(',', $fks)));
+                        $query = clone $data['query'];
+                        $loaded->values = $query->findMany($fksArray);
                     }
                 }
                 return $loaded->values;
@@ -205,9 +202,10 @@ class Record extends RecordAbstract implements Arrayable
             if ($loaded->fk != $fk) {
                 $loaded->fk = $fk;
                 if ($data['type']) {
-                    $loaded->value = Type::getInstance($fk);
+                    $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                 } else {
-                    $loaded->value = $data['provider']->records()->find($fk);
+                    $query = clone $data['query'];
+                    $loaded->value = $query->find($fk);
                 }
             }
             return $loaded->value;
@@ -242,7 +240,7 @@ class Record extends RecordAbstract implements Arrayable
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
-            return Type::getInstance($id_tipo);
+            return Type::getInstance($id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
         }
     }
 
@@ -270,7 +268,7 @@ class Record extends RecordAbstract implements Arrayable
         } else {
             $class_name = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
             if (!$class_name) {
-                $class_name = isset($options['default_class']) ? $options['default_class'] : self::class;
+                $class_name = isset($options['default_class']) ? $options['default_class'] : static::DEFAULT_NAMESPACE.'Record';
             }
         }
 
@@ -375,7 +373,7 @@ class Record extends RecordAbstract implements Arrayable
             // Anonymous classes or instance has different id_tipo
             if (!$this->id_tipo) {
                 // Instance was not brought from DB, id_tipo is empty
-                throw new Exception('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
+                throw new UnexpectedValueException('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
             $tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,
@@ -393,7 +391,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function setType(Type $tipo = null)
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
     /**
@@ -509,12 +507,8 @@ class Record extends RecordAbstract implements Arrayable
      *
      * @deprecated
      */
-    public function getArquivos($deprecated, $options = [])
+    public function deprecated_getArquivos($options = [])
     {
-        if ($deprecated != self::DEPRECATED_METHOD) {
-            throw new Exception('Use arquivos()->get() instead.');
-        }
-
         $arquivos = [];
         if (isset($options['class'])) {
             $className = $options['class'];
@@ -565,7 +559,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_deleteArquivos($options = [])
     {
-        $arquivos = $this->getArquivos($options);
+        $arquivos = $this->deprecated_getArquivos($options);
         foreach ($arquivos as $arquivo) {
             $arquivo->delete();
         }
@@ -630,14 +624,14 @@ class Record extends RecordAbstract implements Arrayable
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
+                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type'])) {
                     $tag_text = $tag_tipo->getFieldsValues('nome');
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
                             'where' => ['id = '.$row->id],
                         ];
-                        if ($tag_registro = $tag_tipo->findFirst($options)) {
+                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
@@ -693,15 +687,7 @@ class Record extends RecordAbstract implements Arrayable
         // date_modify
         $this->date_modify = date('c');
 
-        return parent::save();
-    }
-
-    /**
-     * Saves without logs and triggers.
-     */
-    public function saveRaw()
-    {
-        return parent::save();
+        return $this->saveRaw();
     }
 
     public function generateSlug()
@@ -747,7 +733,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         return $this->getType()->getCampos();
     }
-    public function getCampoTipo($campo)
+    final public function getCampoTipo($campo)
     {
         return $this->getType()->getCampoTipo($campo);
     }
@@ -889,7 +875,7 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         $campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
-        $record = $campoTipo->findFirst([
+        $record = $campoTipo->deprecatedFindFirst([
             'where' => [$searchColumn." = '".$searchValue."'"],
         ]);
         if (starts_with($nomeCampo, 'select_multi_')) {

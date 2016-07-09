@@ -39,7 +39,7 @@ class TypeQuery extends BaseQuery
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedGetChildren($this->options);
     }
 
     public function first()
@@ -50,7 +50,7 @@ class TypeQuery extends BaseQuery
 
         $this->options['limit'] = 1;
 
-        return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->deprecatedGetChildren($this->options)->first();
     }
     
     public function count()
@@ -62,7 +62,7 @@ class TypeQuery extends BaseQuery
         $options['limit'] = 1;
         $options['fields'] = "COUNT(*)";
         
-        $result = $this->provider->getChildren(Record::DEPRECATED_METHOD, $options)->first();
+        $result = $this->provider->deprecatedGetChildren($options)->first();
         return $result->count;
     }
     
@@ -73,7 +73,7 @@ class TypeQuery extends BaseQuery
         }
 
         if (is_array($id)) {
-            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
+            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use get() instead of find().');
         }
 
         if (is_string($id) && !is_numeric($id)) {
@@ -82,7 +82,7 @@ class TypeQuery extends BaseQuery
             $this->options['where'][] = $this->_parseComparison('id_tipo', '=', $id);
         }
 
-        return $this->provider->getChildren(Record::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->deprecatedGetChildren($this->options)->first();
     }
 
     public function findOrFail($id)

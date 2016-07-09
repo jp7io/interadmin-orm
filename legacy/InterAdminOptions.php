@@ -2,7 +2,7 @@
 
 class InterAdminOptions extends InterAdminOptionsBase
 {
-    public function all()
+    public function get()
     {
         return $this->provider->find($this->options);
     }

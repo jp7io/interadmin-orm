@@ -71,7 +71,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
             ]);
             if ($siteSettings) {
                 $config = Zend_Registry::get('config');
-                $attributes = $siteSettings->attributes;
+                $attributes = $siteSettings->getAttributes();
                 // Retirando atributos que não interessam ao config
                 unset($attributes['id_tipo']);
                 unset($attributes['id']);

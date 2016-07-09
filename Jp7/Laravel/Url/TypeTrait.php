@@ -20,11 +20,11 @@ trait TypeTrait
      *
      * @return string
      */
-    public function getUrl($action = 'index', array $parameters = [])
+    public function getUrl() // FIXME - $action = 'index', array $parameters = []
     {
-        if (func_num_args() === 1 && is_array($action)) {
-            list($action, $parameters) = [null, $action];
-        }
+        $args = func_get_args();
+        $action = isset($args[0]) ? $args[0] : 'index';
+        $parameters = isset($args[1]) ? $args[1] : [];
 
         if ($this->getParent() instanceof Record) {
             array_unshift($parameters, $this->getParent());

@@ -28,11 +28,11 @@ class SelectAjaxField extends SelectField
             return []; // evita query inutil
         }
         if (!$this->hasTipo()) {
-            $records = $this->records()->where('id', $value)->all();
+            $records = $this->records()->where('id', $value)->get();
             return $this->toOptions($records);
         }
         if ($this->nome instanceof InterAdminTipo || $this->nome === 'all') {
-            $tipos = $this->tipos()->where('id_tipo', $value)->all();
+            $tipos = $this->tipos()->where('id_tipo', $value)->get();
             return $this->toOptions($tipos);
         }
         throw new UnexpectedValueException('Not implemented');
@@ -42,11 +42,11 @@ class SelectAjaxField extends SelectField
     {
         if (!$this->hasTipo()) {
             $query = $this->buildSearch($this->records(), $this->getSearchableFields(), $search, false);
-            return $this->toJsonOptions($query->all());
+            return $this->toJsonOptions($query->get());
         }
         if ($this->nome instanceof InterAdminTipo || $this->nome === 'all') {
             $query = $this->buildSearch($this->tipos(), ['nome'], $search, 'id_tipo');
-            return $this->toJsonOptions($query->all());
+            return $this->toJsonOptions($query->get());
         }
         throw new UnexpectedValueException('Not implemented');
     }
