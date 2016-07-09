@@ -35,7 +35,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
     public function testPublished(array $attributes)
     {
         $record = new InterAdmin;
-        $record->attributes = $attributes;
+        $record->setAttributes($attributes);
         $this->assertTrue($record->isPublished());
     }
 
@@ -45,7 +45,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
     public function testUnpublished(array $attributes)
     {
         $record = new InterAdmin;
-        $record->attributes = $attributes;
+        $record->setAttributes($attributes);
         $this->assertFalse($record->isPublished());
     }
     

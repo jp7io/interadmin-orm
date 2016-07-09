@@ -59,20 +59,12 @@ abstract class RecordAbstract implements Serializable
      */
     public function __set($name, $value)
     {
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected"); // FIXME remove when old code is validated
+        }
         $mutator = 'set' . Str::studly($name) . 'Attribute';
         if (method_exists($this, $mutator)) {
             return $this->$mutator($value);
-        }
-        if (is_string($value)) {
-            try {
-                $column = array_search($name, $this->getAttributesAliases()) ?: $name;
-            } catch (UnexpectedValueException $e) {
-                $column = $name;
-            }
-            $value = $this->getMutatedAttribute($column, $value);
-        }
-        if ($name === 'attributes') {
-            throw new Exception("attributes is protected");
         }
         $this->attributes[$name] = $value;
     }

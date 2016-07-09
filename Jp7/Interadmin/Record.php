@@ -109,6 +109,27 @@ class Record extends RecordAbstract implements Arrayable
         }
         return $value;
     }
+    /**
+     * Magic set acessor.
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function __set($name, $value)
+    {
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected"); // FIXME remove when old code is validated
+        }
+        $mutator = 'set' . Str::studly($name) . 'Attribute';
+        if (method_exists($this, $mutator)) {
+            return $this->$mutator($value);
+        }
+        if (is_string($value) && $this->attributes['id_tipo']) {
+            $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+            $value = $this->getMutatedAttribute($column, $value);
+        }
+        $this->attributes[$name] = $value;
+    }
     
     /**
      * Magic isset acessor.
