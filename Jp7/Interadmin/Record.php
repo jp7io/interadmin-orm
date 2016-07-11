@@ -193,44 +193,51 @@ class Record extends RecordAbstract implements Arrayable
     protected function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];
+        // select_multi
         if ($data['multi']) {
-            if ($fks = $this->{$name.'_ids'}) {
-                $loaded = &$this->_loadedRelationships[$name.'_ids'];
-                if (!$loaded) {
-                    $loaded = (object) ['fks' => null];
-                }
-                if ($loaded->fks != $fks) {
-                    $loaded->fks = $fks;
-                    $fksArray = array_filter(explode(',', $fks));
-                    if ($data['type']) {
-                        $multi = collect([]);
-                        foreach ($fksArray as $fk) {
-                            $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
-                        }
-                        $loaded->values = $multi;
-                    } else {
-                        $query = clone $data['query'];
-                        $loaded->values = $query->findMany($fksArray);
-                    }
-                }
-                return $loaded->values;
+            $fks = $this->{$name.'_ids'};
+            if (!$fks) {
+                return collect([]);
             }
-        } elseif ($fk = $this->{$name.'_id'}) {
-            $loaded = &$this->_loadedRelationships[$name.'_id'];
+            $loaded = &$this->_loadedRelationships[$name.'_ids'];
             if (!$loaded) {
-                $loaded = (object) ['fk' => null];
+                $loaded = (object) ['fks' => null];
             }
-            if ($loaded->fk != $fk) {
-                $loaded->fk = $fk;
+            if ($loaded->fks != $fks) {
+                $loaded->fks = $fks;
+                $fksArray = array_filter(explode(',', $fks));
                 if ($data['type']) {
-                    $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                    $multi = collect([]);
+                    foreach ($fksArray as $fk) {
+                        $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                    }
+                    $loaded->values = $multi;
                 } else {
                     $query = clone $data['query'];
-                    $loaded->value = $query->find($fk);
+                    $loaded->values = $query->findMany($fksArray);
                 }
             }
-            return $loaded->value;
+            return $loaded->values;
         }
+        // select
+        $fk = $this->{$name.'_id'};
+        if (!$fk) {
+            return null;
+        }
+        $loaded = &$this->_loadedRelationships[$name.'_id'];
+        if (!$loaded) {
+            $loaded = (object) ['fk' => null];
+        }
+        if ($loaded->fk != $fk) {
+            $loaded->fk = $fk;
+            if ($data['type']) {
+                $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+            } else {
+                $query = clone $data['query'];
+                $loaded->value = $query->find($fk);
+            }
+        }
+        return $loaded->value;
     }
 
     public static function __callStatic($name, array $arguments)
