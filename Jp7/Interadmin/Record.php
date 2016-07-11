@@ -149,16 +149,17 @@ class Record extends RecordAbstract implements Arrayable
     
     private function _lazyLoadAttribute($name)
     {
-        if (!$this->id) {
-            return;
-        }
-        // relationship
+        // relationships -> select and select_multi
         $relationships = $this->getType()->getRelationships();
         if (isset($relationships[$name])) {
             $related = $this->_loadRelationship($relationships, $name);
 
             return $related; // returned as reference
         }
+        if (!$this->id) {
+            return; // data below depends on an ID
+        }
+        // children most likely
         if ($query = $this->_loadManyRelationship($name)) {
             return $query->get();
         }
