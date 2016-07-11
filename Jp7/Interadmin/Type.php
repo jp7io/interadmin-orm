@@ -689,6 +689,14 @@ class Type extends RecordAbstract
         return $retorno;
     }
 
+    protected function _update($attributes)
+    {
+        parent::_update($attributes);
+        // clear attributes cache
+        Cache::forget('Type::__get,'.$this->id_tipo);
+        return $this;
+    }
+
     public function syncInheritance()
     {
         // Retornando ao valor real
@@ -714,8 +722,6 @@ class Type extends RecordAbstract
             }
         }
         $this->inherited = implode(',', $this->inherited);
-        // clear attributes cache
-        Cache::forget('Type::__get,'.$this->id_tipo);
     }
     /**
      * Sets this row as deleted as saves it.
