@@ -101,6 +101,36 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         return $this->deprecatedFind($options)->all();
     }
    
+    public function distinct($column, $options = [])
+    {
+        return parent::deprecated_distinct($column, $options);
+    }
+
+    public function max($column, $options = [])
+    {
+        return parent::deprecated_max($column, $options);
+    }
+
+    public function min($column, $options = [])
+    {
+        return parent::deprecated_min($column, $options);
+    }
+
+    public function sum($column, $options = [])
+    {
+        return parent::deprecated_sum($column, $options);
+    }
+
+    public function avg($column, $options = [])
+    {
+        return parent::deprecated_avg($column, $options);
+    }
+
+    public function aggregate($function, $column, $options)
+    {
+        return parent::deprecated_aggregate($function, $column, $options);
+    }
+    
     /**
      * Returns the number of InterAdmins using COUNT(id).
      *
