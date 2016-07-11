@@ -363,4 +363,10 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         $this->deprecated_deleteInterAdmins($options);
     }
+    
+    public function updateAttributes($attributes)
+    {
+        $this->setRawAttributes($attributes);
+        $this->_update($attributes);
+    }
 }
