@@ -929,6 +929,32 @@ class Record extends RecordAbstract implements Arrayable
         return $this->$varchar_key_alias;
     }
 
+    /**
+     * Returns this object´s varchar_key and all the fields marked as 'combo', if the field
+     * is an InterAdmin such as a select_key, its getStringValue() method is used.
+     *
+     * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
+     */
+    public function getStringValue()
+    {
+        $camposCombo = $this->getType()->getCamposCombo();
+        if (!$camposCombo) {
+            return $this->id;
+        }
+        $stringValue = [];
+        foreach ($camposCombo as $campoCombo) {
+            $value = $this->$campoCombo;
+            if ($value instanceof FileField) {
+                continue;
+            } elseif ($value instanceof RecordAbstract) {
+                $value = $value->getStringValue();
+            }
+            $stringValue[] = $value;
+        }
+        
+        return implode(' - ', $stringValue);
+    }
+
     public function toArray()
     {
         $array = $this->attributes;

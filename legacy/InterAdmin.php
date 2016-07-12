@@ -83,32 +83,6 @@ class InterAdmin extends Record implements InterAdminAbstract
     }
     
     /**
-     * Returns this object´s varchar_key and all the fields marked as 'combo', if the field
-     * is an InterAdmin such as a select_key, its getStringValue() method is used.
-     *
-     * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
-     */
-    public function getStringValue()
-    {
-        $camposCombo = $this->getTipo()->getCamposCombo();
-        if (!$camposCombo) {
-            return $this->id;
-        }
-        $valoresCombo = $this->getFieldsValues($camposCombo);
-        $stringValue = [];
-        foreach ($valoresCombo as $value) {
-            if ($value instanceof FileField) {
-                continue;
-            } elseif ($value instanceof RecordAbstract) {
-                $value = $value->getStringValue();
-            }
-            $stringValue[] = $value;
-        }
-        
-        return implode(' - ', $stringValue);
-    }
-
-    /**
      * Magic method calls.
      *
      * Available magic methods:

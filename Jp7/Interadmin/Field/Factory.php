@@ -35,7 +35,7 @@ class Factory
     public function makeField(array $campo)
     {
         // tipo_de_campo -> only used in a few specials / xtra_disabledfields
-        $tipo = $campo['tipo_de_campo'] ? $campo['tipo_de_campo'].'_' : $campo['tipo'];
+        $tipo = empty($campo['tipo_de_campo']) ? $campo['tipo'] : $campo['tipo_de_campo'].'_';
         $prefix = $this->getPrefix($tipo, $campo['xtra']);
         $class = $this->getFieldClass($prefix, $campo);
         return new $class($campo);

@@ -26,7 +26,7 @@ class SelectMultiField extends ColumnField
     
     protected function getTextArray($html)
     {
-        $ids = jp7_explode(',', $this->getValue());
+        $ids = array_filter(explode(',', $this->getValue()));
         $array = [];
         foreach ($ids as $id) {
             $array[] = $this->formatText($id, $html);
@@ -68,7 +68,7 @@ class SelectMultiField extends ColumnField
         // Problem with populate from POST: https://github.com/formers/former/issues/364
         $ids = $field->getValue();
         if (!$ids) {
-            $ids = jp7_explode(',', $this->getValue());
+            $ids = array_filter(explode(',', $this->getValue()));
         }
         
         foreach ($this->getOptions() as $key => $value) {

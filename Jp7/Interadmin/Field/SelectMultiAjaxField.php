@@ -31,7 +31,7 @@ class SelectMultiAjaxField extends SelectMultiField
             return []; // evita query inutil
         }
         if (!$this->hasTipo()) {
-            $ids = jp7_explode(',', $value);
+            $ids = array_filter(explode(',', $value));
             $records = $this->records()->whereIn('id', $ids)->get();
             return $this->toOptions($records);
         }
