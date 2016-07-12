@@ -693,8 +693,8 @@ class Record extends RecordAbstract implements Arrayable
         return $this->char_key &&
             !$this->deleted &&
             ($this->parent_id || $this->publish || $s_session['preview'] || !config('interadmin.preview')) &&
-            strtotime($this->date_publish) <= Record::getTimestamp() &&
-            (strtotime($this->date_expire) >= Record::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00');
+            $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
+            ($this->date_expire->getTimestamp() >= Record::getTimestamp() || $this->date_expire->format('Y') < 1);
     }
 
     /**
