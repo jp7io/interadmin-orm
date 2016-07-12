@@ -33,6 +33,10 @@ abstract class RecordAbstract
      */
     protected $attributes = [];
 
+    /**
+     * Connection name
+     * @var string
+     */
     protected $_db = null;
 
     /**
@@ -1020,16 +1024,16 @@ abstract class RecordAbstract
      */
     public function getDb()
     {
-        return $this->_db ?: DB::connection();
+        return $this->_db ? DB::connection($this->_db) : DB::connection();
     }
     /**
      * Sets the database object.
      *
-     * @param ADOConnection $db
+     * @param string $db Connection name
      */
     public function setDb(ConnectionInterface $db)
     {
-        $this->_db = $db;
+        $this->_db = $db->getName();
     }
 
     /**
