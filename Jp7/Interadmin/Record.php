@@ -202,7 +202,7 @@ class Record extends RecordAbstract implements Arrayable
         if ($data['multi']) {
             $fks = $this->{$name.'_ids'};
             if (!$fks) {
-                return collect([]);
+                return jp7_collect([]);
             }
             $loaded = &$this->_loadedRelationships[$name.'_ids'];
             if (!$loaded) {
@@ -212,7 +212,7 @@ class Record extends RecordAbstract implements Arrayable
                 $loaded->fks = $fks;
                 $fksArray = array_filter(explode(',', $fks));
                 if ($data['type']) {
-                    $multi = collect([]);
+                    $multi = jp7_collect([]);
                     foreach ($fksArray as $fk) {
                         $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                     }
