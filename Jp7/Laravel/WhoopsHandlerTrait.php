@@ -9,7 +9,7 @@ trait WhoopsHandlerTrait
 {
     protected function convertExceptionToResponse(Exception $e)
     {
-        if (config('app.debug') && !$e instanceof ErrorException) {
+        if (config('app.debug') && config('app.env') === 'local' && !$e instanceof ErrorException) {
             return $this->renderExceptionWithWhoops($e);
         }
         return parent::convertExceptionToResponse($e);
