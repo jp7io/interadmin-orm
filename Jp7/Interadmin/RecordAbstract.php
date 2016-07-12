@@ -397,6 +397,18 @@ abstract class RecordAbstract implements Serializable
             ($options['from'] ? ' LEFT JOIN '.implode(' LEFT JOIN ', $options['from']) : '').
             ' WHERE '.$filters.$clauses.
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
+    
+        if (getenv('APP_DEBUG')) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+            $i = 0;
+            while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
+                $i++;
+            }
+            if (isset($trace[$i]['file'])) {
+                $sql .= PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
+            }
+        }
+            
         $rs = $db->select($sql);
 
         if (!$rs && !is_array($rs)) {
