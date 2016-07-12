@@ -125,10 +125,10 @@ class Record extends RecordAbstract implements Arrayable
             return $this->$mutator($value);
         }
         if (is_string($value)) {
-            if ($this->attributes['id_tipo']) {
-                $column = array_search($name, $this->getAttributesAliases()) ?: $name;
-            } else {
+            if (empty($this->attributes['id_tipo'])) {
                 $column = $name;
+            } else {
+                $column = array_search($name, $this->getAttributesAliases()) ?: $name;
             }
             $value = $this->getMutatedAttribute($column, $value);
         }
@@ -305,7 +305,7 @@ class Record extends RecordAbstract implements Arrayable
             }
         }
 
-        $instance = new $class_name(['id' => $id]);
+        $instance = new $class_name(['id' => $id, 'id_tipo' => $tipo->id_tipo]);
         $instance->setType($tipo);
         $instance->setDb($tipo->getDb());
 
