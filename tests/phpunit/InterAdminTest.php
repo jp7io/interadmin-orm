@@ -58,7 +58,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
                 'deleted'  => '',
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => 0 // sem date_expire
+                'date_expire' => '0000-00-00 00:00:00' // sem date_expire
             ]],
             [[
                 'char_key' => 'S',
@@ -88,7 +88,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
                 'deleted'  => '',
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => 0
+                'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
                 'char_key' => 'S',
@@ -96,7 +96,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
                 'deleted'  => 'S', // com deleted
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => 0
+                'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
                 'char_key' => 'S',

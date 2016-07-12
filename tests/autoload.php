@@ -7,6 +7,8 @@ $_SERVER['REMOTE_ADDR'] = '::1';
 $_SERVER['HTTP_HOST'] = 'localhost';
 require __DIR__ . '/../vendor/jp7internet/inc/7.lib.php';
 
+class_alias('Jp7_Date', 'Date');
+
 function config($key)
 {
     $repository = new Illuminate\Config\Repository([

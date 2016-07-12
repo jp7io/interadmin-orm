@@ -124,8 +124,12 @@ class Record extends RecordAbstract implements Arrayable
         if (method_exists($this, $mutator)) {
             return $this->$mutator($value);
         }
-        if (is_string($value) && $this->attributes['id_tipo']) {
-            $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+        if (is_string($value)) {
+            if ($this->attributes['id_tipo']) {
+                $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+            } else {
+                $column = $name;
+            }
             $value = $this->getMutatedAttribute($column, $value);
         }
         $this->attributes[$name] = $value;
