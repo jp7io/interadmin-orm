@@ -65,14 +65,9 @@ class Jp7_Date extends DateTime
      * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
      * Diferenças menores de 1 minuto retornam 'agora'.
      *
-     * Static: 		humanDiff($timeStamp = false)
-     * Instance: 	humanDiff()
-     *
-     * @param int|string $timeStamp [only with static calls] Timestamp ou Datetime.
-     *
      * @return string
      */
-    public static function humanDiff($timeStamp = false)
+    public function humanDiff()
     {
         global $lang;
         switch ($lang->lang) {
@@ -88,10 +83,7 @@ class Jp7_Date extends DateTime
                 $yesterday = 'ontem';
                 $ago = 'atrás';
         }
-        if (isset($this) && $this instanceof self) {
-            $timeStamp = $this;
-        }
-        $timeStamp = self::_toTime($timeStamp);
+        $timeStamp = $this->getTimestamp();
         $currentTime = time();
         $units = array_combine($units_names, [31556926, 2629743, 604800, 86400, 3600, 60]);
         $seconds = $currentTime - $timeStamp;
@@ -114,24 +106,14 @@ class Jp7_Date extends DateTime
     /**
      * Returns the age based on the birthdate and the current date.
      *
-     * Static: 		yearsDiff($from, $to = null)
-     * Instance: 	yearsDiff($to = false)
-     *
-     * @param string|int $from [only with static calls] Datetime (string) or Timestamp (int).
      * @param string|int $to   [optional]
      *
      * @return int Age in years.
-     *             TODO needs refactoring
+     *
      */
     public function yearsDiff($to = false)
     {
-        if (isset($this) && $this instanceof self) {
-            $from = $this;
-        } else {
-            $from = $to;
-            $to = @func_get_arg(1);
-        }
-        $from = self::_toTime($from);
+        $from = $this->getTimestamp();
         if ($to === false) {
             $to = time();
         } else {
@@ -150,9 +132,6 @@ class Jp7_Date extends DateTime
     /**
      * Difference of days between 2 timestamps.
      *
-     * Static: 		daysDiff($from, $to = null, $min = false)
-     * Instance: 	daysDiff($to = false, $min = false)
-     *
      * @param int $from [only with static calls]
      * @param int $to   [optional]
      *
@@ -160,14 +139,7 @@ class Jp7_Date extends DateTime
      */
     public function daysDiff($to = false, $min = false)
     {
-        if (isset($this) && $this instanceof self) {
-            $from = $this;
-        } else {
-            $from = $to;
-            $to = $min;
-            $min = @func_get_arg(2);
-        }
-        $from = self::_toTime($from);
+        $from = $this->getTimestamp();
         if ($to === false) {
             $to = time();
         } else {
