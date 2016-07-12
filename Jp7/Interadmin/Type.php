@@ -82,9 +82,7 @@ class Type extends RecordAbstract
         } elseif (in_array($name, $this->getAttributesNames())) {
             $cacheKey = 'Type::__get,'.$this->id_tipo;
             $this->attributes += Cache::remember($cacheKey, 60, function () {
-                $columns = $this->getAttributesNames();
-                $this->loadAttributes($columns, false);
-                return array_intersect_key($this->attributes, array_flip($columns));
+                return (array) $this->getDb()->table('tipos')->where('id_tipo', $this->id_tipo)->first();
             });
             return $this->attributes[$name];
         }
