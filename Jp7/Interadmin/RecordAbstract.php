@@ -7,7 +7,6 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Str;
 use Jp7\CollectionUtil;
 use Jp7\TryMethod;
-use Serializable;
 use Exception;
 use UnexpectedValueException;
 use DB;
@@ -16,7 +15,7 @@ use SqlFormatter;
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
-abstract class RecordAbstract implements Serializable
+abstract class RecordAbstract
 {
     use TryMethod;
     
@@ -98,34 +97,6 @@ abstract class RecordAbstract implements Serializable
         $pk = $this->_primary_key;
 
         return (string) $this->$pk;
-    }
-
-    public function __krumoTitle()
-    {
-        return $this->__toString().' - '.$this->getName();
-    }
-
-    public function __krumoProperties()
-    {
-        return $this->attributes;
-    }
-
-    public function serialize()
-    {
-        $vars = get_object_vars($this);
-        unset($vars['_db']);
-
-        return serialize($vars);
-    }
-
-    public function unserialize($data)
-    {
-        global $db;
-        $vars = unserialize($data);
-        foreach ($vars as $key => $value) {
-            $this->$key = $value;
-        }
-        $this->_db = $db;
     }
 
     /**
