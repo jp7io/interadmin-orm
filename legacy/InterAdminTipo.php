@@ -46,7 +46,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
                 if ($match[1]) {
                     $options['limit'] = 1;
                 }
-                $retorno = $this->deprecatedFind($options);
+                $retorno = $this->find($options);
                 return ($match[1]) ? reset($retorno) : $retorno;
             }
         }
@@ -165,6 +165,8 @@ class InterAdminTipo extends Type implements InterAdminAbstract
      */
     public function getChildren($options = [])
     {
+        $this->_whereArrayFix($options['where']); // FIXME
+        $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
         return $this->deprecatedGetChildren($options);
     }
     

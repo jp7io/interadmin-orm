@@ -3,7 +3,7 @@
 namespace Jp7\Interadmin\Field;
 
 use UnexpectedValueException;
-use InterAdminTipo;
+use Jp7\Interadmin\Type;
 
 class SelectAjaxField extends SelectField
 {
@@ -15,43 +15,25 @@ class SelectAjaxField extends SelectField
                 ->data_has_tipo($this->hasTipo());
     }
     
-    /**
-     * Returns only the current selected option, all the other options will be
-     * provided by the AJAX search
-     * @return array
-     * @throws Exception
-     */
     protected function getOptions()
     {
-        global $db;
-        if (!$value = $this->getValue()) {
-            return []; // evita query inutil
-        }
-        if (!$this->hasTipo()) {
-            $records = $this->records()->where('id', $value)->get();
-            return $this->toOptions($records);
-        }
-        if ($this->nome instanceof InterAdminTipo || $this->nome === 'all') {
-            $tipos = $this->tipos()->where('id_tipo', $value)->get();
-            return $this->toOptions($tipos);
-        }
-        throw new UnexpectedValueException('Not implemented');
+        return $this->toOptions($this->getCurrentRecords());
     }
     
     public function searchOptions($search)
     {
         if (!$this->hasTipo()) {
-            $query = $this->buildSearch($this->records(), $this->getSearchableFields(), $search, false);
+            $query = $this->buildSearch($this->records(), $this->getSearchableFields(), $search);
             return $this->toJsonOptions($query->get());
         }
-        if ($this->nome instanceof InterAdminTipo || $this->nome === 'all') {
-            $query = $this->buildSearch($this->tipos(), ['nome'], $search, 'id_tipo');
+        if ($this->nome instanceof Type || $this->nome === 'all') {
+            $query = $this->buildSearch($this->tipos(), ['nome'], $search);
             return $this->toJsonOptions($query->get());
         }
         throw new UnexpectedValueException('Not implemented');
     }
     
-    protected function buildSearch($query, $fields, $search, $primary_key)
+    protected function buildSearch($query, $fields, $search)
     {
         global $db;
         $pattern = '%'.str_replace(' ', '%', $search).'%';
@@ -69,7 +51,7 @@ class SelectAjaxField extends SelectField
             $order[] = $field.' LIKE '.$db->qstr($search.'%').' DESC'; // starts with
         }
         $order = array_merge($order, $fields);
-        $query->order(implode(', ', $order));
+        $query->orderByRaw(implode(', ', $order));
         return $query;
     }
     
@@ -79,7 +61,7 @@ class SelectAjaxField extends SelectField
         $searchable = [];
         
         foreach ($this->nome->getCamposCombo() as $campoCombo) {
-            if ($campos[$campoCombo]['nome'] instanceof InterAdminTipo) {
+            if ($campos[$campoCombo]['nome'] instanceof Type) {
                 foreach ($campos[$campoCombo]['nome']->getCamposCombo() as $campoCombo2) {
                     $searchable[] = $campoCombo.'.'.$campoCombo2;
                 }
@@ -90,7 +72,7 @@ class SelectAjaxField extends SelectField
         return $searchable;
     }
     
-    protected function toJsonOptions(array $array)
+    protected function toJsonOptions($array)
     {
         $options = [];
         foreach ($this->toOptions($array) as $id => $text) {

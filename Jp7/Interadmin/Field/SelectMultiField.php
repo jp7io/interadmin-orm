@@ -26,10 +26,9 @@ class SelectMultiField extends ColumnField
     
     protected function getTextArray($html)
     {
-        $ids = array_filter(explode(',', $this->getValue()));
         $array = [];
-        foreach ($ids as $id) {
-            $array[] = $this->formatText($id, $html);
+        foreach ($this->getCurrentRecords() as $related) {
+            $array[] = $this->formatText($related, $html);
         }
         return $array;
     }

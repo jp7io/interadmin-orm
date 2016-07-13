@@ -2,9 +2,11 @@
 
 namespace Jp7\Interadmin\Field;
 
+use Jp7\Interadmin\Type;
+
 /**
  * @property string $tipo
- * @property InterAdminTipo|string $nome
+ * @property Type|string $nome
  * @property string $ajuda
  * @property string|int $tamanho
  * @property string|bool $obrigatorio    'S' or ''

@@ -4,9 +4,8 @@ namespace Jp7\Interadmin\Field;
 
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\Type;
+use Jp7\Interadmin\Query\TypeQuery;
 use UnexpectedValueException;
-use InterAdminOptions;
-use InterAdminOptionsTipos;
 
 trait SelectFieldTrait
 {
@@ -23,30 +22,28 @@ trait SelectFieldTrait
         }
         throw new UnexpectedValueException('Not implemented');
     }
-        
-    protected function formatText($id, $html)
+    
+    protected function formatText($related, $html)
     {
-        list($value, $status) = $this->valueAndStatus($id);
+        list($value, $status) = $this->valueAndStatus($related);
         if ($html) {
             return ($status ? e($value) : '<del>'.e($value).'</del>');
         }
         return $value.($status ? '' : ' [unpublished]');
     }
     
-    protected function valueAndStatus($id)
+    protected function valueAndStatus($related)
     {
-        if (!$id) {
-            return ['', true];
+        if ($related instanceof Type) {
+            return [$related->getName(), true];
         }
-        if ($this->hasTipo()) {
-            return [interadmin_tipos_nome($id), true];
-        }
-        /* @var $related Record */
-        $related = $this->nome->records()->find($id);
-        if ($related) {
+        if ($related instanceof Record) {
             return [$related->getStringValue(), $related->isPublished()];
         }
-        return [$id, false];
+        if (!$related) {
+            return ['', true];
+        }
+        return [$related, false];
     }
         
     protected function getDefaultValue()
@@ -66,6 +63,27 @@ trait SelectFieldTrait
         return $this->default;
     }
     
+    /**
+     * Returns only the current selected option, all the other options will be
+     * provided by the AJAX search
+     * @return array
+     * @throws Exception
+     */
+    protected function getCurrentRecords()
+    {
+        $ids = array_filter(explode(',', $this->getValue()));
+        if (!$ids) {
+            return []; // evita query inutil
+        }
+        if (!$this->hasTipo()) {
+            return $this->records()->whereIn('id', $ids)->get();
+        }
+        if ($this->nome instanceof Type || $this->nome === 'all') {
+            return $this->tipos()->whereIn('id_tipo', $ids)->get();
+        }
+        throw new UnexpectedValueException('Not implemented');
+    }
+    
     protected function getOptions()
     {
         if (!$this->hasTipo()) {
@@ -83,13 +101,10 @@ trait SelectFieldTrait
     protected function records()
     {
         $camposCombo = $this->nome->getCamposCombo();
-        $query = new InterAdminOptions($this->nome);
-        $query->setOptionsArray([
-            'fields' => $camposCombo,
-            'fields_alias' => false,
-            'where' => ["deleted = ''"],
-            'order' => implode(', ', $camposCombo)
-        ]);
+        $query = $this->nome->records();
+        $query->select($camposCombo)
+            ->where('deleted', false)
+            ->orderByRaw(implode(', ', $camposCombo));
         
         if ($this->where) {
             // From xtra_disabledfields
@@ -102,14 +117,10 @@ trait SelectFieldTrait
     {
         global $lang;
         
-        $query = new InterAdminOptionsTipos(new Type);
-        $query->setOptionsArray([
-            'fields' => ['nome'.$lang->prefix, 'parent_id_tipo'],
-            'fields_alias' => false,
-            'use_published_filters' => true,
-            'where' => [],
-            'order' => 'admin,ordem,nome'.$lang->prefix
-        ]);
+        $query = new TypeQuery(new Type);
+        $query->select('nome'.$lang->prefix, 'parent_id_tipo')
+            ->published()
+            ->orderByRaw('admin,ordem,nome'.$lang->prefix);
         // only children tipos
         if ($this->nome instanceof Type) {
             $query->where('parent_id_tipo', $this->nome->id_tipo);
@@ -117,7 +128,7 @@ trait SelectFieldTrait
         return $query;
     }
     
-    protected function toOptions(array $array)
+    protected function toOptions($array)
     {
         $options = [];
         if ($array[0] instanceof Type) {
@@ -128,13 +139,13 @@ trait SelectFieldTrait
             foreach ($array as $record) {
                 $options[$record->id] = $record->getStringValue();
             }
-        } elseif ($array) {
+        } elseif (count($array)) {
             throw new UnexpectedValueException('Should be an array of Record or Type');
         }
         return $options;
     }
     
-    protected function toTreeOptions(array $tipos)
+    protected function toTreeOptions($tipos)
     {
         $map = [];
         foreach ($tipos as $tipo) {

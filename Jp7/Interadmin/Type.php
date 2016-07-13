@@ -200,17 +200,19 @@ class Type extends RecordAbstract
      *
      * @return array Array of Type objects.
      *
-     * @deprecated
+     * @deprecated Actually its being used by TypeQuery to find any type
      */
     public function deprecatedGetChildren($options = [])
     {
         $this->_whereArrayFix($options['where']); // FIXME
         
-        $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
         }
         return Cache::remember('Type::children,'.serialize($options), 60, function () use ($options) {
+            if (empty($options['where'])) {
+                $options['where'] = ['1=1'];
+            }
             if (empty($options['fields'])) {
                 $options['fields'] = $this->getAttributesNames();
             } else {
@@ -241,7 +243,8 @@ class Type extends RecordAbstract
 
     public function children()
     {
-        return new Query\TypeQuery($this);
+        $query = new Query\TypeQuery($this);
+        return $query->where('parent_id_tipo', $this->id_tipo);
     }
 
     public function childrenByModel($model_id_tipo)
