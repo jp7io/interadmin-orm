@@ -190,9 +190,6 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $url_arr = '';
         $parent = $this;
         while ($parent) {
-            if (!isset($parent->nome)) {
-                $parent->getFieldsValues('nome');
-            }
             if ($seo) {
                 if (!in_array($parent->nome, (array) $implicit_parents_names)) {
                     $url_arr[] = toSeo($parent->nome);

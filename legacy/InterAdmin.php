@@ -34,20 +34,12 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         global $seo, $seo_sep;
         if ($seo && $this->getParent()->id) {
-            $link = $this->_parent->getUrl().'/'.toSeo($this->getTipo()->getFieldsValues('nome'));
+            $link = $this->_parent->getUrl().'/'.toSeo($this->getTipo()->nome);
         } else {
             $link = $this->getTipo()->getUrl();
         }
         if ($seo) {
-            $aliases = $this->getTipo()->getCamposAlias();
-            if (array_key_exists('varchar_key', $aliases)) {
-                $alias = $aliases['varchar_key'];
-                if (isset($this->$alias)) {
-                    $nome = $this->$alias;
-                } else {
-                    $nome = $this->getFieldsValues('varchar_key');
-                }
-            }
+            $nome = $this->varchar_key;
             if (is_null($sep)) {
                 $sep = $seo_sep;
             }
@@ -512,7 +504,7 @@ class InterAdmin extends Record implements InterAdminAbstract
             $this->_tags = [];
             foreach ($rs as $row) {
                 if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
-                    $tag_text = $tag_tipo->getFieldsValues('nome');
+                    $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
@@ -550,8 +542,8 @@ class InterAdmin extends Record implements InterAdminAbstract
         foreach ($tags as $tag) {
             $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
-                (($tag instanceof self) ? $tag->id : 0).','.
-                (($tag instanceof self) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
+                ($tag instanceof self ? $tag->id : 0).','.
+                ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
             if (!$db->insert($sql)) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }

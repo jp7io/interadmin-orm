@@ -181,7 +181,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
             $parent = $parent->getParent();
         }
 
-        $filepath = toId($parent->getTipo()->getFieldsValues('nome')).'/'.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
+        $filepath = toId($parent->getTipo()->nome).'/'.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
 
         // Movendo arquivo temporário
         if (starts_with($this->url, '../../upload')) {
