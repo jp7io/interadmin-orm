@@ -739,13 +739,7 @@ abstract class RecordAbstract
             } else {
                 $nome = $this->_aliasToColumn($campo, $aliases);
                 if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-                    if (strpos($campo, 'file_') === 0) {
-                        // necessário para quando o parametro fields está sem alias, mas o retorno está com alias
-                        $file_campo = array_search($campo, $aliases);
-                    } else {
-                        $file_campo = $campo;
-                    }
-                    $fields[] = $table.$nome.'_text  AS `'.$file_campo.'.text`';
+                    $fields[] = $table.$nome.'_text';
                 }
 
                 $fields[$join] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
@@ -795,13 +789,6 @@ abstract class RecordAbstract
     protected function _getAttributesFromRow($row, $object, $options)
     {
         $campos = &$options['campos'];
-        $aliases = &$options['aliases'];
-        if (empty($options['fields_alias'])) {
-            $aliases = [];
-        }
-        if ($aliases) {
-            $fields = array_flip($aliases);
-        }
         $attributes = &$object->attributes;
 
         foreach ($row as $key => $value) {
@@ -812,11 +799,11 @@ abstract class RecordAbstract
                 list($table, $field) = $parts;
             }
             if ($table == 'main') {
-                $alias = isset($aliases[$field]) ? $aliases[$field] : $field;
-                if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
+                if (isset($attributes[$field]) && is_object($attributes[$field])) {
+                    dd('here');
                     continue;
                 }
-                $attributes[$alias] = $object->getMutatedAttribute($field, $value);
+                $attributes[$field] = $object->getMutatedAttribute($field, $value);
                 /*
                 if (!empty($options['select_multi_fields'])) {
                     if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
@@ -828,6 +815,7 @@ abstract class RecordAbstract
                 }
                 */
             } else {
+                dd('here');
                 $joinAlias = '';
                 $join = isset($fields[$table]) ? $fields[$table] : $table;
                 $joinTipo = isset($campos[$join]) ? $this->getCampoTipo($campos[$join]) : null;
