@@ -32,22 +32,7 @@ class InterAdmin extends Record implements InterAdminAbstract
      */
     public function getUrl($sep = null)
     {
-        global $seo, $seo_sep;
-        if ($seo && $this->getParent()->id) {
-            $link = $this->_parent->getUrl().'/'.toSeo($this->getTipo()->nome);
-        } else {
-            $link = $this->getTipo()->getUrl();
-        }
-        if ($seo) {
-            $nome = $this->varchar_key;
-            if (is_null($sep)) {
-                $sep = $seo_sep;
-            }
-            $link .= $sep.toSeo($nome);
-        } else {
-            $link .= '?id='.$this->id;
-        }
-        return $link;
+        return parent::getUrl($sep);
     }
     
     /**

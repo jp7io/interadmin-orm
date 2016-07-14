@@ -176,49 +176,6 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     }
     
     /**
-     * Returns the full url for this InterAdminTipo.
-     *
-     * @return string
-     */
-    public function getUrl()
-    {
-        if ($this->_url) {
-            return $this->_url;
-        }
-        global $config, $implicit_parents_names, $seo, $lang;
-        $url = '';
-        $url_arr = '';
-        $parent = $this;
-        while ($parent) {
-            if ($seo) {
-                if (!in_array($parent->nome, (array) $implicit_parents_names)) {
-                    $url_arr[] = toSeo($parent->nome);
-                }
-            } else {
-                if (toId($parent->nome)) {
-                    $url_arr[] = toId($parent->nome);
-                }
-            }
-            $parent = $parent->getParent();
-            if ($parent instanceof InterAdmin) {
-                $parent = $parent->getTipo();
-            }
-        }
-        $url_arr = array_reverse((array) $url_arr);
-        if ($seo) {
-            $url = $config->url.$lang->path.jp7_implode('/', $url_arr);
-        } else {
-            $url = $config->url.$lang->path_url.implode('_', $url_arr);
-            $pos = strpos($url, '_');
-            if ($pos) {
-                $url = substr_replace($url, '/', $pos, 1);
-            }
-            $url .= (count($url_arr) > 1) ? '.php' : '/';
-        }
-        return $this->_url = $url;
-    }
-    
-    /**
      * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
      *
      * @param array $options [optional]

@@ -10,14 +10,13 @@ use UnexpectedValueException;
 use Exception;
 use DB;
 use Request;
+use RecordUrl;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
 class Record extends RecordAbstract implements Arrayable
 {
-    use \Jp7\Laravel\Url\RecordTrait;
-     
     /**
      * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
      *
@@ -1007,5 +1006,36 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return $fillable;
+    }
+
+    public function getRoute($action = 'index')
+    {
+        return $this->getType()->getRoute($action);
+    }
+
+    /**
+     * Parameters to be used with URL::route().
+     *
+     * @param array $variables
+     *
+     * @return array
+     */
+    public function getUrlParameters(array $variables)
+    {
+        $parameters = [];
+        $parent = $this;
+        foreach ($variables as $variable) {
+            if (!$parent = $parent->getParent()) {
+                break;
+            }
+            $parameters[] = $parent;
+        }
+
+        return $parameters;
+    }
+    
+    public function getUrl($action = 'show')
+    {
+        return RecordUrl::getRecordUrl($this, $action);
     }
 }

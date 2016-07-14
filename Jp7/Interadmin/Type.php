@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin;
 
 use Jp7\CollectionUtil;
+use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Exception;
@@ -10,6 +11,7 @@ use Lang;
 use Request;
 use App;
 use Cache;
+use RecordUrl;
 
 /**
  * JP7's PHP Functions.
@@ -32,7 +34,6 @@ use Cache;
 class Type extends RecordAbstract
 {
     use \Jp7\Laravel\Routable;
-    use \Jp7\Laravel\Url\TypeTrait;
     
     const ID_TIPO = 0;
 
@@ -47,12 +48,6 @@ class Type extends RecordAbstract
 
     protected $_primary_key = 'id_tipo';
 
-    /**
-     * Caches the url retrieved by getUrl().
-     *
-     * @var string
-     */
-    protected $_url;
     /**
      * Contains the parent Type object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
      *
@@ -1267,5 +1262,28 @@ class Type extends RecordAbstract
     public function records()
     {
         return new Query($this);
+    }
+
+    public function getUrl() // $action = 'index', array $parameters = []
+    {
+        $args = func_get_args();
+        $action = isset($args[0]) ? $args[0] : 'index';
+        $parameters = isset($args[1]) ? $args[1] : [];
+        return RecordUrl::getTypeUrl($this, $action, $parameters);
+    }
+
+    /**
+     * Gets the route for this type.
+     * @param  string $action Default to 'index'
+     * @return
+     */
+    public function getRoute($action = 'index')
+    {
+        $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
+        if (!in_array($action, $validActions)) {
+            throw new BadMethodCallException('Invalid action "'.$action.'", valid actions: '.implode(', ', $validActions));
+        }
+
+        return r::getRouteByTypeId($this->id_tipo, $action);
     }
 }
