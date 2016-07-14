@@ -626,7 +626,7 @@ class Record extends RecordAbstract implements Arrayable
             $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
                 (($tag instanceof Record) ? $tag->id : 0).','.
-                (($tag instanceof Record) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
+                (($tag instanceof Record) ? $tag->id_tipo : $tag->id_tipo).')';
             if (!$db->Execute($sql)) {
                 throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
             }
@@ -657,7 +657,7 @@ class Record extends RecordAbstract implements Arrayable
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
                 if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type'])) {
-                    $tag_text = $tag_tipo->getFieldsValues('nome');
+                    $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],

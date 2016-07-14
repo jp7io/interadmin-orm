@@ -46,7 +46,7 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract
                             $registro->city,
                         ]);
                         if ($registro->state) {
-                            $fullAddress .= ' - '.$registro->state->getByAlias('sigla');
+                            $fullAddress .= ' - '.$registro->state->sigla;
                         }
                         $location = Jp7_GoogleMaps::getLatLngByEndereco($fullAddress);
                         if ($location) {

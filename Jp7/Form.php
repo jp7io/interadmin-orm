@@ -121,7 +121,7 @@ class Jp7_Form extends Zend_Form
         if ($field['label']) {
             return $field['label'];
         } elseif ($field['nome'] instanceof InterAdminTipo) {
-            return $field['nome']->getFieldsValues('nome');
+            return $field['nome']->nome;
         } else {
             return $field['nome'];
         }

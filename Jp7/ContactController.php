@@ -78,7 +78,6 @@ class Jp7_ContactController extends __Controller_Action
     protected function _sendEmail($record, $sendReply = true)
     {
         $contactTipo = self::getTipo();
-        $contactTipo->getFieldsValues('nome');
         $config = Zend_Registry::get('config');
 
         $recipients = $this->_getRecipients($contactTipo, $record);
