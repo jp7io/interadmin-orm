@@ -108,7 +108,7 @@ class Log extends RecordAbstract
     {
         if (!$this->_parent) {
             $tipo = $this->getType();
-            if ($this->id || $this->getFieldsValues('id')) {
+            if ($this->id) {
                 $this->_parent = Record::getInstance($this->id, $options, $tipo);
             }
         }
