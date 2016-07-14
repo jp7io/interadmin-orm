@@ -1,5 +1,8 @@
 <?php
 
+use Jp7\Interadmin\Record;
+use Jp7\Interadmin\Type;
+
 class Jp7_Interadmin_Util
 {
     protected static $_default_vars = ['id_slug', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted'];
@@ -20,14 +23,13 @@ class Jp7_Interadmin_Util
             'fields_alias' => false,
         ];
 
-        $optionsRegistros = $options;
-        if ($use_id_string) {
-            $optionsRegistros = self::_prepareOptionsForIdString($optionsRegistros, $tipoObj);
-        }
-        $exports = $tipoObj->find($optionsRegistros + [
+        $exports = $tipoObj->find($options + [
             'where' => 'id IN('.implode(',', $ids).')',
         ]);
-
+        if ($use_id_string) {
+            self::_prepareForIdString($exports, $tipoObj);
+        }
+        
         $tiposChildren = $tipoObj->getInterAdminsChildren();
         foreach ($exports as $export) {
             self::_exportChildren($export, $tiposChildren, $use_id_string, $options);
@@ -40,16 +42,15 @@ class Jp7_Interadmin_Util
     {
         $export->_children = [];
         foreach ($tiposChildren as $tipoChildrenArr) {
-            $optionsChildren = $options;
-            $optionsChildren['where'][] = "deleted = ''";
-
             $tipoChildren = $export->getChildrenTipo($tipoChildrenArr['id_tipo']);
+            
+            $children = $tipoChildren->find($options  + [
+                'where' => "deleted = ''",
+            ]);
             if ($use_id_string) {
-                $optionsChildren = self::_prepareOptionsForIdString($optionsChildren, $tipoChildren);
+                self::_prepareForIdString($children, $tipoChildren);
             }
-
-            //$optionsChildren['fields_alias'] = true;
-            $children = $tipoChildren->find($optionsChildren);
+            
             $tiposGrandChildren = $tipoChildren->getInterAdminsChildren();
             foreach ($children as $child) {
                 self::_exportChildren($child, $tiposGrandChildren, $use_id_string, $options);
@@ -60,35 +61,53 @@ class Jp7_Interadmin_Util
         $export->setTipo(null);
     }
 
-    protected static function _prepareOptionsForIdString($options, $tipo)
+    /**
+     * @return void
+     */
+    protected static function _prepareForIdString($records, $tipo)
     {
-        $campos = $tipo->getCampos();
-        foreach ($campos as $campo) {
-            $isSpecialRegistro = strpos($campo['tipo'], 'special_') === 0 && $campo['xtra'] == 'registros' && $tipo->getCampoTipo($campo) instanceof InterAdminTipo;
-            $isSelectRegistro = strpos($campo['tipo'], 'select_') === 0 && strpos($campo['tipo'], 'select_multi_') !== 0 && !in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
-            if ($isSpecialRegistro || $isSelectRegistro) {
-                $options['fields'][$campo['tipo']] = ['id_string'];
+        foreach ($records as $record) {
+            $record->_relations = [];
+        }
+             
+        foreach ($tipo->getRelationships() as $relation => $data) {
+            if ($data['type'] || $data['multi']) {
+                continue;
+            }
+            foreach ($records as $record) {
+                $fk = $record->{$relation.'_id'};
+                $query = (clone $data['query']);
+                $related = $query->select('id_string')->find($fk);
+                if ($related && $related->id_string) {
+                    $record->_relations[$relation] = $related->id_string;
+                }
             }
         }
-
-        return $options;
     }
-
-    protected static function _importAttributeFromIdString($record, $bind_children = false)
+    
+    /**
+     * @return void
+     */
+    protected static function importRelationsFromIdString($record, $relations, $bind_children = false)
     {
-        foreach ($record->getAttributes() as $attributeName => $attribute) {
-            if ($attribute instanceof InterAdmin && $attribute->id_string) {
-                $attributeTipo = InterAdminTipo::getInstance($attribute->id_tipo);
-                //$attribute->setTipo($attributeTipo);
-                if ($attributeTipo) {
-                    $options = [];
-                    if ($bind_children) {
-                        $options['order'] = 'parent_id = '.$record->parent_id.' DESC, ';
-                    }
-                    $options['order'] .= 'deleted = \'\' DESC';
-
-                    $record->$attributeName = $attributeTipo->findByIdString($attribute->id_string, $options);
-                }
+        if (!$relations) {
+            return;
+        }
+        $relationships = $record->getType()->getRelationships();
+        $aliases = $record->getType()->getCamposAlias();
+        foreach ($relations as $relation => $id_string) {
+            $query = clone $relationships[$relation]['query'];
+            if ($bind_children) {
+                $query->orderByRaw('parent_id = '.$record->parent_id.' DESC');
+            }
+            $related = $query->select('id')
+                ->where('id_string', $id_string)
+                ->orderByRaw("deleted = '' DESC")
+                ->first();
+             
+            if ($related) {
+                $column = array_search($relation.'_id', $aliases);
+                $record->$column = $related->id;
             }
         }
     }
@@ -107,54 +126,57 @@ class Jp7_Interadmin_Util
     {
         $returnIds = [];
         foreach ($records as $record) {
-            $returnId = ['id' => $record->id];
+            $oldId = $record->id;
             $children = $record->_children;
-            $record->id = 0;
-            unset($record->id_slug);
-            unset($record->_children);
-
-            $record->setParent($parent);
-            $record->setTipo($tipoObj);
+            $relations = $record->_relations;
+            self::prepareNewRecord($record, $parent, $tipoObj);
 
             if ($use_id_string) {
-                self::_importAttributeFromIdString($record);
+                self::importRelationsFromIdString($record, $relations);
             }
 
             $record->save();
-            $returnId['new_id'] = $record->id;
 
             if ($import_children) {
-                $record->_children = $children;
-                self::_importChildren($record, $use_id_string, $bind_children);
+                self::_importChildren($record, $children, $use_id_string, $bind_children);
             }
-            $returnIds[] = $returnId;
+            $returnIds[] = [
+                'id' => $oldId,
+                'new_id' => $record->id
+            ];
         }
 
         return $returnIds;
     }
-
-    public static function _importChildren($record, $use_id_string, $bind_children)
+    
+    protected static function prepareNewRecord($record, $parent, $tipoObj)
     {
-        foreach ($record->_children as $child_id_tipo => $tipo_children) {
+        $record->id = 0;
+        unset($record->id_slug);
+        unset($record->_children);
+        unset($record->_relations);
+
+        $record->setParent($parent);
+        $record->setTipo($tipoObj);
+    }
+
+    public static function _importChildren($record, $children, $use_id_string, $bind_children)
+    {
+        foreach ($children as $child_id_tipo => $tipo_children) {
             $childTipo = InterAdminTipo::getInstance($child_id_tipo);
             $childTipo->setParent($record);
 
             foreach ($tipo_children as $child) {
                 $grandChildren = $child->_children;
-                $child->id = 0;
-                unset($child->id_slug);
-                unset($child->_children);
-
-                $child->setParent($record);
-                $child->setTipo($childTipo);
-
+                $childRelations = $child->_relations;
+                self::prepareNewRecord($child, $record, $childTipo);
+ 
                 if ($use_id_string || $bind_children) {
-                    self::_importAttributeFromIdString($child, $bind_children);
+                    self::importRelationsFromIdString($child, $childRelations, $bind_children);
                 }
 
                 $child->save();
-                $child->_children = $grandChildren;
-                self::_importChildren($child, $use_id_string, $bind_children);
+                self::_importChildren($child, $grandChildren, $use_id_string, $bind_children);
             }
         }
     }
