@@ -878,18 +878,14 @@ class Type extends RecordAbstract
     }
     protected function _setMetadata($varname, $value)
     {
-        $db_identifier = $this->getDb()->getDatabaseName();
-
-        $cache = TipoCache::getInstance($db_identifier, $this->getDb()->getTablePrefix(), $this->id_tipo);
-        $cache->set($varname, $value);
+        $cacheKey = static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+        Cache::put($cacheKey, $value, 60);
     }
+    
     protected function _getMetadata($varname)
     {
-        $db_identifier = $this->getDb()->getDatabaseName();
-
-        $cache = TipoCache::getInstance($db_identifier, $this->getDb()->getTablePrefix(), $this->id_tipo);
-
-        return $cache->get($varname);
+        $cacheKey = static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+        return Cache::get($cacheKey);
     }
     /**
      * Returns metadata about the children tipos that the Records have.

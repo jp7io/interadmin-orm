@@ -958,16 +958,11 @@ abstract class RecordAbstract
     
     public function getColumns()
     {
-        $dbName = $this->getDb()->getDatabaseName();
         $table = $this->getTableName();
-        $cache = TipoCache::getInstance($dbName);
-
-        if (!$columns = $cache->get($table)) {
-            $columns = $this->_pdoColumnNames($table);
-            $cache->set($table, $columns);
-        }
-
-        return $columns;
+        $cacheKey = 'columns,'.$this->_db.','.$table;
+        return \Cache::remember($cacheKey, 60, function () use ($table) {
+            return $this->_pdoColumnNames($table);
+        });
     }
 
     private function _pdoColumnNames($table)
