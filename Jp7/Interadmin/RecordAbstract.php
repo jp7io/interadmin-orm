@@ -982,14 +982,20 @@ abstract class RecordAbstract
     {
         global $s_session;
         
+        $tableParts = explode('_', $table);
+         // remove interadmin_cliente_
+        array_shift($tableParts);
+        array_shift($tableParts);
+        $table = implode('_', $tableParts);
+        
         // Tipos
-        if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
+        if ($table === 'tipos') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
         // Tags
-        } elseif (strpos($table, '_tags') === (strlen($table) - strlen('_tags'))) {
+        } elseif ($table === 'tags') {
             // do nothing
         // Arquivos
-        } elseif (strpos($table, '_arquivos') === (strlen($table) - strlen('_arquivos'))) {
+        } elseif ($table === 'arquivos') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
         // Registros
         } else {
