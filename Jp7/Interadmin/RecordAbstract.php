@@ -381,7 +381,7 @@ abstract class RecordAbstract
             }
             if (isset($trace[$i]['file'])) {
                 $sql .= PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
-                \Log::notice($sql);
+                \Log::info($sql);
             }
         }
             
@@ -946,16 +946,11 @@ abstract class RecordAbstract
     
     public function getColumns()
     {
-        $dbName = $this->getDb()->getDatabaseName();
         $table = $this->getTableName();
-        $cache = TipoCache::getInstance($dbName);
-
-        if (!$columns = $cache->get($table)) {
-            $columns = $this->_pdoColumnNames($table);
-            $cache->set($table, $columns);
-        }
-
-        return $columns;
+        $cacheKey = 'columns,'.$this->_db.','.$table;
+        return \Cache::remember($cacheKey, 60, function () use ($table) {
+            return $this->_pdoColumnNames($table);
+        });
     }
 
     private function _pdoColumnNames($table)
@@ -975,14 +970,20 @@ abstract class RecordAbstract
     {
         global $s_session;
         
+        $tableParts = explode('_', $table);
+         // remove interadmin_cliente_
+        array_shift($tableParts);
+        array_shift($tableParts);
+        $table = implode('_', $tableParts);
+        
         // Tipos
-        if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
+        if ($table === 'tipos') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
         // Tags
-        } elseif (strpos($table, '_tags') === (strlen($table) - strlen('_tags'))) {
+        } elseif ($table === 'tags') {
             // do nothing
         // Arquivos
-        } elseif (strpos($table, '_arquivos') === (strlen($table) - strlen('_arquivos'))) {
+        } elseif ($table === 'arquivos') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
         // Registros
         } else {
