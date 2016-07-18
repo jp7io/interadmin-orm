@@ -6,6 +6,7 @@ use Jp7\CollectionUtil;
 use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use InvalidArgumentException;
+use UnexpectedValueException;
 use Exception;
 use Lang;
 use Request;
@@ -75,7 +76,7 @@ class Type extends RecordAbstract
         if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
-            $cacheKey = 'Type::__get,'.$this->id_tipo;
+            $cacheKey = $this->getCacheKey('attributes');
             $this->attributes += Cache::remember($cacheKey, 60, function () {
                 return (array) $this->getDb()->table('tipos')->where('id_tipo', $this->id_tipo)->first();
             });
@@ -473,7 +474,7 @@ class Type extends RecordAbstract
                         $alias = $array['label'] ?: $alias->nome;
                     }
                     if (!$alias) {
-                        kd('inesperado');
+                        throw new UnexpectedValueException('An alias was expected.');
                         $alias = $campo;
                     }
                     $A[$campo]['nome_id'] = to_slug($alias, '_');
@@ -691,7 +692,12 @@ class Type extends RecordAbstract
     {
         parent::_update($attributes);
         // clear attributes cache
-        Cache::forget('Type::__get,'.$this->id_tipo);
+        Cache::forget($this->getCacheKey('attributes'));
+        Cache::forget($this->getCacheKey('campos'));
+        Cache::forget($this->getCacheKey('children'));
+        Cache::forget($this->getCacheKey('interadmins_order'));
+        Cache::forget($this->getCacheKey('relationships'));
+        Cache::forget($this->getCacheKey('camposAlias'));
         return $this;
     }
 
@@ -878,15 +884,21 @@ class Type extends RecordAbstract
     }
     protected function _setMetadata($varname, $value)
     {
-        $cacheKey = static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+        $cacheKey = $this->getCacheKey($varname);
         Cache::put($cacheKey, $value, 60);
     }
     
     protected function _getMetadata($varname)
     {
-        $cacheKey = static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+        $cacheKey = $this->getCacheKey($varname);
         return Cache::get($cacheKey);
     }
+    
+    protected function getCacheKey($varname)
+    {
+        return static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+    }
+    
     /**
      * Returns metadata about the children tipos that the Records have.
      *
