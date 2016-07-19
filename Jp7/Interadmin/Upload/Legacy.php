@@ -1,6 +1,6 @@
 <?php
 
-use League\Url\Url;
+use League\Uri\Schemes\Http as Uri;
 
 class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
 {
@@ -11,7 +11,7 @@ class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
     // $config->url/upload/bla/123?size=40x40
     public function imageUrl($path, $template)
     {
-        $url = Url::createFromUrl($this->url($path));
+        $url = Uri::createFromString($this->url($path));
 
         $template = self::$templates[$template];
 
