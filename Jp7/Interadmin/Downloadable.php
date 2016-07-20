@@ -26,7 +26,7 @@ trait Downloadable
     public function getUrl($template = 'original')
     {
         $config = config('interadmin.storage');
-        $storageUrl = 'https://'.$config['host'].$config['path'];
+        $storageUrl = $config['scheme'].'://'.$config['host'].$config['path'];
         
         // '../..' => 'http://www.example.com'
         $url = replace_prefix($config['backend_path'], $storageUrl, $this->url);
@@ -51,10 +51,9 @@ trait Downloadable
         return replace_prefix($backendPath.'/', '', $url);
     }
     
-    public function removeQueryString()
+    private function removeQueryString()
     {
-        $parsed = parse_url($this->url);
-        return $parsed['path'];
+        return parse_url($this->url, PHP_URL_PATH);
     }
     
     public function isExternal()

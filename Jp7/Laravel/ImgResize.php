@@ -111,7 +111,8 @@ class ImgResize
     
     protected static function storageUrl()
     {
-        return 'http://'.config('interadmin.storage.host');
+        $config = config('interadmin.storage');
+        return $config['scheme'].'://'.$config['host'];
     }
     
     public static function srcset($img, $prefix)
