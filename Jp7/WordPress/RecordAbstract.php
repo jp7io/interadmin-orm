@@ -67,10 +67,10 @@ abstract class Jp7_WordPress_RecordAbstract extends Jp7_WordPress_BaseAbstract
 
         if ($this->$pk) {
             $db->AutoExecute($this->_table, $valuesToSave, 'UPDATE', $pk.' = '.$this->$pk)
-                or die(jp7_debug('Error while updating values in `'.$this->_table.'` '.$db->ErrorMsg(), print_r($valuesToSave, true)));
+                or jp7_debug('Error while updating values in `'.$this->_table.'` '.$db->ErrorMsg(), print_r($valuesToSave, true));
         } else {
             $db->AutoExecute($this->_table, $valuesToSave, 'INSERT')
-                or die(jp7_debug('Error while inserting data into `'.$this->_table.'` '.$db->ErrorMsg(), print_r($valuesToSave, true)));
+                or jp7_debug('Error while inserting data into `'.$this->_table.'` '.$db->ErrorMsg(), print_r($valuesToSave, true));
             $this->$pk = $db->Insert_ID();
         }
     }

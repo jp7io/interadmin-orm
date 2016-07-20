@@ -364,32 +364,13 @@ class Jp7_Debugger
      * @param string|Exception $backtraceOrException
      *
      * @return bool
+     * @deprecated
      */
     public function sendTraceByEmail($backtraceOrException)
     {
-        global $config, $s_interadmin_cliente, $jp7_app;
-
-        if ($backtraceOrException instanceof Exception) {
-            $e = $backtraceOrException;
-            $backtrace = $this->getBacktrace($e->getMessage().' - '.$e->getFile().':'.$e->getLine(), '', $e->getTrace());
-        } else {
-            $backtrace = $backtraceOrException;
-        }
-
-        $nome_app = ($jp7_app) ? $jp7_app : 'Site';
-        if (trim($config->name_id)) {
-            $cliente = $config->name_id;
-        } elseif (trim($s_interadmin_cliente)) {
-            $cliente = $s_interadmin_cliente;
-        }
-        $subject = '['.$cliente.']['.$nome_app.'][Erro]';
-        $message = 'Ocorreram erros no '.$nome_app.' - '.$cliente.'<br />'.$backtrace;
-        $to = 'debug+'.$cliente.'@jp7.com.br';
-        $headers = 'To: '.$to.' <'.$to.">\r\n";
-        //$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
-
-        return jp7_mail($to, $subject, $message, $headers, '', '', true);
+        trigger_error('Use Sentry and Log::error() instead', E_USER_DEPRECATED);
     }
+    
     /**
      * Returns $maintenancePage.
      *

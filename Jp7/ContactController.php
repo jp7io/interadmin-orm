@@ -78,7 +78,6 @@ class Jp7_ContactController extends __Controller_Action
     protected function _sendEmail($record, $sendReply = true)
     {
         $contactTipo = self::getTipo();
-        $contactTipo->getFieldsValues('nome');
         $config = Zend_Registry::get('config');
 
         $recipients = $this->_getRecipients($contactTipo, $record);
@@ -90,7 +89,7 @@ class Jp7_ContactController extends __Controller_Action
             'title' => $contactTipo->nome,
             'recipients' => $recipients,
         ]);
-        $mail->setFrom($record->email, $record->name);
+        $mail->setFrom(getenv('MAIL_ADDRESS'), $record->name);
         $mail->send();
 
         if ($sendReply) {
@@ -102,7 +101,7 @@ class Jp7_ContactController extends __Controller_Action
                 'message' => 'Agradecemos o seu contato.<br />'.
                     'Por favor, aguarde nosso retorno em breve.<br /><br />',
             ]);
-            $reply->setFrom($config->admin_email, $config->admin_name);
+            $reply->setFrom(getenv('MAIL_ADDRESS'), $config->admin_name);
             $reply->send();
         }
     }

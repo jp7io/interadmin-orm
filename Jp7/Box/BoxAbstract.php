@@ -5,7 +5,7 @@ abstract class Jp7_Box_BoxAbstract
     public function __construct(InterAdmin $record = null)
     {
         if ($record) {
-            foreach ($record->attributes as $key => $value) {
+            foreach ($record->getAttributes() as $key => $value) {
                 $this->$key = $value;
             }
             if (is_string($record->params)) {

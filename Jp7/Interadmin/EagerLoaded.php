@@ -4,25 +4,25 @@ namespace Jp7\Interadmin;
 
 use BadMethodCallException;
 
-class EagerLoaded
+class EagerLoaded extends Query
 {
     protected $data;
     protected $type;
     protected $debug;
 
-    public function __construct(Type $type, $data)
+    public function __construct(RecordAbstract $type, $data)
     {
+        parent::__construct($type);
         $this->data = $data;
-        $this->type = $type;
     }
 
-    public function all()
+    public function get()
     {
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
         if ($this->debug) {
-            krumo('Eager loading '.count($this->data).' children records.');
+            dump('Eager loading '.count($this->data).' children records.');
         }
 
         return $this->data;
@@ -34,7 +34,7 @@ class EagerLoaded
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
         if ($this->debug) {
-            krumo('Counting eager loaded children records.');
+            dump('Counting eager loaded children records.');
         }
 
         return count($this->data);
@@ -46,7 +46,7 @@ class EagerLoaded
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
         if ($this->debug) {
-            krumo('Returning first eager loaded children record.');
+            dump('Returning first eager loaded children record.');
         }
 
         return reset($this->data);

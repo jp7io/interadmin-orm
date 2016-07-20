@@ -18,7 +18,7 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController
         // CoC - name is always snake_case of the class name
         $this->name = snake_case(substr(get_called_class(), 4), '-');
 
-        if (class_exists('Debugbar')) {
+        if (class_exists('Debugbar', false)) {
             \Debugbar::startMeasure('Cell '.$this->name);
         }
     }
@@ -48,7 +48,7 @@ abstract class CellBaseController extends \Torann\Cells\CellBaseController
         unset($this->data);
         $this->data = array_merge($this->attributes, (array) $this);
 
-        if (class_exists('Debugbar')) {
+        if (class_exists('Debugbar', false)) {
             \Debugbar::stopMeasure('Cell '.$this->name);
         }
     }

@@ -22,14 +22,13 @@ trait DateFieldTrait
     protected function formatValue($format)
     {
         $value = parent::getValue();
-        if (!$value) {
+        if (!$value instanceof Date) {
+            $value = new Date($value ?: Date::EMPTY_DATE);
+        }
+        if (!$value->isValid()) {
             return '';
         }
-        $date = new Date($value);
-        if (!$date->isValid()) {
-            return '';
-        }
-        return $date->format($format);
+        return $value->format($format);
     }
     
     protected function getFormerField()

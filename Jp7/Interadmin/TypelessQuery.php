@@ -20,7 +20,7 @@ class TypelessQuery extends Query
 
     public function first()
     {
-        return $this->provider->deprecatedTypelessFind($this->options + ['limit' => 1])->first();
+        return $this->provider->deprecatedTypelessFind(['limit' => 1] + $this->options)->first();
     }
 
     public function count()
@@ -34,12 +34,35 @@ class TypelessQuery extends Query
 
     public function find($id)
     {
-        throw new BadMethodCallException('Not implemented.');
-    }
+        if (func_num_args() != 1) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 1.');
+        }
 
-    public function findOrFail($id)
+        if (is_array($id)) {
+            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
+        }
+
+        if (is_string($id) && !is_numeric($id)) {
+            $this->options['where'][] = $this->_parseComparison('id_slug', '=', $id);
+        } else {
+            $this->options['where'][] = $this->_parseComparison('id', '=', $id);
+        }
+
+        return $this->first();
+    }
+    
+    public function findMany($ids)
     {
-        throw new BadMethodCallException('Not implemented.');
+        $sample = reset($ids);
+        if (is_string($sample) && !is_numeric($sample)) {
+            $key = 'id_slug';
+        } else {
+            $key = 'id';
+        }
+
+        $this->whereIn($key, $ids);
+
+        return $this->provider->deprecatedTypelessFind($this->options);
     }
 
     public function delete()

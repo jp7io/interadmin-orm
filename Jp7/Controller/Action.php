@@ -71,7 +71,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
             ]);
             if ($siteSettings) {
                 $config = Zend_Registry::get('config');
-                $attributes = $siteSettings->attributes;
+                $attributes = $siteSettings->getAttributes();
                 // Retirando atributos que não interessam ao config
                 unset($attributes['id_tipo']);
                 unset($attributes['id']);
@@ -156,7 +156,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 
         // Adiciona o nome do registro atual ao título
         if ($record) {
-            if ($titulo = $record->getFieldsValues('varchar_key')) {
+            if ($titulo = $record->varchar_key) {
                 $this->view->headTitle($titulo);
             }
         }
@@ -179,12 +179,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
             $tipo = static::getTipo();
             $record = static::getRecord();
             if (!$settings->title) {
-                $tipo->getFieldsValues('nome');
                 if ($tipo->nome != 'Home') {
                     $metas['keywords'] = $tipo->nome.','.$metas['keywords'];
                 }
                 if ($record instanceof InterAdmin) {
-                    $metas['keywords'] = $record->getFieldsValues('varchar_key').','.$metas['keywords'];
+                    $metas['keywords'] = $record->varchar_key.','.$metas['keywords'];
                 }
                 $this->view->headMeta()->setName('keywords', $metas['keywords']);
             }

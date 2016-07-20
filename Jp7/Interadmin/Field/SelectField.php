@@ -19,12 +19,23 @@ class SelectField extends ColumnField
         
     public function getCellHtml()
     {
-        return $this->formatText($this->getValue(), true);
+        return $this->formatTextRelated(true);
     }
 
     public function getText()
     {
-        return $this->formatText($this->getValue(), false);
+        return $this->formatTextRelated(false);
+    }
+    
+    protected function formatTextRelated($html)
+    {
+        $currentRecords = $this->getCurrentRecords();
+        if (count($currentRecords)) {
+            $related = $currentRecords[0];
+        } else {
+            $related = $this->getValue(); // to show only an ID
+        }
+        return $this->formatText($related, $html);
     }
     
     public function hasTipo()
@@ -53,7 +64,6 @@ class SelectField extends ColumnField
     public function getFilterTag()
     {
         $options = ['blank' => '(vazio)'] + $this->getOptions();
-        
         return $this->getFilterField()
             ->name('filtro_'.$this->getFormerName())
             ->options($options)

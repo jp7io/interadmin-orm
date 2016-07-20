@@ -3,11 +3,14 @@
 namespace Jp7\Former;
 
 use Former\Former as OriginalFormer;
-use Debugbar;
+use Log;
 use Jp7\Interadmin\Record;
+use Jp7\Interadmin\EloquentProxy;
 use Jp7\Interadmin\FieldUtil;
 use Lang;
 use UnexpectedValueException;
+use BadMethodCallException;
+use DateTime;
 
 /**
  * Add InterAdmin settings on former automatically.
@@ -22,10 +25,10 @@ class FormerExtension
 
     public function __construct(OriginalFormer $former)
     {
-        // Send missing validations to Debugbar
-        if ($errors = app()['session']->get('errors')) {
-            if (class_exists('Debugbar')) {
-                Debugbar::error($errors->all());
+        // Send missing validations to Log
+        if (getenv('APP_DEBUG')) {
+            if ($errors = app()['session']->get('errors')) {
+                Log::notice('Validation error', $errors->all());
             }
         }
 
@@ -61,12 +64,16 @@ class FormerExtension
 
     public function populate($model)
     {
-        if ($model instanceof Record) {
-            $this->model = $model;
-            $this->rules = $model->getRules();
+        if (!$model instanceof Record) {
+            return $this->former->populate($model);
         }
+        
+        $this->model = $model;
+        $this->rules = $model->getRules();
 
-        return $this->former->populate($model);
+        $proxy = new EloquentProxy;
+        $proxy->setRecord($model);
+        return $this->former->populate($proxy);
     }
   
     public function close()
@@ -97,8 +104,27 @@ class FormerExtension
         if (!$this->model || (!$alias = $field->getName())) {
             return;
         }
-
+        if (str_contains($alias, '[')) {
+            // Nested models: socios[0][nome]
+            $aliasParts = explode('.', $this->toDots($alias));
+            if (count($aliasParts) !== 3) {
+                return;
+            }
+            list($childName, $i, $childAlias) = $aliasParts;
+            try {
+                $childType = $this->model->$childName()->type();
+                $this->decorateFieldByTypeAndAlias($field, $childType, $childAlias);
+            } catch (BadMethodCallException $e) {
+                // no child type with this name
+            }
+            return;
+        }
         $type = $this->model->getType();
+        $this->decorateFieldByTypeAndAlias($field, $type, $alias);
+    }
+
+    private function decorateFieldByTypeAndAlias($field, $type, $alias)
+    {
         $campos = $type->getCampos();
         $aliases = array_flip($type->getCamposAlias());
 
@@ -111,7 +137,8 @@ class FormerExtension
 
         // Set label
         if (!Lang::has('validation.attributes.'.$alias)) {
-            $label = FieldUtil::getCampoHeader($campo);
+            // FIXME FieldUtil::getCampoHeader roda funcoes special_
+            $label = $campo['label'] ?: FieldUtil::getCampoHeader($campo);
             $field->label($label);
         }
 
@@ -119,7 +146,11 @@ class FormerExtension
         if (starts_with($name, 'select_')) {
             $this->populateOptions($field, $campo['nome']);
         }
-
+        // Fix date format
+        if ($field->getType() === 'date' && $field->getValue() instanceof DateTime) {
+            $field->setValue($field->getValue()->format('Y-m-d'));
+        }
+        
         if (isset($this->rules[$alias])) {
             if (in_array('name_and_surname', $this->rules[$alias])) {
                 $field->pattern('\S+ +\S.*')
@@ -128,14 +159,26 @@ class FormerExtension
         }
     }
 
+    protected function toDots($name)
+    {
+        $name = str_replace( // same replace Laravel and Former do
+            ['[', ']'],
+            ['.', ''],
+            $name
+        );
+        return trim($name, '.');
+    }
+
     private function populateOptions($field, $campoType)
     {
         if ($field->getType() === 'select') {
-            $options = [];
-            foreach ($campoType->records()->get() as $record) {
-                $options[$record->id] = $record->getName();
-            }
-            $field->options($options);
+            $field->options(function () use ($campoType) {
+                $options = [];
+                foreach ($campoType->records()->get() as $record) {
+                    $options[$record->id] = $record->getName();
+                }
+                return $options;
+            });
         } elseif ($field->getType() === 'radios') {
             $radios = [];
             foreach ($campoType->records()->get() as $record) {

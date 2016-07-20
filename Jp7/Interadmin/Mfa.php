@@ -198,20 +198,24 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         $this->updateAttributes([
             'mfa_secret' => $secret,
         ]);
-
+        
         $issuer = $this->getIssuer();
+        
+        $body = 'Token de acesso - '.$issuer.':<br><br>';
+        $body .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">'.$secret.'</div>';
+        $body .= '<br><br>';
+        $body .= 'Obrigado por solicitar o seu token de acesso.';
 
-        $message = '<div style="font-family: Verdana;font-size: 13px;">';
-        $message .= 'Token de acesso - '.$issuer.':<br><br>';
-        $message .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">'.$secret.'</div>';
-        $message .= '<br><br>';
-        $message .= 'Obrigado por solicitar o seu token de acesso.';
-        $message .= '</div>';
+        $data = [
+            'title' => $issuer,
+            'body' => $body
+        ];
         
-        $subject = $issuer.' Token';
-        $headers = 'From: '.$issuer." <no-reply@jp7.com.br>\r\n";
-        
-        jp7_mail($this->email, $subject, $message, $headers);
+        Mail::send('emails.default', $data, function ($message) use ($issuer) {
+            $message->subject($issuer.' Token')
+                ->from(env('MAIL_ADDRESS'), $issuer)
+                ->to($this->email);
+        });
     }
 
     public function createGoogleSecret()

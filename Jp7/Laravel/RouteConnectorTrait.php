@@ -17,7 +17,10 @@ trait RouteConnectorTrait
      */
     protected function mapWebRoutes(Router $router)
     {
-        $this->checkInteradminConnection();
+        if (!DynamicLoader::isRegistered()) {
+            $this->showDbNotConnected();
+            return;
+        }
         // Clear Interadmin route map - allows route:cache to work
         r::clearCache();
         
@@ -32,12 +35,13 @@ trait RouteConnectorTrait
         r::saveCache();
     }
     
-    protected function checkInteradminConnection()
+    protected function showDbNotConnected()
     {
-        if (DynamicLoader::isRegistered()) {
-            return;
-        }
-        $errorMsg = 'InterAdmin not connected. Check if InteradminServiceProvider is before RouteServiceProvider on config/app.php';
+        $errorMsg = 'InterAdmin not connected. Possible causes:
+            1 - nano .env
+                => Check DB_HOST, DB_USERNAME, ...
+            2 - nano config/app.php
+                => Make sure InteradminServiceProvider is before RouteServiceProvider';
         if (!\App::runningInConsole()) {
             throw new \Exception($errorMsg);
         }

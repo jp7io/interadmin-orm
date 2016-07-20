@@ -3,12 +3,16 @@
 namespace Jp7\Interadmin;
 
 use Jp7\CollectionUtil;
+use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use InvalidArgumentException;
+use UnexpectedValueException;
 use Exception;
 use Lang;
 use Request;
 use App;
+use Cache;
+use RecordUrl;
 
 /**
  * JP7's PHP Functions.
@@ -31,7 +35,6 @@ use App;
 class Type extends RecordAbstract
 {
     use \Jp7\Laravel\Routable;
-    use \Jp7\Laravel\Url\TypeTrait;
     
     const ID_TIPO = 0;
 
@@ -46,12 +49,6 @@ class Type extends RecordAbstract
 
     protected $_primary_key = 'id_tipo';
 
-    /**
-     * Caches the url retrieved by getUrl().
-     *
-     * @var string
-     */
-    protected $_url;
     /**
      * Contains the parent Type object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
      *
@@ -76,11 +73,13 @@ class Type extends RecordAbstract
 
     public function &__get($name)
     {
-        if (isset($this->attributes[$name])) {
+        if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
-            $this->loadAttributes($this->getAttributesNames(), false);
-
+            $cacheKey = $this->getCacheKey('attributes');
+            $this->attributes += Cache::remember($cacheKey, 60, function () {
+                return (array) $this->getDb()->table('tipos')->where('id_tipo', $this->id_tipo)->first();
+            });
             return $this->attributes[$name];
         }
 
@@ -197,50 +196,51 @@ class Type extends RecordAbstract
      *
      * @return array Array of Type objects.
      *
-     * @deprecated
+     * @deprecated Actually its being used by TypeQuery to find any type
      */
-    public function getChildren($deprecated, $options = [])
+    public function deprecatedGetChildren($options = [])
     {
-        if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use children()->get() instead.');
-        }
-
         $this->_whereArrayFix($options['where']); // FIXME
-
-        if (empty($options['fields'])) {
-            $options['fields'] = $this->getAttributesNames();
-        } else {
-            $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
-        }
-        $options['from'] = $this->getTableName().' AS main';
-        $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
+        
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
         }
-        // Internal use
-        $options['aliases'] = $this->getAttributesAliases();
-        $options['campos'] = $this->getAttributesCampos();
+        return Cache::remember('Type::children,'.serialize($options), 60, function () use ($options) {
+            if (empty($options['where'])) {
+                $options['where'] = ['1=1'];
+            }
+            if (empty($options['fields'])) {
+                $options['fields'] = $this->getAttributesNames();
+            } else {
+                $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
+            }
+            // Internal use
+            $options['from'] = $this->getTableName().' AS main';
+            $options['aliases'] = $this->getAttributesAliases();
+            $options['campos'] = $this->getAttributesCampos();
+            
+            $rs = $this->_executeQuery($options);
 
-        $rs = $this->_executeQuery($options);
-
-        $tipos = [];
-        foreach ($rs as $row) {
-            $tipo = self::getInstance($row->id_tipo, [
-                'db' => $this->_db,
-                'class' => isset($options['class']) ? $options['class'] : null,
-                'default_class' => static::DEFAULT_NAMESPACE.'Type',
-            ]);
-            $tipo->setParent($this);
-            $this->_getAttributesFromRow($row, $tipo, $options);
-            $tipos[] = $tipo;
-        }
-        // $rs->Close();
-        return new Collection($tipos);
+            $tipos = [];
+            foreach ($rs as $row) {
+                $tipo = self::getInstance($row->id_tipo, [
+                    'db' => $this->_db,
+                    'class' => isset($options['class']) ? $options['class'] : null,
+                    'default_class' => static::DEFAULT_NAMESPACE.'Type',
+                ]);
+                $tipo->setParent($this);
+                $this->_getAttributesFromRow($row, $tipo, $options);
+                $tipos[] = $tipo;
+            }
+            // $rs->Close();
+            return new Collection($tipos);
+        });
     }
 
     public function children()
     {
-        return new Query\TypeQuery($this);
+        $query = new Query\TypeQuery($this);
+        return $query->where('parent_id_tipo', $this->id_tipo);
     }
 
     public function childrenByModel($model_id_tipo)
@@ -258,14 +258,12 @@ class Type extends RecordAbstract
     public function deprecatedFind($options = [])
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
-
         $options['where'][] = 'id_tipo = '.$this->id_tipo;
         if ($this->_parent instanceof Record) {
-            $options['where'][] =  'parent_id = '.intval($this->_parent->id);
+            $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
         }
 
-        $rs = $this->_executeQuery($options, $select_multi_fields);
-        $options['select_multi_fields'] = $select_multi_fields;
+        $rs = $this->_executeQuery($options);
 
         $records = [];
         foreach ($rs as $row) {
@@ -280,12 +278,13 @@ class Type extends RecordAbstract
         if ($options['eager_load']) {
             foreach ($options['eager_load'] as $relationshipData) {
                 if ($relationshipData['type'] == 'select') {
+                    // Any eager load level missing?
                     if ($relationshipData['levels']) {
                         $selects = [];
-                        $property = $relationshipData['name'];
+                        $attribute = $relationshipData['name'];
                         foreach ($records as $item) {
-                            if ($item->$property) {
-                                $selects[] = $item->$property;
+                            if ($item->$attribute) {
+                                $selects[] = $item->$attribute;
                             }
                         }
                         CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
@@ -363,11 +362,8 @@ class Type extends RecordAbstract
      *
      * @return int Count of Records found.
      */
-    public function count($deprecated, $options = [])
+    public function deprecatedCount($options = [])
     {
-        if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use records()->count() instead.');
-        }
         if (empty($options['group'])) {
             $options['fields'] = ['COUNT(id) AS count_id'];
         } elseif ($options['group'] == 'id') {
@@ -395,12 +391,8 @@ class Type extends RecordAbstract
      *
      * @return Record First Record object found.
      */
-    public function findFirst($deprecated, $options = [])
+    public function deprecatedFindFirst($options = [])
     {
-        if ($deprecated != Record::DEPRECATED_METHOD) {
-            throw new Exception('Use records()->first() instead.');
-        }
-
         return $this->deprecatedFind(['limit' => 1] + $options)->first();
     }
 
@@ -429,7 +421,8 @@ class Type extends RecordAbstract
     {
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
-                $model = new self($this->model_id_tipo);
+                $className = static::DEFAULT_NAMESPACE.'Type';
+                $model = new $className($this->model_id_tipo);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
                 $model = new $className();
@@ -482,7 +475,7 @@ class Type extends RecordAbstract
                         $alias = $array['label'] ?: $alias->nome;
                     }
                     if (!$alias) {
-                        kd('inesperado');
+                        throw new UnexpectedValueException('An alias was expected.');
                         $alias = $campo;
                     }
                     $A[$campo]['nome_id'] = to_slug($alias, '_');
@@ -542,6 +535,13 @@ class Type extends RecordAbstract
         return isset($aliases[$fields]) ? $aliases[$fields] : null;
     }
 
+    public function getCamposCombo()
+    {
+        return array_keys(array_filter($this->getCampos(), function ($campo) {
+            return (bool) $campo['combo'] || $campo['tipo'] === 'varchar_key';
+        }));
+    }
+
     public function getRelationships()
     {
         $this->_camposMetadata();
@@ -561,29 +561,34 @@ class Type extends RecordAbstract
                 }
                 if (strpos($campo, 'select_') === 0) {
                     $multi = strpos($campo, 'select_multi_') === 0;
+                    $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
                     if ($multi) {
-                        $relationship = substr($array['nome_id'], 0, -4);
+                        $relationship = substr($array['nome_id'], 0, -4); // _ids = 4 chars
                     } else {
-                        $relationship = substr($array['nome_id'], 0, -3);
+                        $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
                     }
                     $relationships[$relationship] = [
-                        'provider' => $array['nome'],
-                        'type' => in_array($array['xtra'], FieldUtil::getSelectTipoXtras()),
+                        'query' => $hasType ? $array['nome'] : $array['nome']->records(),
+                        'type' => $hasType,
                         'multi' => $multi,
-                        'special' => false,
                     ];
                 } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
                     $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
+                    $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
                     if ($multi) {
-                        $relationship = substr($array['nome_id'], 0, -4);
+                        $relationship = substr($array['nome_id'], 0, -4); // _ids = 4 chars
                     } else {
-                        $relationship = substr($array['nome_id'], 0, -3);
+                        $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                    }
+                    if ($specialTipo = $this->getCampoTipo($array)) {
+                        $query = $specialTipo->records();
+                    } else {
+                        $query = new TypelessQuery(static::getInstance(0));
                     }
                     $relationships[$relationship] = [
-                        'provider' => null, // FIXME
-                        'type' => in_array($array['xtra'], FieldUtil::getSpecialTipoXtras()),
+                        'query' => $query,
+                        'type' => $hasType,
                         'multi' => $multi,
-                        'special' => true,
                     ];
                 }
 
@@ -668,7 +673,7 @@ class Type extends RecordAbstract
 
         // Inheritance
         $this->syncInheritance();
-        $retorno = parent::save();
+        $retorno = $this->saveRaw();
 
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->id_tipo) {
@@ -677,11 +682,24 @@ class Type extends RecordAbstract
             ]);
             foreach ($inheritingTipos as $tipo) {
                 $tipo->syncInheritance();
-                $tipo->updateAttributes($tipo->attributes);
+                $tipo->saveRaw();
             }
         }
 
         return $retorno;
+    }
+
+    protected function _update($attributes)
+    {
+        parent::_update($attributes);
+        // clear attributes cache
+        Cache::forget($this->getCacheKey('attributes'));
+        Cache::forget($this->getCacheKey('campos'));
+        Cache::forget($this->getCacheKey('children'));
+        Cache::forget($this->getCacheKey('interadmins_order'));
+        Cache::forget($this->getCacheKey('relationships'));
+        Cache::forget($this->getCacheKey('camposAlias'));
+        return $this;
     }
 
     public function syncInheritance()
@@ -695,22 +713,15 @@ class Type extends RecordAbstract
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
                 $modelo = new self($this->model_id_tipo);
-                $modelo->loadAttributes(self::$inheritedFields, false);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
-                if (class_exists($className)) {
-                    $modelo = new $className();
-                } else {
-                    echo 'Erro: Class '.$className.' not found';
-                }
+                $modelo = new $className();
             }
-            if ($modelo) {
-                foreach (self::$inheritedFields as $field) {
-                    if ($modelo->$field) {
-                        if (!$this->$field || in_array($field, self::$privateFields)) {
-                            $this->inherited[] = $field;
-                            $this->$field = $modelo->$field;
-                        }
+            foreach (self::$inheritedFields as $field) {
+                if ($modelo->$field) {
+                    if (!$this->$field || in_array($field, self::$privateFields)) {
+                        $this->inherited[] = $field;
+                        $this->$field = $modelo->$field;
                     }
                 }
             }
@@ -874,19 +885,21 @@ class Type extends RecordAbstract
     }
     protected function _setMetadata($varname, $value)
     {
-        $db_identifier = $this->getDb()->getDatabaseName();
-
-        $cache = TipoCache::getInstance($db_identifier, $this->getDb()->getTablePrefix(), $this->id_tipo);
-        $cache->set($varname, $value);
+        $cacheKey = $this->getCacheKey($varname);
+        Cache::put($cacheKey, $value, 60);
     }
+    
     protected function _getMetadata($varname)
     {
-        $db_identifier = $this->getDb()->getDatabaseName();
-
-        $cache = TipoCache::getInstance($db_identifier, $this->getDb()->getTablePrefix(), $this->id_tipo);
-
-        return $cache->get($varname);
+        $cacheKey = $this->getCacheKey($varname);
+        return Cache::get($cacheKey);
     }
+    
+    protected function getCacheKey($varname)
+    {
+        return static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+    }
+    
     /**
      * Returns metadata about the children tipos that the Records have.
      *
@@ -941,12 +954,12 @@ class Type extends RecordAbstract
 
         if (isset($relationships[$relationship])) {
             $data = $relationships[$relationship];
-
             return [
                 'type' => 'select',
-                'tipo' => $data['provider'],
+                'tipo' => $data['query']->type(),
                 'name' => $relationship,
                 'alias' => true,
+                'multi' => $data['multi']
             ];
         }
         // As children
@@ -957,6 +970,7 @@ class Type extends RecordAbstract
                 'tipo' => $childrenTipo,
                 'name' => $relationship,
                 'alias' => true,
+                'multi' => true
             ];
         }
         // As method
@@ -1161,7 +1175,10 @@ class Type extends RecordAbstract
                     if ($relationshipData['type'] === 'select') {
                         // select.* - Esse carregamento é feito com join para aproveitar código existente
                         // E também porque join é mais rápido para hasOne() do que um novo select
-                        $options['fields'][$levels[0]] = ['*'];
+                        if (!$relationshipData['multi']) {
+                            // select_multi resolve eager_load depois no _loadRelationship()
+                            $options['fields'][$levels[0]] = ['*'];
+                        }
                         array_shift($levels);
                     }
                     $options['eager_load'][] = $relationshipData + [
@@ -1207,7 +1224,7 @@ class Type extends RecordAbstract
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $type = Type::getInstance($row->id_tipo);
+            $type = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
 
             $record = Record::getInstance($row->id, $optionsInstance, $type);
             $this->_getAttributesFromRow($row, $record, $options);
@@ -1258,5 +1275,28 @@ class Type extends RecordAbstract
     public function records()
     {
         return new Query($this);
+    }
+
+    public function getUrl() // $action = 'index', array $parameters = []
+    {
+        $args = func_get_args();
+        $action = isset($args[0]) ? $args[0] : 'index';
+        $parameters = isset($args[1]) ? $args[1] : [];
+        return RecordUrl::getTypeUrl($this, $action, $parameters);
+    }
+
+    /**
+     * Gets the route for this type.
+     * @param  string $action Default to 'index'
+     * @return
+     */
+    public function getRoute($action = 'index')
+    {
+        $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
+        if (!in_array($action, $validActions)) {
+            throw new BadMethodCallException('Invalid action "'.$action.'", valid actions: '.implode(', ', $validActions));
+        }
+
+        return r::getRouteByTypeId($this->id_tipo, $action);
     }
 }

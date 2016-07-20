@@ -251,13 +251,7 @@ class Jp7_Collections
     {
         $stringArr = [];
         foreach ($array as $item) {
-            if ($item instanceof InterAdminTipo) {
-                $stringArr[] = $item->getFieldsValues($propertyName);
-            } elseif ($item instanceof InterAdmin) {
-                $stringArr[] = $item->getByAlias($propertyName);
-            } else {
-                $stringArr[] = $item->$propertyName;
-            }
+            $stringArr[] = $item->$propertyName;
         }
         if ($discardEmptyValues) {
             return jp7_implode($separator, $stringArr);

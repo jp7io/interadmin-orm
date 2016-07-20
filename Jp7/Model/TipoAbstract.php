@@ -45,7 +45,8 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
                 ],
             ]);
             if ($sistemaTipo) {
-                $columns = $sistemaTipo->getDb()->MetaColumns($sistemaTipo->getTableName());
+                global $db;
+                $columns = $db->MetaColumns($sistemaTipo->getTableName());
                 if ($columns['MODEL_ID_TIPO']->type == 'varchar') {
                     $classesTipo = $sistemaTipo->getFirstChildByNome('Classes');
                     if ($classesTipo) {

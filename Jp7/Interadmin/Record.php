@@ -6,22 +6,17 @@ use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use BadMethodCallException;
+use UnexpectedValueException;
 use Exception;
 use DB;
 use Request;
+use RecordUrl;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  */
 class Record extends RecordAbstract implements Arrayable
 {
-    use \Jp7\Laravel\Url\RecordTrait;
-     
-    /**
-     * To be used temporarily with deprecated methods.
-     */
-    const DEPRECATED_METHOD = '54dac5afe1fcac2f65c059fc97b44a58';
-
     /**
      * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
      *
@@ -41,7 +36,6 @@ class Record extends RecordAbstract implements Arrayable
      */
     protected $_tags;
 
-    protected $_loadedRelationships;
     protected $_eagerLoad;
 
     /**
@@ -83,28 +77,64 @@ class Record extends RecordAbstract implements Arrayable
     public function &__get($name)
     {
         $value = null;
-        if (array_key_exists($name, $this->attributes)) {
-            $value = &$this->attributes[$name];
-        } else {
-            $aliases = $this->getAttributesAliases();
-            // Fixes fields that have alias
-            if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
-                $name = $aliases[$name];
-                $value = &$this->attributes[$name];
-            } else {
-                // returned as reference
-                $value = $this->_lazyLoadAttribute($name);
-            }
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected");
         }
         // Mutators
         if ($name !== 'id') {
-            $mutator = 'get' . Str::studly($name) . 'Attribute';
+            $mutator = 'get'.Str::studly($name).'Attribute';
             if (method_exists($this, $mutator)) {
                 $value = $this->$mutator($value);
+                return $value;
             }
         }
-        
+        if (array_key_exists($name, $this->attributes)) {
+            $value = &$this->attributes[$name];
+            return $value;
+        }
+        $aliases = $this->getAttributesAliases();
+        // Fixes fields that have alias
+        if (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
+            // column is present, alias requested
+            $name = array_search($name, $aliases);
+            $value = &$this->attributes[$name];
+        } elseif (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+            throw new UnexpectedValueException('$this->attributes must not use alias');
+            // alias is present, column requested
+            // $name = $aliases[$name];
+            // $value = &$this->attributes[$name];
+        } else {
+            $value = $this->_lazyLoadAttribute($name);
+        }
+        // returned as reference
         return $value;
+    }
+    /**
+     * Magic set acessor.
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function __set($name, $value)
+    {
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected"); // FIXME remove when old code is validated
+        }
+        // Mutators
+        $mutator = 'set' . Str::studly($name) . 'Attribute';
+        if (method_exists($this, $mutator)) {
+            return $this->$mutator($value);
+        }
+        if (!empty($this->attributes['id_tipo'])) {
+            $column = array_search($name, $this->getAttributesAliases());
+            if ($column) {
+                $name = $column;
+            }
+        }
+        if (is_string($value)) {
+            $value = $this->getMutatedAttribute($name, $value);
+        }
+        $this->attributes[$name] = $value;
     }
     
     /**
@@ -125,88 +155,92 @@ class Record extends RecordAbstract implements Arrayable
     
     private function _lazyLoadAttribute($name)
     {
-        if ($this->id) {
-            // relationship
-            $relationships = $this->getType()->getRelationships();
-            if (isset($relationships[$name])) {
-                $related = $this->_loadRelationship($relationships, $name);
-
-                return $related; // returned as reference
-            }
-
-            // Lazy loading
-            $columns = $this->getColumns();
-            $aliases = $this->getAttributesAliases();
-            if (in_array($name, $columns) || in_array($name, $aliases)) {
-                if (class_exists('Debugbar')) {
-                    $caller = debug_backtrace(false, 2)[1];
-
-                    \Debugbar::warning('N+1 query: Attribute "'.$name.'" was not loaded for '
-                        .get_class($this)
-                        .' - ID: '.$this->id
-                        .' - File: '. $caller['file'] . ' - Line: ' . $caller['line']);
-                }
-
-                $attributes = array_intersect($columns, array_merge(
-                    $this->getAttributesNames(),
-                    $this->getAdminAttributes()
-                ));
-
-                $this->loadAttributes($attributes);
-                // Fixes lazy loading of fields that are not aliases
-                if (isset($aliases[$name])) {
-                    $name = $aliases[$name];
-                }
-                return $this->attributes[$name];
-            }
+        // relationships -> select and select_multi
+        $relationships = $this->getType()->getRelationships();
+        if (isset($relationships[$name])) {
+            $related = $this->_loadRelationship($relationships, $name);
+            return $related; // returned as reference
         }
+        if (!$this->id) {
+            return; // data below depends on an ID
+        }
+        // children most likely
+        if ($query = $this->_loadManyRelationship($name)) {
+            return $query->get();
+        }
+
+        // Lazy loading
+        $columns = $this->getColumns();
+        $aliases = $this->getAttributesAliases();
+        if (!in_array($name, $columns) && !in_array($name, $aliases)) {
+            return;
+        }
+        if (getenv('APP_DEBUG')) {
+            $caller = debug_backtrace(false, 2)[1];
+            \Log::notice('N+1 query: Loading attribute "'.$name.'".'.PHP_EOL.
+                '- Class: '.get_class($this).PHP_EOL.
+                '- ID: '.$this->id.PHP_EOL.
+                '- File: '.$caller['file'].' - Line: '.$caller['line']);
+        }
+
+        $attributes = array_intersect($columns, array_merge(
+            $this->getAttributesNames(),
+            $this->getAdminAttributes()
+        ));
+        $this->loadAttributes($attributes);
+        // Fixes lazy loading of fields that are aliases
+        if ($column = array_search($name, $aliases)) {
+            $name = $column;
+        }
+        return $this->attributes[$name];
     }
         
-    private function _loadRelationship($relationships, $name)
+    protected function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];
-
-        if ($data['special']) {
-            throw new Exception('Not implemented: '.$name);
-        }
-
+        // select_multi
         if ($data['multi']) {
-            if ($fks = $this->{$name.'_ids'}) {
-                $loaded = &$this->_loadedRelationships[$name.'_ids'];
-                if (!$loaded) {
-                    $loaded = (object) ['fks' => null];
-                }
-                if ($loaded->fks != $fks) {
-                    $loaded->fks = $fks;
-                    if ($data['type']) {
-                        $multi = [];
-                        foreach (array_filter(explode(',', $fks)) as $fk) {
-                            $multi[] = Type::getInstance($fk);
-                        }
-
-                        $loaded->values = $multi;
-                    } else {
-                        $loaded->values = $data['provider']->records()
-                            ->findMany(array_filter(explode(',', $fks)));
-                    }
-                }
-                return $loaded->values;
+            $fks = $this->{$name.'_ids'};
+            if (!$fks) {
+                return jp7_collect([]);
             }
-        } elseif ($fk = $this->{$name.'_id'}) {
-            $loaded = &$this->_loadedRelationships[$name.'_id'];
+            $loaded = &$this->_eagerLoad[$name];
             if (!$loaded) {
-                $loaded = (object) ['fk' => null];
+                $loaded = (object) ['fks' => null];
             }
-            if ($loaded->fk != $fk) {
-                $loaded->fk = $fk;
+            if ($loaded->fks != $fks) {
+                // stale data or not loaded
+                $loaded->fks = $fks;
+                $fksArray = array_filter(explode(',', $fks));
                 if ($data['type']) {
-                    $loaded->value = Type::getInstance($fk);
+                    $multi = jp7_collect([]);
+                    foreach ($fksArray as $fk) {
+                        $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                    }
+                    $loaded->values = $multi;
                 } else {
-                    $loaded->value = $data['provider']->records()->find($fk);
+                    $query = clone $data['query'];
+                    $loaded->values = $query->findMany($fksArray);
                 }
             }
-            return $loaded->value;
+            return $loaded->values;
         }
+        // select
+        $fk = $this->{$name.'_id'};
+        if (!$fk) {
+            return null;
+        }
+        $loaded = &$this->_eagerLoad[$name];
+        if (!$loaded || $loaded->id != $fk) {
+            /// stale data or not loaded
+            if ($data['type']) {
+                $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+            } else {
+                $query = clone $data['query'];
+                $loaded = $query->find($fk);
+            }
+        }
+        return $loaded;
     }
 
     public static function __callStatic($name, array $arguments)
@@ -228,11 +262,16 @@ class Record extends RecordAbstract implements Arrayable
             return new Query($type);
         }
     }
-
+    // called by EloquentUserProvider
+    public function newQuery()
+    {
+        return self::query();
+    }
+    
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
-            return Type::getInstance($id_tipo);
+            return Type::getInstance($id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
         }
     }
 
@@ -260,11 +299,11 @@ class Record extends RecordAbstract implements Arrayable
         } else {
             $class_name = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
             if (!$class_name) {
-                $class_name = isset($options['default_class']) ? $options['default_class'] : self::class;
+                $class_name = isset($options['default_class']) ? $options['default_class'] : static::DEFAULT_NAMESPACE.'Record';
             }
         }
 
-        $instance = new $class_name(['id' => $id]);
+        $instance = new $class_name(['id' => $id, 'id_tipo' => $tipo->id_tipo]);
         $instance->setType($tipo);
         $instance->setDb($tipo->getDb());
 
@@ -311,16 +350,8 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function __call($methodName, $args)
     {
-        // childName() - relacionamento
-        if ($child = $this->_findChild(ucfirst($methodName))) {
-            $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-            if (isset($this->_eagerLoad[$methodName])) {
-                return new EagerLoaded($childrenTipo, $this->_eagerLoad[$methodName]);
-            }
-
-            return new Query($childrenTipo);
-        } elseif ($methodName === 'arquivos' && $this->getType()->arquivos) {
-            return new Query\FileQuery($this);
+        if ($query = $this->_loadManyRelationship($methodName)) {
+            return $query;
         }
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
@@ -335,6 +366,22 @@ class Record extends RecordAbstract implements Arrayable
 
         throw new BadMethodCallException($message);
     }
+
+    protected function _loadManyRelationship($name)
+    {
+        // childName() - relacionamento
+        if ($child = $this->_findChild(ucfirst($name))) {
+            $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
+            if (isset($this->_eagerLoad[$name])) {
+                return new EagerLoaded($childrenTipo, $this->_eagerLoad[$name]);
+            }
+
+            return new Query($childrenTipo);
+        } elseif ($name === 'arquivos' && $this->getType()->arquivos) {
+            return new Query\FileQuery($this);
+        }
+    }
+
     /**
      * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
@@ -351,32 +398,20 @@ class Record extends RecordAbstract implements Arrayable
         if (empty($this->attributes['id_tipo'])) {
             $this->id_tipo = 0;
         }
-        
+        // Record::type() -> Classes that have name
         $tipo = static::type();
-        if (!$tipo || $this->id_tipo != $tipo->id_tipo) {
+        if (!$tipo || ($this->id_tipo && $this->id_tipo != $tipo->id_tipo)) {
+            // Anonymous classes or instance has different id_tipo
             if (!$this->id_tipo) {
-                $db = $this->getDb();
-                $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
-
-                $data = DB::table($table)
-                    ->select('id_tipo')
-                    ->where('id', $this->id)
-                    ->first();
-
-                if (!$data || !$data->id_tipo) {
-                    throw new Exception('Could not find id_tipo for record with id: ' . $this->id);
-                }
-
-                $this->id_tipo = $data->id_tipo;
+                // Instance was not brought from DB, id_tipo is empty
+                throw new UnexpectedValueException('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
             $tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
             ]);
         }
-        
         $this->setType($tipo);
-
         return $this->_tipo;
     }
 
@@ -387,7 +422,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function setType(Type $tipo = null)
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
     /**
@@ -503,12 +538,8 @@ class Record extends RecordAbstract implements Arrayable
      *
      * @deprecated
      */
-    public function getArquivos($deprecated, $options = [])
+    public function deprecated_getArquivos($options = [])
     {
-        if ($deprecated != self::DEPRECATED_METHOD) {
-            throw new Exception('Use arquivos()->get() instead.');
-        }
-
         $arquivos = [];
         if (isset($options['class'])) {
             $className = $options['class'];
@@ -559,7 +590,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_deleteArquivos($options = [])
     {
-        $arquivos = $this->getArquivos($options);
+        $arquivos = $this->deprecated_getArquivos($options);
         foreach ($arquivos as $arquivo) {
             $arquivo->delete();
         }
@@ -594,7 +625,7 @@ class Record extends RecordAbstract implements Arrayable
             $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
                 (($tag instanceof Record) ? $tag->id : 0).','.
-                (($tag instanceof Record) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo).')';
+                (($tag instanceof Record) ? $tag->id_tipo : $tag->id_tipo).')';
             if (!$db->Execute($sql)) {
                 throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
             }
@@ -624,14 +655,14 @@ class Record extends RecordAbstract implements Arrayable
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
-                    $tag_text = $tag_tipo->getFieldsValues('nome');
+                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type'])) {
+                    $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
                             'where' => ['id = '.$row->id],
                         ];
-                        if ($tag_registro = $tag_tipo->findFirst($options)) {
+                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
@@ -664,8 +695,8 @@ class Record extends RecordAbstract implements Arrayable
         return $this->char_key &&
             !$this->deleted &&
             ($this->parent_id || $this->publish || $s_session['preview'] || !config('interadmin.preview')) &&
-            strtotime($this->date_publish) <= Record::getTimestamp() &&
-            (strtotime($this->date_expire) >= Record::getTimestamp() || $this->date_expire == '0000-00-00 00:00:00');
+            $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
+            ($this->date_expire->getTimestamp() >= Record::getTimestamp() || $this->date_expire->format('Y') < 1);
     }
 
     /**
@@ -687,15 +718,7 @@ class Record extends RecordAbstract implements Arrayable
         // date_modify
         $this->date_modify = date('c');
 
-        return parent::save();
-    }
-
-    /**
-     * Saves without logs and triggers.
-     */
-    public function saveRaw()
-    {
-        return parent::save();
+        return $this->saveRaw();
     }
 
     public function generateSlug()
@@ -741,7 +764,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         return $this->getType()->getCampos();
     }
-    public function getCampoTipo($campo)
+    final public function getCampoTipo($campo)
     {
         return $this->getType()->getCampoTipo($campo);
     }
@@ -751,13 +774,7 @@ class Record extends RecordAbstract implements Arrayable
     }
     public function getTableName()
     {
-        if (empty($this->attributes['id_tipo'])) {
-            // Compatibilidade, tenta encontrar na tabela global
-            throw new Exception('Not implemented');
-            return $this->getDb()->getTablePrefix(). (isset($this->attributes['table']) ? $this->attributes['table'] : '');
-        } else {
-            return $this->getType()->getInterAdminsTableName();
-        }
+        return $this->getType()->getInterAdminsTableName();
     }
     /**
      * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
@@ -889,7 +906,7 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         $campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
-        $record = $campoTipo->findFirst([
+        $record = $campoTipo->deprecatedFindFirst([
             'where' => [$searchColumn." = '".$searchValue."'"],
         ]);
         if (starts_with($nomeCampo, 'select_multi_')) {
@@ -912,6 +929,32 @@ class Record extends RecordAbstract implements Arrayable
         $varchar_key_alias = $this->getType()->getCamposAlias('varchar_key');
 
         return $this->$varchar_key_alias;
+    }
+
+    /**
+     * Returns this object´s varchar_key and all the fields marked as 'combo', if the field
+     * is an InterAdmin such as a select_key, its getStringValue() method is used.
+     *
+     * @return string For the city 'Curitiba' with the field 'state' marked as 'combo' it would return: 'Curitiba - Paraná'.
+     */
+    public function getStringValue()
+    {
+        $camposCombo = $this->getType()->getCamposCombo();
+        if (!$camposCombo) {
+            return $this->id;
+        }
+        $stringValue = [];
+        foreach ($camposCombo as $campoCombo) {
+            $value = $this->$campoCombo;
+            if ($value instanceof FileField) {
+                continue;
+            } elseif ($value instanceof RecordAbstract) {
+                $value = $value->getStringValue();
+            }
+            $stringValue[] = $value;
+        }
+        
+        return implode(' - ', $stringValue);
     }
 
     public function toArray()
@@ -962,5 +1005,36 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return $fillable;
+    }
+
+    public function getRoute($action = 'index')
+    {
+        return $this->getType()->getRoute($action);
+    }
+
+    /**
+     * Parameters to be used with URL::route().
+     *
+     * @param array $variables
+     *
+     * @return array
+     */
+    public function getUrlParameters(array $variables)
+    {
+        $parameters = [];
+        $parent = $this;
+        foreach ($variables as $variable) {
+            if (!$parent = $parent->getParent()) {
+                break;
+            }
+            $parameters[] = $parent;
+        }
+
+        return $parameters;
+    }
+    
+    public function getUrl($action = 'show')
+    {
+        return RecordUrl::getRecordUrl($this, $action);
     }
 }

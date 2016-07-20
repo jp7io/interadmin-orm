@@ -29,6 +29,21 @@ class FuncField extends ColumnField
         return $response;
     }
     
+    protected function getDefaultValue()
+    {
+        if ($this->default) {
+            return $this->default;
+        }
+        if (isset($_POST[$this->tipo])) {
+            return $_POST[$this->tipo][0];
+        }
+    }
+    
+    public function getLabel()
+    {
+        return $this->label;
+    }
+    
     public function getEditTag()
     {
         $html = trim($this->getFuncHtml($this->getValue(), 'edit'));

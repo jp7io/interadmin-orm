@@ -3,12 +3,13 @@
 namespace Jp7\Laravel;
 
 use Exception;
+use ErrorException;
 
 trait WhoopsHandlerTrait
 {
     protected function convertExceptionToResponse(Exception $e)
     {
-        if (config('app.debug')) {
+        if (config('app.debug') && config('app.env') === 'local' && !$e instanceof ErrorException) {
             return $this->renderExceptionWithWhoops($e);
         }
         return parent::convertExceptionToResponse($e);
@@ -25,10 +26,6 @@ trait WhoopsHandlerTrait
     {
         $whoops = new \Whoops\Run;
         $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
-        return new \Illuminate\Http\Response(
-            $whoops->handleException($e),
-            $e->getStatusCode(),
-            $e->getHeaders()
-        );
+        return $whoops->handleException($e);
     }
 }

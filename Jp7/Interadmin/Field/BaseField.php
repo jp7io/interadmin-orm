@@ -4,7 +4,7 @@ namespace Jp7\Interadmin\Field;
 
 use HtmlObject\Element;
 use Former;
-use InterAdminTipo;
+use Jp7\Interadmin\Type;
 
 abstract class BaseField implements FieldInterface
 {
@@ -17,7 +17,7 @@ abstract class BaseField implements FieldInterface
      */
     protected $record;
     /**
-     * @var InterAdminTipo
+     * @var Type
      */
     protected $type;
     /**
@@ -31,7 +31,7 @@ abstract class BaseField implements FieldInterface
         $this->record = $record;
     }
     
-    public function setType(InterAdminTipo $type)
+    public function setType(Type $type)
     {
         $this->type = $type;
     }

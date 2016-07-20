@@ -18,39 +18,11 @@ class SelectMultiAjaxField extends SelectMultiField
             ->data_has_tipo($this->hasTipo());
     }
     
-    /**
-     * Returns only the current selected options, all the other options will be
-     * provided by the AJAX search
-     * @return array
-     * @throws Exception
-     */
     protected function getOptions()
     {
-        global $db;
-        if (!$value = $this->getValue()) {
-            return []; // evita query inutil
-        }
-        if (!$this->hasTipo()) {
-            $ids = jp7_explode(',', $value);
-            $records = $this->records()->whereIn('id', $ids)->all();
-            return $this->toOptions($records);
-        }
-        /*
-        if ($this->nome instanceof InterAdminTipo) {
-            return $this->getTipoOptions([
-                'parent_id_tipo = '.$this->nome->id_tipo,
-                'id_tipo IN ('.$value.')'
-            ]);
-        }
-        if ($this->nome === 'all') {
-            return $this->getTipoOptions([
-                'id_tipo IN ('.$value.')'
-            ]);
-        }
-        */
-        throw new UnexpectedValueException('Not implemented');
+        return $this->toOptions($this->getCurrentRecords());
     }
-    
+        
     public function getFilterTag()
     {
         $selectField = new SelectAjaxField($this->campo);
@@ -59,7 +31,7 @@ class SelectMultiAjaxField extends SelectMultiField
     }
 
     // We have more than one option selected, so we need to add the selected attribute to options
-    protected function toOptions(array $array)
+    protected function toOptions($array)
     {
         $options = [];
         foreach ($array as $record) {

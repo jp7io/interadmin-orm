@@ -2,7 +2,7 @@
 
 class InterAdminOptionsTipos extends InterAdminOptionsBase
 {
-    public function all()
+    public function get()
     {
         return InterAdminTipo::findTipos($this->options);
     }

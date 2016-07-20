@@ -28,7 +28,7 @@ class Jp7_Session_File
         global $c_jp7;
         if ($c_jp7 && !is_dir(static::$save_path)) {
             if (!mkdir(static::$save_path)) {
-                die(jp7_debug('Unable to create directory for session: '.self::$save_path));
+                jp7_debug('Unable to create directory for session: '.self::$save_path);
             }
         }
 

@@ -1,12 +1,5 @@
 <?php
 
-//ALTER TABLE `teste`.`interadmin_teste` DROP INDEX `search` ,
-//ADD FULLTEXT `search` (
-//`varchar_key` ,
-//`text_1` ,
-//`text_2`
-//)
-
 class Jp7_Interadmin_Search
 {
     private $booleanMode = false;
@@ -35,6 +28,7 @@ class Jp7_Interadmin_Search
     public function checkIndexes($exclude_tables = [])
     {
         global $db;
+        $executedSqls = [];
         $tables = array_diff($this->getTables(), $exclude_tables && is_array($exclude_tables) ? $exclude_tables : []);
         foreach ($tables as $table) {
             $indexes = $db->MetaIndexes($table);
@@ -48,14 +42,21 @@ class Jp7_Interadmin_Search
                     $index = $indexes['interadmin_search'];
                     if (!$index || array_full_diff($index['columns'], $textColumns)) {
                         $sql = $this->getIndexSql($table, $textColumns, $index);
-                        //krumo($sql);
+                        $executedSqls[] = $sql;
                         $db->Execute($sql);
                     }
                 }
             }
         }
+        return $executedSqls;
     }
-
+    
+    //ALTER TABLE `teste`.`interadmin_teste` DROP INDEX `search` ,
+    //ADD FULLTEXT `search` (
+    //`varchar_key` ,
+    //`text_1` ,
+    //`text_2`
+    //)
     public function getIndexSql($table, $columns, $drop = false)
     {
         $sql = 'ALTER TABLE '.$table.' '.
@@ -67,8 +68,6 @@ class Jp7_Interadmin_Search
 
     public function getSql($search, $date_filter, $exclude_tables = [])
     {
-        global $db;
-
         $tables = array_diff($this->getTables(), $exclude_tables);
         $sqls = [];
         foreach ($tables as $table) {
@@ -95,10 +94,9 @@ class Jp7_Interadmin_Search
         $tables = [];
         $tipos = InterAdminTipo::findTipos($options);
         foreach ($tipos as $tipo) {
-            $tables[] = $db_prefix.($tipo->tabela ? '_'.$tipo->tabela : '');
+            $tables[] = $db_prefix.'_'.($tipo->tabela ?: 'registros');
         }
         $tables[] = $db_prefix.'_tipos';
-
         return $tables;
     }
 
@@ -107,7 +105,7 @@ class Jp7_Interadmin_Search
      *
      * @param string $table
      * @param string $search
-     * @param bool   $count
+     * @param bool   $date_filter
      *
      * @return string
      */
@@ -142,6 +140,7 @@ class Jp7_Interadmin_Search
         $short_words = ['de', 'do', 'da', 'ao', 'em', 'no', 'na'];
 
         $where = [];
+        $matches = [];
         // Trata as aspas como uma palavra só
         preg_match_all('/-?"(?:\\\\.|[^\\\\"])*"|[^" ]+/', $search, $matches);
         $words = $matches[0];

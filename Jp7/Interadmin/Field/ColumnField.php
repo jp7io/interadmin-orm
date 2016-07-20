@@ -2,11 +2,11 @@
 
 namespace Jp7\Interadmin\Field;
 
-use Former;
+use Jp7\Interadmin\Type;
 
 /**
  * @property string $tipo
- * @property InterAdminTipo|string $nome
+ * @property Type|string $nome
  * @property string $ajuda
  * @property string|int $tamanho
  * @property string|bool $obrigatorio    'S' or ''
@@ -88,6 +88,7 @@ class ColumnField extends BaseField
         if ($this->ajuda) {
             $input->help($this->ajuda);
         }
+        // Title is just for information
         $input->getLabel()->setAttribute('title', $this->nome_id.' ('.$this->tipo.', xtra: '.$this->xtra.')');
         $input->onGroupAddClass($this->id);
         $input->onGroupAddClass($this->nome_id.'-group');

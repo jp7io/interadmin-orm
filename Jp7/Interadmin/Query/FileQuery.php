@@ -20,14 +20,14 @@ class FileQuery extends BaseQuery
 
     public function get()
     {
-        return $this->provider->getArquivos(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecated_getArquivos($this->options);
     }
 
     public function first()
     {
         $this->options['limit'] = 1;
 
-        return $this->provider->getArquivos(Record::DEPRECATED_METHOD, $this->options)->first();
+        return $this->provider->deprecated_getArquivos($this->options)->first();
     }
 
     public function build(array $attributes = [])

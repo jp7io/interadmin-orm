@@ -9,6 +9,9 @@ class Query extends Query\BaseQuery
 {
     protected $model = null;
 
+    /**
+     * @return Type
+     */
     public function type()
     {
         return $this->provider;
@@ -16,21 +19,23 @@ class Query extends Query\BaseQuery
 
     /**
      * Returns a instance with id 0, to get scopes, rules, and so on.
+     * 
+     * @return Record
      */
     public function getModel()
     {
         if (is_null($this->model)) {
-            if ($classname = $this->provider->getRecordClass()) {
-                $this->model = new $classname;
-                $this->model->setType($this->provider);
-            }
+            $defaultNamespace = constant(get_class($this->provider).'::DEFAULT_NAMESPACE');
+            $options = ['default_class' => $defaultNamespace.'Record'];
+            $this->model = Record::getInstance(0, $options, $this->provider);
         }
-
         return $this->model;
     }
 
     /**
      * Create a record without saving.
+     * 
+     * @return Record
      */
     public function build(array $attributes = [])
     {
@@ -39,6 +44,8 @@ class Query extends Query\BaseQuery
 
     /**
      * Create and save a record.
+     * 
+     * @return Record
      */
     public function create(array $attributes = [])
     {
@@ -47,6 +54,8 @@ class Query extends Query\BaseQuery
 
     /**
      * Set deleted = 'S' and update the records.
+     * 
+     * @return int
      */
     public function delete()
     {
@@ -149,13 +158,27 @@ class Query extends Query\BaseQuery
         return $this->provider->deprecatedFind($this->options);
     }
 
+    /**
+     * Get a single column's value from the first result of a query.
+     *
+     * @param  string  $column
+     * @return mixed
+     */
+    public function value($column)
+    {
+        $result = $this->select($column)->first();
+        if ($result) {
+            return $result->{$column};
+        }
+    }
+
     public function first()
     {
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->findFirst(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedFindFirst($this->options);
     }
 
     public function firstOrFail()
@@ -173,7 +196,7 @@ class Query extends Query\BaseQuery
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->count(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedCount($this->options);
     }
 
     /**
@@ -241,9 +264,8 @@ class Query extends Query\BaseQuery
         if (func_num_args() != 1) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 1.');
         }
-
         if (is_array($id)) {
-            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use all() instead of find().');
+            throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use get() instead of find().');
         }
 
         if (is_string($id) && !is_numeric($id)) {
@@ -252,7 +274,7 @@ class Query extends Query\BaseQuery
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
         }
 
-        return $this->provider->findFirst(Record::DEPRECATED_METHOD, $this->options);
+        return $this->provider->deprecatedFindFirst($this->options);
     }
 
     public function findMany($ids)

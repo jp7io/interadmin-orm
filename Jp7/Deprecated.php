@@ -679,18 +679,7 @@ class Jp7_Deprecated
             $meta_cols = $db->MetaColumns($table, false);
             foreach ($meta_cols as $meta) {
                 $name = $meta->name;
-                // Dates
-                if (strpos($meta->type, 'date') !== false) {
-                    $array[$var_prefix.$name] = $row->$name;
-                    $array[$var_prefix.$name.'_split'] = jp7_date_split($row->$name);
-                    $array[$var_prefix.$name.'_time'] = strtotime($row->$name);
-                } else {
-                    if ($jp7_app) {
-                        $array[$var_prefix.$name] = $row->$name;
-                    } else {
-                        $array[$var_prefix.$name] = $row->$name;
-                    }
-                }
+                $array[$var_prefix.$name] = $row->$name;
             }
         }
         $rs->Close();
