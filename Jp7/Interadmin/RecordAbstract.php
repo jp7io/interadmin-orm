@@ -381,8 +381,8 @@ abstract class RecordAbstract
             }
             if (isset($trace[$i]['file'])) {
                 $sql .= PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
-                \Log::info($sql);
             }
+            \Log::info($sql);
         }
             
         $rs = $db->select($sql);
@@ -707,11 +707,9 @@ abstract class RecordAbstract
                     $joinTipo = $this->getCampoTipo($campos[$nome]);
                 }
                 if ($joinTipo) {
-                    $wildcardPos = array_search('*', $fields[$join]);
-                    if ($wildcardPos !== false) {
-                        unset($fields[$join][$wildcardPos]);
-                        $fields[$join] = array_merge($fields[$join], $joinTipo->getCamposNames(), $joinTipo->getInterAdminsAdminAttributes());
-                    }
+                    $joinModel = Record::getInstance(0, ['default_class' => static::DEFAULT_NAMESPACE.'Record'], $joinTipo);
+                    $this->_resolveWildcard($fields[$join], $joinModel);
+                    
                     $joinOptions = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
@@ -739,13 +737,7 @@ abstract class RecordAbstract
             } else {
                 $nome = $this->_aliasToColumn($campo, $aliases);
                 if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-                    if (strpos($campo, 'file_') === 0) {
-                        // necessário para quando o parametro fields está sem alias, mas o retorno está com alias
-                        $file_campo = array_search($campo, $aliases);
-                    } else {
-                        $file_campo = $campo;
-                    }
-                    $fields[] = $table.$nome.'_text  AS `'.$file_campo.'.text`';
+                    $fields[] = $table.$nome.'_text';
                 }
 
                 $fields[$join] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
@@ -795,15 +787,8 @@ abstract class RecordAbstract
     protected function _getAttributesFromRow($row, $object, $options)
     {
         $campos = &$options['campos'];
-        $aliases = &$options['aliases'];
-        if (empty($options['fields_alias'])) {
-            $aliases = [];
-        }
-        if ($aliases) {
-            $fields = array_flip($aliases);
-        }
         $attributes = &$object->attributes;
-
+        
         foreach ($row as $key => $value) {
             $parts = explode('.', $key);
             if (count($parts) == 1) {
@@ -812,11 +797,11 @@ abstract class RecordAbstract
                 list($table, $field) = $parts;
             }
             if ($table == 'main') {
-                $alias = isset($aliases[$field]) ? $aliases[$field] : $field;
-                if (isset($attributes[$alias]) && is_object($attributes[$alias])) {
+                if (isset($attributes[$field]) && is_object($attributes[$field])) {
+                    dd('here'.__LINE__);
                     continue;
                 }
-                $attributes[$alias] = $object->getMutatedAttribute($field, $value);
+                $attributes[$field] = $object->getMutatedAttribute($field, $value);
                 /*
                 if (!empty($options['select_multi_fields'])) {
                     if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
@@ -828,42 +813,24 @@ abstract class RecordAbstract
                 }
                 */
             } else {
-                $joinAlias = '';
-                $join = isset($fields[$table]) ? $fields[$table] : $table;
-                $joinTipo = isset($campos[$join]) ? $this->getCampoTipo($campos[$join]) : null;
-
-                if (!$joinTipo) {
-                    if (isset($fields[$table.'_id'])) {
-                        $join = $fields[$table.'_id'];
-                        $joinTipo = $this->getCampoTipo($campos[$join]);
-                        if (!is_object(@$attributes[$table]) && $field === 'id' && $value) {
-                            $attributes[$table] = Record::getInstance($value, [], $joinTipo);
-                        }
-                    } elseif (!empty($options['joins'][$table])) {
-                        // $options['joins']
-                        list($_joinType, $joinTipo, $_on) = $options['joins'][$table];
-                        if (!is_object(@$attributes[$table])) {
-                            $attributes[$table] = Record::getInstance(0, [], $joinTipo);
-                        }
-                    }
-                }
-
-                if ($joinTipo) {
-                    $joinCampos = $joinTipo->getCampos();
-                    if ($joinTipo->id_tipo == '0') {
-                        $joinAlias = ''; // Tipos
+                $column = array_search($table.'_id', $options['aliases']);
+                $fk = $object->$column;
+                
+                $loaded = &$object->_eagerLoad[$table];
+                if (!$loaded || $loaded->id != $fk) {
+                    /// stale data or not loaded
+                    $relationships = $object->getType()->getRelationships();
+                    $data = $relationships[$table];
+                    
+                    if ($data['type']) {
+                        $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                     } else {
-                        $joinAlias = $joinTipo->getCamposAlias($field);
+                        $loaded = $data['query']->getModel();
+                        $loaded->id = $fk;
                     }
                 }
-
-                if (isset($attributes[$table]) && is_object($attributes[$table])) {
-                    $subobject = $attributes[$table];
-                    $alias = ($aliases && $joinAlias) ? $joinAlias : $field;
-                    if (isset($subobject->attributes[$alias]) && is_object($subobject->attributes[$alias])) {
-                        continue;
-                    }
-                    $subobject->$alias = $object->getMutatedAttribute($field, $value);
+                if ($loaded) {
+                    $loaded->attributes[$field] = $loaded->getMutatedAttribute($field, $value);
                 }
             }
         }
@@ -876,15 +843,19 @@ abstract class RecordAbstract
      */
     protected function _resolveWildcard(&$fields, RecordAbstract $object)
     {
-        if ($fields == '*') {
+        if ($fields === '*') {
             $fields = [$fields];
         }
-        if (is_array($fields) && in_array('*', $fields)) {
-            unset($fields[array_search('*', $fields)]);
-
-            $attributes = array_merge($object->getAttributesNames(), $object->getAdminAttributes());
-            $attributes = array_intersect($attributes, $object->getColumns());
-
+        if (!is_array($fields)) {
+            return;
+        }
+        $position = array_search('*', $fields);
+        if ($position !== false) {
+            unset($fields[$position]);
+            $attributes = array_intersect($object->getColumns(), array_merge(
+                $object->getAttributesNames(),
+                $object->getAdminAttributes()
+            ));
             $fields = array_merge($attributes, $fields);
         }
     }

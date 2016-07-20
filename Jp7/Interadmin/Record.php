@@ -36,7 +36,6 @@ class Record extends RecordAbstract implements Arrayable
      */
     protected $_tags;
 
-    protected $_loadedRelationships;
     protected $_eagerLoad;
 
     /**
@@ -78,34 +77,38 @@ class Record extends RecordAbstract implements Arrayable
     public function &__get($name)
     {
         $value = null;
-        if (array_key_exists($name, $this->attributes)) {
-            $value = &$this->attributes[$name];
-        } else {
-            $aliases = $this->getAttributesAliases();
-            // Fixes fields that have alias
-            if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
-                // alias is present, column requested
-                $name = $aliases[$name];
-                $value = &$this->attributes[$name];
-            } elseif (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
-                // column is present, alias requested
-                $name = array_search($name, $aliases);
-                $value = &$this->attributes[$name];
-            } else {
-                // returned as reference
-                $value = $this->_lazyLoadAttribute($name);
-            }
-            if ($name === 'attributes') {
-                throw new Exception("attributes is protected");
-            }
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected");
         }
         // Mutators
         if ($name !== 'id') {
-            $mutator = 'get' . Str::studly($name) . 'Attribute';
+            $mutator = 'get'.Str::studly($name).'Attribute';
             if (method_exists($this, $mutator)) {
                 $value = $this->$mutator($value);
+                dd($mutator);
+                return $value;
             }
         }
+        if (array_key_exists($name, $this->attributes)) {
+            $value = &$this->attributes[$name];
+            return $value;
+        }
+        $aliases = $this->getAttributesAliases();
+        // Fixes fields that have alias
+        if (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
+            // column is present, alias requested
+            $name = array_search($name, $aliases);
+            $value = &$this->attributes[$name];
+        } elseif (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+            dd($name, $this);
+            throw new Exception('I should not have aliases set');
+            // alias is present, column requested
+            $name = $aliases[$name];
+            $value = &$this->attributes[$name];
+        } else {
+            $value = $this->_lazyLoadAttribute($name);
+        }
+        // returned as reference
         return $value;
     }
     /**
@@ -119,17 +122,19 @@ class Record extends RecordAbstract implements Arrayable
         if ($name === 'attributes') {
             throw new Exception("attributes is protected"); // FIXME remove when old code is validated
         }
+        // Mutators
         $mutator = 'set' . Str::studly($name) . 'Attribute';
         if (method_exists($this, $mutator)) {
             return $this->$mutator($value);
         }
-        if (is_string($value)) {
-            if (empty($this->attributes['id_tipo'])) {
-                $column = $name;
-            } else {
-                $column = array_search($name, $this->getAttributesAliases()) ?: $name;
+        if (!empty($this->attributes['id_tipo'])) {
+            $column = array_search($name, $this->getAttributesAliases());
+            if ($column) {
+                $name = $column;
             }
-            $value = $this->getMutatedAttribute($column, $value);
+        }
+        if (is_string($value)) {
+            $value = $this->getMutatedAttribute($name, $value);
         }
         $this->attributes[$name] = $value;
     }
@@ -156,7 +161,6 @@ class Record extends RecordAbstract implements Arrayable
         $relationships = $this->getType()->getRelationships();
         if (isset($relationships[$name])) {
             $related = $this->_loadRelationship($relationships, $name);
-
             return $related; // returned as reference
         }
         if (!$this->id) {
@@ -185,11 +189,10 @@ class Record extends RecordAbstract implements Arrayable
             $this->getAttributesNames(),
             $this->getAdminAttributes()
         ));
-
         $this->loadAttributes($attributes);
-        // Fixes lazy loading of fields that are not aliases
-        if (isset($aliases[$name])) {
-            $name = $aliases[$name];
+        // Fixes lazy loading of fields that are aliases
+        if ($column = array_search($name, $aliases)) {
+            $name = $column;
         }
         return $this->attributes[$name];
     }
@@ -203,11 +206,12 @@ class Record extends RecordAbstract implements Arrayable
             if (!$fks) {
                 return jp7_collect([]);
             }
-            $loaded = &$this->_loadedRelationships[$name.'_ids'];
+            $loaded = &$this->_eagerLoad[$name];
             if (!$loaded) {
                 $loaded = (object) ['fks' => null];
             }
             if ($loaded->fks != $fks) {
+                // stale data or not loaded
                 $loaded->fks = $fks;
                 $fksArray = array_filter(explode(',', $fks));
                 if ($data['type']) {
@@ -228,20 +232,17 @@ class Record extends RecordAbstract implements Arrayable
         if (!$fk) {
             return null;
         }
-        $loaded = &$this->_loadedRelationships[$name.'_id'];
-        if (!$loaded) {
-            $loaded = (object) ['fk' => null];
-        }
-        if ($loaded->fk != $fk) {
-            $loaded->fk = $fk;
+        $loaded = &$this->_eagerLoad[$name];
+        if (!$loaded || $loaded->id != $fk) {
+            /// stale data or not loaded
             if ($data['type']) {
-                $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
             } else {
                 $query = clone $data['query'];
-                $loaded->value = $query->find($fk);
+                $loaded = $query->find($fk);
             }
         }
-        return $loaded->value;
+        return $loaded;
     }
 
     public static function __callStatic($name, array $arguments)

@@ -278,12 +278,13 @@ class Type extends RecordAbstract
         if ($options['eager_load']) {
             foreach ($options['eager_load'] as $relationshipData) {
                 if ($relationshipData['type'] == 'select') {
+                    // Any eager load level missing?
                     if ($relationshipData['levels']) {
                         $selects = [];
-                        $property = $relationshipData['name'];
+                        $attribute = $relationshipData['name'];
                         foreach ($records as $item) {
-                            if ($item->$property) {
-                                $selects[] = $item->$property;
+                            if ($item->$attribute) {
+                                $selects[] = $item->$attribute;
                             }
                         }
                         CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
@@ -953,12 +954,12 @@ class Type extends RecordAbstract
 
         if (isset($relationships[$relationship])) {
             $data = $relationships[$relationship];
-
             return [
                 'type' => 'select',
                 'tipo' => $data['query']->type(),
                 'name' => $relationship,
                 'alias' => true,
+                'multi' => $data['multi']
             ];
         }
         // As children
@@ -969,6 +970,7 @@ class Type extends RecordAbstract
                 'tipo' => $childrenTipo,
                 'name' => $relationship,
                 'alias' => true,
+                'multi' => true
             ];
         }
         // As method
@@ -1173,7 +1175,10 @@ class Type extends RecordAbstract
                     if ($relationshipData['type'] === 'select') {
                         // select.* - Esse carregamento é feito com join para aproveitar código existente
                         // E também porque join é mais rápido para hasOne() do que um novo select
-                        $options['fields'][$levels[0]] = ['*'];
+                        if (!$relationshipData['multi']) {
+                            // select_multi resolve eager_load depois no _loadRelationship()
+                            $options['fields'][$levels[0]] = ['*'];
+                        }
                         array_shift($levels);
                     }
                     $options['eager_load'][] = $relationshipData + [

@@ -25,12 +25,10 @@ class Query extends Query\BaseQuery
     public function getModel()
     {
         if (is_null($this->model)) {
-            if ($classname = $this->provider->getRecordClass()) {
-                $this->model = new $classname;
-                $this->model->setType($this->provider);
-            }
+            $defaultNamespace = constant(get_class($this->provider).'::DEFAULT_NAMESPACE');
+            $options = ['default_class' => $defaultNamespace.'Record'];
+            $this->model = Record::getInstance(0, $options, $this->provider);
         }
-
         return $this->model;
     }
 
