@@ -137,7 +137,8 @@ class FormerExtension
 
         // Set label
         if (!Lang::has('validation.attributes.'.$alias)) {
-            $label = FieldUtil::getCampoHeader($campo);
+            // FIXME FieldUtil::getCampoHeader roda funcoes special_
+            $label = $campo['label'] ?: FieldUtil::getCampoHeader($campo);
             $field->label($label);
         }
 
