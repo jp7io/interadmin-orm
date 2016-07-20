@@ -26,7 +26,7 @@ trait Downloadable
     public function getUrl($template = 'original')
     {
         $config = config('interadmin.storage');
-        $storageUrl = 'http://'.$config['host'].$config['path'];
+        $storageUrl = 'https://'.$config['host'].$config['path'];
         
         // '../..' => 'http://www.example.com'
         $url = replace_prefix($config['backend_path'], $storageUrl, $this->url);
