@@ -826,6 +826,7 @@ abstract class RecordAbstract
                         $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
                     } else {
                         $loaded = $data['query']->getModel();
+                        $loaded->id = $fk;
                     }
                 }
                 if ($loaded) {
