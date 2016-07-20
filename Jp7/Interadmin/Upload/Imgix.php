@@ -1,7 +1,5 @@
 <?php
 
-use League\Uri\Schemes\Http as Uri;
-
 class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
 {
 
@@ -10,16 +8,15 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
     {
         global $config;
 
-        $uri = Uri::createFromString($this->url($path));
-    
-        $uri->setHost($config->imgix['host']);
-
-        $params = $config->imgix['templates'][$template];
+        $url = $this->url($path);
         
+        // Replace host
+        $url = $this->setHost($url, $config->imgix['host']);
+        
+        $params = $config->imgix['templates'][$template];
         if ($params) {
-            $uri->getQuery()->modify($params);
+            $url = $this->mergeQuery($url, $params);
         }
-
-        return (string) $uri;
+        return (string) $url;
     }
 }

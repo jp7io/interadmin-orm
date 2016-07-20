@@ -1,7 +1,5 @@
 <?php
 
-use League\Uri\Schemes\Http as Uri;
-
 class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
 {
     public static $templates = [
@@ -11,13 +9,12 @@ class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
     // $config->url/upload/bla/123?size=40x40
     public function imageUrl($path, $template)
     {
-        $url = Uri::createFromString($this->url($path));
+        $url = $this->url($path);
 
         $template = self::$templates[$template];
-
-        $url->getQuery()->modify(['size' => $template]);
+        
+        $url = $this->mergeQuery($url, ['size' => $template]);
         
         return (string) $url;
     }
 }
-
