@@ -85,7 +85,6 @@ class Record extends RecordAbstract implements Arrayable
             $mutator = 'get'.Str::studly($name).'Attribute';
             if (method_exists($this, $mutator)) {
                 $value = $this->$mutator($value);
-                dd($mutator);
                 return $value;
             }
         }
@@ -100,11 +99,10 @@ class Record extends RecordAbstract implements Arrayable
             $name = array_search($name, $aliases);
             $value = &$this->attributes[$name];
         } elseif (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
-            dd($name, $this);
-            throw new Exception('I should not have aliases set');
+            throw new UnexpectedValueException('$this->attributes must not use alias');
             // alias is present, column requested
-            $name = $aliases[$name];
-            $value = &$this->attributes[$name];
+            // $name = $aliases[$name];
+            // $value = &$this->attributes[$name];
         } else {
             $value = $this->_lazyLoadAttribute($name);
         }

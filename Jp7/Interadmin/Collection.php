@@ -27,16 +27,6 @@ class Collection extends BaseCollection
         return new self($subitems);
     }
 
-    /**
-     * Just like ->lists(), but chainable.
-     * @deprecated
-     */
-    public function collect($value, $key = null)
-    {
-        dd('replace it with lists()');
-        return new self(array_pluck($this->items, $value, $key));
-    }
-
     public function split($parts)
     {
         $size = ceil(count($this) / $parts);

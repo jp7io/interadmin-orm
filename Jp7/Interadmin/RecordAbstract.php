@@ -798,7 +798,7 @@ abstract class RecordAbstract
             }
             if ($table == 'main') {
                 if (isset($attributes[$field]) && is_object($attributes[$field])) {
-                    dd('here'.__LINE__);
+                    throw new UnexpectedValueException('relations and attributes are separate things now');
                     continue;
                 }
                 $attributes[$field] = $object->getMutatedAttribute($field, $value);
