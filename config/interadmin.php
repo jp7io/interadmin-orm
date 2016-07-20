@@ -1,6 +1,6 @@
 <?php
 
-$defaultAppHost = str_replace('http://', '', config('app.url'));
+$defaultAppHost = parse_url(config('app.url'), PHP_URL_HOST);
 
 return [
     // Prefix of the class: Client_Record, Client_Type
@@ -15,6 +15,7 @@ return [
         'path' => '',
         // Storage HOST
         'host' => env('STORAGE_HOST', $defaultAppHost),
+        'scheme' => 'https',
     ],
     // Which host Interadmin can be found on
     'host' => env('INTERADMIN_HOST', 'interadmin.jp7.com.br')
