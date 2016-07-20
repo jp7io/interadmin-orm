@@ -36,7 +36,6 @@ class Record extends RecordAbstract implements Arrayable
      */
     protected $_tags;
 
-    protected $_loadedRelationships;
     protected $_eagerLoad;
 
     /**
@@ -207,11 +206,12 @@ class Record extends RecordAbstract implements Arrayable
             if (!$fks) {
                 return jp7_collect([]);
             }
-            $loaded = &$this->_loadedRelationships[$name.'_ids'];
+            $loaded = &$this->_eagerLoad[$name];
             if (!$loaded) {
                 $loaded = (object) ['fks' => null];
             }
             if ($loaded->fks != $fks) {
+                // stale data or not loaded
                 $loaded->fks = $fks;
                 $fksArray = array_filter(explode(',', $fks));
                 if ($data['type']) {
@@ -232,20 +232,17 @@ class Record extends RecordAbstract implements Arrayable
         if (!$fk) {
             return null;
         }
-        $loaded = &$this->_loadedRelationships[$name.'_id'];
-        if (!$loaded) {
-            $loaded = (object) ['fk' => null];
-        }
-        if ($loaded->fk != $fk) {
-            $loaded->fk = $fk;
+        $loaded = &$this->_eagerLoad[$name];
+        if (!$loaded || $loaded->id != $fk) {
+            /// stale data or not loaded
             if ($data['type']) {
-                $loaded->value = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
             } else {
                 $query = clone $data['query'];
-                $loaded->value = $query->find($fk);
+                $loaded = $query->find($fk);
             }
         }
-        return $loaded->value;
+        return $loaded;
     }
 
     public static function __callStatic($name, array $arguments)

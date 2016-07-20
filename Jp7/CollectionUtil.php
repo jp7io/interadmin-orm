@@ -62,23 +62,26 @@ class CollectionUtil
             return false;
         }
         $model = reset($records);
-
         if ($data = $model->getType()->getRelationshipData($relationship)) {
             if ($data['type'] == 'select') {
                 // select.id = record.select_id
-                $indexed = self::separate($records, $relationship.'.id');
-
+                $idsMap = [];
+                foreach ($records as $record) {
+                    $alias = $relationship.'_id';
+                    if (!isset($idsMap[$record->$alias])) {
+                        $idsMap[$record->$alias] = [];
+                    }
+                    $idsMap[$record->$alias][] = $record;
+                }
+                
                 $rows = $data['tipo']
                     ->records()
-                    ->whereIn('id', array_keys($indexed))
+                    ->whereIn('id', array_keys($idsMap))
                     ->get();
-
-                if ($relationships) {
-                    self::eagerLoad($rows, $relationships);
-                }
+                
                 foreach ($rows as $row) {
-                    foreach ($indexed[$row->id] as $record) {
-                        $record->$relationship = $row;
+                    foreach ($idsMap[$row->id] as $record) {
+                        $record->setEagerLoad($relationship, $row);
                     }
                     unset($row);
                 }
