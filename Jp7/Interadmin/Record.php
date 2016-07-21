@@ -776,6 +776,17 @@ class Record extends RecordAbstract implements Arrayable
     {
         return $this->getType()->getInterAdminsTableName();
     }
+    public function getAliasedAttributes()
+    {
+        $return = [];
+        $aliases = $this->getAttributesAliases();
+        foreach ($this->attributes as $column => $value) {
+            $alias = isset($aliases[$column]) ? $aliases[$column] : $column;
+            $return[$alias] = $value;
+        }
+        return $return;
+    }
+    
     /**
      * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
      * applications and 'site' otherwise.
