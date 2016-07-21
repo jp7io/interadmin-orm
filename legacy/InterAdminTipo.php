@@ -355,4 +355,9 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $this->setRawAttributes($attributes);
         $this->_update($attributes);
     }
+    
+    public function getUrl()
+    {
+        return RecordUrl::getTypeUrl($this);
+    }
 }
