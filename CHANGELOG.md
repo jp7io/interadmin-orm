@@ -1,11 +1,11 @@
 ## master
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
 * Changes to projects which used InterAdmin/InterAdminTipo:
-** InterAdmin::__construct receives an array now
-** Calling select_* without alias won't bring objects
-** ->attributes is not public anymore
-** ->getCampoTipo() call only be overwritten on a Type
-** Replace setFieldsValues -> updateAttributes
+ * InterAdmin::__construct receives an array now
+ * Calling select_* without alias won't bring objects
+ * ->attributes is not public anymore
+ * ->getCampoTipo() call only be overwritten on a Type
+ * Replace setFieldsValues -> updateAttributes
 
 ## 2.7
 * Branch laravel was reintegrated to master
