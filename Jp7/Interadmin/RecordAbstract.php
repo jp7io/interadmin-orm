@@ -192,7 +192,7 @@ abstract class RecordAbstract
         }
         foreach ($fillable as $name) {
             if (isset($attributes[$name])) {
-                $this->attributes[$name] = $attributes[$name];
+                $this->$name = $attributes[$name];
             }
         }
 
