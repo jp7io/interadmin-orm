@@ -7,6 +7,7 @@
  * ->getCampoTipo() call only be overwritten on a Type
  * Replace setFieldsValues() -> updateAttributes()
  * Fields are eager and lazy loaded, ->getFieldsValues() and getByAlias() are not needed anymore
+ * Auto-generated alias are in snake_case now. To use old aliases you must manually define them (if not set yet)
 * Changes to projects which used Jp7/Interadmin/Record:
  * Attributes are stored internally without alias / use getAliasedAttributes() if needed
 
