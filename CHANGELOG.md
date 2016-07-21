@@ -8,6 +8,7 @@
  * Replace setFieldsValues() -> updateAttributes()
  * Fields are eager and lazy loaded, ->getFieldsValues() and getByAlias() are not needed anymore
  * Default aliases are generated in snake_case now (if empty). To use old aliases you must manually define them.
+ * ORM depends on new configuration: /config/interadmin.php and /resources/lang/pt-BR/interadmin.php
 * Changes to projects which used Jp7/Interadmin/Record:
  * Attributes are stored internally without alias / use getAliasedAttributes() if needed
 
