@@ -2,10 +2,13 @@
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
 * Changes to projects which used InterAdmin/InterAdminTipo:
  * InterAdmin::__construct receives an array now
- * Calling select_* without alias won't bring objects: relationFromColumn() can be used if the alias is not known
- * ->attributes is not public anymore
+ * Calling select_* without alias won't bring objects: ->relationFromColumn() can be used if the alias is not known
+ * ->attributes is not public anymore - Use ->getAttributes()
  * ->getCampoTipo() call only be overwritten on a Type
- * Replace setFieldsValues -> updateAttributes
+ * Replace setFieldsValues() -> updateAttributes()
+ * Fields are eager and lazy loaded, ->getFieldsValues() and getByAlias() are not needed anymore
+* Changes to projects which used Jp7/Interadmin/Record:
+ * Attributes are stored internally without alias / use getAliasedAttributes() if needed
 
 ## 2.7
 * Branch laravel was reintegrated to master
