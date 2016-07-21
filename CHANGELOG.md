@@ -1,4 +1,13 @@
 ## master
+* Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
+* Changes to projects which used InterAdmin/InterAdminTipo:
+** InterAdmin::__construct receives an array now
+** Calling select_* without alias won't bring objects
+** ->attributes is not public anymore
+** ->getCampoTipo() call only be overwritten on a Type
+** Replace setFieldsValues -> updateAttributes
+
+## 2.7
 * Branch laravel was reintegrated to master
 * Dependencies removed from classes, each client must require them as needed:
  * "zendframework/zendframework1": "1.12.0"
@@ -24,4 +33,4 @@
  * Change config suffix in resources/lang/en/interadmin.php from \_en to en\_
 
 ## 2.6
-* TODO
+* ...
