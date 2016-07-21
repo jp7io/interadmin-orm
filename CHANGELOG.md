@@ -2,7 +2,7 @@
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
 * Changes to projects which used InterAdmin/InterAdminTipo:
  * InterAdmin::__construct receives an array now
- * Calling select_* without alias won't bring objects (relationFromColumn() can be used if the alias is unknown)
+ * Calling select_* without alias won't bring objects: relationFromColumn() can be used if the alias is not known
  * ->attributes is not public anymore
  * ->getCampoTipo() call only be overwritten on a Type
  * Replace setFieldsValues -> updateAttributes
