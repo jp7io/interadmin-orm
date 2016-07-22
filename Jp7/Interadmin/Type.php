@@ -130,11 +130,7 @@ class Type extends RecordAbstract
             $classTipo = TypeClassMap::getInstance()->getClass($id_tipo);
             if (!$classTipo) {
                 if (isset($options['default_namespace'])) {
-                    if (class_exists($options['default_namespace'].'InterAdminTipo')) {
-                        $classTipo = $options['default_namespace'].'InterAdminTipo';
-                    } else {
-                        $classTipo = $options['default_namespace'].'Type';
-                    }
+                    $classTipo = $options['default_namespace'].'Type';
                 } else {
                     $classTipo = self::$_defaultClass;
                 }

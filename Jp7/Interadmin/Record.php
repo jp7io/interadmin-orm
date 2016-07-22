@@ -310,7 +310,7 @@ class Record extends RecordAbstract implements Arrayable
      *
      * @return Record Returns an Record or a child class in case it's defined on the 'class' property of its Type.
      */
-    public static function getInstance($id, $options = [], Type $tipo)
+    public static function getInstance($id, $options, Type $tipo)
     {
         // Classe foi forçada
         if (isset($options['class'])) {
@@ -318,15 +318,7 @@ class Record extends RecordAbstract implements Arrayable
         } else {
             $className = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
             if (!$className) {
-                if (isset($options['default_namespace'])) {
-                    if (class_exists($options['default_namespace'].'InterAdmin')) {
-                        $className = $options['default_namespace'].'InterAdmin';
-                    } else {
-                        $className = $options['default_namespace'].'Record';
-                    }
-                } else {
-                    $className = static::DEFAULT_NAMESPACE.'Record';
-                }
+                $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
         }
 
