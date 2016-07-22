@@ -52,7 +52,7 @@ class FileRecord extends RecordAbstract
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
-                kd('not implemented');
+                kd('no id_tipo, not implemented');
                 $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
             }
             $this->_tipo = Type::getInstance($this->id_tipo, [

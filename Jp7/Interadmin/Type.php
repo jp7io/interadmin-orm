@@ -129,7 +129,15 @@ class Type extends RecordAbstract
             // Classe não foi forçada, verificar classMap
             $classTipo = TypeClassMap::getInstance()->getClass($id_tipo);
             if (!$classTipo) {
-                $classTipo = isset($options['default_class']) ? $options['default_class'] : self::$_defaultClass;
+                if (isset($options['default_namespace'])) {
+                    if (class_exists($options['default_namespace'].'InterAdminTipo')) {
+                        $classTipo = $options['default_namespace'].'InterAdminTipo';
+                    } else {
+                        $classTipo = $options['default_namespace'].'Type';
+                    }
+                } else {
+                    $classTipo = self::$_defaultClass;
+                }
             }
         }
         // Classe foi encontrada, instanciar o objeto
@@ -163,7 +171,7 @@ class Type extends RecordAbstract
             return $this->_parent;
         }
         if ($this->parent_id_tipo) {
-            $options['default_class'] = static::DEFAULT_NAMESPACE.'Type';
+            $options['default_namespace'] = static::DEFAULT_NAMESPACE;
 
             return $this->_parent = self::getInstance($this->parent_id_tipo, $options);
         }
@@ -226,7 +234,7 @@ class Type extends RecordAbstract
                 $tipo = self::getInstance($row->id_tipo, [
                     'db' => $this->_db,
                     'class' => isset($options['class']) ? $options['class'] : null,
-                    'default_class' => static::DEFAULT_NAMESPACE.'Type',
+                    'default_namespace' => static::DEFAULT_NAMESPACE,
                 ]);
                 $tipo->setParent($this);
                 $this->_getAttributesFromRow($row, $tipo, $options);
@@ -421,8 +429,7 @@ class Type extends RecordAbstract
     {
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
-                $className = static::DEFAULT_NAMESPACE.'Type';
-                $model = new $className($this->model_id_tipo);
+                $model = Type::getInstance($this->model_id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
                 $model = new $className();
@@ -461,7 +468,7 @@ class Type extends RecordAbstract
                         $id_tipo = $A[$parameters[0]]['nome'];
                         $A[$parameters[0]]['nome'] = self::getInstance($id_tipo, [
                             'db' => $this->_db,
-                            'default_class' => static::DEFAULT_NAMESPACE.'Type',
+                            'default_namespace' => static::DEFAULT_NAMESPACE,
                         ]);
                     }
                 }
@@ -943,7 +950,7 @@ class Type extends RecordAbstract
 
             return self::getInstance($id_tipo, [
                 'db' => $this->_db,
-                'default_class' => static::DEFAULT_NAMESPACE.'Type',
+                'default_namespace' => static::DEFAULT_NAMESPACE,
             ]);
         }
     }
@@ -974,7 +981,7 @@ class Type extends RecordAbstract
             ];
         }
         // As method
-        $optionsInstance = ['default_class' => static::DEFAULT_NAMESPACE.'Record'];
+        $optionsInstance = ['default_namespace' => static::DEFAULT_NAMESPACE];
         $recordModel = Record::getInstance(0, $optionsInstance, $this);
         if (method_exists($recordModel, $relationship)) {
             return $recordModel->$relationship()->getRelationshipData();
@@ -991,7 +998,7 @@ class Type extends RecordAbstract
      */
     public function deprecated_createInterAdmin(array $attributes = [])
     {
-        $options = ['default_class' => static::DEFAULT_NAMESPACE.'Record'];
+        $options = ['default_namespace' => static::DEFAULT_NAMESPACE];
         $record = Record::getInstance(0, $options, $this);
         if ($mostrar = $this->getCamposAlias('char_key')) {
             $record->$mostrar = 'S';
@@ -1027,7 +1034,7 @@ class Type extends RecordAbstract
             ];
             $rs = $this->_executeQuery($options2);
 
-            $options['default_class'] = static::DEFAULT_NAMESPACE.'Type';
+            $options['default_namespace'] = static::DEFAULT_NAMESPACE;
             $this->_tiposUsingThisModel = [];
             foreach ($rs as $row) {
                 $this->_tiposUsingThisModel[$row->id_tipo] = Type::getInstance($row->id_tipo, $options);
@@ -1130,7 +1137,7 @@ class Type extends RecordAbstract
 
         $optionsInstance = [
             'class' => isset($options['class']) ? $options['class'] : null,
-            'default_class' => static::DEFAULT_NAMESPACE.'Record',
+            'default_namespace' => static::DEFAULT_NAMESPACE,
         ];
 
         $recordModel = Record::getInstance(0, $optionsInstance, $this);
@@ -1224,7 +1231,7 @@ class Type extends RecordAbstract
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $type = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+            $type = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
 
             $record = Record::getInstance($row->id, $optionsInstance, $type);
             $this->_getAttributesFromRow($row, $record, $options);

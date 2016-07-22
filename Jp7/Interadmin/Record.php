@@ -234,7 +234,7 @@ class Record extends RecordAbstract implements Arrayable
                 if ($data['type']) {
                     $multi = jp7_collect([]);
                     foreach ($fksArray as $fk) {
-                        $multi[] = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                        $multi[] = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     }
                     $loaded->values = $multi;
                 } else {
@@ -253,7 +253,7 @@ class Record extends RecordAbstract implements Arrayable
         if (!$loaded || $loaded->id != $fk) {
             /// stale data or not loaded
             if ($data['type']) {
-                $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
             } else {
                 $query = clone $data['query'];
                 $loaded = $query->find($fk);
@@ -290,7 +290,7 @@ class Record extends RecordAbstract implements Arrayable
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
-            return Type::getInstance($id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+            return Type::getInstance($id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
         }
     }
 
@@ -314,15 +314,23 @@ class Record extends RecordAbstract implements Arrayable
     {
         // Classe foi forçada
         if (isset($options['class'])) {
-            $class_name = $options['class'];
+            $className = $options['class'];
         } else {
-            $class_name = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
-            if (!$class_name) {
-                $class_name = isset($options['default_class']) ? $options['default_class'] : static::DEFAULT_NAMESPACE.'Record';
+            $className = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
+            if (!$className) {
+                if (isset($options['default_namespace'])) {
+                    if (class_exists($options['default_namespace'].'InterAdmin')) {
+                        $className = $options['default_namespace'].'InterAdmin';
+                    } else {
+                        $className = $options['default_namespace'].'Record';
+                    }
+                } else {
+                    $className = static::DEFAULT_NAMESPACE.'Record';
+                }
             }
         }
 
-        $instance = new $class_name(['id' => $id, 'id_tipo' => $tipo->id_tipo]);
+        $instance = new $className(['id' => $id, 'id_tipo' => $tipo->id_tipo]);
         $instance->setType($tipo);
         $instance->setDb($tipo->getDb());
 
@@ -508,7 +516,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function getChildrenTipo($id_tipo, $options = [])
     {
-        $options['default_class'] = static::DEFAULT_NAMESPACE.'Type';
+        $options['default_namespace'] = static::DEFAULT_NAMESPACE;
         $childrenTipo = Type::getInstance($id_tipo, $options);
         $childrenTipo->setParent($this);
 
@@ -682,7 +690,7 @@ class Record extends RecordAbstract implements Arrayable
 
             $this->_tags = [];
             while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_class' => static::DEFAULT_NAMESPACE.'Type'])) {
+                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE])) {
                     $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [

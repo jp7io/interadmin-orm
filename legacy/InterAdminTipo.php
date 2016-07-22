@@ -293,7 +293,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
      */
     public function createInterAdmin(array $attributes = [])
     {
-        $options = ['default_class' => static::DEFAULT_NAMESPACE.'Record'];
+        $options = ['default_namespace' => static::DEFAULT_NAMESPACE];
         $record = Record::getInstance(0, $options, $this);
         if ($mostrar = $this->getCamposAlias('char_key')) {
             $record->$mostrar = 'S';

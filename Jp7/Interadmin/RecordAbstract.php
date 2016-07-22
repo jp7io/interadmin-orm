@@ -148,7 +148,11 @@ abstract class RecordAbstract
             return new \Date($value);
         }
         if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
-            $class_name = static::DEFAULT_NAMESPACE.'FileField';
+            if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
+                $class_name = static::DEFAULT_NAMESPACE.'InterAdminFieldFile';
+            } else {
+                $class_name = static::DEFAULT_NAMESPACE.'FileField';
+            }
             if (!class_exists($class_name)) {
                 $class_name = 'Jp7\\Interadmin\\FileField';
             }
@@ -489,7 +493,7 @@ abstract class RecordAbstract
                         // Children
                         $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db' => $this->_db,
-                            'default_class' => static::DEFAULT_NAMESPACE.'Type',
+                            'default_namespace' => static::DEFAULT_NAMESPACE,
                         ]);
 
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
@@ -557,7 +561,7 @@ abstract class RecordAbstract
                     if (isset($childrenArr[$joinNome]) || isset($childrenArr[$joinNome])) {
                         $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db' => $this->_db,
-                            'default_class' => static::DEFAULT_NAMESPACE.'Type',
+                            'default_namespace' => static::DEFAULT_NAMESPACE,
                         ]);
 
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
@@ -707,7 +711,7 @@ abstract class RecordAbstract
                     $joinTipo = $this->getCampoTipo($campos[$nome]);
                 }
                 if ($joinTipo) {
-                    $joinModel = Record::getInstance(0, ['default_class' => static::DEFAULT_NAMESPACE.'Record'], $joinTipo);
+                    $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinTipo);
                     $this->_resolveWildcard($fields[$join], $joinModel);
                     
                     $joinOptions = [
@@ -823,7 +827,7 @@ abstract class RecordAbstract
                     $data = $relationships[$table];
                     
                     if ($data['type']) {
-                        $loaded = Type::getInstance($fk, ['default_class' => static::DEFAULT_NAMESPACE.'Type']);
+                        $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     } else {
                         $loaded = $data['query']->getModel();
                         $loaded->id = $fk;

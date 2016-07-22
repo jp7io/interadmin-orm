@@ -81,7 +81,7 @@ class Log extends RecordAbstract
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
-                'default_class' => static::DEFAULT_NAMESPACE.'Type'
+                'default_namespace' => static::DEFAULT_NAMESPACE
             ]);
         }
 

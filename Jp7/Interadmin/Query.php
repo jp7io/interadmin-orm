@@ -26,8 +26,7 @@ class Query extends Query\BaseQuery
     {
         if (is_null($this->model)) {
             $defaultNamespace = constant(get_class($this->provider).'::DEFAULT_NAMESPACE');
-            $options = ['default_class' => $defaultNamespace.'Record'];
-            $this->model = Record::getInstance(0, $options, $this->provider);
+            $this->model = Record::getInstance(0, ['default_namespace' => $defaultNamespace], $this->provider);
         }
         return $this->model;
     }
