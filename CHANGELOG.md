@@ -4,7 +4,7 @@
  * InterAdmin::__construct receives an array now
  * Calling select_* without alias won't bring objects: ->relationFromColumn() can be used if the alias is not known
  * ->attributes is not public anymore - Use ->getAttributes()
- * ->getCampoTipo() call only be overwritten on a Type
+ * ->getCampoTipo() can only be overwritten on a Type
  * Replace setFieldsValues() -> updateAttributes()
  * Fields are eager and lazy loaded, ->getFieldsValues() and getByAlias() are not needed anymore
  * Default aliases are generated in snake_case now (if empty). To use old aliases you must manually define them.
