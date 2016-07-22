@@ -53,21 +53,20 @@ class CollectionUtil
 
     public static function eagerLoad($records, $relationships)
     {
-        if (!is_array($relationships)) {
-            $relationships = [$relationships];
-        }
-        $relationship = array_shift($relationships);
-
         if (!$records) {
             return false;
         }
+        if (!is_array($relationships)) {
+            $relationships = [$relationships];
+        }
+        $relation = array_shift($relationships);
         $model = reset($records);
-        if ($data = $model->getType()->getRelationshipData($relationship)) {
+        if ($data = $model->getType()->getRelationshipData($relation)) {
             if ($data['type'] == 'select') {
                 // select.id = record.select_id
                 $idsMap = [];
                 foreach ($records as $record) {
-                    $alias = $relationship.'_id';
+                    $alias = $relation.'_id';
                     if (!isset($idsMap[$record->$alias])) {
                         $idsMap[$record->$alias] = [];
                     }
@@ -81,7 +80,7 @@ class CollectionUtil
                 
                 foreach ($rows as $row) {
                     foreach ($idsMap[$row->id] as $record) {
-                        $record->setEagerLoad($relationship, $row);
+                        $record->setRelation($relation, $row);
                     }
                     unset($row);
                 }
@@ -98,13 +97,13 @@ class CollectionUtil
                 $children = self::separate($children, 'parent_id');
 
                 foreach ($records as $record) {
-                    $record->setEagerLoad($relationship, $children[$record->id] ?: []);
+                    $record->setRelation($relation, $children[$record->id] ?: []);
                 }
             } else {
                 throw new Exception('Unsupported relationship type: "'.$data['type'].'" for class '.get_class($model).' - ID: '.$model->id);
             }
         } else {
-            throw new Exception('Unknown relationship: "'.$relationship.'" for class '.get_class($model).' - ID: '.$model->id);
+            throw new Exception('Unknown relationship: "'.$relation.'" for class '.get_class($model).' - ID: '.$model->id);
         }
     }
 }

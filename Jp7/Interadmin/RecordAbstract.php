@@ -816,7 +816,7 @@ abstract class RecordAbstract
                 $column = array_search($table.'_id', $options['aliases']);
                 $fk = $object->$column;
                 
-                $loaded = &$object->_eagerLoad[$table];
+                $loaded = &$object->relations[$table];
                 if (!$loaded || $loaded->id != $fk) {
                     /// stale data or not loaded
                     $relationships = $object->getType()->getRelationships();

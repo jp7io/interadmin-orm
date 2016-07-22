@@ -36,7 +36,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     protected $_tags;
 
-    protected $_eagerLoad;
+    protected $relations;
 
     /**
      * Username to be inserted in the log when saving this record.
@@ -230,7 +230,7 @@ class Record extends RecordAbstract implements Arrayable
         if (!$fk) {
             return null;
         }
-        $loaded = &$this->_eagerLoad[$name];
+        $loaded = &$this->relations[$name];
         if (!$loaded || $loaded->id != $fk) {
             /// stale data or not loaded
             if ($data['type']) {
@@ -372,8 +372,8 @@ class Record extends RecordAbstract implements Arrayable
         // childName() - relacionamento
         if ($child = $this->_findChild(ucfirst($name))) {
             $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-            if (isset($this->_eagerLoad[$name])) {
-                return new EagerLoaded($childrenTipo, $this->_eagerLoad[$name]);
+            if (isset($this->relations[$name])) {
+                return new EagerLoaded($childrenTipo, $this->relations[$name]);
             }
 
             return new Query($childrenTipo);
@@ -927,9 +927,18 @@ class Record extends RecordAbstract implements Arrayable
         }
     }
 
-    public function setEagerLoad($key, $data)
+    /**
+     * Set the specific relationship in the model.
+     *
+     * @param  string  $relation
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setRelation($relation, $value)
     {
-        $this->_eagerLoad[$key] = $data;
+        $this->relations[$relation] = $value;
+
+        return $this;
     }
 
     /**
