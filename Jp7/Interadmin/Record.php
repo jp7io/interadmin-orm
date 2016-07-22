@@ -77,37 +77,36 @@ class Record extends RecordAbstract implements Arrayable
     public function &__get($name)
     {
         $value = null;
-        if ($name === 'attributes') {
-            throw new Exception("attributes is protected");
-        }
-        // Mutators
-        if ($name !== 'id') {
-            $mutator = 'get'.Str::studly($name).'Attribute';
-            if (method_exists($this, $mutator)) {
-                $value = $this->$mutator($value);
-                return $value;
-            }
-        }
+        // Attributes
         if (array_key_exists($name, $this->attributes)) {
             $value = &$this->attributes[$name];
             return $value;
         }
-        $aliases = $this->getAttributesAliases();
-        // Fixes fields that have alias
-        if (in_array($name, $aliases) && array_key_exists(array_search($name, $aliases), $this->attributes)) {
-            // column is present, alias requested
-            $name = array_search($name, $aliases);
-            $value = &$this->attributes[$name];
-        } elseif (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
-            throw new UnexpectedValueException('$this->attributes must not use alias');
-            // alias is present, column requested
-            // $name = $aliases[$name];
-            // $value = &$this->attributes[$name];
-        } else {
-            $value = $this->_lazyLoadAttribute($name);
+        if ($name === 'attributes') {
+            throw new Exception("attributes is protected"); // FIXME remove when old code is validated
         }
-        // returned as reference
-        return $value;
+        // Mutators
+        $mutator = 'get'.Str::studly($name).'Attribute';
+        if (method_exists($this, $mutator)) {
+            $value = $this->$mutator($value);
+            return $value;
+        }
+        // Aliases
+        $aliases = $this->getAttributesAliases();
+        $column = array_search($name, $aliases);
+        // Fixes fields that have alias
+        if ($column !== false && array_key_exists($column, $this->attributes)) {
+            // column is present, alias requested
+            $value = &$this->attributes[$column];
+            return $value;
+        }
+        // FIXME remove when old code is validated
+        if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
+            throw new UnexpectedValueException('$this->attributes must not use alias');
+        }
+        // Relations / Lazy Loading
+        $value = $this->_lazyLoadAttribute($name);
+        return $value; // returned as reference
     }
     /**
      * Magic set acessor.
@@ -125,7 +124,7 @@ class Record extends RecordAbstract implements Arrayable
         if (method_exists($this, $mutator)) {
             return $this->$mutator($value);
         }
-        if (!empty($this->attributes['id_tipo'])) {
+        if (!empty($this->attributes['id_tipo'])) { // Aliases are not available if id_tipo is not set
             $column = array_search($name, $this->getAttributesAliases());
             if ($column) {
                 $name = $column;
@@ -146,11 +145,31 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function __isset($name)
     {
-        if (array_key_exists($name, $this->attributes) || $this->_lazyLoadAttribute($name)) {
+        // Attributes or Mutators
+        if (array_key_exists($name, $this->attributes) || method_exists($this, 'get' . Str::studly($name) . 'Attribute')) {
             return true;
         }
-        
-        return method_exists($this, 'get' . Str::studly($name) . 'Attribute');
+        // Aliases
+        $column = array_search($name, $this->getAttributesAliases());
+        if ($column !== false && array_key_exists($column, $this->attributes)) {
+            return true;
+        }
+        // Relations / Lazy Loading
+        if ($this->_lazyLoadAttribute($name)) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Unset an attribute on the model.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+        unset($this->attributes[$name], $this->relations[$name]);
     }
     
     private function _lazyLoadAttribute($name)
@@ -161,7 +180,7 @@ class Record extends RecordAbstract implements Arrayable
             $related = $this->_loadRelationship($relationships, $name);
             return $related; // returned as reference
         }
-        if (!$this->id) {
+        if (!$this->attributes['id']) {
             return; // data below depends on an ID
         }
         // children most likely
@@ -400,17 +419,21 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         if (empty($this->attributes['id_tipo'])) {
-            $this->id_tipo = 0;
+            $this->attributes['id_tipo'] = 0;
         }
         // Record::type() -> Classes that have name
         $tipo = static::type();
-        if (!$tipo || ($this->id_tipo && $this->id_tipo != $tipo->id_tipo)) {
-            // Anonymous classes or instance has different id_tipo
-            if (!$this->id_tipo) {
-                // Instance was not brought from DB, id_tipo is empty
+        // instance has different id_tipo
+        if ($tipo && $this->attributes['id_tipo'] && $this->attributes['id_tipo'] != $tipo->id_tipo) {
+            $tipo = null;
+        }
+        // Generic class
+        if (!$tipo) {
+            // Instance was not brought from DB, id_tipo is empty
+            if (!$this->attributes['id_tipo']) {
                 throw new UnexpectedValueException('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
-            $tipo = Type::getInstance($this->id_tipo, [
+            $tipo = Type::getInstance($this->attributes['id_tipo'], [
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
             ]);
