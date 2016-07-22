@@ -162,7 +162,11 @@ class Jp7_Box_Manager
 
     public static function createBoxFromId($id_box)
     {
+        $columnTipo = new Jp7_Model_BoxesTipo;
+        $boxIdTipo = $columnTipo->getInterAdminsChildren()['Boxes']['id_tipo'];
+        
         $fakeRecord = new InterAdmin();
+        $fakeRecord->id_tipo = $boxIdTipo;
         $fakeRecord->id_box = $id_box;
 
         return self::createBox($fakeRecord);
