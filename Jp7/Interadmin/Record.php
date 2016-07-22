@@ -204,7 +204,7 @@ class Record extends RecordAbstract implements Arrayable
             if (!$fks) {
                 return jp7_collect([]);
             }
-            $loaded = &$this->_eagerLoad[$name];
+            $loaded = &$this->relations[$name];
             if (!$loaded) {
                 $loaded = (object) ['fks' => null];
             }
