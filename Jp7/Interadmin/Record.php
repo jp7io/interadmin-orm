@@ -353,6 +353,10 @@ class Record extends RecordAbstract implements Arrayable
         if ($query = $this->_loadManyRelationship($methodName)) {
             return $query;
         }
+        $relationships = $this->getType()->getRelationships();
+        if (isset($relationships[$methodName])) {
+            return $relationships[$methodName]['query'];
+        }
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
         $children = $this->getType()->getInterAdminsChildren();
