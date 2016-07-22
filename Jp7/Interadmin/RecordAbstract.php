@@ -705,7 +705,6 @@ abstract class RecordAbstract
                         $joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
                         if ($joinClasse !== 'tipo') {
                             $fields[$join][] = 'id';
-                            $fields[$join][] = 'id_slug';
                         }
                     }
                     $joinTipo = $this->getCampoTipo($campos[$nome]);
