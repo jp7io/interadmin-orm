@@ -101,6 +101,9 @@ trait SelectFieldTrait
     protected function records()
     {
         $camposCombo = $this->nome->getCamposCombo();
+        if (!$camposCombo) {
+            $camposCombo = ['id'];
+        }
         $query = $this->nome->records();
         $query->select($camposCombo)
             ->where('deleted', false)
