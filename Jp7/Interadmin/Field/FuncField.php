@@ -2,6 +2,9 @@
 
 namespace Jp7\Interadmin\Field;
 
+use Throwable;
+use Log;
+
 class FuncField extends ColumnField
 {
     protected $id = 'func';
@@ -21,12 +24,17 @@ class FuncField extends ColumnField
         if (!is_callable($this->nome)) {
             return 'Function '.$this->nome.' not found.';
         }
-        ob_start();
-        // http://wiki.jp7.com.br:81/jp7/InterAdmin:Special
-        // callable(array $campo, mixed $value, string $parte, stdClass $record)
-        $response = call_user_func($this->nome, $this->campo, $value, $parte, $this->record);
-        $response .= ob_get_clean();
-        return $response;
+        try {
+            ob_start();
+            // http://wiki.jp7.com.br:81/jp7/InterAdmin:Special
+            // callable(array $campo, mixed $value, string $parte, stdClass $record)
+            $response = call_user_func($this->nome, $this->campo, $value, $parte, $this->record);
+            $response .= ob_get_clean();
+            return $response;
+        } catch (Throwable $e) {
+            Log::error($e);
+            return '(erro: '.$this->nome.')';
+        }
     }
     
     protected function getDefaultValue()
