@@ -48,7 +48,9 @@ class DynamicLoader
             $replacedClass = str_replace('Record', 'InterAdmin', $class);
             $replacedClass = str_replace('Type', 'InterAdminTipo', $replacedClass);
             $replacedClass = str_replace('FileField', 'InterAdminFieldFile', $replacedClass);
-            class_alias($replacedClass, $class);
+            if (class_exists($replacedClass)) {
+                class_alias($replacedClass, $class);
+            }
             return true;
         }
         
