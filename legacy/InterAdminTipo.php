@@ -167,7 +167,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         $this->_whereArrayFix($options['where']); // FIXME
         $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
-        return $this->deprecatedGetChildren($options);
+        return $this->deprecatedGetChildren($options)->all();
     }
     
     public function getNome()
