@@ -137,7 +137,11 @@ class Type extends RecordAbstract
             }
         }
         // Classe foi encontrada, instanciar o objeto
-        return new $classTipo($id_tipo);
+        $tipo = new $classTipo($id_tipo);
+        if (!empty($options['db'])) {
+            $tipo->setDb($options['db']);
+        }
+        return $tipo;
     }
     /*
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
@@ -1117,7 +1121,7 @@ class Type extends RecordAbstract
 
         foreach ($rs as $row) {
             $tipo = self::getInstance($row->id_tipo, [
-                'db' => $instance->getDb(),
+                'db' => $options['db'],
                 'class' => isset($options['class']) ? $options['class'] : null,
             ]);
             $instance->_getAttributesFromRow($row, $tipo, $options);

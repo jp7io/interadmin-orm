@@ -324,7 +324,7 @@ class Record extends RecordAbstract implements Arrayable
 
         $instance = new $className(['id' => $id, 'id_tipo' => $tipo->id_tipo]);
         $instance->setType($tipo);
-        $instance->setDb($tipo->getDb());
+        $instance->setDb($tipo->getDbName());
 
         return $instance;
     }
@@ -509,6 +509,7 @@ class Record extends RecordAbstract implements Arrayable
     public function getChildrenTipo($id_tipo, $options = [])
     {
         $options['default_namespace'] = static::DEFAULT_NAMESPACE;
+        $options['db'] = $this->_db;
         $childrenTipo = Type::getInstance($id_tipo, $options);
         $childrenTipo->setParent($this);
 

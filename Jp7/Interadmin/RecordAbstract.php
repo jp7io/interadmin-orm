@@ -37,7 +37,7 @@ abstract class RecordAbstract
      * Connection name
      * @var string
      */
-    protected $_db = null;
+    protected $_db = '';
 
     /**
      * Magic get acessor.
@@ -1007,9 +1007,20 @@ abstract class RecordAbstract
      *
      * @param string $db Connection name
      */
-    public function setDb(ConnectionInterface $db)
+    public function setDb($db)
     {
-        $this->_db = $db->getName();
+        if (is_string($db) || is_null($db)) {
+            $this->_db = $db;
+        } elseif ($db instanceof ConnectionInterface) {
+            $this->_db = $db->getName();
+        } else {
+            throw new UnexpectedValueException('Expected instance of ConnectionInterface or connection name, received '.gettype($db));
+        }
+    }
+    
+    public function getDbName()
+    {
+        return $this->_db;
     }
 
     /**
