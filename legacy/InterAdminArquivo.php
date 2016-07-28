@@ -255,4 +255,16 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     {
         return Upload::getHumanSize($this->url);
     }
+    
+    /**
+     * Sets this object´s attributes with the given array keys and values.
+     *
+     * @param array $attributes
+     */
+    public function setAttributes(array $attributes)
+    {
+        foreach ($attributes as $key => $value) {
+            $this->$key = $value;
+        }
+    }
 }

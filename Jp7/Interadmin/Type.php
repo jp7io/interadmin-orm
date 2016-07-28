@@ -955,6 +955,15 @@ class Type extends RecordAbstract
         }
     }
 
+    public function getInterAdminsChildrenTipos()
+    {
+        $tipos = [];
+        foreach ($this->getInterAdminsChildren() as $nome_id => $metadata) {
+            $tipos[] = $this->getInterAdminsChildrenTipo($nome_id);
+        }
+        return $tipos;
+    }
+
     public function getRelationshipData($relationship)
     {
         $relationships = $this->getRelationships();
