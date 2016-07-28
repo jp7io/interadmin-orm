@@ -45,7 +45,7 @@ class DynamicLoader
 
         // Support legacy ORM class names
         if (str_contains($class, '_')) {
-            $last = array_pop(explode('_', $class));
+            $last = last(explode('_', $class));
             $replacements = [
                 'Record' => 'InterAdmin',
                 'Type' => 'InterAdminTipo',

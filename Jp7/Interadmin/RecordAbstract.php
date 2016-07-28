@@ -815,7 +815,14 @@ abstract class RecordAbstract
                     }
                 }
                 */
+            } elseif (isset($options['joins'][$table])) {
+                // manual join
+                if (!isset($object->attributes[$table])) {
+                    $object->attributes[$table] = $options['joins'][$table][1]->records()->getModel();
+                }
+                $object->attributes[$table]->$field = $value;
             } else {
+                // select_* relationship
                 $column = array_search($table.'_id', $options['aliases']);
                 $fk = $object->$column;
                 
