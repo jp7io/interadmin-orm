@@ -267,4 +267,24 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
             $this->$key = $value;
         }
     }
+    
+    public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
+    {
+        if ($forceAsString) {
+            throw new Exception('Not implemented');
+        }
+        if (is_array($fields)) {
+            $retorno = (object) [];
+            // returns only the fields requested on $fields
+            foreach ($fields as $key => $value) {
+                if (is_array($value)) {
+                    $retorno->$key = $this->$key;
+                } else {
+                    $retorno->$value = $this->$value;
+                }
+            }
+            return $retorno;
+        }
+        return $this->$fields;
+    }
 }
