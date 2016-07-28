@@ -1034,7 +1034,7 @@ class Record extends RecordAbstract implements Arrayable
                     $rules[$alias][] = 'integer';
                 }
                 if (starts_with($campo['tipo'], 'date_')) {
-                    $rules[$alias][] = 'date';
+                    $rules[$alias][] = 'date_format:Y-m-d';
                 }
             }
         }
