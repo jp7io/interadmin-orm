@@ -44,12 +44,19 @@ class DynamicLoader
         }
 
         // Support legacy ORM class names
-        if (str_contains($class, '_') && (ends_with($class, 'Record') || ends_with($class, 'Type') || ends_with($class, 'FileField'))) {
-            $replacedClass = str_replace('Record', 'InterAdmin', $class);
-            $replacedClass = str_replace('Type', 'InterAdminTipo', $replacedClass);
-            $replacedClass = str_replace('FileField', 'InterAdminFieldFile', $replacedClass);
-            if (class_exists($replacedClass)) {
-                class_alias($replacedClass, $class);
+        if (str_contains($class, '_')) {
+            $last = array_pop(explode('_', $class));
+            $replacements = [
+                'Record' => 'InterAdmin',
+                'Type' => 'InterAdminTipo',
+                'FileField' => 'InterAdminFieldFile',
+                'FileRecord' => 'InterAdminArquivo',
+            ];
+            if (array_key_exists($last, $replacements)) {
+                $replacedClass = str_replace($last, $replacements[$last], $class);
+                if (class_exists($replacedClass)) {
+                    class_alias($replacedClass, $class);
+                }
             }
             return true;
         }
