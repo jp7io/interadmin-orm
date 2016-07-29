@@ -127,9 +127,10 @@ class Jp7_Interadmin_Util
         $returnIds = [];
         foreach ($records as $record) {
             $oldId = $record->id;
+            $record->setTipo($tipoObj);
             $children = $record->_children;
             $relations = $record->_relations;
-            self::prepareNewRecord($record, $parent, $tipoObj);
+            self::prepareNewRecord($record, $parent);
 
             if ($use_id_string) {
                 self::importRelationsFromIdString($record, $relations);
@@ -149,7 +150,7 @@ class Jp7_Interadmin_Util
         return $returnIds;
     }
     
-    protected static function prepareNewRecord($record, $parent, $tipoObj)
+    protected static function prepareNewRecord($record, $parent)
     {
         $record->id = 0;
         unset($record->id_slug);
@@ -157,7 +158,6 @@ class Jp7_Interadmin_Util
         unset($record->_relations);
 
         $record->setParent($parent);
-        $record->setTipo($tipoObj);
     }
 
     public static function _importChildren($record, $children, $use_id_string, $bind_children)
@@ -167,9 +167,11 @@ class Jp7_Interadmin_Util
             $childTipo->setParent($record);
 
             foreach ($tipo_children as $child) {
+                $child->setTipo($childTipo);
                 $grandChildren = $child->_children;
                 $childRelations = $child->_relations;
-                self::prepareNewRecord($child, $record, $childTipo);
+                
+                self::prepareNewRecord($child, $record);
  
                 if ($use_id_string || $bind_children) {
                     self::importRelationsFromIdString($child, $childRelations, $bind_children);
@@ -201,7 +203,10 @@ class Jp7_Interadmin_Util
 
         foreach ($registros as $registro) {
             if ($tipoObj->id_tipo == $tipoDestino->id_tipo) {
-                $registro->varchar_key = 'Cópia de '.$registro->varchar_key;
+                $registro->setTipo($tipoDestino);
+                if (isset($registro->varchar_key)) {
+                    $registro->varchar_key = 'Cópia de '.$registro->varchar_key;
+                }
             }
             $registro->publish = '';
         }
