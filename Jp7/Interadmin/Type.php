@@ -557,7 +557,8 @@ class Type extends RecordAbstract
 
     public function getRelationships()
     {
-        $cacheKey = $this->getCacheKey('relationships');
+        // getCampoTipo might be different for each class
+        $cacheKey = static::class.','.$this->getCacheKey('relationships');
         return Cache::remember($cacheKey, 60, function () {
             $relationships = [];
 
@@ -888,7 +889,7 @@ class Type extends RecordAbstract
         
     protected function getCacheKey($varname)
     {
-        return static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
+        return 'Type,'.$varname.','.$this->_db.','.$this->id_tipo;
     }
     
     /**
