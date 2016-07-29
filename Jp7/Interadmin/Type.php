@@ -447,8 +447,8 @@ class Type extends RecordAbstract
      */
     public function getCampos()
     {
-        if (!$A = $this->_getMetadata('campos')) {
-            //unset($model->campos);
+        $cacheKey = $this->getCacheKey('campos');
+        return Cache::remember($cacheKey, 60, function () {
             $campos_parameters = [
                 'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
                 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
@@ -483,7 +483,7 @@ class Type extends RecordAbstract
                     }
                     if (!$alias) {
                         throw new UnexpectedValueException('An alias was expected.');
-                        $alias = $campo;
+                        //$alias = $campo;
                     }
                     $A[$campo]['nome_id'] = to_slug($alias, '_');
                 }
@@ -501,10 +501,8 @@ class Type extends RecordAbstract
                     }
                 }
             }
-            $this->_setMetadata('campos', $A);
-        }
-
-        return $A;
+            return $A;
+        });
     }
     /**
      * Returns an array with the names of all the fields available.
@@ -531,9 +529,17 @@ class Type extends RecordAbstract
      */
     public function getCamposAlias($fields = null)
     {
-        $this->_camposMetadata();
-
-        $aliases = $this->_getMetadata('camposAlias');
+        $cacheKey = $this->getCacheKey('campos_alias');
+        $aliases = Cache::remember($cacheKey, 60, function () {
+            $aliases = [];
+            foreach ($this->getCampos() as $campo => $array) {
+                if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
+                    continue;
+                }
+                $aliases[$campo] = $array['nome_id'];
+            }
+            return $aliases;
+        });
 
         if (is_null($fields)) {
             return $aliases;
@@ -551,15 +557,8 @@ class Type extends RecordAbstract
 
     public function getRelationships()
     {
-        $this->_camposMetadata();
-
-        return $this->_getMetadata('relationships');
-    }
-
-    protected function _camposMetadata()
-    {
-        if (is_null($this->_getMetadata('camposAlias'))) {
-            $aliases = [];
+        $cacheKey = $this->getCacheKey('relationships');
+        return Cache::remember($cacheKey, 60, function () {
             $relationships = [];
 
             foreach ($this->getCampos() as $campo => $array) {
@@ -570,11 +569,11 @@ class Type extends RecordAbstract
                     $multi = strpos($campo, 'select_multi_') === 0;
                     $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
                     if ($multi) {
-                        $relationship = substr($array['nome_id'], 0, -4); // _ids = 4 chars
+                        $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
                     } else {
-                        $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                        $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
                     }
-                    $relationships[$relationship] = [
+                    $relationships[$relation] = [
                         'query' => $hasType ? $array['nome'] : $array['nome']->records(),
                         'type' => $hasType,
                         'multi' => $multi,
@@ -583,28 +582,24 @@ class Type extends RecordAbstract
                     $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
                     $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
                     if ($multi) {
-                        $relationship = substr($array['nome_id'], 0, -4); // _ids = 4 chars
+                        $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
                     } else {
-                        $relationship = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                        $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
                     }
                     if ($specialTipo = $this->getCampoTipo($array)) {
                         $query = $specialTipo->records();
                     } else {
                         $query = new TypelessQuery(static::getInstance(0));
                     }
-                    $relationships[$relationship] = [
+                    $relationships[$relation] = [
                         'query' => $query,
                         'type' => $hasType,
                         'multi' => $multi,
                     ];
                 }
-
-                $aliases[$campo] = $array['nome_id'];
             }
-
-            $this->_setMetadata('relationships', $relationships);
-            $this->_setMetadata('camposAlias', $aliases);
-        }
+            return $relationships;
+        });
     }
 
     /**
@@ -703,9 +698,9 @@ class Type extends RecordAbstract
         Cache::forget($this->getCacheKey('attributes'));
         Cache::forget($this->getCacheKey('campos'));
         Cache::forget($this->getCacheKey('children'));
-        Cache::forget($this->getCacheKey('interadmins_order'));
+        Cache::forget($this->getCacheKey('order'));
         Cache::forget($this->getCacheKey('relationships'));
-        Cache::forget($this->getCacheKey('camposAlias'));
+        Cache::forget($this->getCacheKey('campos_alias'));
         return $this;
     }
 
@@ -816,27 +811,27 @@ class Type extends RecordAbstract
     }
     public function getInterAdminsOrder()
     {
-        if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
-            $interadminsOrderBy = [];
+        $cacheKey = $this->getCacheKey('order');
+        return Cache::remember($cacheKey, 60, function () {
+            $order = [];
             $campos = $this->getCampos();
             if ($campos) {
                 foreach ($campos as $key => $row) {
-                    if ($row['orderby'] && strpos($key, 'func_') === false) {
-                        if ($row['orderby'] < 0) {
-                            $key .= ' DESC';
-                        }
-                        $interadminsOrderBy[$row['orderby']] = $key;
+                    if (!$row['orderby'] || strpos($key, 'func_') !== false) {
+                        continue;
                     }
+                    if ($row['orderby'] < 0) {
+                        $key .= ' DESC';
+                    }
+                    $order[$row['orderby']] = $key;
                 }
-                if ($interadminsOrderBy) {
-                    ksort($interadminsOrderBy);
+                if ($order) {
+                    ksort($order);
                 }
             }
-            $interadminsOrderBy[] = 'date_publish DESC';
-            $this->_setMetadata('interadmins_order', $interadminsOrderBy);
-        }
-
-        return implode(',', $interadminsOrderBy);
+            $order[] = 'date_publish DESC';
+            return implode(',', $order);
+        });
     }
     /**
      * Returns the table name for the Records.
@@ -890,18 +885,7 @@ class Type extends RecordAbstract
 
         return $table;
     }
-    protected function _setMetadata($varname, $value)
-    {
-        $cacheKey = $this->getCacheKey($varname);
-        Cache::put($cacheKey, $value, 60);
-    }
-    
-    protected function _getMetadata($varname)
-    {
-        $cacheKey = $this->getCacheKey($varname);
-        return Cache::get($cacheKey);
-    }
-    
+        
     protected function getCacheKey($varname)
     {
         return static::class.','.$varname.','.$this->_db.','.$this->id_tipo;
@@ -914,9 +898,8 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsChildren()
     {
-        if (!$children = $this->_getMetadata('children')) {
-            //$model = $this->getModel();
-
+        $cacheKey = $this->getCacheKey('children');
+        return Cache::remember($cacheKey, 60, function () {
             $children = [];
             $childrenArr = explode('{;}', $this->children);
             for ($i = 0; $i < count($childrenArr) - 1; $i++) {
@@ -929,10 +912,8 @@ class Type extends RecordAbstract
                 $nome_id = studly_case(to_slug($child['nome']));
                 $children[$nome_id] = $child;
             }
-            $this->_setMetadata('children', $children);
-        }
-
-        return $children;
+            return $children;
+        });
     }
 
     /**
