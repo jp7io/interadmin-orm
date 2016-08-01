@@ -230,7 +230,7 @@ class Record extends RecordAbstract implements Arrayable
             if ($loaded->fks != $fks) {
                 // stale data or not loaded
                 $loaded->fks = $fks;
-                $fksArray = array_filter(explode(',', $fks));
+                $fksArray = is_array($fks) ? $fks : array_filter(explode(',', $fks));
                 if ($data['type']) {
                     $multi = jp7_collect([]);
                     foreach ($fksArray as $fk) {
