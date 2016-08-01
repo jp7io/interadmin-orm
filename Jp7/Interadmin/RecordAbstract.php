@@ -446,6 +446,7 @@ abstract class RecordAbstract
         // not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
         $not_function = '(?![ ]?\()';
         $reserved = [
+            'SELECT', 'WHERE',
             'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
             'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
             'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END', 'BINARY'
@@ -453,6 +454,7 @@ abstract class RecordAbstract
 
         $offset = 0;
         $ignoreJoinsUntil = -1;
+        $insideFrom = false;
 
         $options += [
             'from_alias' => [],
@@ -477,6 +479,17 @@ abstract class RecordAbstract
                 continue;
             }
 
+            if ($termo === 'FROM') {
+                $insideFrom = true;
+            }
+            if ($insideFrom) {
+                if ($termo === 'WHERE') { // join ainda nao suportado
+                    $insideFrom = false;
+                }
+                $offset = $pos + strlen($termo);
+                continue;
+            }
+            
             // Joins com EXISTS
             if ($termo == 'EXISTS') {
                 $inicio = substr($clause, 0, $pos + strlen($termo));
