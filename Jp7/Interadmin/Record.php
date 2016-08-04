@@ -125,11 +125,15 @@ class Record extends RecordAbstract implements Arrayable
             return $this->$mutator($value);
         }
         if (!empty($this->attributes['id_tipo'])) { // Aliases are not available if id_tipo is not set
-            $column = array_search($name, $this->getAttributesAliases());
+            $aliases = $this->getAttributesAliases();
+            $column = array_search($name, $aliases);
             if ($column) {
                 $name = $column;
             } elseif (!array_key_exists($name, $this->attributes) && array_key_exists($name, $this->getType()->getRelationships())) {
-                throw new Exception($name.' is a relation, use '.$name.'_id');
+                $column = $this->_aliasToColumn($name, array_flip($aliases)); // FIXME remove when old code is validated
+                if ($column === $name) {
+                    throw new Exception($name.' is a relation, use '.$name.'_id');
+                }
             }
         }
         if (is_string($value)) {
