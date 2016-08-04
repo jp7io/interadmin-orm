@@ -128,6 +128,8 @@ class Record extends RecordAbstract implements Arrayable
             $column = array_search($name, $this->getAttributesAliases());
             if ($column) {
                 $name = $column;
+            } elseif (!array_key_exists($name, $this->attributes) && array_key_exists($name, $this->getType()->getRelationships())) {
+                throw new Exception($name.' is a relation, use '.$name.'_id');
             }
         }
         if (is_string($value)) {
