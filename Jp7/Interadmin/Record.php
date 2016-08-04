@@ -132,8 +132,10 @@ class Record extends RecordAbstract implements Arrayable
             } elseif (!array_key_exists($name, $this->attributes) && array_key_exists($name, $this->getType()->getRelationships())) {
                 $column = $this->_aliasToColumn($name, array_flip($aliases)); // FIXME remove when old code is validated
                 if ($column === $name) {
-                    throw new Exception($name.' is a relation, use '.$name.'_id');
+  					 $data = $this->getType()->getRelationships()[$name]; 
+                    throw new Exception($name.' is a relation, use '.$name.($data['multi'] ? '_ids' : '_id')); // laravel code
                 }
+                $name = $column;
             }
         }
         if (is_string($value)) {
