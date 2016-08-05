@@ -157,11 +157,15 @@ class InterAdmin extends Record implements InterAdminAbstract
             return $aliases[$alias];
         }
         if (isset($aliases[$alias.'_id'])) {
-            \Log::warning($alias.' is a relation, use '.$alias.'_id');
+            if (getenv('APP_DEBUG') && getenv('APP_ENV') === 'local') {
+                trigger_error($alias.' is a relation, use '.$alias.'_id', E_USER_DEPRECATED);
+            }
             return $aliases[$alias.'_id'];
         }
         if (isset($aliases[$alias.'_ids'])) {
-            \Log::warning($alias.' is a relation, use '.$alias.'_ids');
+            if (getenv('APP_DEBUG') && getenv('APP_ENV') === 'local') {
+                trigger_error($alias.' is a relation, use '.$alias.'_ids', E_USER_DEPRECATED);
+            }
             return $aliases[$alias.'_ids'];
         }
         return $alias;
@@ -425,10 +429,14 @@ class InterAdmin extends Record implements InterAdminAbstract
             if (isset($valuesToSave[$name])) {
                 if ($data['multi']) {
                     $alias = $aliases[$name.'_ids'];
-                    \Log::warning($name.' is a relation, use '.$name.'_ids');
+                    if (getenv('APP_DEBUG') && getenv('APP_ENV') === 'local') {
+                        trigger_error($name.' is a relation, use '.$name.'_ids', E_USER_DEPRECATED);
+                    }
                 } else {
                     $alias = $aliases[$name.'_id'];
-                    \Log::warning($name.' is a relation, use '.$name.'_id');
+                    if (getenv('APP_DEBUG') && getenv('APP_ENV') === 'local') {
+                        trigger_error($name.' is a relation, use '.$name.'_id', E_USER_DEPRECATED);
+                    }
                 }
                 if ($alias) {
                     $valuesToSave[$alias] = $valuesToSave[$name];
