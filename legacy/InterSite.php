@@ -265,6 +265,7 @@ class InterSite
                     'secret' => getenv('AWS_SECRET'),
                     'region' => getenv('S3_REGION'),
                     'bucket' => getenv('S3_BUCKET'),
+                    'root'   => ''
                 ]
             ]
         ];

@@ -352,7 +352,7 @@ class Jp7_Deprecated
             }
             if ($row = $rs->FetchNextObj()) {
                 if (count($fields_arr) > 1 || $OOP) {
-                    if (!$O) {
+                    if (empty($O)) {
                         $O = new stdClass();
                     }
                     foreach ($fields_arr as $field) {

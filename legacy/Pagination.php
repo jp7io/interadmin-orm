@@ -129,7 +129,10 @@ class Pagination
         if ($seo) {
             $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
         }
-        $this->query_string = preg_replace('([&]?go_url='.$_GET['go_url'].')', '', $this->query_string); // Retira a GO Url da Query String
+        
+        $go_url = isset($_GET['go_url']) ? $_GET['go_url'] : '';
+        
+        $this->query_string = preg_replace('([&]?go_url='.$go_url.')', '', $this->query_string); // Retira a GO Url da Query String
         if ($this->query_string[0] == '&') {
             $this->query_string = mb_substr($this->query_string, 1); // Limpa & que sobrou no começo da string
         }
@@ -146,7 +149,7 @@ class Pagination
 
         // Se $show_first_and_last for TRUE irá sempre mostrar a página [1] .... [4] [5] ....[1000]
         // Se $show_first_and_last for FALSE irá mostrar só um range [2][3][4][5][6]
-        if ($show_first_and_last) {
+        if (!empty($show_first_and_last)) {
             $numbers_limit -= 1;
         }
 
