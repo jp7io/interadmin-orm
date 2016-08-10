@@ -39,11 +39,16 @@ class CharField extends ColumnField
         }
     }
 
+    protected function handleReadonly($input)
+    {
+        // Former doesnt disable the hidden input
+        if ($this->isReadonly()) {
+            $input->push(false)->disabled();
+        }
+    }
+
     public function hasMassEdit()
     {
         return true;
     }
 }
-
-
-
