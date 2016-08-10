@@ -40,9 +40,16 @@ class SelectMultiField extends ColumnField
 
     public function getEditTag()
     {
+        return $this->getPushInput().parent::getEditTag();
+    }
+
+    protected function getPushInput()
+    {
         // Push checkbox / Former can't handle this on multiple checkboxes
-        return '<input type="hidden" value="" name="'.$this->getFormerName().'" />'.
-            parent::getEditTag();
+        if ($this->isReadonly()) {
+            return '';
+        }
+        return '<input type="hidden" value="" name="'.$this->getFormerName().'" />';
     }
 
     protected function getFormerField()
