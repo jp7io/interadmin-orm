@@ -17,7 +17,7 @@ class ImgResize extends BaseImgResize
         $cachePath = self::storageUrl() . '/imagecache/' .$template.'/';
         return replace_prefix($uploadPath, $cachePath, $url);
     }
-    
+
     protected static function getAllTemplates()
     {
         return array_keys(config('imagecache.templates'));

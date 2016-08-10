@@ -12,9 +12,9 @@ class ServiceProvider extends BaseServiceProvider
         $app['http_cache.store'] = $app->share(function ($app) {
             return new Store($app['http_cache.cache_dir']);
         });
-        
+
         $stack = app('Barryvdh\StackMiddleware\StackMiddleware');
-               
+
         $stack->bind(
             'Jp7\HttpCache\CacheRequests',
             HttpCacheExtension::class,

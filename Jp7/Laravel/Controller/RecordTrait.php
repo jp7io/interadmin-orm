@@ -95,7 +95,7 @@ trait RecordTrait
             }
         }
     }
-    
+
     /*
     Find where to put this code:
     if ($method == 'show' && !$this->record) {

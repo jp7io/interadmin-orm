@@ -13,20 +13,20 @@ class Select extends \Former\Form\Fields\Select
         if ($list instanceof \Jp7\Interadmin\Query\BaseQuery) {
             throw new \Exception('Use ->lists(attr_name,id)');
         }
-        
+
         // clear previous options
         $this->children = [];
         $this->lazyOptions = null;
-        
+
         // Lazy loading options
         if ($list instanceof Closure) {
             $this->lazyOptions = $list;
             return $this;
         }
-        
+
         return parent::options($list, $selected, $valuesAsKeys);
     }
-    
+
     public function render()
     {
         // Lazy loading options

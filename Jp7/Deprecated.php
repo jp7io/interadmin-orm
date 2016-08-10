@@ -668,13 +668,13 @@ class Jp7_Deprecated
         if ($rs === false) {
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
         }
-        
+
         if ($returnValues) {
             $array = [];
         } else {
             $array = &$GLOBALS;
         }
-        
+
         while ($row = $rs->FetchNextObj()) {
             $meta_cols = $db->MetaColumns($table, false);
             foreach ($meta_cols as $meta) {

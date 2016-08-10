@@ -35,7 +35,7 @@ use RecordUrl;
 class Type extends RecordAbstract
 {
     use \Jp7\Laravel\Routable;
-    
+
     const ID_TIPO = 0;
 
     private static $inheritedFields = [
@@ -209,7 +209,7 @@ class Type extends RecordAbstract
     public function deprecatedGetChildren($options = [])
     {
         $this->_whereArrayFix($options['where']); // FIXME
-        
+
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
         }
@@ -226,7 +226,7 @@ class Type extends RecordAbstract
             $options['from'] = $this->getTableName().' AS main';
             $options['aliases'] = $this->getAttributesAliases();
             $options['campos'] = $this->getAttributesCampos();
-            
+
             $rs = $this->_executeQuery($options);
 
             $tipos = [];
@@ -886,12 +886,12 @@ class Type extends RecordAbstract
 
         return $table;
     }
-        
+
     protected function getCacheKey($varname)
     {
         return 'Type,'.$varname.','.$this->_db.','.$this->id_tipo;
     }
-    
+
     /**
      * Returns metadata about the children tipos that the Records have.
      *

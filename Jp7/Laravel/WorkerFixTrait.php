@@ -8,7 +8,7 @@ use App;
 use Log;
 use Illuminate\Database\QueryException;
 
-trait WorkerFixTrait 
+trait WorkerFixTrait
 {
   protected function preventWorkerLooping(Exception $e)
   {

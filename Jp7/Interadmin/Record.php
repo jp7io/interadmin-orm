@@ -132,7 +132,7 @@ class Record extends RecordAbstract implements Arrayable
             } elseif (!array_key_exists($name, $this->attributes) && array_key_exists($name, $this->getType()->getRelationships())) {
                 $column = $this->_aliasToColumn($name, array_flip($aliases)); // FIXME remove when old code is validated
                 if ($column === $name) {
-  					 $data = $this->getType()->getRelationships()[$name]; 
+  					 $data = $this->getType()->getRelationships()[$name];
                     throw new Exception($name.' is a relation, use '.$name.($data['multi'] ? '_ids' : '_id')); // laravel code
                 }
                 $name = $column;
@@ -143,7 +143,7 @@ class Record extends RecordAbstract implements Arrayable
         }
         $this->attributes[$name] = $value;
     }
-    
+
     /**
      * Magic isset acessor.
      *
@@ -168,7 +168,7 @@ class Record extends RecordAbstract implements Arrayable
         }
         return false;
     }
-    
+
     /**
      * Unset an attribute on the model.
      *
@@ -179,7 +179,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         unset($this->attributes[$name], $this->relations[$name]);
     }
-    
+
     private function _lazyLoadAttribute($name)
     {
         // relationships -> select and select_multi
@@ -221,7 +221,7 @@ class Record extends RecordAbstract implements Arrayable
         }
         return $this->attributes[$name];
     }
-        
+
     protected function _loadRelationship($relationships, $name)
     {
         $data = $relationships[$name];
@@ -294,7 +294,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         return self::query();
     }
-    
+
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
@@ -822,7 +822,7 @@ class Record extends RecordAbstract implements Arrayable
         }
         return $return;
     }
-    
+
     /**
      * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
      * applications and 'site' otherwise.
@@ -1009,7 +1009,7 @@ class Record extends RecordAbstract implements Arrayable
             }
             $stringValue[] = $value;
         }
-        
+
         return implode(' - ', $stringValue);
     }
 
@@ -1088,7 +1088,7 @@ class Record extends RecordAbstract implements Arrayable
 
         return $parameters;
     }
-    
+
     public function getUrl($action = 'show')
     {
         return RecordUrl::getRecordUrl($this, $action);

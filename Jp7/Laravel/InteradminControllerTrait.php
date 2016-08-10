@@ -13,7 +13,7 @@ trait InteradminControllerTrait
     {
         return redirect('http://'.config('interadmin.host').'/'.config('app.name'));
     }
-    
+
     public function show(Request $request, $action)
     {
         if ($action === 'session') {

@@ -12,9 +12,9 @@ class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
         $url = $this->url($path);
 
         $template = self::$templates[$template];
-        
+
         $url = $this->mergeQuery($url, ['size' => $template]);
-        
+
         return (string) $url;
     }
 }

@@ -7,7 +7,7 @@ use Former;
 class CharField extends ColumnField
 {
     protected $id = 'char';
-    
+
     const XTRA_UNCHECKED = '0';
     const XTRA_CHECKED = 'S';
 
@@ -15,7 +15,7 @@ class CharField extends ColumnField
     {
         return $this->getValue() ? '&bull;' : '';
     }
-    
+
     protected function getFormerField()
     {
         $input = Former::checkbox($this->getFormerName())
@@ -28,7 +28,7 @@ class CharField extends ColumnField
         }
         return $input;
     }
-    
+
     protected function getDefaultValue()
     {
         if ($this->default) {
@@ -38,7 +38,7 @@ class CharField extends ColumnField
             return 'S';
         }
     }
-    
+
     public function hasMassEdit()
     {
         return true;

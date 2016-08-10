@@ -5,10 +5,10 @@ namespace Jp7\Interadmin\Field;
 class TitField extends ColumnField
 {
     protected $id = 'tit';
-    
+
     const XTRA_VISIBLE = '0';
     const XTRA_HIDDEN = 'hidden';
-    
+
     public function openPanel()
     {
         $class = $this->xtra === self::XTRA_VISIBLE ? 'in' : '';
@@ -17,7 +17,7 @@ class TitField extends ColumnField
                     '<div id="collapse'.$this->tipo.$this->index.'" class="panel-collapse collapse '.$class.'" role="tabpanel">
                         <div class="panel-body">';
     }
-    
+
     public function getEditTag()
     {
         return '<div class="panel-heading">'.
@@ -29,7 +29,7 @@ class TitField extends ColumnField
             '</h4>'.
         '</div>';
     }
-    
+
     public function closePanel()
     {
         return '    </div>

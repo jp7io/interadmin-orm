@@ -129,9 +129,9 @@ class Pagination
         if ($seo) {
             $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
         }
-        
+
         $go_url = isset($_GET['go_url']) ? $_GET['go_url'] : '';
-        
+
         $this->query_string = preg_replace('([&]?go_url='.$go_url.')', '', $this->query_string); // Retira a GO Url da Query String
         if ($this->query_string[0] == '&') {
             $this->query_string = mb_substr($this->query_string, 1); // Limpa & que sobrou no começo da string

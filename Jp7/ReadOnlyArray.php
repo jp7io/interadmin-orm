@@ -4,7 +4,7 @@ namespace Jp7;
 class ReadOnlyArray implements \Iterator, \ArrayAccess
 {
     protected $index = 0;
-    
+
     protected $storage = array();
 
     public function __construct(array $array)
@@ -39,22 +39,22 @@ class ReadOnlyArray implements \Iterator, \ArrayAccess
     {
         return isset($this->storage[$this->index]);
     }
-    
+
     public function offsetSet($offset, $value)
     {
         throw new \Exception('You cannot write values to a Read Only Array after it is created.');
     }
-    
+
     public function offsetExists($offset)
     {
         return isset($this->storage[$offset]);
     }
-    
+
     public function offsetUnset($offset)
     {
         throw new \Exception('You cannot delete values from a Read Only Array after it is created.');
     }
-    
+
     public function offsetGet($offset)
     {
         if (isset($this->storage[$offset])) {

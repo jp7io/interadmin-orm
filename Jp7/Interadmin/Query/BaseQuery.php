@@ -191,7 +191,7 @@ abstract class BaseQuery
 
         return $this->_addWhere($where);
     }
-    
+
     public function whereDoesntHave($relationship, $conditions = null)
     {
         return $this->whereHas($relationship, $conditions, true);
@@ -440,7 +440,7 @@ abstract class BaseQuery
         $totalItems = $this->count();
 
         $page = LengthAwarePaginator::resolveCurrentPage($pageName) ?: 1;
-        
+
         $items = $this->skip(($page - 1) * $perPage)
             ->take($perPage)
             ->get();

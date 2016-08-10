@@ -56,7 +56,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
     ?>
 							<img src="<?= DEFAULT_PATH ?>/img/icons/<?php echo $key;
     ?>.png" style="vertical-align:middle;" />
-						<?php 
+						<?php
 }
     ?>
 					Título:</label>
@@ -67,7 +67,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
 						value="<?php echo $this->params->{'title'.$sufix};
     ?>"	/>
 				</div>
-			<?php 
+			<?php
 }
         ?>
 			<div class="field obligatory">

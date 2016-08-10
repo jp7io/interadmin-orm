@@ -25,7 +25,7 @@ class VarcharField extends ColumnField
     {
         $rules = parent::getRules();
         $name = $this->getRuleName();
-        
+
         if ($this->isUnique()) {
             $rules[$name][] = $this->getUniqueRule();
         }
@@ -43,12 +43,12 @@ class VarcharField extends ColumnField
         }
         return $rules;
     }
-    
+
     protected function isUnique()
     {
         return $this->xtra === 'id' || $this->xtra === 'id_email' || $this->xtra === 'cpf';
     }
-    
+
     protected function getUniqueRule()
     {
         // unique:table,column,except,idColumn
@@ -62,37 +62,37 @@ class VarcharField extends ColumnField
             'id_tipo', $this->type->id_tipo
         ]);
     }
-    
+
     protected function isEmail()
     {
         return $this->xtra === 'email' || $this->xtra === 'id_email';
     }
-    
+
     protected function isNumeric()
     {
         return $this->xtra === 'num';
     }
-    
+
     protected function isTel()
     {
         return $this->xtra === 'telefone';
     }
-    
+
     protected function isCpf()
     {
         return $this->xtra === 'cpf';
     }
-    
+
     protected function isCep()
     {
         return $this->xtra === 'cep';
     }
-    
+
     protected function isColor()
     {
         return $this->xtra === 'cor';
     }
-    
+
     protected function getFormerField()
     {
         $input = parent::getFormerField();
@@ -109,12 +109,12 @@ class VarcharField extends ColumnField
         }
         return $input->data_type($this->xtra ?: false);
     }
-    
+
     public function hasMassEdit()
     {
         return true;
     }
-    
+
     protected function getColorpickerHtml()
     {
         return '<div class="colorpicker-button"></div>';

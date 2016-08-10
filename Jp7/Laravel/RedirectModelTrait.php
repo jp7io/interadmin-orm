@@ -19,7 +19,7 @@ trait RedirectModelTrait
             return preg_replace('#^'.$redirect->url.'$#', $redirect->destino, $pathWithQuery);
         }
     }
-    
+
     public function scopeSearch($query, $path)
     {
         $quoted = \DB::getPdo()->quote($path);

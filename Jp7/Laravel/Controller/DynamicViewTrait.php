@@ -22,7 +22,7 @@ trait DynamicViewTrait
 
         $this->checkAjax();
     }
-    
+
     public function checkAjax()
     {
         $this->remote = null;
@@ -88,19 +88,19 @@ trait DynamicViewTrait
     protected function findViewName($method)
     {
         $action = str_replace('_', '-', snake_case($method));
-        
+
         $viewNames = [
             $this->makeViewName(get_class($this), $action),
             $this->makeViewName(get_parent_class($this), $action),
             "templates.{$action}"
         ];
-        
+
         foreach ($viewNames as $viewName) {
             if ($this->viewExists($viewName)) {
                 return $viewName;
             }
         }
-        
+
         throw new Exception('View not found in: ' . implode(', ', $viewNames));
     }
 
@@ -138,7 +138,7 @@ trait DynamicViewTrait
             return str_replace('_', '-', snake_case($string));
         };
         $slugArray = array_map($toSlug, explode('\\', $class));
-        
+
         return implode($separator, $slugArray);
     }
 }

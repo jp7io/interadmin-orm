@@ -50,7 +50,7 @@ class Jp7_Interadmin_Search
         }
         return $executedSqls;
     }
-    
+
     //ALTER TABLE `teste`.`interadmin_teste` DROP INDEX `search` ,
     //ADD FULLTEXT `search` (
     //`varchar_key` ,

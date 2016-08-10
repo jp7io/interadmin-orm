@@ -108,11 +108,11 @@ class Intersite
     {
         self::$instance = $instance;
     }
-        
+
     public function setServer($server)
     {
         $this->server = $server;
-        
+
         // Set variables that depend on the server
         $this->db = clone $this->server->db;
         $this->db->prefix = 'interadmin_'.$this->name_id;
@@ -132,15 +132,15 @@ class Intersite
             }
         }
     }
-    
+
     public function start()
     {
         $host = self::getHost();
-        
+
         if (isset($this->servers[$host])) {
             $this->setServer($this->servers[$host]);
         }
-        
+
         self::setConfig($this);
     }
 
@@ -148,7 +148,7 @@ class Intersite
     {
         return parse_url(config('app.url'))['host'];
     }
-    
+
     public static function __set_state($array)
     {
         $instance = new self();

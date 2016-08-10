@@ -14,11 +14,11 @@ use Jp7\Interadmin\Type;
 //
 interface FieldInterface
 {
-    
+
     public function setRecord($record);
-    
+
     public function setType(Type $type);
-    
+
     /**
      * Returns object for <th> tag
      *
@@ -60,7 +60,7 @@ interface FieldInterface
      * @return string
      */
     public function getText();
-    
+
     /**
      * Return object for <div class="form-group">...</div>
      *
@@ -74,19 +74,19 @@ interface FieldInterface
      * @return Element|string
      */
     public function getFilterTag();
-    
+
     /**
      * @return bool
      */
     public function hasMassEdit();
-    
+
     /**
      * Return input for mass edit
      *
      * @return Element|string
      */
     public function getMassEditTag();
-    
+
     /**
      * @return array
      */

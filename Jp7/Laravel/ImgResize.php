@@ -18,7 +18,7 @@ class ImgResize
     protected static $lazy = false;
     protected static $seo = false;
     protected static $minSrcsetWidth = 720;
-    
+
     public static function getLazy()
     {
         return static::$lazy;
@@ -28,7 +28,7 @@ class ImgResize
     {
         static::$lazy = (bool) $status;
     }
-    
+
     public static function getSeo()
     {
         return static::$seo;
@@ -38,7 +38,7 @@ class ImgResize
     {
         static::$seo = (bool) $status;
     }
-    
+
     public static function getMinSrcsetWidth()
     {
         return static::$minSrcsetWidth;
@@ -48,7 +48,7 @@ class ImgResize
     {
         static::$minSrcsetWidth = $minSrcsetWidth;
     }
-    
+
     /**
      * Generates image tag. Can create lazy loading images with "data-src".
      *
@@ -65,10 +65,10 @@ class ImgResize
             $options['title'] = is_object($img) ? $img->getText() : basename($img);
         }
         $alt = $options['title'];
-        
+
         return static::makeElement($img, $template, $alt, $options);
     }
-    
+
     protected static function makeElement($img, $template, $alt, $options)
     {
         if (ends_with($template, '-')) {
@@ -80,17 +80,17 @@ class ImgResize
             // Normal image with src=""
             // Prepend template to classes for CSS use
             $options['class'] = trim(array_get($options, 'class').' '.$template);
-            
+
             $url = static::url($img, $template, $alt);
             $element = ImgResizeElement::create($url, $alt, $options);
-            
+
             if (static::$lazy) {
                 $element->src(static::blankGif())
                     ->data_src($url)
                     ->setLazy(true);
             }
         }
-        
+
         return $element;
     }
 
@@ -101,20 +101,20 @@ class ImgResize
             $img = $url;
             $url = $img->getUrl($template);
         }
-      
+
         if (static::$seo) {
             $url = static::seoReplace($url, $title);
         }
-        
+
         return Cdn::asset($url);
     }
-    
+
     protected static function storageUrl()
     {
         $config = config('interadmin.storage');
         return $config['scheme'].'://'.$config['host'];
     }
-    
+
     public static function srcset($img, $prefix)
     {
         if (!ends_with($prefix, '-')) {
@@ -126,30 +126,30 @@ class ImgResize
         $templates = array_filter($all, function ($x) use ($prefix) {
             return starts_with($x, $prefix);
         });
-        
+
         $srcs = [];
         foreach ($templates as $template) {
             $parts = explode('-', $template);
             $width = end($parts);
-            
+
             if ($width >= static::$minSrcsetWidth) {
                 $srcs[] = static::url($img, $template) . " ${width}w";
             }
         }
-        
+
         return implode(', ', $srcs);
     }
-    
+
     public static function bg($url, $template = null, $title = '')
     {
         return 'background-image: url(\'' . static::url($url, $template, $title) . '\')';
     }
-    
+
     public static function blankGif()
     {
         return 'data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=';
     }
-    
+
     // SEO
     // Should only be applied to local images
     private static function seoReplace($url, $title)
@@ -160,25 +160,25 @@ class ImgResize
         return $url.(str_contains($url, '?') ? '&' : '?').
             'title='.to_slug($title);
     }
-    
+
     protected static function isExternal($url)
     {
         return parse_url($url, PHP_URL_HOST) != parse_url(self::storageUrl(), PHP_URL_HOST);
     }
-    
+
     // External images are downloaded locally to resize them
     /*
     private static function downloadExternal($url)
     {
         $local = static::urlToFilename($url);
         $filePath = '/upload/_external/' . $local;
-        
+
         if (!Storage::has($filePath)) {
             if ($file = @file_get_contents($url)) {
                 Storage::put($filePath, $file);
             }
         }
-        
+
         return self::storageUrl() . $filePath;
     }
 

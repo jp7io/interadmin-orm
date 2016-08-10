@@ -178,7 +178,7 @@ function interadmin_select_multi_item_down(campo) {
         <td style="background:#DDD">
             <input type="button" value="&laquo;" title="Adicionar" style="width:20px;height:40px;margin:0px;color:green;font-weight:bold" onclick="interadmin_select_multi_item_add('<?= $campo ?>[<?= $j ?>]')" /><br />
             <input type="button" value="X" title="Remover" style="width:20px;height:40px;margin:5px 0px;color:red;font-weight:bold" onclick="interadmin_select_multi_item_del('<?= $campo ?>[<?= $j ?>]')" /><br />
-        
+
             <input type="button" value="^" title="Mover para Cima" style="font-family:Arial;width:20px;height:20px;margin-top:20px;font-size: 15px;color:blue;font-weight:bold" onclick="interadmin_select_multi_item_up('<?= $campo ?>[<?= $j ?>]')" /><br />
             <input type="button" value="v" title="Mover para Baixo" style="font-family:Arial;width:20px;height:20px;margin:0px;color:blue;font-size: 12px;font-weight:bold" onclick="interadmin_select_multi_item_down('<?= $campo ?>[<?= $j ?>]')" />
         </td>

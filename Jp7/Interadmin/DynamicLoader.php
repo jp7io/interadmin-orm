@@ -60,7 +60,7 @@ class DynamicLoader
             }
             return true;
         }
-        
+
         if (!$retry && App::environment('local') && starts_with($class, config('interadmin.namespace'))) {
             RecordClassMap::getInstance()->clearCache();
             TypeClassMap::getInstance()->clearCache();

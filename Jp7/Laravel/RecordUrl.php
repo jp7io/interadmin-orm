@@ -45,7 +45,7 @@ class RecordUrl
                 return $parameter;
             }
         }, $parameters);
-        
+
         return URL::route($route->getName(), $parameters);
     }
 
@@ -88,7 +88,7 @@ class RecordUrl
             throw new BadMethodCallException('Route "'.$route->getUri().'" has '.count($variables).
                     ' parameters, but received '.count($parameters).'. Called on '.get_class($record));
         }
-        
+
         return URL::route($route->getName(), $parameters);
     }
 }

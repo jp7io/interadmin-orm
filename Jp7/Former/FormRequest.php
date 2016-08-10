@@ -31,14 +31,14 @@ class FormRequest
     {
         if (!$this->validator()->fails()) {
             $backupLogUser = Record::setLogUser('site - '.Request::header('user-agent'));
-            
+
             $saved = $this->model
                 ->fill($this->input())
                 ->save();
-            
+
             // Revert variable
             Record::setLogUser($backupLogUser);
-            
+
             return $saved;
         }
     }

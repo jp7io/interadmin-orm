@@ -16,10 +16,10 @@ class QaAuth
             echo '401 Unauthorized';
             exit;
         }
-        
+
         return $next($request);
     }
-    
+
     // We don't want super security
     // We just want to stop curious people and Google from opening the web page
     // While not complicating the development cycle

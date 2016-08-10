@@ -52,7 +52,7 @@ class InterAdminRecordUrl
         //$this->_url = $url;
         return $url;
     }
-    
+
     /**
      * Return URL from the route associated with this record.
      *

@@ -20,7 +20,7 @@ class ImageCacheController extends BaseController
             abort(404);
         }
         $img = Image::make($original);
-        
+
         if ($template !== 'original') {
             $templates = config('imagecache.templates');
             if (!isset($templates[$template])) {

@@ -6,14 +6,14 @@ class Jp7_Controller_InteradminController extends Jp7_Controller_Action
     public function indexAction()
     {
         $config = Zend_Registry::get('config');
-        
+
         if ($interadmin_remote = reset($config->server->interadmin_remote)) {
             $this->_redirect('http://'.$interadmin_remote.'/'.$config->name_id);
         }
         echo 'No InterAdmin remote found.';
         exit;
     }
-    
+
     // Set cookie to flag that user MIGHT have access to interadmin
     // Access should be validated elsewhere
     public function sessionAction()
@@ -33,7 +33,7 @@ class Jp7_Controller_InteradminController extends Jp7_Controller_Action
         echo 'ok';
         exit;
     }
-    
+
     // Updates log file / Used to invalidate cache
     public function logUpdateAction()
     {

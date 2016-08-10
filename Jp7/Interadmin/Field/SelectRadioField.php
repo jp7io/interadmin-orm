@@ -13,7 +13,7 @@ class SelectRadioField extends SelectField
                 ->radios($this->getRadios())
                 ->check($this->getValue());
     }
-    
+
     protected function getRadios()
     {
         $radios = [];
@@ -25,7 +25,7 @@ class SelectRadioField extends SelectField
         }
         return $radios;
     }
-    
+
     protected function getFilterField()
     {
         return parent::getFormerField();

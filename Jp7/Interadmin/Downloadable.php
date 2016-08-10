@@ -21,13 +21,13 @@ trait Downloadable
         // '../..' => ''
         return replace_prefix($config['backend_path'], $config['path'], $this->url);
     }
-    
+
     // For client side use
     public function getUrl($template = 'original')
     {
         $config = config('interadmin.storage');
         $storageUrl = $config['scheme'].'://'.$config['host'].$config['path'];
-        
+
         // '../..' => 'http://www.example.com'
         $url = replace_prefix($config['backend_path'], $storageUrl, $this->url);
 
@@ -44,23 +44,23 @@ trait Downloadable
         if ($this->isExternal()) {
             throw new Exception('Cannot get filename of external image.');
         }
-        
+
         $backendPath = config('interadmin.storage.backend_path');
         $url = $this->removeQueryString();
-        
+
         return replace_prefix($backendPath.'/', '', $url);
     }
-    
+
     private function removeQueryString()
     {
         return parse_url($this->url, PHP_URL_PATH);
     }
-    
+
     public function isExternal()
     {
         return !empty(parse_url($this->url)['host']);
     }
-    
+
     /**
      * Returns the extension of this file.
      *
@@ -75,7 +75,7 @@ trait Downloadable
     {
         return Storage::size($this->getFilename());
     }
-    
+
     public function getHumanSize()
     {
         return human_size($this->getSize());

@@ -11,7 +11,7 @@ class TextField extends ColumnField
     const XTRA_TEXT = '0';
     const XTRA_HTML = 'S';
     const XTRA_HTML_LIGHT = 'html_light';
-    
+
     public function getText()
     {
         $text = $this->getValue();
@@ -20,7 +20,7 @@ class TextField extends ColumnField
         }
         return $text;
     }
-    
+
     protected function getFormerField()
     {
         return Former::textarea($this->getFormerName())

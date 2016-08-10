@@ -19,7 +19,7 @@ class Query extends Query\BaseQuery
 
     /**
      * Returns a instance with id 0, to get scopes, rules, and so on.
-     * 
+     *
      * @return Record
      */
     public function getModel()
@@ -33,7 +33,7 @@ class Query extends Query\BaseQuery
 
     /**
      * Create a record without saving.
-     * 
+     *
      * @return Record
      */
     public function build(array $attributes = [])
@@ -43,7 +43,7 @@ class Query extends Query\BaseQuery
 
     /**
      * Create and save a record.
-     * 
+     *
      * @return Record
      */
     public function create(array $attributes = [])
@@ -53,7 +53,7 @@ class Query extends Query\BaseQuery
 
     /**
      * Set deleted = 'S' and update the records.
-     * 
+     *
      * @return int
      */
     public function delete()
@@ -310,7 +310,7 @@ class Query extends Query\BaseQuery
 
         return $items->jsonList($column, $key);
     }
-    
+
     public function findOrFail($id)
     {
         $result = $this->find($id);

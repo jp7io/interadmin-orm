@@ -23,7 +23,7 @@ class Jp7_Interadmin_Upload
             return $path;
         }
         $path = substr($path, strlen('../../'));
-        
+
         if (static::isImage($path)) {
             return static::getAdapter()->imageUrl($path, $template);
         } else {
@@ -53,7 +53,7 @@ class Jp7_Interadmin_Upload
     {
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $url);
     }
-    
+
     public static function getAdapter()
     {
         global $config;

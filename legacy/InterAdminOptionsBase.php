@@ -12,7 +12,7 @@ class InterAdminOptionsBase
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
     ];
-    
+
     public function __construct(InterAdminTipo $provider)
     {
         $this->provider = $provider;
@@ -28,7 +28,7 @@ class InterAdminOptionsBase
         $isOperator = in_array($operator, $this->operators);
         return ($isOperator && $operator != '=' && is_null($value));
     }
-    
+
     public function where($column, $operator = null, $value = null)
     {
         $where = [];
@@ -61,10 +61,10 @@ class InterAdminOptionsBase
             $where[] = $this->_parseComparison($column, $operator, $value);
         }
         $this->options['where'] = array_merge($this->options['where'], $where);
-        
+
         return $this;
     }
-    
+
     protected function _parseComparison($column, $operator, $value)
     {
         if (is_null($value) && $operator == '=') {
@@ -78,7 +78,7 @@ class InterAdminOptionsBase
         $this->options['where'][] = $where;
         return $this;
     }
-    
+
     public function whereIn($column, $values)
     {
         $values = array_map([$this, '_escapeParam'], $values);
@@ -109,7 +109,7 @@ class InterAdminOptionsBase
     public function whereYear($column, $value)
     {
         $where = $this->_parseComparison('YEAR('.$column.')', '=', $value);
-        
+
         $this->options['where'][] = $where;
         return $this;
     }
@@ -129,7 +129,7 @@ class InterAdminOptionsBase
         $this->options['where'][] = $where;
         return $this;
     }
-    
+
     protected function _escapeParam($value)
     {
         global $db;
@@ -142,7 +142,7 @@ class InterAdminOptionsBase
         if (is_null($value)) {
             $value = 'NULL';
         }
-        
+
         return $value;
     }
 
@@ -226,7 +226,7 @@ class InterAdminOptionsBase
     {
         $this->options = $options;
     }
-    
+
     public function __call($method_name, $params)
     {
         $last = count($params) - 1;

@@ -14,12 +14,12 @@ class SelectAjaxField extends SelectField
                 ->data_id_tipo($this->nome)
                 ->data_has_tipo($this->hasTipo());
     }
-    
+
     protected function getOptions()
     {
         return $this->toOptions($this->getCurrentRecords());
     }
-    
+
     public function searchOptions($search)
     {
         if (!$this->hasTipo()) {
@@ -32,7 +32,7 @@ class SelectAjaxField extends SelectField
         }
         throw new UnexpectedValueException('Not implemented');
     }
-    
+
     protected function buildSearch($query, $fields, $search)
     {
         global $db;
@@ -54,12 +54,12 @@ class SelectAjaxField extends SelectField
         $query->orderByRaw(implode(', ', $order));
         return $query;
     }
-    
+
     protected function getSearchableFields()
     {
         $campos = $this->nome->getCampos();
         $searchable = [];
-        
+
         foreach ($this->nome->getCamposCombo() as $campoCombo) {
             if ($campos[$campoCombo]['nome'] instanceof Type) {
                 foreach ($campos[$campoCombo]['nome']->getCamposCombo() as $campoCombo2) {
@@ -71,7 +71,7 @@ class SelectAjaxField extends SelectField
         }
         return $searchable;
     }
-    
+
     protected function toJsonOptions($array)
     {
         $options = [];

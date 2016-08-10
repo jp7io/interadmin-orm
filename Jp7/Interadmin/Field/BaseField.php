@@ -24,18 +24,18 @@ abstract class BaseField implements FieldInterface
      * @var int|null
      */
     protected $index = null;
-    
+
     public function setRecord($record)
     {
         assert(is_object($record) || is_null($record));
         $this->record = $record;
     }
-    
+
     public function setType(Type $type)
     {
         $this->type = $type;
     }
-    
+
     public function setIndex($index)
     {
         $this->index = $index;
@@ -52,7 +52,7 @@ abstract class BaseField implements FieldInterface
         return Element::td($this->getCellHtml())
             ->class($this->id);
     }
-    
+
     public function getHeaderHtml()
     {
         return e($this->getLabel());
@@ -62,7 +62,7 @@ abstract class BaseField implements FieldInterface
     {
         return nl2br(e($this->getText()));
     }
-    
+
     /**
      * Return object for <div class="form-group">...</div>
      *
@@ -73,7 +73,7 @@ abstract class BaseField implements FieldInterface
         return $this->getFormerField()
             ->label($this->getLabel());
     }
-    
+
     /**
      * @return Element|string
      */
@@ -88,7 +88,7 @@ abstract class BaseField implements FieldInterface
     {
         return '';
     }
-    
+
     public function hasMassEdit()
     {
         return false;
@@ -107,17 +107,17 @@ abstract class BaseField implements FieldInterface
             ->id($this->getFormerId())
             ->value($this->getValue());
     }
-    
+
     protected function getFormerName()
     {
         return $this->id.(is_null($this->index) ? '' : '['.$this->index.']');
     }
-    
+
     protected function getFormerId()
     {
         return $this->id.(is_null($this->index) ? '' : '_'.$this->index);
     }
-    
+
     protected function getRuleName()
     {
         $name = str_replace( // same replace Laravel and Former do
@@ -127,7 +127,7 @@ abstract class BaseField implements FieldInterface
         );
         return trim($name, '.');
     }
-    
+
     protected function getValue()
     {
         $column = $this->id;
@@ -137,12 +137,12 @@ abstract class BaseField implements FieldInterface
         }
         return $value;
     }
-    
+
     protected function getDefaultValue()
     {
         return null;
     }
-    
+
     public function getRules()
     {
         return [];

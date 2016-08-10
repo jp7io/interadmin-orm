@@ -274,7 +274,7 @@ class InterSite
             'path' => getenv('STORAGE_PATH') ?: '',
         ];
     }
-    
+
     public function start()
     {
         if (!self::isWakeupEnabled()) {

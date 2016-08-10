@@ -67,7 +67,7 @@ class FormerExtension
         if (!$model instanceof Record) {
             return $this->former->populate($model);
         }
-        
+
         $this->model = $model;
         $this->rules = $model->getRules();
 
@@ -75,14 +75,14 @@ class FormerExtension
         $proxy->setRecord($model);
         return $this->former->populate($proxy);
     }
-  
+
     public function close()
     {
         $this->model = null;
 
         return $this->former->close();
     }
-    
+
     /**
      * Add "rules" and "action" from InterAdmin.
      */
@@ -150,7 +150,7 @@ class FormerExtension
         if ($field->getType() === 'date' && $field->getValue() instanceof DateTime) {
             $field->setValue($field->getValue()->format('Y-m-d'));
         }
-        
+
         if (isset($this->rules[$alias])) {
             if (in_array('name_and_surname', $this->rules[$alias])) {
                 $field->pattern('\S+ +\S.*')

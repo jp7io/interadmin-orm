@@ -231,7 +231,7 @@ class FileCache
         } elseif (strpos($fileName, '.') === false) {
             $fileName .= (($fileName) ? '/' : '').'index';
         }
-        
+
         // Falha de segurança. Passou com conteúdo inválido. Investigar depois.
         if (preg_match('(%|:|=|\.\.|\*|\?)', $fileName) || strlen($fileName) > 200) {
             return false;

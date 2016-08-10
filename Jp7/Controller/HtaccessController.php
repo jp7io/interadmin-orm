@@ -9,7 +9,7 @@ abstract class Jp7_Controller_HtaccessController extends Jp7_Controller_Action
 
         $redirectTipo = $this->getRedirectTipo();
         $fileContent = $redirectTipo->getHtaccessContent();
-        
+
         $ok = false;
         if (strlen($fileContent) > 10) {
             $file = dirname(APPLICATION_PATH).'/.htaccess';

@@ -13,11 +13,11 @@ class BladeExtension
         if (config('view.includes-with-underline')) {
             Blade::extend(function ($view) {
                 $pattern = '/(?<!\w)(\s*)@include\(([^,\)]+)/';
-                
+
                 return preg_replace($pattern, '$1@include(' . self::class . '::inc($2)', $view);
             });
         }
-        
+
         // @ia($model)
         Blade::directive('ia', function ($expression) {
             return "<?php echo interadmin_data{$expression}; ?>";

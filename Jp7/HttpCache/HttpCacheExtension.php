@@ -13,14 +13,14 @@ class HttpCacheExtension extends HttpCache
         if (!config('httpcache.enabled') || $this->matchesBlacklist($request)) {
             return $this->pass($request, $catch);
         }
-        
+
         if (config('httpcache.invalidate')) {
             return $this->invalidate($request, $catch);
         }
-        
+
         return parent::handle($request, $type, $catch);
     }
-    
+
     public function matchesBlacklist(Request $request)
     {
         $blacklist = config('httpcache.blacklist');

@@ -22,7 +22,7 @@ trait SelectFieldTrait
         }
         throw new UnexpectedValueException('Not implemented');
     }
-    
+
     protected function formatText($related, $html)
     {
         list($value, $status) = $this->valueAndStatus($related);
@@ -31,7 +31,7 @@ trait SelectFieldTrait
         }
         return $value.($status ? '' : ' [unpublished]');
     }
-    
+
     protected function valueAndStatus($related)
     {
         if ($related instanceof Type) {
@@ -45,7 +45,7 @@ trait SelectFieldTrait
         }
         return [$related, false];
     }
-        
+
     protected function getDefaultValue()
     {
         if ($this->default && !is_numeric($this->default) && $this->nome instanceof Type) {
@@ -62,7 +62,7 @@ trait SelectFieldTrait
         }
         return $this->default;
     }
-    
+
     /**
      * Returns only the current selected option, all the other options will be
      * provided by the AJAX search
@@ -83,7 +83,7 @@ trait SelectFieldTrait
         }
         throw new UnexpectedValueException('Not implemented');
     }
-    
+
     protected function getOptions()
     {
         if (!$this->hasTipo()) {
@@ -97,7 +97,7 @@ trait SelectFieldTrait
         }
         throw new UnexpectedValueException('Not implemented');
     }
-    
+
     protected function records()
     {
         $camposCombo = $this->nome->getCamposCombo();
@@ -108,18 +108,18 @@ trait SelectFieldTrait
         $query->select($camposCombo)
             ->where('deleted', false)
             ->orderByRaw(implode(', ', $camposCombo));
-        
+
         if ($this->where) {
             // From xtra_disabledfields
             $query->whereRaw('1=1'.$this->where);
         }
         return $query;
     }
-        
+
     protected function tipos()
     {
         global $lang;
-        
+
         $query = new TypeQuery(new Type);
         $query->select('nome'.$lang->prefix, 'parent_id_tipo')
             ->published()
@@ -130,7 +130,7 @@ trait SelectFieldTrait
         }
         return $query;
     }
-    
+
     protected function toOptions($array)
     {
         $options = [];
@@ -147,7 +147,7 @@ trait SelectFieldTrait
         }
         return $options;
     }
-    
+
     protected function toTreeOptions($tipos)
     {
         $map = [];
@@ -158,7 +158,7 @@ trait SelectFieldTrait
         $this->addTipoTreeOptions($options, $map, 0);
         return $options;
     }
-    
+
     protected function addTipoTreeOptions(&$options, $map, $parent_id_tipo, $level = 0)
     {
         if ($map[$parent_id_tipo]) {

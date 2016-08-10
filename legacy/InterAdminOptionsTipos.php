@@ -11,7 +11,7 @@ class InterAdminOptionsTipos extends InterAdminOptionsBase
     {
         return InterAdminTipo::findFirstTipo($this->options);
     }
-    
+
     public function __call($method_name, $params)
     {
         throw new BadMethodCallException($method_name);

@@ -79,9 +79,9 @@ class Jp7_Uploader
         if ($extension == '.jpeg') {
             $extension = '.jpg';
         }
-        
+
         $tempfile = jp7_path(sys_get_temp_dir()).$destination.$extension;
-        
+
         // Mkdir if needed
         if (!is_dir(dirname($tempfile))) {
             @mkdir(dirname($tempfile));
@@ -100,11 +100,11 @@ class Jp7_Uploader
             $msg = 'Impossível copiar arquivo "'.$tmp_name[$key].'" para "'.$tempfile.'".<br /> getcwd(): '.getcwd();
             throw new Exception($msg);
         }
-        
+
         // Upload to storage
         $filepath = $this->getBasePath().$destination.$extension;
         Storage::put($filepath, file_get_contents($tempfile), 'public');
-        
+
         return '../../'.$filepath;
     }
     /**

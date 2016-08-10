@@ -9,10 +9,10 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
         global $config;
 
         $url = $this->url($path);
-        
+
         // Replace host
         $url = $this->setHost($url, $config->imgix['host']);
-        
+
         $params = $config->imgix['templates'][$template];
         if ($params) {
             $url = $this->mergeQuery($url, $params);

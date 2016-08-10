@@ -17,7 +17,7 @@ class Jp7_Interadmin_User extends InterAdmin
 
         return $username.'@'.$domain;
     }
-    
+
     public function getResetToken()
     {
         if ($this->reset_token_sent_at < new Jp7_Date('-1 day')) {
@@ -29,7 +29,7 @@ class Jp7_Interadmin_User extends InterAdmin
         }
         return $this->reset_token;
     }
-    
+
     /**
      * Crypto strong 256-bit random token
      */
@@ -37,7 +37,7 @@ class Jp7_Interadmin_User extends InterAdmin
     {
         return bin2hex(openssl_random_pseudo_bytes(32));
     }
-    
+
     public function resetPassword($password, $confirm_password)
     {
         if (strlen($password) < 6) {
@@ -46,14 +46,14 @@ class Jp7_Interadmin_User extends InterAdmin
         if ($password !== $confirm_password) {
             throw new UnexpectedValueException('Confirmação de senha deve ser igual à nova senha');
         }
-        
+
         $this->senha = md5($password);
         $this->reset_token = '';
         $this->reset_token_sent_at = new Jp7_Date('0000-00-00');
-        
+
         $this->save();
     }
-    
+
     // Special - Disparo
     public static function disparo($from, $id, $id_tipo)
     {
@@ -66,7 +66,7 @@ class Jp7_Interadmin_User extends InterAdmin
             'fields_alias' => true,
             'class' => Jp7_Interadmin_User::class
         ]);
-        
+
         try {
             if (!$user->isPublished()) {
                 throw new LogicException('Usuário está despublicado');
@@ -80,10 +80,10 @@ class Jp7_Interadmin_User extends InterAdmin
                     // Its not MD5, so user will never login with it
                     'senha' => uniqid()
                 ]);
-                
+
                 $mailer = new Interadmin_Mailer_PasswordRegistration($user);
                 $mailer->handle();
-                
+
                 Session::push('flash.new', 'flash.success');
                 Session::push('flash.success', 'Enviado e-mail com link para cadastro de senha.');
             }
@@ -92,7 +92,7 @@ class Jp7_Interadmin_User extends InterAdmin
             Session::push('flash.error', $e->getMessage());
         }
     }
-    
+
     // Special - Campo
     /**
      * @deprecated Use Interadmin\Fields\PasswordLinkButton
@@ -106,12 +106,12 @@ class Jp7_Interadmin_User extends InterAdmin
                 return $value;
             case 'edit':
                 global $id;
-                
+
                 // Remove custom keys
                 $campo['nome'] = $campo['nome_original'];
                 unset($campo['tipo_de_campo']);
                 unset($campo['nome_original']);
-                
+
                 if (!$id) {
                     // New user shows checkbox to send link
                     $campo['tipo'] = 'char_send_link';
@@ -120,7 +120,7 @@ class Jp7_Interadmin_User extends InterAdmin
                 ob_start();
                 $interAdminField->getHtml();
                 $html = ob_get_clean();
-                
+
                 if (!$id) {
                     // New user shows checkbox to send link
                     $end = '</td><td></td></tr>';

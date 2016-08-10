@@ -37,13 +37,13 @@ return [
         'stale_if_error'         => 60,
         */
     ],
-    
+
     'blacklist' => [
         '_debugbar',
         'interadmin/*',
         // Example: 'eventos/.*/presenca',
         // Example: 'fazer-uma-viagem/seguro-de-viagem-internacional/simulador',
     ],
-    
+
     'invalidate' => false //isset($_COOKIE['{{CLIENT_NAME}}']['interadmin'])
 ];

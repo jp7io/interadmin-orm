@@ -14,14 +14,14 @@ class ImageCacheServiceProvider extends ServiceProvider
     {
         if (!$this->app->routesAreCached()) {
             $filenamePattern = '[ \w\\.\\/\\-]+';
-            
+
             Route::get(
                 'imagecache-service/clear/{filename}',
                 ImageCacheController::class.'@clear'
             )->where([
                 'filename' => $filenamePattern
             ]);
-            
+
             Route::get(
                 'imagecache-service/{template}/{filename}',
                 ImageCacheController::class.'@create'
@@ -30,7 +30,7 @@ class ImageCacheServiceProvider extends ServiceProvider
             ]);
         }
     }
-    
+
     public function register()
     {
     }

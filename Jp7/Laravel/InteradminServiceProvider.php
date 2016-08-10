@@ -34,31 +34,31 @@ class InteradminServiceProvider extends ServiceProvider
                 \Config::set('app.debug', false);
             }
         }
-        
+
         BladeExtension::apply();
-        
+
         $this->publishPackageFiles();
         $this->bootOrm();
         $this->shareViewPath();
         // self::bootTestingEnv();
     }
-    
+
     private function publishPackageFiles()
     {
         $base = __DIR__.'/../..';
-        
+
         $this->publishes([
             $base.'/config/httpcache.php' => config_path('httpcache.php'),
             $base.'/config/imgix.php' => config_path('imgix.php'),
             $base.'/config/interadmin.php' => config_path('interadmin.php'),
         ], 'config');
-        
+
         $this->publishes([
             $base.'/resources/lang/en/interadmin.php' => resource_path('lang/en/interadmin.php'),
             $base.'/resources/lang/pt-BR/interadmin.php' => resource_path('lang/pt-BR/interadmin.php'),
         ], 'resources');
     }
-    
+
     /**
      * Register the application services.
      *
@@ -73,13 +73,13 @@ class InteradminServiceProvider extends ServiceProvider
             }
         });
     }
-    
+
     private function bootOrm()
     {
         if (config('interadmin.namespace')) {
             Type::setDefaultClass(config('interadmin.namespace').'Type');
         }
-        
+
         try {
             if (Schema::hasTable('tipos')) {
                 DynamicLoader::register();
@@ -92,7 +92,7 @@ class InteradminServiceProvider extends ServiceProvider
             Log::error($e);
         }
     }
-    
+
     private function shareViewPath()
     {
         View::composer('*', function ($view) {
@@ -101,7 +101,7 @@ class InteradminServiceProvider extends ServiceProvider
             View::share('viewPath', implode('.', $parts));
         });
     }
-    
+
     /*
     private function bootTestingEnv()
     {
@@ -122,7 +122,7 @@ class InteradminServiceProvider extends ServiceProvider
         \App::before(function ($request) {
             // Needed for tests
             \Former::getFacadeRoot()->ids = [];
-        });   
+        });
     }
     */
 }

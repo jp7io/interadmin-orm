@@ -296,7 +296,7 @@ class InterAdminField
             if (strpos($tipo_de_campo, 'tit_') === 0) {
             } elseif (strpos($tipo_de_campo, 'file_') === 0) {
                 $url = $valor ?: DEFAULT_PATH.'/img/px.png';
-                
+
                 echo ''.
                 $_tr.
                     $_th.
@@ -332,7 +332,7 @@ class InterAdminField
                 echo $S;
             } elseif (strpos($tipo_de_campo, 'password_') === 0 && $valor) { // &&$xtra
                 $form = preg_replace('/value="[^"]+"/', 'value="" disabled', $form, 1);
-                
+
                 echo ''.
                 $_tr.
                     $_th.

@@ -88,7 +88,7 @@ class Jp7_YouTube
 
         $youTubeVideoUrl = self::getEmbedLink($youTubeVideoUrl);
         $youTubeVideoUrl .= (str_contains($youTubeVideoUrl, '?') ? '&' : '?') . 'hl=pt-br&fs=1&rel=0&vq=hd720';
-        
+
         return '
             <object width="'.$width.'" height="'.$height.'">
                 <param name="movie" value="'.$youTubeVideoUrl.'"></param>

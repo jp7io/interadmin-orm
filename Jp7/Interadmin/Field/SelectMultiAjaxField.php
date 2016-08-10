@@ -17,12 +17,12 @@ class SelectMultiAjaxField extends SelectMultiField
             ->data_id_tipo($this->nome)
             ->data_has_tipo($this->hasTipo());
     }
-    
+
     protected function getOptions()
     {
         return $this->toOptions($this->getCurrentRecords());
     }
-        
+
     public function getFilterTag()
     {
         $selectField = new SelectAjaxField($this->campo);

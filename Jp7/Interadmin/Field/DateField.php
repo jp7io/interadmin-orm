@@ -7,7 +7,7 @@ use Jp7_Date as Date;
 class DateField extends ColumnField
 {
     use DateFieldTrait;
-    
+
     const XTRA_NORMAL = '0';
     const XTRA_NO_TIME = 'S';
     protected $id = 'date';
@@ -21,7 +21,7 @@ class DateField extends ColumnField
     $S_form_xtra_arr['calendar_nocombo_datetime']="Calendário S/ Combo";
     $S_form_xtra_arr['calendar_nocombo_date']="Calendário S/ Combo S/ Hora";
     */
-    
+
     protected function isDatetime()
     {
         return (ends_with($this->xtra, '_datetime') || $this->xtra === self::XTRA_NORMAL);

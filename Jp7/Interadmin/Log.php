@@ -54,7 +54,7 @@ class Log extends RecordAbstract
     {
         $this->attributes = $attributes + ['id_log' => 0];
     }
-    
+
     public function &__get($name)
     {
         if (isset($this->attributes[$name])) {
@@ -66,7 +66,7 @@ class Log extends RecordAbstract
 
         return $null; // Needs to be variable to be returned as reference
     }
-    
+
     /**
      * Gets the Type object for this record, which is then cached on the $_tipo property.
      *
@@ -202,7 +202,7 @@ class Log extends RecordAbstract
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();
         $options['campos'] = $instance->getAttributesCampos();
-        
+
         $rs = $instance->_executeQuery($options);
         $logs = [];
 
@@ -211,7 +211,7 @@ class Log extends RecordAbstract
             $instance->_getAttributesFromRow($row, $log, $options);
             $logs[] = $log;
         }
-        
+
         return $logs;
     }
 
@@ -219,7 +219,7 @@ class Log extends RecordAbstract
     {
         return static::findLogs($options)[0];
     }
-    
+
     public static function getPublishedFilters($table, $alias)
     {
         // N￣o precisa

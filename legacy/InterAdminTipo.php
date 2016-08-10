@@ -22,7 +22,7 @@ use Jp7\Interadmin\Record;
 class InterAdminTipo extends Type implements InterAdminAbstract
 {
     const DEFAULT_NAMESPACE = '';
-    
+
     /**
      * Magic method calls(On Development).
      *
@@ -52,7 +52,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         }
         return parent::__call($method, $args);
     }
-    
+
     /**
      * Retrieves the unique record which have this id.
      *
@@ -66,7 +66,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $options['where'][] = 'id = '.intval((string) $id);
         return $this->deprecatedFindFirst($options);
     }
-    
+
     /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, class.
      *
@@ -77,7 +77,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $result = $this->find(['limit' => 1] + $options);
         return reset($result);
     }
-    
+
     /**
      * Retrieves the first record which have this id_string.
      *
@@ -90,7 +90,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $options['where'][] = "id_string = '".$id_string."'";
         return $this->findFirst($options);
     }
-    
+
     /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
      *
@@ -100,7 +100,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         return $this->deprecatedFind($options)->all();
     }
-   
+
     public function distinct($column, $options = [])
     {
         return parent::deprecated_distinct($column, $options);
@@ -130,7 +130,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         return parent::deprecated_aggregate($function, $column, $options);
     }
-    
+
     /**
      * Returns the number of InterAdmins using COUNT(id).
      *
@@ -155,7 +155,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $retorno = $this->deprecatedFindFirst($options);
         return intval($retorno->count_id);
     }
-    
+
     /**
      * Retrieves the children of this InterAdminTipo.
      *
@@ -169,12 +169,12 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
         return $this->deprecatedGetChildren($options)->all();
     }
-    
+
     public function getNome()
     {
         return $this->getName();
     }
-    
+
     /**
      * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
      *
@@ -196,7 +196,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         }
         return $records;
     }
-    
+
     protected function _aliasToColumn($alias, $aliases)
     {
         if (isset($aliases[$alias])) {
@@ -210,7 +210,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         }
         return $alias;
     }
-    
+
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
     {
         if ($forceAsString) {
@@ -230,7 +230,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         }
         return $this->$fields;
     }
-    
+
      /**
      * Gets the first child.
      *
@@ -243,7 +243,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $retorno = $this->getChildren(['limit' => 1] + $options);
         return $retorno[0];
     }
-    
+
     /**
      * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
      *
@@ -283,7 +283,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $options['where'][] = "model_id_tipo != '0'";
         return $this->getChildren($options);
     }
-    
+
     /**
      * Creates a record with id_tipo, mostrar, date_insert and date_publish filled.
      *
@@ -310,7 +310,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $record->setAttributes($attributes);
         return $record;
     }
-    
+
     /**
      * Creates a object of the given Class name with the same attributes.
      *
@@ -324,12 +324,12 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $newobject->attributes = $this->attributes;
         return $newobject;
     }
-    
+
     public function getTagFilters()
     {
         return '(tags.id_tipo = '.$this->id_tipo.' AND tags.id = 0)';
     }
-    
+
     public function getBreadcrumb()
     {
         $parents = [];
@@ -339,23 +339,23 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         } while (($parent = $parent->getParent()) && $parent->id_tipo);
         return array_reverse($parents);
     }
-    
+
     public function deleteInterAdminsForever($options = [])
     {
         $this->deprecated_deleteInterAdminsForever($options);
     }
-    
+
     public function deleteInterAdmins($options = [])
     {
         $this->deprecated_deleteInterAdmins($options);
     }
-    
+
     public function updateAttributes($attributes)
     {
         $this->setRawAttributes($attributes);
         $this->_update($attributes);
     }
-    
+
     public function getUrl()
     {
         return RecordUrl::getTypeUrl($this);

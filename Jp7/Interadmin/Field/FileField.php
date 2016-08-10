@@ -18,7 +18,7 @@ class FileField extends ColumnField
             true // icon_small
         );
     }
-    
+
     function setEditCredits($boolean)
     {
         $this->editCredits = $boolean;
@@ -35,7 +35,7 @@ class FileField extends ColumnField
         }
         return $input;
     }
-    
+
     protected function getSearchButton()
     {
         $input = Input::button(null, 'Procurar...')
@@ -43,7 +43,7 @@ class FileField extends ColumnField
         $this->handleReadonly($input);
         return $input;
     }
-    
+
     protected function getCreditsHtml()
     {
         $field = new VarcharField(['tipo' => $this->tipo.'_text']);

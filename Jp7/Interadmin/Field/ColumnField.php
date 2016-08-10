@@ -28,7 +28,7 @@ class ColumnField extends BaseField
      * @var array
      */
     protected $campo;
-    
+
     /**
      * @param array $campo
      */
@@ -36,7 +36,7 @@ class ColumnField extends BaseField
     {
         $this->campo = $campo;
     }
-    
+
     /**
      * @param string $name
      * @return mixed
@@ -48,7 +48,7 @@ class ColumnField extends BaseField
         }
         return $this->campo[$name];
     }
-    
+
     /**
      * @param string $name
      * @return bool
@@ -57,7 +57,7 @@ class ColumnField extends BaseField
     {
         return isset($this->campo[$name]);
     }
-    
+
     /**
      * @param string $name
      * @return void
@@ -66,12 +66,12 @@ class ColumnField extends BaseField
     {
         unset($this->campo[$name]);
     }
-    
+
     public function getHeaderTag()
     {
         return parent::getHeaderTag()->title($this->tipo);
     }
-    
+
     public function getLabel()
     {
         return $this->nome;
@@ -81,7 +81,7 @@ class ColumnField extends BaseField
     {
         return $this->getValue();
     }
-    
+
     public function getEditTag()
     {
         $input = parent::getEditTag();
@@ -98,17 +98,17 @@ class ColumnField extends BaseField
         $this->handleReadonly($input);
         return $input;
     }
-        
+
     protected function getFormerName()
     {
         return $this->tipo.(is_null($this->index) ? '' : '['.$this->index.']');
     }
-    
+
     protected function getFormerId()
     {
         return $this->nome_id.(is_null($this->index) ? '' : '_'.$this->index);
     }
-    
+
     protected function getValue()
     {
         $column = $this->tipo;
@@ -118,24 +118,24 @@ class ColumnField extends BaseField
         }
         return $value;
     }
-    
+
     protected function getDefaultValue()
     {
         return $this->default;
     }
-    
+
     protected function handleReadonly($input)
     {
         if ($this->isReadonly()) {
             $input->disabled();
         }
     }
-    
+
     protected function isReadonly()
     {
         return $this->readonly || !$this->hasPermissions();
     }
-    
+
     protected function hasPermissions()
     {
         global $s_user;
@@ -151,7 +151,7 @@ class ColumnField extends BaseField
         }
         return false;
     }
-    
+
     public function getRules()
     {
         $rules = [];

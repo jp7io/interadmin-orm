@@ -50,7 +50,7 @@ class TypelessQuery extends Query
 
         return $this->first();
     }
-    
+
     public function findMany($ids)
     {
         $sample = reset($ids);

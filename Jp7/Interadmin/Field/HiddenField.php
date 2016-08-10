@@ -7,7 +7,7 @@ use Former;
 class HiddenField extends ColumnField
 {
     protected $id = 'hidden';
-    
+
     protected function getFormerField()
     {
         return Former::hidden($this->getFormerName())

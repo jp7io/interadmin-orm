@@ -10,7 +10,7 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
             ($config->storage['path'] ? $config->storage['path'].'/' : '') .
             $path;
     }
-    
+
     protected function setHost($url, $host)
     {
         $parts = parse_url($url);
@@ -21,7 +21,7 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
             $url
         );
     }
-    
+
     protected function mergeQuery($url, $params)
     {
         $query = http_build_query($params);

@@ -8,17 +8,17 @@ use Log;
 class FuncField extends ColumnField
 {
     protected $id = 'func';
-    
+
     public function getHeaderHtml()
     {
         return $this->getFuncHtml('', 'header');
     }
-    
+
     public function getCellHtml()
     {
         return $this->getFuncHtml($this->getValue(), 'list');
     }
-    
+
     protected function getFuncHtml($value, $parte)
     {
         if (!is_callable($this->nome)) {
@@ -36,7 +36,7 @@ class FuncField extends ColumnField
             return '(erro: '.$this->nome.')';
         }
     }
-    
+
     protected function getDefaultValue()
     {
         if ($this->default) {
@@ -46,16 +46,16 @@ class FuncField extends ColumnField
             return $_POST[$this->tipo][0];
         }
     }
-    
+
     public function getLabel()
     {
         return $this->label;
     }
-    
+
     public function getEditTag()
     {
         $html = trim($this->getFuncHtml($this->getValue(), 'edit'));
-        
+
         if (starts_with($html, '<tr') || ends_with($html, '</tr>')) {
              $html = '<table class="special-shim">'.$html.'</table>';
         }

@@ -29,7 +29,7 @@ class Jp7_Interadmin_Util
         if ($use_id_string) {
             self::_prepareForIdString($exports, $tipoObj);
         }
-        
+
         $tiposChildren = $tipoObj->getInterAdminsChildren();
         foreach ($exports as $export) {
             self::_exportChildren($export, $tiposChildren, $use_id_string, $options);
@@ -43,14 +43,14 @@ class Jp7_Interadmin_Util
         $export->_children = [];
         foreach ($tiposChildren as $tipoChildrenArr) {
             $tipoChildren = $export->getChildrenTipo($tipoChildrenArr['id_tipo']);
-            
+
             $children = $tipoChildren->find($options  + [
                 'where' => "deleted = ''",
             ]);
             if ($use_id_string) {
                 self::_prepareForIdString($children, $tipoChildren);
             }
-            
+
             $tiposGrandChildren = $tipoChildren->getInterAdminsChildren();
             foreach ($children as $child) {
                 self::_exportChildren($child, $tiposGrandChildren, $use_id_string, $options);
@@ -69,7 +69,7 @@ class Jp7_Interadmin_Util
         foreach ($records as $record) {
             $record->_relations = [];
         }
-             
+
         foreach ($tipo->getRelationships() as $relation => $data) {
             if ($data['type'] || $data['multi']) {
                 continue;
@@ -84,7 +84,7 @@ class Jp7_Interadmin_Util
             }
         }
     }
-    
+
     /**
      * @return void
      */
@@ -104,7 +104,7 @@ class Jp7_Interadmin_Util
                 ->where('id_string', $id_string)
                 ->orderByRaw("deleted = '' DESC")
                 ->first();
-             
+
             if ($related) {
                 $column = array_search($relation.'_id', $aliases);
                 $record->$column = $related->id;
@@ -149,7 +149,7 @@ class Jp7_Interadmin_Util
 
         return $returnIds;
     }
-    
+
     protected static function prepareNewRecord($record, $parent)
     {
         $record->id = 0;
@@ -170,9 +170,9 @@ class Jp7_Interadmin_Util
                 $child->setTipo($childTipo);
                 $grandChildren = $child->_children;
                 $childRelations = $child->_relations;
-                
+
                 self::prepareNewRecord($child, $record);
- 
+
                 if ($use_id_string || $bind_children) {
                     self::importRelationsFromIdString($child, $childRelations, $bind_children);
                 }
@@ -390,11 +390,11 @@ STR;
 
         return $avisos;
     }
-    
+
     public static function getTiposChecksum()
     {
         global $db, $db_prefix;
-        
+
         $rs = $db->Execute("CHECKSUM TABLE ".$db_prefix."_tipos");
         $row = $rs->FetchNextObj();
         return $row->Checksum;

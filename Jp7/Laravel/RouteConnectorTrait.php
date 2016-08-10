@@ -23,18 +23,18 @@ trait RouteConnectorTrait
         }
         // Clear Interadmin route map - allows route:cache to work
         r::clearCache();
-        
+
         // Normal Laravel routing
         $router->group([
             'namespace' => $this->namespace, 'middleware' => 'web',
         ], function ($router) {
             require app_path('Http/routes.php');
         });
-        
+
         // Save new Interadmin route map
         r::saveCache();
     }
-    
+
     protected function showDbNotConnected()
     {
         $errorMsg = 'InterAdmin not connected. Possible causes:

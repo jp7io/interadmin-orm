@@ -16,7 +16,7 @@ class Jp7_Antibot
             'captcha_url' => '',
             'attempts_before_captcha' => null
         ];
-        
+
         $this->captcha_url = DEFAULT_PATH.'/site/_templates/antibot.php';
         $this->redirect = $options['redirect'] ?: $_SERVER['REQUEST_URI'];
         $this->captcha_url = $options['captcha_url'] ?: $this->captcha_url;

@@ -96,7 +96,7 @@ abstract class Jp7_Box_BoxAbstract
 			<?php if ($hasFields) {
     ?>
 				<div class="icon icon-toggle" onclick="toggleConfig(this);"></div>
-			<?php 
+			<?php
 }
         ?>
 			<div class="icon icon-delete" onclick="deleteBox(this);"></div>
@@ -194,7 +194,7 @@ abstract class Jp7_Box_BoxAbstract
     ?>" <?php echo($option->value == $value) ? 'selected="selected"' : '';
     ?>><?php echo $option->text;
     ?></option>
-		<?php 
+		<?php
 }
         ?>
 		<?php

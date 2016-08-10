@@ -370,7 +370,7 @@ class Jp7_Debugger
     {
         trigger_error('Use Sentry and Log::error() instead', E_USER_DEPRECATED);
     }
-    
+
     /**
      * Returns $maintenancePage.
      *

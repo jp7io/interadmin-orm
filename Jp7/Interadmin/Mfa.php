@@ -144,7 +144,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         global $jp7_app;
 
         $cookieKey = $jp7_app ? $jp7_app : 0;
-        
+
         return unserialize($_COOKIE['mfa'][$this->getCliente()][$cookieKey]);
     }
 
@@ -161,9 +161,9 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
     public function saveCookie($last_code)
     {
         global $jp7_app;
-        
+
         $cookieKey = $jp7_app ? $jp7_app : 0;
-        
+
         $mfaToken = $this->addMfaToken($last_code);
 
         $cookie = [
@@ -198,9 +198,9 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         $this->updateAttributes([
             'mfa_secret' => $secret,
         ]);
-        
+
         $issuer = $this->getIssuer();
-        
+
         $body = 'Token de acesso - '.$issuer.':<br><br>';
         $body .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">'.$secret.'</div>';
         $body .= '<br><br>';
@@ -210,7 +210,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
             'title' => $issuer,
             'body' => $body
         ];
-        
+
         Mail::send('emails.default', $data, function ($message) use ($issuer) {
             $message->subject($issuer.' Token')
                 ->from(env('MAIL_ADDRESS'), $issuer)

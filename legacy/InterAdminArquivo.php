@@ -49,7 +49,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     public function __construct($id_arquivo = 0, $options = [])
     {
         $this->id_arquivo = $id_arquivo;
-        
+
         if ($options['fields']) {
             $this->getFieldsValues($options['fields']);
         }
@@ -86,7 +86,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
         $this->id_tipo = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
-    
+
     public function getType($options = [])
     {
         return $this->getTipo($options);
@@ -100,7 +100,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     {
         $this->setTipo($tipo);
     }
-    
+
     /**
      * Gets the parent InterAdmin object for this record, which is then cached on the $_parent property.
      *
@@ -255,7 +255,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     {
         return Upload::getHumanSize($this->url);
     }
-    
+
     /**
      * Sets this object´s attributes with the given array keys and values.
      *
@@ -267,7 +267,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
             $this->$key = $value;
         }
     }
-    
+
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
     {
         if ($forceAsString) {

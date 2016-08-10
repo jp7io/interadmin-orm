@@ -9,16 +9,16 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
 {
     private $oldTimestamp;
     private $oldConfig;
-    
+
     public function setUp()
     {
         global $config;
         $this->oldConfig = $config;
         $this->oldTimestamp = InterAdmin::getTimestamp();
-        
+
         $config = $config ? clone $config : new stdClass;
         $config->interadmin_preview = true;
-        
+
         InterAdmin::setTimestamp(strtotime('2016-01-01 02:00:00'));
     }
 
@@ -28,7 +28,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
         $config = $this->oldConfig;
         InterAdmin::setTimestamp($this->oldTimestamp);
     }
-    
+
     /**
      * @dataProvider publishedProvider
      */
@@ -48,7 +48,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
         $record->setAttributes($attributes);
         $this->assertFalse($record->isPublished());
     }
-    
+
     public function publishedProvider()
     {
         return [
@@ -78,7 +78,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
             ]],
         ];
     }
-    
+
     public function unpublishedProvider()
     {
         return [

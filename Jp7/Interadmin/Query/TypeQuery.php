@@ -52,7 +52,7 @@ class TypeQuery extends BaseQuery
 
         return $this->provider->deprecatedGetChildren($this->options)->first();
     }
-    
+
     public function count()
     {
         if (func_num_args() > 0) {
@@ -61,11 +61,11 @@ class TypeQuery extends BaseQuery
         $options = $this->options;
         $options['limit'] = 1;
         $options['fields'] = "COUNT(*)";
-        
+
         $result = $this->provider->deprecatedGetChildren($options)->first();
         return $result->count;
     }
-    
+
     public function find($id)
     {
         if (func_num_args() != 1) {
@@ -94,7 +94,7 @@ class TypeQuery extends BaseQuery
 
         return $result;
     }
-    
+
     public function lists($column, $key = null)
     {
         $array = $this->provider->deprecatedGetChildren([
@@ -103,8 +103,8 @@ class TypeQuery extends BaseQuery
 
         return collect(array_pluck($array, $column, $key));
     }
-    
-    
+
+
     public function build(array $attributes = [])
     {
         $className = Type::getDefaultClass();

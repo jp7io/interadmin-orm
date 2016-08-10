@@ -15,7 +15,7 @@ class FormRequest extends Request
     {
         return true;  // Allows all users in
     }
-    
+
     /**
      * Get the validation rules that apply to the request.
      *

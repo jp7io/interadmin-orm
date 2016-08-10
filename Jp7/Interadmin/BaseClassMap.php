@@ -18,7 +18,7 @@ class BaseClassMap
         static::$instance = static::$instance ?: new static;
         return static::$instance;
     }
-    
+
     protected static function prepareMap($attr)
     {
         $tipos = DB::table('tipos')
@@ -44,14 +44,14 @@ class BaseClassMap
     {
         Cache::forget(static::CACHE_KEY);
     }
-    
+
     public function getClasses()
     {
         return Cache::remember(static::CACHE_KEY, 60, function () {
             return static::prepareMap(static::CLASS_ATTRIBUTE);
         });
     }
-    
+
     /**
      * @param  string $class
      * @return int   id_tipo

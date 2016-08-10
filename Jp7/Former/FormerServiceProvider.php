@@ -11,18 +11,18 @@ class FormerServiceProvider extends OriginalServiceProvider
     public function bindFormer(Container $app)
     {
         parent::bindFormer($app);
-        
+
         // Add folder to dispatcher
         $dispatcher = $app->make('former.dispatcher');
         $dispatcher->addRepository('Jp7\\Former\\Fields\\');
-        
+
         // Extend former
         $former = $app->make('former');
-        
+
         $app->singleton('former', function ($app) use ($former) {
             return new FormerExtension($former);
         });
-        
+
         return $app;
     }
 }

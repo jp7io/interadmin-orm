@@ -9,7 +9,7 @@ use Jp7\Laravel\Controller\DynamicViewTrait;
 class Controller extends BaseController
 {
     use RecordTrait, DynamicViewTrait;
-    
+
     protected static $current = null;
 
     protected $action = '';
@@ -21,7 +21,7 @@ class Controller extends BaseController
         if ($route = \Route::getCurrentRoute()) {
             $this->action = explode('@', $route->getActionName())[1];
         }
-        
+
         $this->constructDynamicViewTrait();
         $this->constructRecordTrait();
     }

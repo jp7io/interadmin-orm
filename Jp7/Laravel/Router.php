@@ -22,42 +22,42 @@ class Router extends MethodForwarder
     protected $map = [];
     protected $cachefile = 'bootstrap/cache/routemap.cache';
     protected $locale;
-    
+
 ////
 //// Cache functions: Type map will work even when Laravel routes are cached
 ////
-    
+
     public function __construct($target)
     {
         $this->cachefile = base_path($this->cachefile);
-        
+
         if (is_file($this->cachefile)) {
             $this->loadCache();
         }
-        
+
         parent::__construct($target);
     }
-    
+
     public function clearCache()
     {
         $this->map = [];
         $this->saveCache();
     }
-    
+
     public function saveCache()
     {
         file_put_contents($this->cachefile, serialize($this->map));
     }
-    
+
     public function loadCache()
     {
         $this->map = unserialize(file_get_contents($this->cachefile));
     }
-    
+
 ////
 //// Map functions: Read/write to the type map
 ////
-     
+
     private function addType($id_tipo, $slug)
     {
         $map = &$this->map[$this->getLocale()];
@@ -78,7 +78,7 @@ class Router extends MethodForwarder
         }
         return false; // already existed route for this type
     }
-    
+
     /**
      * @param  int $id_tipo
      * @param  string $action
@@ -93,7 +93,7 @@ class Router extends MethodForwarder
         }
         $mappedRoute = $map[$id_tipo];
         $routePrefix = ($mappedRoute && $mappedRoute != '/') ? $mappedRoute . '.' : '';
-        
+
         return $this->target->getRoutes()->getByName($routePrefix . $action);
     }
     /**
@@ -119,7 +119,7 @@ class Router extends MethodForwarder
         $basename = $this->getRouteBasename($route);
         return $this->getTypeByRouteBasename($basename);
     }
-    
+
     /**
      * @return array [id_tipo => route basename]
      */
@@ -127,11 +127,11 @@ class Router extends MethodForwarder
     {
         return $this->map;
     }
-    
+
 ////
 //// Route override: Adds default values for methods
 ////
-    
+
     /**
      * Adds conventions for controllers and 'only' option:
      *     r::resource('places')
@@ -160,7 +160,7 @@ class Router extends MethodForwarder
         }
         return parent::resource($name, $controller, $options);
     }
-    
+
     /**
      * @param  string $name Resource name such as 'places'
      * @return string       Controller name such as 'PlacesController'
@@ -177,7 +177,7 @@ class Router extends MethodForwarder
         $controller .= 'Controller';
         return $controller;
     }
-    
+
     protected function getControllerActions($classBasename)
     {
         $stack = $this->getGroupStack();
@@ -201,7 +201,7 @@ class Router extends MethodForwarder
         }
         return $actions;
     }
-    
+
     /**
      * Adds conventions for 'namespace':
      *     r::group(['prefix' => 'contact'], $callback)
@@ -218,19 +218,19 @@ class Router extends MethodForwarder
         }
         return parent::group($attributes, $callback);
     }
-    
+
 
 ////
 //// Localization: allows caching routes with localization
 ////
-    
+
     protected function getLocale()
     {
         // route creation: $this->locale
         // route resolution: App::getLocale()
         return is_null($this->locale) ? App::getLocale() : $this->locale;
     }
-    
+
     public function languages(Closure $callback)
     {
         foreach (LaravelLocalization::getSupportedLanguagesKeys() as $locale) {
@@ -244,11 +244,11 @@ class Router extends MethodForwarder
         }
         $this->locale = null;
     }
-    
+
 ////
 //// Dynamic routes: Creates routes automatically from InterAdmin's sections
 ////
-    
+
     /**
      * Creates routes automatically from InterAdmin's sections.
      * Only creates routes if Type has 'menu' checked.
@@ -260,14 +260,14 @@ class Router extends MethodForwarder
     public function createDynamicRoutes($section, $currentPath = [])
     {
         $isRoot = $section->isRoot();
-        
+
         if ($subsections = $section->getChildrenMenu()) {
             $closure = function () use ($subsections, $currentPath) {
                 foreach ($subsections as $subsection) {
                     $this->createDynamicRoutes($subsection, $currentPath, false);
                 }
             };
-            
+
             if ($isRoot) {
                 $closure();
             } else {
@@ -279,7 +279,7 @@ class Router extends MethodForwarder
         }
         if (!$isRoot) {
             $slug = $section->getSlug();
-        
+
             if ($this->addType($section->id_tipo, $slug)) {
                 // won't enter here if there is already a route for this type
                 $controllerClass = $section->getControllerBasename();
@@ -289,7 +289,7 @@ class Router extends MethodForwarder
             }
         }
     }
-    
+
 ////
 //// Helpers: Get extra information from Laravel routes
 ////
@@ -309,7 +309,7 @@ class Router extends MethodForwarder
 
         return $matches[1] ?: [];
     }
-    
+
     /**
      * Parses route basename
      *
@@ -325,7 +325,7 @@ class Router extends MethodForwarder
         array_pop($parts);
         return implode('.', $parts);
     }
-    
+
     /**
      * Map URI to breadcrumb of objects
      * Allows custom resolution of {placeholder} to Objects.

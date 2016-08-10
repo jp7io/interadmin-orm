@@ -18,7 +18,7 @@ use SqlFormatter;
 abstract class RecordAbstract
 {
     use TryMethod;
-    
+
     const DEFAULT_FIELDS_ALIAS = true;
     const DEFAULT_NAMESPACE = 'Jp7\Interadmin\\';
     const DEFAULT_FIELDS = '*';
@@ -113,9 +113,9 @@ abstract class RecordAbstract
         $aliases = $this->getAttributesAliases();
         $fieldsSet = array_keys($this->attributes);
         $aliasesSet = array_keys(array_intersect($aliases, $fieldsSet));
-        
+
         $attributes = array_diff($attributes, $fieldsSet, $aliasesSet);
-        
+
         // Retrieving data
         if ($attributes) {
             $options = [
@@ -162,12 +162,12 @@ abstract class RecordAbstract
         }
         return $value;
     }
-    
+
     public function getFillable()
     {
         return [];
     }
-    
+
     // Used by ResetsPasswords
     public function forceFill(array $attributes)
     {
@@ -219,7 +219,7 @@ abstract class RecordAbstract
     {
         return $this->saveRaw();
     }
-    
+
     /**
      * Saves without logs and triggers.
      */
@@ -227,7 +227,7 @@ abstract class RecordAbstract
     {
         return $this->_update($this->attributes);
     }
-    
+
     /**
      * Increments a numeric attribute.
      *
@@ -255,7 +255,7 @@ abstract class RecordAbstract
 
         $aliases = array_flip($this->getAttributesAliases());
         $valuesToSave = $this->_convertForDatabase($attributes, $aliases);
-        
+
         $pk = $this->_primary_key;
         $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
@@ -275,7 +275,7 @@ abstract class RecordAbstract
 
         return $this;
     }
-    
+
     protected function _convertForDatabase($attributes, $aliases)
     {
         $valuesToSave = [];
@@ -301,7 +301,7 @@ abstract class RecordAbstract
         }
         return $valuesToSave;
     }
-    
+
     /**
      * Executes a SQL Query based on the values passed by $options.
      *
@@ -376,7 +376,7 @@ abstract class RecordAbstract
             ($options['from'] ? ' LEFT JOIN '.implode(' LEFT JOIN ', $options['from']) : '').
             ' WHERE '.$filters.$clauses.
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
-    
+
         if (getenv('APP_DEBUG')) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
             $i = 0;
@@ -388,7 +388,7 @@ abstract class RecordAbstract
             }
             \Log::info($sql);
         }
-            
+
         $rs = $db->select($sql);
 
         if (!$rs && !is_array($rs)) {
@@ -489,7 +489,7 @@ abstract class RecordAbstract
                 $offset = $pos + strlen($termo);
                 continue;
             }
-            
+
             // Joins com EXISTS
             if ($termo == 'EXISTS') {
                 $inicio = substr($clause, 0, $pos + strlen($termo));
@@ -725,7 +725,7 @@ abstract class RecordAbstract
                 if ($joinTipo) {
                     $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinTipo);
                     $this->_resolveWildcard($fields[$join], $joinModel);
-                    
+
                     $joinOptions = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
@@ -761,7 +761,7 @@ abstract class RecordAbstract
         }
         $options['fields'] = $fields;
     }
-    
+
     protected function _aliasToColumn($alias, $aliases)
     {
         if (isset($aliases[$alias])) {
@@ -769,7 +769,7 @@ abstract class RecordAbstract
         }
         return $alias;
     }
-    
+
     /**
      * Helper function to add a join.
      */
@@ -804,7 +804,7 @@ abstract class RecordAbstract
     {
         $campos = &$options['campos'];
         $attributes = &$object->attributes;
-        
+
         foreach ($row as $key => $value) {
             $parts = explode('.', $key);
             if (count($parts) == 1) {
@@ -838,13 +838,13 @@ abstract class RecordAbstract
                 // select_* relationship
                 $column = array_search($table.'_id', $options['aliases']);
                 $fk = $object->$column;
-                
+
                 $loaded = &$object->relations[$table];
                 if (!$loaded || $loaded->id != $fk) {
                     /// stale data or not loaded
                     $relationships = $object->getType()->getRelationships();
                     $data = $relationships[$table];
-                    
+
                     if ($data['type']) {
                         $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     } else {
@@ -944,12 +944,12 @@ abstract class RecordAbstract
     abstract public function getAttributesAliases();
     abstract public function getAdminAttributes();
     abstract public function getTableName();
-    
+
     public function getAttributes()
     {
         return $this->attributes;
     }
-    
+
     public function getColumns()
     {
         $table = $this->getTableName();
@@ -975,13 +975,13 @@ abstract class RecordAbstract
     public static function getPublishedFilters($table, $alias)
     {
         global $s_session;
-        
+
         $tableParts = explode('_', $table);
          // remove interadmin_cliente_
         array_shift($tableParts);
         array_shift($tableParts);
         $table = implode('_', $tableParts);
-        
+
         // Tipos
         if ($table === 'tipos') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
@@ -1037,7 +1037,7 @@ abstract class RecordAbstract
             throw new UnexpectedValueException('Expected instance of ConnectionInterface or connection name, received '.gettype($db));
         }
     }
-    
+
     public function getDbName()
     {
         return $this->_db;

@@ -9,7 +9,7 @@ class FieldUtil
 {
     public $id;
     public $id_tipo;
-    
+
     /**
      * Construtor público.
      *
@@ -25,7 +25,7 @@ class FieldUtil
     {
         return $this->field['tipo'];
     }
-    
+
     /**
      * Retorna os xtra dos campos do tipo select_ que armazenam tipos.
      *

@@ -47,12 +47,12 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
 						</div>
 					</div>
 				</div>
-			<?php 
+			<?php
 } else {
     ?>
 				<?php echo parent::_getEditorImageFields($box, false, 310, 230);
     ?>
-			<?php 
+			<?php
 }
         ?>
 		</div>

@@ -21,7 +21,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
         }
         return $null; // Needs to be variable to be returned as reference
     }
-    
+
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
     {
         if (is_string($fields)) {
@@ -170,7 +170,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
 						<?php echo $box->checkbox('lightbox');
     ?>
 					</div>
-				<?php 
+				<?php
 }
         ?>
 			</div>

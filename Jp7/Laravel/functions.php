@@ -99,7 +99,7 @@ if (!function_exists('interadmin_data')) {
                 return preg_match('/'.$search.'/i', $a);
             });
         }
-        
+
         dd(compact('methods', 'object'));
     }
 
@@ -125,7 +125,7 @@ if (!function_exists('interadmin_data')) {
     {
         return new \Jp7\Interadmin\Collection($arr);
     }
-    
+
     function trans_route($name, $parameters = [], $absolute = true)
     {
         $locale = LaravelLocalization::getCurrentLocale();

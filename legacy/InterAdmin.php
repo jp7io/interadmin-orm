@@ -24,7 +24,7 @@ use Illuminate\Support\Collection;
 class InterAdmin extends Record implements InterAdminAbstract
 {
     const DEFAULT_NAMESPACE = '';
-    
+
     /**
      * Returns the full url for this record.
      *
@@ -34,7 +34,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         return parent::getUrl($sep);
     }
-    
+
     /**
      * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
      *
@@ -46,7 +46,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         $filteredAttributes = array_intersect_key($attributes, $editableFields);
         return $this->setAttributes($filteredAttributes);
     }
-    
+
     /**
      * Sets this object´s attributes with the given array keys and values.
      *
@@ -58,7 +58,7 @@ class InterAdmin extends Record implements InterAdminAbstract
             $this->$key = $value;
         }
     }
-    
+
     /**
      * Magic method calls.
      *
@@ -128,7 +128,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return parent::__call($methodName, $args);
     }
-    
+
     protected function _loadRelationship($relationships, $name)
     {
         $result = parent::_loadRelationship($relationships, $name);
@@ -137,7 +137,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $result;
     }
-    
+
     public function relationFromColumn($column)
     {
         $alias = $this->getType()->getCamposAlias($column);
@@ -150,7 +150,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $this->$relationship;
     }
-    
+
     protected function _aliasToColumn($alias, $aliases)
     {
         if (isset($aliases[$alias])) {
@@ -170,7 +170,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $alias;
     }
-    
+
     /**
      * Finds a Child Tipo by a camelcase keyword.
      *
@@ -191,7 +191,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $children[$nome_id];
     }
-    
+
     /**
      * Creates and returns a child record.
      *
@@ -204,7 +204,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         return $this->getChildrenTipo($id_tipo)->createInterAdmin($attributes);
     }
-    
+
     /**
      * Sets the InterAdminTipo object for this record, changing the $_tipo property.
      *
@@ -214,7 +214,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         return $this->setType($tipo);
     }
-    
+
     /**
      * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
      *
@@ -226,7 +226,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         return $this->getType($options);
     }
-    
+
     /**
      * Gets fields values by their alias.
      *
@@ -350,7 +350,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     {
         return $this->deprecated_getArquivos($options)->all();
     }
-    
+
     public function getFirstArquivo($options = [])
     {
         $retorno = $this->getArquivos($options + ['limit' => 1]);
@@ -390,7 +390,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $children;
     }
-    
+
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false)
     {
         if ($forceAsString) {
@@ -410,7 +410,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $this->$fields;
     }
-    
+
     /**
      * Updates all the attributes from the passed-in array and saves the record.
      *
@@ -421,7 +421,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         $this->setRawAttributes($attributes);
         $this->_update($attributes);
     }
-    
+
     protected function _convertForDatabase($attributes, $aliases)
     {
         $valuesToSave = parent::_convertForDatabase($attributes, $aliases);
@@ -446,7 +446,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return $valuesToSave;
     }
-    
+
     /**
      * Reloads all the attributes.
      *
@@ -466,7 +466,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         $isAliased = static::DEFAULT_FIELDS_ALIAS;
         $this->getFieldsValues($fields, false, $isAliased);
     }
-    
+
     /**
      * Creates a object of the given Class name with the same attributes.
      *
@@ -480,7 +480,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         $newobject->attributes = $this->attributes;
         return $newobject;
     }
-    
+
     /**
      * Returns the tags.
      *
@@ -526,7 +526,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         }
         return (array) $retorno;
     }
-    
+
     /**
      * Sets the tags for this record. It DELETES the previous records.
      *
@@ -546,12 +546,12 @@ class InterAdmin extends Record implements InterAdminAbstract
             }
         }
     }
-    
+
     public function getTagFilters()
     {
         return '(tags.id = '.$this->id." AND tags.id_tipo = '".$this->getTipo()->id_tipo."')";
     }
-    
+
     public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')
     {
         return $this->setAttributeBySearch($attribute, $searchValue, $searchColumn);

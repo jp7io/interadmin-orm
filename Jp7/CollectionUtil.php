@@ -72,12 +72,12 @@ class CollectionUtil
                     }
                     $idsMap[$record->$alias][] = $record;
                 }
-                
+
                 $rows = $data['tipo']
                     ->records()
                     ->whereIn('id', array_keys($idsMap))
                     ->get();
-                
+
                 foreach ($rows as $row) {
                     foreach ($idsMap[$row->id] as $record) {
                         $record->setRelation($relation, $row);

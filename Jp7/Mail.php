@@ -3,7 +3,7 @@
 class Jp7_Mail extends Zend_Mail
 {
     protected $_charset = 'utf-8';
-    
+
     /*
      * Parses an e-mail string and passes it to the given Zend_Mail method.
      *
@@ -60,7 +60,7 @@ class Jp7_Mail extends Zend_Mail
         self::clearDefaultTransport();
         ini_restore('sendmail_from');
     }
-    
+
     /**
      * Formats and sends an e-mail message.
      *
@@ -124,9 +124,9 @@ class Jp7_Mail extends Zend_Mail
         } else {
             $message_html = $message_text;
         }
-    
+
         $object = new static;
-        
+
         $headersArray = http_parse_headers($headers);
         foreach ($headersArray as $key => $value) {
             switch (strtolower($key)) {
@@ -149,20 +149,20 @@ class Jp7_Mail extends Zend_Mail
                     $object->addHeader($key, $value);
             }
         }
-        
+
         $object->addHeader('Return-Errors-To', 'sites@jp7.com.br');
         $object->setSubject($subject);
-        
+
         // Send
         foreach (explode(',', $to) as $toAddress) {
             $object->parseEmailAndSet('addTo', $toAddress);
         }
-        
+
         if ($config->server->type != InterSite::PRODUCAO) {
             $object->clearRecipients();
             $object->addTo('debug@jp7.com.br');
         }
-        
+
         $object->setBodyHtml($message_html);
         $object->setBodyText($message_text);
         return $object->send();
