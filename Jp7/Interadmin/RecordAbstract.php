@@ -837,6 +837,11 @@ abstract class RecordAbstract
             } else {
                 // select_* relationship
                 $column = array_search($table.'_id', $options['aliases']);
+                if ($column === false && isset($options['aliases'][$table])) {
+                    // sem alias (select_key)
+                    $column = $table;
+                    $table = substr($options['aliases'][$table], 0, -3);
+                }
                 $fk = $object->$column;
 
                 $loaded = &$object->relations[$table];
@@ -844,7 +849,6 @@ abstract class RecordAbstract
                     /// stale data or not loaded
                     $relationships = $object->getType()->getRelationships();
                     $data = $relationships[$table];
-
                     if ($data['type']) {
                         $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     } else {
