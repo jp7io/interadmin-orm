@@ -156,7 +156,7 @@ class ColumnField extends BaseField
     {
         $rules = [];
         if ($this->isReadonly()) {
-            $rules[$this->getRuleName()][] = 'in:'.$this->getValue();
+            $rules[$this->getRuleName()][] = 'not_present';
         } elseif ($this->obrigatorio) {
             $rules[$this->getRuleName()][] = 'required';
         }
