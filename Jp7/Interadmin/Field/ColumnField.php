@@ -131,7 +131,7 @@ class ColumnField extends BaseField
         }
     }
 
-    protected function isReadonly()
+    public function isReadonly()
     {
         return $this->readonly || !$this->hasPermissions();
     }
