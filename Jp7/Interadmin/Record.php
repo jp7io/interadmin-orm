@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use BadMethodCallException;
 use UnexpectedValueException;
+use InvalidArgumentException;
 use Exception;
 use DB;
 use Request;
@@ -268,6 +269,19 @@ class Record extends RecordAbstract implements Arrayable
             }
         }
         return $loaded;
+    }
+
+    public function relationFromColumn($column)
+    {
+        $alias = $this->getType()->getCamposAlias($column);
+        if (starts_with($column, 'select_multi_')) {
+            $relation = substr($alias, 0, -4); // _ids = 4 chars
+        } elseif (starts_with($column, 'select_')) {
+            $relation = substr($alias, 0, -3); // _id = 3 chars
+        } else {
+            throw new InvalidArgumentException('$column must start with select_ or select_multi_.');
+        }
+        return $this->$relation;
     }
 
     public static function __callStatic($name, array $arguments)
