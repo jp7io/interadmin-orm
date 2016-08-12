@@ -16,10 +16,42 @@
  */
 class Jp7_Date extends DateTime
 {
+    /**
+     * A test Date instance to be returned when now instances are created.
+     *  
+     * @see copied from Carbon: http://carbon.nesbot.com/docs/#api-testing
+     * @var Jp7_Date
+     */
+    protected static $testNow;
+
     const DURATION_LOWERISO = 0;
     const DURATION_ISO = 1;
     const DURATION_HUMAN = 2;
     const EMPTY_DATE = '0000-00-00 00:00:00';
+
+    public function __construct($time = 'now', $timezone = null)
+    {
+        if ($time === 'now' && static::hasTestNow()) {
+            $testInstance = clone static::getTestNow();
+            $time = (string) $testInstance;
+        }
+        return parent::__construct($time, $timezone);
+    }
+
+    public static function setTestNow(Jp7_Date $testNow = null)
+    {
+        static::$testNow = $testNow;
+    }
+
+    public static function getTestNow()
+    {
+        return static::$testNow;
+    }
+
+    public static function hasTestNow()
+    {
+        return static::getTestNow() !== null;
+    }
 
     /**
      * Returns new Jp7_Date object formatted according to the specified format.
