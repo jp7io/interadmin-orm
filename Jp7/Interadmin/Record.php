@@ -1029,7 +1029,7 @@ class Record extends RecordAbstract implements Arrayable
 
     public function toArray()
     {
-        $array = $this->attributes;
+        $array = $this->getAliasedAttributes();
         foreach ($array as &$value) {
             if ($value instanceof Arrayable) {
                 $value = $value->toArray();
