@@ -896,6 +896,8 @@ abstract class RecordAbstract
         foreach ($attributes as $key => $value) {
             $this->$key = $value;
         }
+        
+        return $this;
     }
 
     /**
