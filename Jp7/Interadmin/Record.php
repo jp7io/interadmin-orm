@@ -1049,7 +1049,7 @@ class Record extends RecordAbstract implements Arrayable
                 if ($campo['obrigatorio']) {
                     $rules[$alias][] = 'required';
                 }
-                if ($campo['xtra'] === 'email') {
+                if ($campo['xtra'] === 'email' || $campo['xtra'] === 'id_email') {
                     $rules[$alias][] = 'email';
                 }
                 if (starts_with($campo['tipo'], 'int_')) {
