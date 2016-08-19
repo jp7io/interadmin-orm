@@ -13,7 +13,7 @@ class Jp7_Interadmin_Form extends InterAdminField
         $this->campos = $tipo->getCampos();
     }
 
-    public function getHtml($record)
+    public function getHtml($record = null)
     {
         global $j, $iframes_i;
         $j = 0; // Gambiarra InterAdmin
