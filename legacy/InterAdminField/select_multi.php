@@ -186,7 +186,7 @@ function interadmin_select_multi_item_down(campo) {
             <select id="box_<?= $campo ?>[<?= $j ?>]" size="10" class="select_multi_half" multiple="multiple" />
             <?php
             $buscaTipo = new InterAdminTipo($campo_nome);
-            $count = $buscaTipo->getInterAdminsCount();
+            $count = $buscaTipo->count();
             // Se os registros forem poucos e couberem no select, são carregados na inicialização
             if ($count > 0 && $count < 20) {
             ?>
