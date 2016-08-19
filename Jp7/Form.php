@@ -140,7 +140,7 @@ class Jp7_Form extends Zend_Form
             $tipo = $field['nome'];
 
             if (is_numeric($value)) {
-                $value = $tipo->getInterAdminById($value);
+                $value = $tipo->findById($value);
             }
             if ($value instanceof InterAdminAbstract) {
                 return $value->getStringValue();
