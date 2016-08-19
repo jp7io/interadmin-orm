@@ -5,8 +5,9 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
     public function url($path)
     {
         global $config;
-
-        return 'http://'.$config->storage['host'].'/'.
+        
+        $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
+        return $protocol.'://'.$config->storage['host'].'/'.
             ($config->storage['path'] ? $config->storage['path'].'/' : '') .
             $path;
     }
