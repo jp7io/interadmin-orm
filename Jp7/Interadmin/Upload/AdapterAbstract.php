@@ -6,19 +6,22 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
     {
         global $config;
         
-        $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
-        return $protocol.'://'.$config->storage['host'].'/'.
+        return $this->getScheme().'://'.$config->storage['host'].'/'.
             ($config->storage['path'] ? $config->storage['path'].'/' : '') .
             $path;
     }
 
+    protected function getScheme()
+    {
+        return 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
+    }
+
     protected function setHost($url, $host)
     {
-        $parts = parse_url($url);
         // Replace host
         return replace_prefix(
-            $parts['scheme'].'://'.$parts['host'],
-            $parts['scheme'].'://'.$host,
+            $this->url(''),
+            $this->getScheme().'://'.$host.'/',
             $url
         );
     }
