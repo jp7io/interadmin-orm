@@ -23,7 +23,15 @@ trait LogServiceProviderTrait
             Log::info('[QUEUE] Processed: '.$event->job->getName());
         });
         Queue::looping(function () {
-            Log::info('[QUEUE] Looping');
+            static $last = 0;
+            if ($last > time() - 60) {
+                return; // too soon for ping
+            }
+            Log::info('[QUEUE] Ping');
+            if ($url = env('QUEUE_HEARTBEAT_URL')) {
+                get_headers($url);
+            }
+            $last = time();
         });
     }
 
