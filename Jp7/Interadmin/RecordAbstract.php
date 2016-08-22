@@ -983,16 +983,12 @@ abstract class RecordAbstract
         global $s_session;
 
         $tableParts = explode('_', $table);
-         // remove interadmin_cliente_
-        array_shift($tableParts);
-        array_shift($tableParts);
-        $table = implode('_', $tableParts);
-
+        $table = end($tableParts);
         // Tipos
-        if ($table === 'tipos') {
+        if ($table === 'tipos' && count($tableParts) === 3) {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
         // Tags
-        } elseif ($table === 'tags') {
+        } elseif ($table === 'tags' && count($tableParts) === 3) {
             // do nothing
         // Arquivos
         } elseif ($table === 'arquivos') {
