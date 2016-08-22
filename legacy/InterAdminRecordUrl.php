@@ -66,7 +66,7 @@ class InterAdminRecordUrl
     {
         global $seo, $seo_sep;
         if ($seo && $record->getParent()->id) {
-            $link = $record->_parent->getUrl().'/'.toSeo($record->getTipo()->nome);
+            $link = $record->getParent()->getUrl().'/'.toSeo($record->getTipo()->nome);
         } else {
             $link = $record->getTipo()->getUrl();
         }
