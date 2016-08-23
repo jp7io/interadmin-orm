@@ -26,16 +26,6 @@ class InterAdmin extends Record implements InterAdminAbstract
     const DEFAULT_NAMESPACE = '';
 
     /**
-     * Returns the full url for this record.
-     *
-     * @return string
-     */
-    public function getUrl($sep = null)
-    {
-        return parent::getUrl($sep);
-    }
-
-    /**
      * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
      *
      * @param array $attributes

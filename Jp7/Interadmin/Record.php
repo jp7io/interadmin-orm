@@ -1105,6 +1105,8 @@ class Record extends RecordAbstract implements Arrayable
 
     public function getUrl($action = 'show')
     {
-        return RecordUrl::getRecordUrl($this, $action);
+        $args = func_get_args();
+        array_unshift($args, $this);
+        return call_user_func_array([RecordUrl::class, 'getRecordUrl'], $args);
     }
 }

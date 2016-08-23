@@ -1287,9 +1287,8 @@ class Type extends RecordAbstract
     public function getUrl() // $action = 'index', array $parameters = []
     {
         $args = func_get_args();
-        $action = isset($args[0]) ? $args[0] : 'index';
-        $parameters = isset($args[1]) ? $args[1] : [];
-        return RecordUrl::getTypeUrl($this, $action, $parameters);
+        array_unshift($args, $this);
+        return call_user_func_array([RecordUrl::class, 'getTypeUrl'], $args);
     }
 
     /**
