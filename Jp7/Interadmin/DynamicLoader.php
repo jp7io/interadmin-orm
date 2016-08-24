@@ -22,6 +22,9 @@ class DynamicLoader
     // Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
     public static function load($class, $retry = false)
     {
+        if (!App::bound('config')) {
+            return false; // there was a problem with codeception after running all tests
+        }
         $code = null;
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo($class)) {
             $tipo = new Type($id_tipo);
