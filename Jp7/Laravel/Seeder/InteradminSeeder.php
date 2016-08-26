@@ -19,8 +19,15 @@ class InteradminSeeder extends Seeder
         $file = new SplFileObject($filepath);
         while (!$file->eof()) {
             $line = $file->fgets();
-            if (strpos($line, 'INSERT INTO') === false) {
-                continue;
+            if (!starts_with($line, 'INSERT INTO')) {
+                if (starts_with($line, '--') ||
+                    starts_with($line, '/*') ||
+                    starts_with($line, 'LOCK TABLES') ||
+                    starts_with($line, 'UNLOCK TABLES') ||
+                    !trim($line)) {
+                    continue;
+                }
+                throw new Exception('Invalid SQL: '.$line);
             }
             DB::unprepared($line);
         }
