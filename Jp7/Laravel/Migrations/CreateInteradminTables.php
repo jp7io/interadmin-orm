@@ -24,7 +24,7 @@ class CreateInteradminTables extends Migration
         }
     }
 
-    private function getSchemaSql()
+    protected function getSchemaSql()
     {
         return file_get_contents(database_path('interadmin_schema.sql'));
     }
