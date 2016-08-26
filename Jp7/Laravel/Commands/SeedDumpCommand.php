@@ -48,7 +48,6 @@ class SeedDumpCommand extends Command
     protected function dumpRecords()
     {
         $tables = $this->getRecordsTables();
-        $tables[] = 'interadmin_'.config('app.name'); // FIXME detect views
 
         $options = " --tables ".implode(' ', $tables).
             " --where=\"id_tipo IN (".implode(',', $this->typeIds).")\"".
