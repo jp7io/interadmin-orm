@@ -2,7 +2,7 @@
 
 class Jp7_YouTube
 {
-    const URL_PREFIX = 'http://www.youtube.com/v/';
+    const URL_PREFIX = 'https://www.youtube.com/v/';
     const SHORT_URL_PREFIX = 'http://youtu.be/';
     const API_KEY = 'AIzaSyACr-Ib2wc9mxT1AbGQHhzJ71GAeJoDrj4';
 
@@ -33,7 +33,7 @@ class Jp7_YouTube
     public static function getThumbnail($youTubeVideoUrl, $size = 0)
     {
         if ($id = self::getId($youTubeVideoUrl)) {
-            return 'http://img.youtube.com/vi/'.$id.'/'.$size.'.jpg';
+            return 'https://img.youtube.com/vi/'.$id.'/'.$size.'.jpg';
         }
     }
 
