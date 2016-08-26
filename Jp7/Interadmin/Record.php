@@ -1015,13 +1015,16 @@ class Record extends RecordAbstract implements Arrayable
         }
         $stringValue = [];
         foreach ($camposCombo as $campoCombo) {
-            $value = $this->$campoCombo;
-            if ($value instanceof FileField) {
+            if (starts_with($campoCombo, 'file_')) {
                 continue;
-            } elseif ($value instanceof RecordAbstract) {
-                $value = $value->getStringValue();
             }
-            $stringValue[] = $value;
+            if (starts_with($campoCombo, 'select_')) {
+                if ($relation = $this->relationFromColumn($campoCombo)) {
+                    $stringValue[] = $relation->getStringValue();
+                }
+                continue;
+            }
+            $stringValue[] = $this->$campoCombo;
         }
 
         return implode(' - ', $stringValue);
