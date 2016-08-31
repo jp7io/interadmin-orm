@@ -226,6 +226,7 @@
         $request = Zend_Controller_Front::getInstance()->getRequest();
         $params = $request->getParams();
          $id = toId(implode('_', [
+            $request->getScheme(),
             $request->getHttpHost(),
             $params['controller'],
             $params['action'],
