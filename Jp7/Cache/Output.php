@@ -4,6 +4,7 @@
   * Extende o Zend_Cache_Frontend_Output com Zend_Cache_Backend_File.
   *
   * @category Jp7
+  * @deprecated
   */
  class Jp7_Cache_Output extends Zend_Cache_Frontend_Output
  {
@@ -104,9 +105,11 @@
          }
         /* Fim: CODIGO ORIGINAL DA ZEND */
         if ($retorno) {
+            header('X-Cache: HIT');
             $this->_showDebug($id, $logTime);
             exit;
         }
+        header('X-Cache: MISS');
          self::$placeholderEnabled = true;
          self::$_started = true;
 
@@ -220,9 +223,10 @@
       */
      protected function _makeId($data)
      {
-         $params = Zend_Controller_Front::getInstance()->getRequest()->getParams();
-
+        $request = Zend_Controller_Front::getInstance()->getRequest();
+        $params = $request->getParams();
          $id = toId(implode('_', [
+            $request->getHttpHost(),
             $params['controller'],
             $params['action'],
             $params['lang'],
