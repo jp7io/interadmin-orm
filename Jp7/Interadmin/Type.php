@@ -629,27 +629,13 @@ class Type extends RecordAbstract
         return $this->getCampoTipo($campos[$nomeCampo]);
     }
     /**
-     * Returns this object´s nome and all the fields marked as 'combo', if the field
-     * is an Type such as a select_key, its getStringValue() method is used.
+     * Returns this object´s nome.
      *
-     * @return string For the tipo 'City' with the field 'state' marked as 'combo' it would return: 'City - State'.
+     * @return string 
      */
     public function getStringValue(/*$simple = FALSE*/)
     {
-        $campos = $this->getCampos();
-        $return[] = $this->nome;
-        //if (!$simple) {
-            foreach ($campos as $key => $row) {
-                if (($row['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
-                    if (is_object($row['nome'])) {
-                        $return[] = $row['nome']->getStringValue();
-                    } else {
-                        $return[] = $row['nome'];
-                    }
-                }
-            }
-        //}
-        return implode(' - ', $return);
+        return $this->nome;
     }
     /**
      * Returns the nome according to the $lang.
