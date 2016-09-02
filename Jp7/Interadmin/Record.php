@@ -36,6 +36,13 @@ class Record extends RecordAbstract implements Arrayable
      * @var array
      */
     protected $_tags;
+    
+    /**
+     * Cached aliases.
+     * 
+     * @var array 
+     */
+    protected $_aliases = [];
 
     protected $relations;
 
@@ -93,7 +100,7 @@ class Record extends RecordAbstract implements Arrayable
             return $value;
         }
         // Aliases
-        $aliases = $this->getAttributesAliases();
+        $aliases = $this->_aliases;
         $column = array_search($name, $aliases);
         // Fixes fields that have alias
         if ($column !== false && array_key_exists($column, $this->attributes)) {
@@ -126,7 +133,7 @@ class Record extends RecordAbstract implements Arrayable
             return $this->$mutator($value);
         }
         if (!empty($this->attributes['id_tipo'])) { // Aliases are not available if id_tipo is not set
-            $aliases = $this->getAttributesAliases();
+            $aliases = $this->_aliases;
             $column = array_search($name, $aliases);
             if ($column) {
                 $name = $column;
@@ -159,7 +166,7 @@ class Record extends RecordAbstract implements Arrayable
             return true;
         }
         // Aliases
-        $column = array_search($name, $this->getAttributesAliases());
+        $column = array_search($name, $this->_aliases);
         if ($column !== false && array_key_exists($column, $this->attributes)) {
             return true;
         }
@@ -199,7 +206,7 @@ class Record extends RecordAbstract implements Arrayable
 
         // Lazy loading
         $columns = $this->getColumns();
-        $aliases = $this->getAttributesAliases();
+        $aliases = $this->_aliases;
         if (!in_array($name, $columns) && !in_array($name, $aliases)) {
             return;
         }
@@ -473,6 +480,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
+        $this->_aliases = $this->getAttributesAliases();
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.
@@ -829,7 +837,7 @@ class Record extends RecordAbstract implements Arrayable
     public function getAliasedAttributes()
     {
         $return = [];
-        $aliases = $this->getAttributesAliases();
+        $aliases = $this->_aliases;
         foreach ($this->attributes as $column => $value) {
             $alias = isset($aliases[$column]) ? $aliases[$column] : $column;
             $return[$alias] = $value;
