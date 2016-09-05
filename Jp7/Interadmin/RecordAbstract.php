@@ -123,6 +123,7 @@ abstract class RecordAbstract
                 'fields_alias' => $fieldsAlias,
                 'from' => $this->getTableName().' AS main',
                 'where' => [$this->_primary_key.' = '.intval($this->{$this->_primary_key})],
+                'use_published_filters' => false,
                 // Internal use
                 'aliases' => $aliases,
                 'campos' => $this->getAttributesCampos(),
