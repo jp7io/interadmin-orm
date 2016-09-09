@@ -20,7 +20,7 @@ class DynamicLoader
     }
 
     // Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
-    public static function load($class, $retry = false)
+    public static function load($class)
     {
         if (!App::bound('config')) {
             return false; // there was a problem with codeception after running all tests
@@ -62,12 +62,6 @@ class DynamicLoader
                 }
             }
             return true;
-        }
-
-        if (!$retry && App::environment('local') && starts_with($class, config('interadmin.namespace'))) {
-            RecordClassMap::getInstance()->clearCache();
-            TypeClassMap::getInstance()->clearCache();
-            return self::load($class, true);
         }
 
         return false;
