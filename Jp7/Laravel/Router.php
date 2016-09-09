@@ -244,7 +244,14 @@ class Router extends MethodForwarder
         }
         $this->locale = null;
     }
-
+    
+    public function localizeRoute($routeName)
+    {
+        if ($this->locale === LaravelLocalization::getDefaultLocale()) {
+            return $routeName;
+        }
+        return $this->locale.'.'.$routeName;
+    }
 ////
 //// Dynamic routes: Creates routes automatically from InterAdmin's sections
 ////
