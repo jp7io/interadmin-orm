@@ -659,7 +659,7 @@ class Type extends RecordAbstract
         // log
         $this->log = date('d/m/Y H:i').' - '.Record::getLogUser().' - '.
             Request::ip().chr(13).$this->log;
-
+        $this->date_modify = date('c');
         // Inheritance
         $this->syncInheritance();
         $retorno = $this->saveRaw();
