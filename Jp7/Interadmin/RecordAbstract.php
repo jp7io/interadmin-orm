@@ -110,30 +110,26 @@ abstract class RecordAbstract
      */
     public function loadAttributes($attributes, $fieldsAlias = true)
     {
-        $aliases = $this->getAttributesAliases();
-        $fieldsSet = array_keys($this->attributes);
-        $aliasesSet = array_keys(array_intersect($aliases, $fieldsSet));
-
-        $attributes = array_diff($attributes, $fieldsSet, $aliasesSet);
-
-        // Retrieving data
-        if ($attributes) {
-            $options = [
-                'fields' => (array) $attributes,
-                'fields_alias' => $fieldsAlias,
-                'from' => $this->getTableName().' AS main',
-                'where' => [$this->_primary_key.' = '.intval($this->{$this->_primary_key})],
-                'use_published_filters' => false,
-                // Internal use
-                'aliases' => $aliases,
-                'campos' => $this->getAttributesCampos(),
-            ];
-            $rs = $this->_executeQuery($options);
-            if ($row = array_shift($rs)) {
-                $this->_getAttributesFromRow($row, $this, $options);
-            }
-            //$rs->Close();
+        $attributes = array_diff($attributes, array_keys($this->attributes));
+        if (!$attributes) {
+            return;
         }
+        // Retrieving data
+        $options = [
+            'fields' => $attributes,
+            'fields_alias' => $fieldsAlias,
+            'from' => $this->getTableName().' AS main',
+            'where' => [$this->_primary_key.' = '.intval($this->{$this->_primary_key})],
+            'use_published_filters' => false,
+            // Internal use
+            'aliases' => $this->getAttributesAliases(),
+            'campos' => $this->getAttributesCampos(),
+        ];
+        $rs = $this->_executeQuery($options);
+        if ($row = array_shift($rs)) {
+            $this->_getAttributesFromRow($row, $this, $options);
+        }
+        //$rs->Close();
     }
 
     /**

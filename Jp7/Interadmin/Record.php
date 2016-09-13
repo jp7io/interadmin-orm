@@ -217,16 +217,17 @@ class Record extends RecordAbstract implements Arrayable
                 '- ID: '.$this->id.PHP_EOL.
                 '- File: '.$caller['file'].' - Line: '.$caller['line']);
         }
-
-        $attributes = array_intersect($columns, array_merge(
-            $this->getAttributesNames(),
-            $this->getAdminAttributes()
-        ));
-        $this->loadAttributes($attributes);
+        // not all columns are loaded by default / most types use same table
+        $attributes = array_keys($aliases);
         // Fixes lazy loading of fields that are aliases
         if ($column = array_search($name, $aliases)) {
             $name = $column;
         }
+        if (!in_array($name, $attributes)) {
+            $attributes[] = $name;
+        }
+        $this->loadAttributes($attributes);
+
         return $this->attributes[$name];
     }
 
