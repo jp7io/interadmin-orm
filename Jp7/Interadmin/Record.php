@@ -280,7 +280,7 @@ class Record extends RecordAbstract implements Arrayable
 
     public function relationFromColumn($column)
     {
-        $alias = $this->getType()->getCamposAlias($column);
+        $alias = $this->_aliases[$column];
         if (starts_with($column, 'select_multi_')) {
             $relation = substr($alias, 0, -4); // _ids = 4 chars
         } elseif (starts_with($column, 'select_')) {
@@ -781,16 +781,11 @@ class Record extends RecordAbstract implements Arrayable
 
     public function generateSlug()
     {
-        if (isset($this->attributes['varchar_key'])) {
-            $alias_varchar_key = 'varchar_key';
-        } else {
-            $alias_varchar_key = $this->getType()->getCamposAlias('varchar_key');
-        }
-        if (empty($this->attributes[$alias_varchar_key])) {
-            return;
+        if (!$this->varchar_key) {
+            return '';
         }
 
-        $id_slug = to_slug($this->$alias_varchar_key);
+        $id_slug = to_slug($this->varchar_key);
         if (is_numeric($id_slug)) {
             $id_slug = '--'.$id_slug;
         }
@@ -967,7 +962,7 @@ class Record extends RecordAbstract implements Arrayable
     public function setAttributeBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')
     {
         $campos = $this->getType()->getCampos();
-        $aliases = array_flip($this->getType()->getCamposAlias());
+        $aliases = array_flip($this->_aliases);
         $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 
         if (!starts_with($nomeCampo, 'select_')) {
@@ -1004,9 +999,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function getName()
     {
-        $varchar_key_alias = $this->getType()->getCamposAlias('varchar_key');
-
-        return $this->$varchar_key_alias;
+        return $this->varchar_key;
     }
 
     /**
