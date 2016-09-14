@@ -376,7 +376,7 @@ class Record extends RecordAbstract implements Arrayable
             }
         }
 
-        $instance = new $className(['id' => $id, 'id_tipo' => $tipo->id_tipo]);
+        $instance = new $className(['id' => $id]);
         $instance->setType($tipo);
         $instance->setDb($tipo->getDbName());
 
