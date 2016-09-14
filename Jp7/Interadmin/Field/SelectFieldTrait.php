@@ -145,6 +145,16 @@ trait SelectFieldTrait
         } elseif (count($array)) {
             throw new UnexpectedValueException('Should be an array of Record or Type');
         }
+        // Append ID to duplicated values
+        foreach (array_count_values($options) as $text => $count) {
+            if ($count < 2) {
+                continue;
+            }
+            for ($count; $count > 0; $count--) {
+                $id = array_search($text, $options);
+                $options[$id] = $text.' ('.$id.')';
+            }
+        }
         return $options;
     }
 
