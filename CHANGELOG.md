@@ -3,7 +3,8 @@
 
 ## 3.0
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
-* Changes to projects which used InterAdmin/InterAdminTipo:
+
+### Changes to projects which used InterAdmin/InterAdminTipo:
  * InterAdmin::__construct receives an array now
  * Calling select_* without alias won't bring objects: ->relationFromColumn() can be used if the alias is not known
  * ->attributes is not public anymore - Use ->getAttributes()
@@ -12,7 +13,8 @@
  * Fields are eager and lazy loaded, ->getFieldsValues() and getByAlias() are not needed anymore
  * Default aliases are generated in snake_case now (if empty). To use old aliases you must manually define them.
  * ORM depends on new configuration: /config/interadmin.php and /resources/lang/pt-BR/interadmin.php
-* Changes to projects which used Jp7/Interadmin/Record:
+
+### Changes to projects which used Jp7/Interadmin/Record
  * Attributes are stored internally without alias / use getAliasedAttributes() if needed
 
 ## 2.7
@@ -28,7 +30,8 @@
 * Replace jp7_replace_beginning() by replace_prefix()
 * Main table is interadmin_CLIENT_registros, it was interadmin_CLIENT
  * To prevent problems with legacy projects a VIEW named interadmin_CLIENT_registros was created
-* Changes to projects which used branch laravel:
+
+### Changes to projects which used branch laravel:
  * InterSite -> Jp7\Intersite
  * InterAdmin -> Jp7\Interadmin\Record
  * InterAdminAbstract -> Jp7\Interadmin\RecordAbstract
