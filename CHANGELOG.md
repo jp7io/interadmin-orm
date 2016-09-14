@@ -1,4 +1,6 @@
-## master
+## development
+* TODO
+## 3.0
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
 * Changes to projects which used InterAdmin/InterAdminTipo:
  * InterAdmin::__construct receives an array now
