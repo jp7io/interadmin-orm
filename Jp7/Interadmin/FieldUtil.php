@@ -11,7 +11,7 @@ class FieldUtil
     public $id_tipo;
 
     /**
-     * Construtor público.
+     * Construtor pï¿ºÃºblico.
      *
      * @param array $field Formato dos campos do Type [optional]
      *
@@ -33,7 +33,7 @@ class FieldUtil
      */
     public static function getSelectTipoXtras()
     {
-        return ['S', 'ajax_tipos', 'radio_tipos'];
+        return ['S', 'X_tipos', 'ajax_tipos', 'radio_tipos'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam tipos.
@@ -45,7 +45,7 @@ class FieldUtil
         return ['tipos_multi', 'tipos'];
     }
     /**
-     * Retorna os xtra dos campos do tipo special_ que armazenam múltiplos registros.
+     * Retorna os xtra dos campos do tipo special_ que armazenam mï¿ºÃºltiplos registros.
      *
      * @return array
      */
@@ -54,7 +54,7 @@ class FieldUtil
         return ['registros_multi', 'tipos_multi'];
     }
     /**
-     * Retorna o valor do campo no header (cabeçalho da listagem).
+     * Retorna o valor do campo no header (cabeÃ§alho da listagem).
      *
      * @param array $campo
      *
@@ -67,7 +67,7 @@ class FieldUtil
             if (is_callable($campo['nome'])) {
                 return call_user_func($campo['nome'], $campo, '', 'header');
             } else {
-                echo 'Função '.$campo['nome'].' não encontrada.';
+                echo 'FunÃ§Ã£o '.$campo['nome'].' nÃ£o encontrada.';
             }
         } elseif (strpos($key, 'select_') === 0) {
             if ($campo['label']) {

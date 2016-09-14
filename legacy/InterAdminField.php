@@ -393,7 +393,7 @@ class InterAdminField
      */
     public static function getSelectTipoXtras()
     {
-        return ['S', 'ajax_tipos', 'radio_tipos'];
+        return ['S', 'X_tipos', 'ajax_tipos', 'radio_tipos'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam tipos.

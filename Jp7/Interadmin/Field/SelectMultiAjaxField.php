@@ -34,9 +34,9 @@ class SelectMultiAjaxField extends SelectMultiField
     protected function toOptions($array)
     {
         $options = [];
-        foreach ($array as $record) {
-            $options[$record->getStringValue()] = [
-                'value' => $record->id,
+        foreach (parent::toOptions($array) as $id => $text) {
+            $options[$text] = [
+                'value' => $id,
                 'selected' => true // We are assuming only selected records were found
             ];
         }

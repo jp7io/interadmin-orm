@@ -62,7 +62,7 @@ class Factory
         if ($prefix === 'select') {
             if (starts_with($tipo, 'select_multi_')) {
                 $prefix .= '_multi'; // SelectMultiField
-                if ($xtra === SelectMultiField::XTRA_RECORD_SEARCH) {
+                if (in_array($xtra, [SelectMultiField::XTRA_RECORD_SEARCH, SelectMultiField::XTRA_TYPE_SEARCH])) {
                     $prefix .= '_ajax'; // SelectMultiAjaxField
                 }
             } else {
@@ -76,29 +76,3 @@ class Factory
         return $prefix;
     }
 }
-
-/*
-public static function getSelectTipoXtras()
-{
-    return ['S', 'ajax_tipos', 'radio_tipos'];
- *
- * multi => S
- *
- *
- * Retorna os xtra dos campos do tipo special_ que armazenam tipos.
- *
- * @return array
-
-public static function getSpecialTipoXtras()
-{
-    return ['tipos_multi', 'tipos'];
-}
-/**
- * Retorna os xtra dos campos do tipo special_ que armazenam múltiplos registros.
- *
- * @return array
-public static function getSpecialMultiXtras()
-{
-    return ['registros_multi', 'tipos_multi'];
-}
-*/

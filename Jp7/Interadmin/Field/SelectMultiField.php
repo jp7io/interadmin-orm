@@ -13,6 +13,7 @@ class SelectMultiField extends ColumnField
     const XTRA_RECORD = '0'; // checkboxes
     const XTRA_TYPE = 'S';   // checkboxes
     const XTRA_RECORD_SEARCH = 'X';
+    const XTRA_TYPE_SEARCH = 'X_tipos';
 
     public function getCellHtml()
     {
@@ -35,7 +36,7 @@ class SelectMultiField extends ColumnField
 
     public function hasTipo()
     {
-        return $this->xtra === self::XTRA_TYPE;
+        return in_array($this->xtra, [self::XTRA_TYPE, self::XTRA_TYPE_SEARCH]);
     }
 
     public function getEditTag()
