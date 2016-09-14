@@ -75,7 +75,7 @@ class Record extends RecordAbstract implements Arrayable
         $this->attributes['id'] = 0; // initialize ID
         // id_tipo needs to be set first because of aliases
         if (isset($attributes['id_tipo'])) {
-            $this->id_tipo = $attributes['id_tipo'];
+            $this->setIdTipoAttribute($attributes['id_tipo']);
             unset($attributes['id_tipo']);
         }
         $this->setRawAttributes($attributes);
@@ -497,7 +497,7 @@ class Record extends RecordAbstract implements Arrayable
     {
         $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
-        $this->_aliases = $this->getAttributesAliases();
+        $this->_aliases = $tipo ? $this->getAttributesAliases() : [];
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.
