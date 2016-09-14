@@ -101,20 +101,22 @@ class Jp7_Mail extends Zend_Mail
                 $message_html = str_replace("\r\n", "<br>\r\n", $message_html); // Linux to Mail Format
             }
             if ($template) {
+                $protocol = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
                 @ini_set('allow_url_fopen', '1');
                 if ((!dirname($template) || dirname($template) == '.') && @ini_get('allow_url_fopen')) {
-                    $template = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']).'/'.$template;
+                    $template = $protocol.'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']).'/'.$template;
                 }
                 if ($pos1 = strpos($template, '?')) {
                     //$template=mb_substr($template,0,$pos1+1).urlencode(mb_substr($template,$pos1+1));
                     $template = str_replace(' ', '%20', $template);
                 }
-                if (strpos($template, 'http://') !== 0) {
-                    $template = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['REQUEST_URI']).'/'.$template;
+                if (strpos($template, 'http://') !== 0 && strpos($template, 'https://') !== 0) {
+                    $template = $protocol.'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['REQUEST_URI']).'/'.$template;
                 }
                 //valida usuário logado e caso o template inicie em http
                 if ($_SERVER['PHP_AUTH_USER']) {
                     $template = str_replace('http://', 'http://'.$_SERVER['PHP_AUTH_USER'].':'.$_SERVER['PHP_AUTH_PW'].'@', $template);
+                    $template = str_replace('https://', 'https://'.$_SERVER['PHP_AUTH_USER'].':'.$_SERVER['PHP_AUTH_PW'].'@', $template);
                 }
                 $template = file_get_contents($template);
 
