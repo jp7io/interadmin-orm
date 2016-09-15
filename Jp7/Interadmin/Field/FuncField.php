@@ -32,6 +32,9 @@ class FuncField extends ColumnField
             $response .= ob_get_clean();
             return $response;
         } catch (Throwable $e) {
+            if (getenv('APP_DEBUG')) {
+                throw $e;
+            }
             Log::error($e);
             return '(erro: '.$this->nome.')';
         }
