@@ -63,6 +63,7 @@ class SelectField extends ColumnField
 
     public function getFilterTag()
     {
+        $this->showCamposCombo = false;
         $options = ['blank' => '(vazio)'] + $this->getOptions();
         return $this->getFilterField()
             ->name('filtro_'.$this->getFormerName())

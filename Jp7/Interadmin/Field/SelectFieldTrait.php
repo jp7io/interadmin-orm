@@ -9,6 +9,8 @@ use UnexpectedValueException;
 
 trait SelectFieldTrait
 {
+    protected $showCamposCombo = true;
+
     public function getLabel()
     {
         if ($this->label) {
@@ -38,7 +40,7 @@ trait SelectFieldTrait
             return [$related->getName(), true];
         }
         if ($related instanceof Record) {
-            return [$related->getStringValue(), $related->isPublished()];
+            return [$related->getName(), $related->isPublished()];
         }
         if (!$related) {
             return ['', true];
@@ -140,7 +142,7 @@ trait SelectFieldTrait
             }
         } elseif ($array[0] instanceof Record) {
             foreach ($array as $record) {
-                $options[$record->id] = $record->getStringValue();
+                $options[$record->id] = ($this->showCamposCombo) ? $record->getStringValue() : $record->getName();
             }
         } elseif (count($array)) {
             throw new UnexpectedValueException('Should be an array of Record or Type');
