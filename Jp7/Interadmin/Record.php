@@ -1038,7 +1038,7 @@ class Record extends RecordAbstract implements Arrayable
             }
             if (starts_with($campoCombo, 'select_')) {
                 if ($relation = $this->relationFromColumn($campoCombo)) {
-                    $stringValue[] = $relation->getStringValue();
+                    $stringValue[] = $relation->getName();
                 }
                 continue;
             }
