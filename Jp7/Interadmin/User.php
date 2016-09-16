@@ -87,7 +87,7 @@ class Jp7_Interadmin_User extends InterAdmin
         }
     }
 
-    public function resetPassword($password, $confirm_password, $old_password = null)
+    public function resetPassword($password, $confirm_password)
     {
         if (strlen($password) < 6) {
             throw new UnexpectedValueException('Senha deve conter no mínimo 6 caracteres');
@@ -99,12 +99,6 @@ class Jp7_Interadmin_User extends InterAdmin
         $this->reset_token = '';
         $this->reset_token_sent_at = new Jp7_Date('0000-00-00');
         $this->save();
-
-        $changePassEvent = Interadmin_Event_ChangePass::getInstance();
-        $changePassEvent->setUserId($this->id);
-        $changePassEvent->setOldPassword($old_password);
-        $changePassEvent->setNewPassword($password);
-        $changePassEvent->notify();
     }
 
     // Special - Disparo
