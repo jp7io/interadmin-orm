@@ -38,7 +38,56 @@ class Jp7_Interadmin_User extends InterAdmin
         return bin2hex(openssl_random_pseudo_bytes(32));
     }
 
-    public function resetPassword($password, $confirm_password)
+    public function getPasswordType()
+    {
+        return $this->getType()->getCampos()['password_key']['xtra'];
+    }
+
+    private function checkHash($value)
+    {
+        if (strlen($this->password_key) === 32 && ctype_xdigit($this->password_key) && md5($value) === $this->password_key) {
+            // MD5 - needs migration
+            $this->setPassword($value);
+            $this->saveRaw();
+        }
+        return Hash::check($value, $this->password_key);
+    }
+
+    public function checkPassword($value)
+    {
+        if (!$value) {
+            return false;
+        }
+        switch ($this->getPasswordType()) {
+            case '': // Plain Text
+                return $this->password_key === $value;
+            case 'hash': // Hash
+                return $this->checkHash($value, $this->password_key);
+            case 'S': // MD5
+                return $this->password_key === md5($value);
+            default:
+                throw new DomainException('Unknown password type');
+        }
+    }
+
+    public function setPassword($password)
+    {
+        switch ($this->getPasswordType()) {
+            case '': // Plain Text
+                $this->password_key = $password;
+                break;
+            case 'hash': // Hash
+                $this->password_key = Hash::make($password);
+                break;
+            case 'S': // MD5
+                $this->password_key = md5($password);
+                break;
+            default:
+                throw new DomainException('Unknown password type');
+        }
+    }
+
+    public function resetPassword($password, $confirm_password, $old_password = null)
     {
         if (strlen($password) < 6) {
             throw new UnexpectedValueException('Senha deve conter no mínimo 6 caracteres');
@@ -46,12 +95,16 @@ class Jp7_Interadmin_User extends InterAdmin
         if ($password !== $confirm_password) {
             throw new UnexpectedValueException('Confirmação de senha deve ser igual à nova senha');
         }
-
-        $this->senha = md5($password);
+        $this->setPassword($password);
         $this->reset_token = '';
         $this->reset_token_sent_at = new Jp7_Date('0000-00-00');
-
         $this->save();
+
+        $changePassEvent = Interadmin_Event_ChangePass::getInstance();
+        $changePassEvent->setUserId($this->id);
+        $changePassEvent->setOldPassword($old_password);
+        $changePassEvent->setNewPassword($password);
+        $changePassEvent->notify();
     }
 
     // Special - Disparo
@@ -69,16 +122,16 @@ class Jp7_Interadmin_User extends InterAdmin
 
         try {
             if (!$user->isPublished()) {
-                throw new LogicException('Usuário está despublicado');
+                throw new UnexpectedValueException('Usuário está despublicado');
             } elseif (!$user->leitura) {
-                throw new LogicException('Usuário sem acesso de leitura');
+                throw new UnexpectedValueException('Usuário sem acesso de leitura');
             } elseif (!$user->email) {
-                throw new LogicException('Usuário não possui e-mail cadastrado');
+                throw new UnexpectedValueException('Usuário não possui e-mail cadastrado');
             } else {
                 // User starts without password
                 $user->updateAttributes([
                     // Its not MD5, so user will never login with it
-                    'senha' => uniqid()
+                    'password_key' => uniqid()
                 ]);
 
                 $mailer = new Interadmin_Mailer_PasswordRegistration($user);
@@ -87,7 +140,7 @@ class Jp7_Interadmin_User extends InterAdmin
                 Session::push('flash.new', 'flash.success');
                 Session::push('flash.success', 'Enviado e-mail com link para cadastro de senha.');
             }
-        } catch (LogicException $e) {
+        } catch (UnexpectedValueException $e) {
             Session::push('flash.new', 'flash.error');
             Session::push('flash.error', $e->getMessage());
         }
