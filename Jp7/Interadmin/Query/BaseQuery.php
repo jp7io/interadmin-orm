@@ -73,14 +73,6 @@ abstract class BaseQuery
             } elseif ($this->invalidOperatorAndValue($operator, $value)) {
                 throw new \InvalidArgumentException('Value must be provided.');
             }
-            if (!in_array(strtolower($operator), $this->operators, true)) {
-                if (is_null($value)) {
-                    // short circuit operator
-                    list($operator, $value) = ['=', $operator];
-                } else {
-                    throw new \InvalidArgumentException('Invalid operator.');
-                }
-            }
             if (str_contains($column, ' ') || str_contains($column, '(')) {
                 throw new BadMethodCallException('Invalid column.');
             }
@@ -164,30 +156,30 @@ abstract class BaseQuery
         return $this->_addWhere($where);
     }
 
-    public function whereYear($column, $value)
+    public function whereYear($column, $operator, $value = null)
     {
-        $where = $this->_parseComparison('YEAR('.$column.')', '=', $value);
+        $where = $this->_parseComparison('YEAR('.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
-    public function whereMonth($column, $value)
+    public function whereMonth($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('MONTH('.$column.')', '=', $value);
+        $where =  $this->_parseComparison('MONTH('.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
-    public function whereDay($column, $value)
+    public function whereDay($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('DAY('.$column.')', '=', $value);
+        $where =  $this->_parseComparison('DAY('.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
-    public function whereDate($column, $value)
+    public function whereDate($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('DATE('.$column.')', '=', $value);
+        $where =  $this->_parseComparison('DATE('.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
@@ -241,6 +233,14 @@ abstract class BaseQuery
 
     protected function _parseComparison($column, $operator, $value)
     {
+        if (!in_array(strtolower($operator), $this->operators, true)) {
+            if (is_null($value)) {
+                // short circuit operator
+                list($operator, $value) = ['=', $operator];
+            } else {
+                throw new \InvalidArgumentException('Invalid operator.');
+            }
+        }
         if (is_bool($value) && $this->_isChar($column)) {
             if ($operator != '=') {
                 throw new \InvalidArgumentException('Invalid operator.');
