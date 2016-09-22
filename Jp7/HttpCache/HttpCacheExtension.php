@@ -10,7 +10,7 @@ class HttpCacheExtension extends HttpCache
 {
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (!config('httpcache.enabled') || $this->matchesBlacklist($request)) {
+        if (!config('httpcache.enabled') || $this->matchesBlacklist($request) || $request->old()) {
             return $this->pass($request, $catch);
         }
 
