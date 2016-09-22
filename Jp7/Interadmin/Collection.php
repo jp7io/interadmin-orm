@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin;
 
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Arr;
 
 class Collection extends BaseCollection
 {
@@ -40,25 +41,23 @@ class Collection extends BaseCollection
     public function jsonList($column, $key)
     {
         $array = [];
-        foreach ($this->items as $item) {
+        foreach (Arr::pluck($this->items, $column, $key) as $key2 => $value) {
             $array[] = [
-                'key' => $item->$key,
-                'value' => $item->$column,
+                'key' => $key2,
+                'value' => $value,
             ];
         }
-
         return $array;
     }
 
     public function radioList($column, $key)
     {
         $array = [];
-        foreach ($this->items as $item) {
-            $array[$item->$column] = [
-                'value' => $item->$key
+        foreach (Arr::pluck($this->items, $column, $key) as $key2 => $value) {
+            $array[$value] = [
+                'value' => $key2
             ];
         }
-
         return $array;
     }
 
