@@ -3,7 +3,7 @@
 class Jp7_YouTube
 {
     const URL_PREFIX = 'https://www.youtube.com/v/';
-    const SHORT_URL_PREFIX = 'http://youtu.be/';
+    const SHORT_URL_PREFIX = 'https://youtu.be/';
     const API_KEY = 'AIzaSyACr-Ib2wc9mxT1AbGQHhzJ71GAeJoDrj4';
 
     /**
@@ -82,8 +82,9 @@ class Jp7_YouTube
      */
     public static function getHtml($youTubeVideoUrl, $width = 310, $height = 230)
     {
-        if (starts_with($youTubeVideoUrl, self::SHORT_URL_PREFIX)) {
-            $youTubeVideoUrl = str_replace(self::SHORT_URL_PREFIX, self::URL_PREFIX, $youTubeVideoUrl);
+        if (parse_url($youTubeVideoUrl, PHP_URL_HOST) === parse_url(self::SHORT_URL_PREFIX, PHP_URL_HOST)) {
+            $youTubeVideoUrl = replace_prefix('http://', 'https://', $youTubeVideoUrl);
+            $youTubeVideoUrl = replace_prefix(self::SHORT_URL_PREFIX, self::URL_PREFIX, $youTubeVideoUrl);
         }
 
         $youTubeVideoUrl = self::getEmbedLink($youTubeVideoUrl);
