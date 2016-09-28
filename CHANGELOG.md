@@ -1,6 +1,16 @@
 ## development
 * TODO
 
+## 3.1
+* Fixed bugs after the merge of the ORM
+* Performance fixes for aliases
+* Add type of password field using Laravel Hash
+* Add commands to generate seeds from InterAdmin database
+* Log that the Laravel queue is running
+* Fixes for HTTPS
+* Use .env values for e-mails, DB and storage
+* Move getUrl() out of the ORM
+
 ## 3.0
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
 
