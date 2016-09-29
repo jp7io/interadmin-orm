@@ -958,21 +958,10 @@ abstract class RecordAbstract
         $table = $this->getTableName();
         $cacheKey = 'columns,'.$this->_db.','.$table;
         return \Cache::remember($cacheKey, 60, function () use ($table) {
-            return $this->_pdoColumnNames($table);
+            $db = $this->getDb();
+            $table = str_replace($db->getTablePrefix(), '', $table); // FIXME
+            return $db->getSchemaBuilder()->getColumnListing($table);
         });
-    }
-
-    private function _pdoColumnNames($table)
-    {
-        $db = $this->getDb()->getPdo();
-
-        $rs = $db->query('SELECT * FROM `'.$table.'` LIMIT 0');
-        for ($i = 0; $i < $rs->columnCount(); $i++) {
-            $col = $rs->getColumnMeta($i);
-            $columns[] = $col['name'];
-        }
-
-        return $columns;
     }
 
     public static function getPublishedFilters($table, $alias)
