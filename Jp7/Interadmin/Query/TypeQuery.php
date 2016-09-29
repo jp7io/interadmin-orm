@@ -5,6 +5,7 @@ namespace Jp7\Interadmin\Query;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\Type;
 use BadMethodCallException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TypeQuery extends BaseQuery
 {
