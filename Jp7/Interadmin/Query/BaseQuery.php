@@ -96,7 +96,7 @@ abstract class BaseQuery
                 $this->or = false;
 
                 $last = array_pop($this->options['where']);
-                $where = $last.' OR '.$where;
+                $where = ($last ? $last.' OR ' : '').$where;
             }
             $this->options['where'][] = $where;
         }
