@@ -15,6 +15,7 @@
 * Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
 
 ### Changes to projects which used InterAdmin/InterAdminTipo:
+ * Removed methods deprecated on 2.1.1 (like getInterAdmins)
  * InterAdmin::__construct receives an array now
  * Calling select_* without alias won't bring objects: ->relationFromColumn() can be used if the alias is not known
  * ->attributes is not public anymore - Use ->getAttributes()
@@ -55,3 +56,13 @@
 
 ## 2.6
 * ...
+
+## 2.1.1
+### Deprecate the following methods, replaced by new names:
+* getFirstInterAdmin -> findFirst
+* getInterAdminById -> findById
+* getInterAdminByIdString -> findByIdString
+* getInterAdmins -> find
+* getInterAdminsByTags -> findByTags
+* getInterAdminsCount -> count
+
