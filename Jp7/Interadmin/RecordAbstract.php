@@ -893,7 +893,7 @@ abstract class RecordAbstract
         foreach ($attributes as $key => $value) {
             $this->$key = $value;
         }
-        
+
         return $this;
     }
 
@@ -957,7 +957,7 @@ abstract class RecordAbstract
     {
         $table = $this->getTableName();
         $cacheKey = 'columns,'.$this->_db.','.$table;
-        return \Cache::remember($cacheKey, 60, function () use ($table) {
+        return \Cache::remember($cacheKey, 5, function () use ($table) {
             $db = $this->getDb();
             $table = str_replace($db->getTablePrefix(), '', $table); // FIXME
             return $db->getSchemaBuilder()->getColumnListing($table);

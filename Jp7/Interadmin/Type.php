@@ -77,7 +77,7 @@ class Type extends RecordAbstract
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $cacheKey = $this->getCacheKey('attributes');
-            $this->attributes += Cache::remember($cacheKey, 60, function () {
+            $this->attributes += Cache::remember($cacheKey, 5, function () {
                 return (array) $this->getDb()->table('tipos')->where('id_tipo', $this->id_tipo)->first();
             });
             return $this->attributes[$name];
@@ -213,7 +213,7 @@ class Type extends RecordAbstract
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
         }
-        return Cache::remember('Type::children,'.serialize($options), 60, function () use ($options) {
+        return Cache::remember('Type::children,'.serialize($options), 5, function () use ($options) {
             if (empty($options['where'])) {
                 $options['where'] = ['1=1'];
             }
@@ -448,7 +448,7 @@ class Type extends RecordAbstract
     public function getCampos()
     {
         $cacheKey = $this->getCacheKey('campos');
-        return Cache::remember($cacheKey, 60, function () {
+        return Cache::remember($cacheKey, 5, function () {
             $campos_parameters = [
                 'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
                 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
@@ -530,7 +530,7 @@ class Type extends RecordAbstract
     public function getCamposAlias($fields = null)
     {
         $cacheKey = $this->getCacheKey('campos_alias');
-        $aliases = Cache::remember($cacheKey, 60, function () {
+        $aliases = Cache::remember($cacheKey, 5, function () {
             $aliases = [];
             foreach ($this->getCampos() as $campo => $array) {
                 if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
@@ -559,7 +559,7 @@ class Type extends RecordAbstract
     {
         // getCampoTipo might be different for each class
         $cacheKey = static::class.','.$this->getCacheKey('relationships');
-        return Cache::remember($cacheKey, 60, function () {
+        return Cache::remember($cacheKey, 5, function () {
             $relationships = [];
 
             foreach ($this->getCampos() as $campo => $array) {
@@ -631,7 +631,7 @@ class Type extends RecordAbstract
     /**
      * Returns this object´s nome.
      *
-     * @return string 
+     * @return string
      */
     public function getStringValue(/*$simple = FALSE*/)
     {
@@ -799,7 +799,7 @@ class Type extends RecordAbstract
     public function getInterAdminsOrder()
     {
         $cacheKey = $this->getCacheKey('order');
-        return Cache::remember($cacheKey, 60, function () {
+        return Cache::remember($cacheKey, 5, function () {
             $order = [];
             $campos = $this->getCampos();
             if ($campos) {
@@ -886,7 +886,7 @@ class Type extends RecordAbstract
     public function getInterAdminsChildren()
     {
         $cacheKey = $this->getCacheKey('children');
-        return Cache::remember($cacheKey, 60, function () {
+        return Cache::remember($cacheKey, 5, function () {
             $children = [];
             $childrenArr = explode('{;}', $this->children);
             for ($i = 0; $i < count($childrenArr) - 1; $i++) {

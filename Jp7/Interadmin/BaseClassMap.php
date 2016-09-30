@@ -47,7 +47,7 @@ class BaseClassMap
 
     public function getClasses()
     {
-        return Cache::remember(static::CACHE_KEY, 60, function () {
+        return Cache::remember(static::CACHE_KEY, 5, function () {
             return static::prepareMap(static::CLASS_ATTRIBUTE);
         });
     }
