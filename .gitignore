@@ -6,3 +6,5 @@ Thumbs.db
 .phpintel
 /nbproject
 vendor
+!.env.example
+.env*
