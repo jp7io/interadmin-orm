@@ -1,13 +1,13 @@
-# JP7 - Classes
+# InterAdmin - ORM
 
-[![Codeship](https://codeship.com/projects/a049a190-3d36-0133-638d-22d459b325ce/status?branch=master)](https://codeship.com/projects/102432)
-[![Test Coverage](https://codeclimate.com/repos/57f69e7dc38d967dac002315/badges/b0083fadee9aee3efece/coverage.svg)](https://codeclimate.com/repos/57f69e7dc38d967dac002315/coverage)
-[![Code Climate](https://codeclimate.com/repos/57f69e7dc38d967dac002315/badges/b0083fadee9aee3efece/gpa.svg)](https://codeclimate.com/repos/57f69e7dc38d967dac002315/feed)
-[![Issue Count](https://codeclimate.com/repos/57f69e7dc38d967dac002315/badges/b0083fadee9aee3efece/issue_count.svg)](https://codeclimate.com/repos/57f69e7dc38d967dac002315/feed)
+[![Codeship Status for jp7internet/interadmin-orm](https://app.codeship.com/projects/499ecbb0-6e29-0134-13c6-7239a098062c/status?branch=master)](https://app.codeship.com/projects/177757)
+[![Test Coverage](https://codeclimate.com/repos/57f6a615e61159361f001150/badges/0c21df38f69c1c472f33/coverage.svg)](https://codeclimate.com/repos/57f6a615e61159361f001150/coverage)
+[![Code Climate](https://codeclimate.com/repos/57f6a615e61159361f001150/badges/0c21df38f69c1c472f33/gpa.svg)](https://codeclimate.com/repos/57f6a615e61159361f001150/feed)
+[![Issue Count](https://codeclimate.com/repos/57f6a615e61159361f001150/badges/0c21df38f69c1c472f33/issue_count.svg)](https://codeclimate.com/repos/57f6a615e61159361f001150/feed)
 
 ## Description
 
-General classes used by our projects, including InterAdmin ORM.
+InterAdmin ORM.
 
 * [CHANGELOG](CHANGELOG.md)
 
