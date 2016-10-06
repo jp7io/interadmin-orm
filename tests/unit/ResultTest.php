@@ -89,36 +89,35 @@ class ResultTest extends \Codeception\Test\Unit
 
     public function testLists()
     {
-        $list = $this->tester->createUsersBulk(10);
+        $users = $this->tester->createUsersBulk(10);
         $listExpected = [];
-        foreach ($list as $item) {
-            $listExpected[$item->id] = $item->username;
+        foreach ($users as $user) {
+            $listExpected[$user->id] = $user->username;
         }
-
-        $this->assertEquals($listExpected, Test_User::lists('username', 'id')->all());
+        $result = Test_User::orderBy('id')->lists('username', 'id');
+        $this->assertEquals($listExpected, $result->all());
     }
 
     public function testJsonList()
     {
-        $list = $this->tester->createUsersBulk(10);
-
-        $listJson = [];
-        foreach ($list as $item) {
-            $listJson[] = [
-                'key' => $item->id,
-                'value' => $item->username
+        $users = $this->tester->createUsersBulk(10);
+        $listExpected = [];
+        foreach ($users as $user) {
+            $listExpected[] = [
+                'key' => $user->id,
+                'value' => $user->username
             ];
         }
-
-        $this->assertEquals($listJson, Test_User::jsonList('username', 'id'));
+        $result = Test_User::orderBy('id')->jsonList('username', 'id');
+        $this->assertEquals($listExpected, $result);
     }
 
     public function testSkipTake()
     {
-        $list = $this->tester->createUsersBulk(40);
+        $users = $this->tester->createUsersBulk(40);
 
-        $usersSkip = Test_User::skip(3)->take(4)->orderBy('id', 'ASC')->get();
-        $expectedList = array_slice($list, 3, 4);
+        $usersSkip = Test_User::skip(3)->take(4)->orderBy('id')->get();
+        $expectedList = array_slice($users, 3, 4);
         foreach ($usersSkip as $actualUser) {
             $expectedUser = array_shift($expectedList);
 
@@ -128,10 +127,10 @@ class ResultTest extends \Codeception\Test\Unit
 
     public function testLimit()
     {
-        $list = $this->tester->createUsersBulk(10);
+        $users = $this->tester->createUsersBulk(10);
 
-        $usersTake = Test_User::take(3)->orderBy('id', 'ASC')->get();
-        $expectedList = array_slice($list, 0, 3);
+        $usersTake = Test_User::take(3)->orderBy('id')->get();
+        $expectedList = array_slice($users, 0, 3);
         foreach ($usersTake as $actualUser) {
             $expectedUser = array_shift($expectedList);
             $this->assertEquals($expectedUser->id, $actualUser->id);
