@@ -7,19 +7,25 @@
         {
             "type": "composer",
             "url": "https://satis.jp7.com.br"
-        },
+        }
     ],
     "require": {
         "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
-        "jp7internet/classes": "dev-master",
-        "jp7internet/inc": "dev-master"
+        "jp7internet/classes": "3.2.x-dev",
+        "jp7internet/inc": "dev-master",
+        "illuminate/support": "~5.2",
+        "illuminate/database": "~5.2",
+        "illuminate/cache": "~5.2",
+        "illuminate/config": "~5.2",
+        "symfony/var-dumper": "~3.0.4",
+        "codeception/codeception": "^2.2"
     },
     "autoload": {
         "psr-4": {
-            "Jp7\\": "Jp7/"
-        },
+            "Jp7\\Interadmin\\": "Jp7/Interadmin/"
+        }
     },
     "scripts": {
 
@@ -28,6 +34,6 @@
         "preferred-install": "dist",
         "component-dir": "vendor/components-installed"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

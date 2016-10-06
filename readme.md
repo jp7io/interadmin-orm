@@ -12,6 +12,7 @@ InterAdmin ORM.
 * [CHANGELOG](CHANGELOG.md)
 
 ## Docs v3.*
+
 * https://wiki.jp7.com.br:81/jp7/ORM
 * https://wiki.jp7.com.br:81/jp7/ORM:Query
 * https://wiki.jp7.com.br:81/jp7/ORM:Mass_Assignment
@@ -19,5 +20,12 @@ InterAdmin ORM.
 * https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
 
 ## Docs v2.*
+
 * https://wiki.jp7.com.br:81/jp7/index.php?title=ORM&oldid=4164
 * https://wiki.jp7.com.br:81/jp7/index.php?title=ORM:Query&oldid=4274
+
+## Tests
+
+```
+php vendor/bin/codecept run --coverage
+```
