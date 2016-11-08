@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5730a1b47f9962ef1f520a6bb8042128",
-    "content-hash": "41a29286fde91f9d440d9ff417318897",
+    "hash": "437ff035642e71ee68fc91e12304e155",
+    "content-hash": "ab2eb5ac1eeb505be27a6ef793da8b1a",
     "packages": [
         {
             "name": "codeclimate/php-test-reporter",
@@ -1747,16 +1747,16 @@
         },
         {
             "name": "jp7internet/classes",
-            "version": "3.2.x-dev",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/classes.git",
-                "reference": "849e3126a4298ab2ec582a26ae78beaee47e71ed"
+                "reference": "d87656de196a2820332359da1c8f98c2bbb01345"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/classes/zipball/849e3126a4298ab2ec582a26ae78beaee47e71ed",
-                "reference": "849e3126a4298ab2ec582a26ae78beaee47e71ed",
+                "url": "https://api.github.com/repos/jp7internet/classes/zipball/d87656de196a2820332359da1c8f98c2bbb01345",
+                "reference": "d87656de196a2820332359da1c8f98c2bbb01345",
                 "shasum": ""
             },
             "require": {
@@ -1790,20 +1790,20 @@
                 "proprietary"
             ],
             "description": "JP7 Classes",
-            "time": "2016-10-06 19:03:31"
+            "time": "2016-09-30 16:32:53"
         },
         {
             "name": "jp7internet/inc",
-            "version": "dev-master",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/inc.git",
-                "reference": "70bc0efc40cb318f810a887bde3921025c1bbb7b"
+                "reference": "d4d1376150b1208e0ad9ccc039eea577c2291856"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/70bc0efc40cb318f810a887bde3921025c1bbb7b",
-                "reference": "70bc0efc40cb318f810a887bde3921025c1bbb7b",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/d4d1376150b1208e0ad9ccc039eea577c2291856",
+                "reference": "d4d1376150b1208e0ad9ccc039eea577c2291856",
                 "shasum": ""
             },
             "require": {
@@ -3674,10 +3674,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "jp7internet/classes": 20,
-        "jp7internet/inc": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
