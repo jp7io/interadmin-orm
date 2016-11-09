@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "437ff035642e71ee68fc91e12304e155",
-    "content-hash": "ab2eb5ac1eeb505be27a6ef793da8b1a",
+    "hash": "28d21803d99ea419ad2df5cde1048982",
+    "content-hash": "a35f89d348d4fabcb13157f0dc0c32f6",
     "packages": [
         {
             "name": "codeclimate/php-test-reporter",
@@ -1747,23 +1747,24 @@
         },
         {
             "name": "jp7internet/classes",
-            "version": "v3.1.1",
+            "version": "3.2.x-dev",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7internet/classes.git",
-                "reference": "d87656de196a2820332359da1c8f98c2bbb01345"
+                "reference": "1b8ea34ad1d825119382a43862622b0b386c9b35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/classes/zipball/d87656de196a2820332359da1c8f98c2bbb01345",
-                "reference": "d87656de196a2820332359da1c8f98c2bbb01345",
+                "url": "https://api.github.com/repos/jp7internet/classes/zipball/1b8ea34ad1d825119382a43862622b0b386c9b35",
+                "reference": "1b8ea34ad1d825119382a43862622b0b386c9b35",
                 "shasum": ""
             },
             "require": {
-                "jdorn/sql-formatter": "~1.2"
+                "jdorn/sql-formatter": "~1.2",
+                "jp7internet/interadmin-orm": "~3.0"
             },
             "require-dev": {
-                "jp7internet/inc": "dev-master",
+                "jp7internet/inc": "~3.0",
                 "phpunit/phpunit": "^4.8"
             },
             "suggest": {
@@ -1790,7 +1791,7 @@
                 "proprietary"
             ],
             "description": "JP7 Classes",
-            "time": "2016-09-30 16:32:53"
+            "time": "2016-11-08 15:45:27"
         },
         {
             "name": "jp7internet/inc",
@@ -3674,7 +3675,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "jp7internet/classes": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],

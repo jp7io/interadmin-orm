@@ -14,7 +14,7 @@
         "codeclimate/php-test-reporter": "^0.3.2"
     },
     "require-dev": {
-        "jp7internet/classes": "~3.0",
+        "jp7internet/classes": "3.2.x-dev",
         "jp7internet/inc": "~3.0",
         "illuminate/support": "~5.2",
         "illuminate/database": "~5.2",
