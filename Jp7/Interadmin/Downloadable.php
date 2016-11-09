@@ -80,4 +80,36 @@ trait Downloadable
     {
         return human_size($this->getSize());
     }
+
+    public function getContents()
+    {
+        if ($this->isExternal()) { // Outside S3
+            return file_get_contents($this->url);
+        } else { // Inside S3
+            return Storage::get($this->getFilename());
+        }
+    }
+
+    /**
+     * Copies a file to a disk
+     *
+     * @param  string $disk One of Laravel disks: local, public or s3
+     * @return string Path or URL of the file
+     */
+    public function copyToDisk($disk, $redownload = false)
+    {
+        if ($this->isExternal()) { // Outside S3
+            $filename = parse_url($this->url, PHP_URL_PATH);
+        } else { // Inside S3
+            $filename = $this->getFilename();
+        }
+        if (!Storage::disk($disk)->has($filename) || $redownload) {
+            Storage::disk($disk)->put($filename, $this->getContents());
+        }
+        if ($disk === 'local') {
+            return Storage::disk($disk)->getDriver()->getAdapter()->getPathPrefix().$filename;
+        } else {
+            return Storage::disk($disk)->url($filename);
+        }
+    }
 }
