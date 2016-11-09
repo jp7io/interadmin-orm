@@ -17,6 +17,11 @@ class Query extends Query\BaseQuery
         return $this->provider;
     }
 
+    protected function providerFind($options)
+    {
+        return $this->provider->deprecatedFind($options);
+    }
+
     /**
      * Returns a instance with id 0, to get scopes, rules, and so on.
      *
@@ -154,7 +159,7 @@ class Query extends Query\BaseQuery
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
 
-        return $this->provider->deprecatedFind($this->options);
+        return $this->providerFind($this->options);
     }
 
     /**
@@ -273,7 +278,7 @@ class Query extends Query\BaseQuery
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
         }
 
-        return $this->provider->deprecatedFindFirst($this->options);
+        return $this->first();
     }
 
     public function findMany($ids)
@@ -287,12 +292,12 @@ class Query extends Query\BaseQuery
 
         $this->whereIn($key, $ids);
 
-        return $this->provider->deprecatedFind($this->options);
+        return $this->providerFind($this->options);
     }
 
     public function lists($column, $key = null)
     {
-        $array = $this->provider->deprecatedFind([
+        $array = $this->providerFind([
             'fields' => array_filter([$column, $key]),
         ] + $this->options);
 
@@ -304,7 +309,7 @@ class Query extends Query\BaseQuery
      */
     public function jsonList($column, $key)
     {
-        $items = $this->provider->deprecatedFind([
+        $items = $this->providerFind([
             'fields' => array_filter([$column, $key]),
         ] + $this->options);
 
