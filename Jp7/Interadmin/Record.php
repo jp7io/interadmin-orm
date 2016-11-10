@@ -437,7 +437,7 @@ class Record extends RecordAbstract implements Arrayable
         foreach (array_keys($children) as $childName) {
             $message .= "\t\t- ".lcfirst($childName)."()\n";
         }
-        if ($this->getType()->arquivos) {
+        if ($this->getType()->arquivos || $this->getType()->arquivos_2) {
             $message .= "\t\t- arquivos()\n";
         }
 
@@ -454,7 +454,7 @@ class Record extends RecordAbstract implements Arrayable
             }
 
             return new Query($childrenTipo);
-        } elseif ($name === 'arquivos' && $this->getType()->arquivos) {
+        } elseif ($name === 'arquivos' && ($this->getType()->arquivos || $this->getType()->arquivos_2)) {
             return new Query\FileQuery($this);
         }
     }
