@@ -326,6 +326,30 @@ class Query extends Query\BaseQuery
         return $result;
     }
 
+    public function save(Record $model)
+    {
+        if (!$this->provider->getParent() instanceof Record) {
+            throw new BadMethodCallException('This method can only save children to a parent.');
+        }
+        $model->setParent($this->provider->getParent());
+        return $model->save() ? $model : false;
+    }
+
+    /**
+     * Attach a collection of models to the parent instance.
+     *
+     * @param  \Traversable|array  $models
+     * @return \Traversable|array
+     */
+    public function saveMany($models)
+    {
+        foreach ($models as $model) {
+            $this->save($model);
+        }
+
+        return $models;
+    }
+
     public function __call($method_name, $params)
     {
         // Scope support
