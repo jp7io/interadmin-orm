@@ -4,6 +4,7 @@ namespace Jp7\Interadmin\Query;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Support\Arrayable;
 use Jp7\Interadmin\Type;
 use Jp7\Interadmin\RecordAbstract;
 use BadMethodCallException;
@@ -109,10 +110,13 @@ abstract class BaseQuery
         return $this->_addWhere($where);
     }
 
-    public function whereIn($column, $values)
+    public function whereIn($column, $values, $_not = false)
     {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
         $values = array_map([$this, '_escapeParam'], $values);
-        $where = $column.' IN ('.implode(',', $values).')';
+        $where = $column.($_not ? ' NOT' : '').' IN ('.implode(',', $values).')';
 
         return $this->_addWhere($where);
     }
@@ -127,10 +131,7 @@ abstract class BaseQuery
 
     public function whereNotIn($column, $values)
     {
-        $values = array_map([$this, '_escapeParam'], $values);
-        $where = $column.' NOT IN ('.implode(',', $values).')';
-
-        return $this->_addWhere($where);
+        return $this->whereIn($column, $values, true);
     }
 
     public function has($relationship)
