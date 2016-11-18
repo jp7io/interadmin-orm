@@ -282,7 +282,11 @@ abstract class BaseQuery
             $value = $value->__toString();
         }
         if (is_string($value)) {
-            $value = \DB::connection()->getPdo()->quote($value);
+            $db = \DB::connection();
+            if (!$db->getPdo()) {
+                $db->reconnect();
+            }
+            $value = $db->getPdo()->quote($value);
         }
         if (is_null($value)) {
             $value = 'NULL';
