@@ -37,6 +37,7 @@ class DB extends Illuminate\Support\Facades\DB
                 'charset'   => 'utf8',
                 'collation' => 'utf8_unicode_ci',
                 'prefix'    => 'interadmin_teste_',
+                'strict' => false,
             ]);
 
             $db->setAsGlobal();
