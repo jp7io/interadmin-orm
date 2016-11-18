@@ -3,6 +3,7 @@
     "description": "JP7 InterAdmin ORM",
     "keywords": [],
     "license": "proprietary",
+    "version": "3.2.x-dev",
     "repositories" : [
         {
             "type": "composer",
