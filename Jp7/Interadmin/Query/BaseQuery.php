@@ -116,7 +116,7 @@ abstract class BaseQuery
             $values = $values->toArray();
         }
         $values = array_map([$this, '_escapeParam'], $values);
-        $where = $column.($_not ? ' NOT' : '').' IN ('.implode(',', $values).')';
+        $where = $this->prefix.$column.($_not ? ' NOT' : '').' IN ('.implode(',', $values).')';
 
         return $this->_addWhere($where);
     }
@@ -124,7 +124,7 @@ abstract class BaseQuery
     public function whereFindInSet($column, $value)
     {
         $value = $this->_escapeParam($value);
-        $where = 'FIND_IN_SET ('.$value.', '.$column.')';
+        $where = 'FIND_IN_SET ('.$value.', '.$this->prefix.$column.')';
 
         return $this->_addWhere($where);
     }
@@ -159,28 +159,28 @@ abstract class BaseQuery
 
     public function whereYear($column, $operator, $value = null)
     {
-        $where = $this->_parseComparison('YEAR('.$column.')', $operator, $value);
+        $where = $this->_parseComparison('YEAR('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
     public function whereMonth($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('MONTH('.$column.')', $operator, $value);
+        $where =  $this->_parseComparison('MONTH('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
     public function whereDay($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('DAY('.$column.')', $operator, $value);
+        $where =  $this->_parseComparison('DAY('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
     public function whereDate($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('DATE('.$column.')', $operator, $value);
+        $where =  $this->_parseComparison('DATE('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
