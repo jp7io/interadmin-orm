@@ -332,6 +332,15 @@ abstract class BaseQuery
         return $this->join($alias, $className, $conditions, 'RIGHT');
     }
 
+    public function typelessJoin($alias, $className, $conditions, $_joinType = 'INNER')
+    {
+        $type = $this->_resolveType($className);
+        $joinOn = $this->_parseConditions($conditions, $type, $alias)[0];
+        $this->options['joins'][$alias] = [$_joinType, $type, $joinOn, true];
+
+        return $this;
+    }
+
     public function skip($offset)
     {
         if (!is_numeric($offset)) {

@@ -354,11 +354,14 @@ abstract class RecordAbstract
         $joins = '';
         if (isset($options['joins']) && $options['joins']) {
             foreach ($options['joins'] as $alias => $join) {
-                list($joinType, $tipo, $on) = $join;
+                @list($joinType, $tipo, $on, $typeless) = $join;
                 $table = $tipo->getInterAdminsTableName();
                 $joins .= ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
-                    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '').
-                    $alias.'.id_tipo = '.$tipo->id_tipo.' AND '.$this->_resolveSql($on, $options, $use_published_filters);
+                    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
+                if (!$typeless) {
+                    $joins .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
+                }
+                $joins .= $this->_resolveSql($on, $options, $use_published_filters);
             }
         }
 
