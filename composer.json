@@ -11,8 +11,7 @@
         }
     ],
     "require": {
-        "jdorn/sql-formatter": "~1.2",
-        "codeclimate/php-test-reporter": "^0.3.2"
+        "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
         "jp7internet/classes": "3.2.x-dev",
@@ -22,7 +21,8 @@
         "illuminate/cache": "~5.2",
         "illuminate/config": "~5.2",
         "symfony/var-dumper": "~3.0",
-        "codeception/codeception": "^2.2"
+        "codeception/codeception": "^2.2",
+        "codeclimate/php-test-reporter": "^0.3.2"
     },
     "autoload": {
         "psr-4": {
