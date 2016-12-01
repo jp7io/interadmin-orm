@@ -765,11 +765,9 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function isPublished()
     {
-        global $s_session;
-
         return $this->char_key &&
             !$this->deleted &&
-            ($this->parent_id || $this->publish || $s_session['preview'] || !config('interadmin.preview')) &&
+            ($this->parent_id || $this->publish || !config('interadmin.preview')) &&
             $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
             ($this->date_expire->getTimestamp() >= Record::getTimestamp() || $this->date_expire->format('Y') < 1);
     }
@@ -858,8 +856,7 @@ class Record extends RecordAbstract implements Arrayable
     }
 
     /**
-     * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
-     * applications and 'site' otherwise.
+     * Returns $log_user. If $log_user is NULL, returns 'site'.
      *
      * @see Record::$log_user
      *
@@ -867,12 +864,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     public static function getLogUser()
     {
-        global $jp7_app, $s_user;
-        if (is_null(self::$log_user)) {
-            return ($jp7_app) ? $s_user['login'] : 'site';
-        }
-
-        return self::$log_user;
+        return self::$log_user ?: 'site';
     }
     /**
      * Sets $log_user and returns the old value.

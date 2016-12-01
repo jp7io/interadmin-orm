@@ -969,8 +969,6 @@ abstract class RecordAbstract
 
     public static function getPublishedFilters($table, $alias)
     {
-        global $s_session;
-
         $tableParts = explode('_', $table);
         $table = end($tableParts);
         // Tipos
@@ -989,7 +987,7 @@ abstract class RecordAbstract
                 ' AND '.$alias.".char_key <> ''".
                 ' AND '.$alias.".deleted = ''".
                 ' AND ';
-            if (config('interadmin.preview') && !$s_session['preview']) {
+            if (config('interadmin.preview')) {
                 $return .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';
             }
 
