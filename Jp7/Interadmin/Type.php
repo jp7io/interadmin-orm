@@ -654,6 +654,7 @@ class Type extends RecordAbstract
      */
     public function save()
     {
+        $this->id_tipo_string = toId($this->nome);
         $this->id_slug = to_slug($this->nome);
 
         // log
