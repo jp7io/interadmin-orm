@@ -13,7 +13,11 @@ trait Downloadable
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $this->url);
     }
 
-    // Client side URL without hostname and protocol
+    /**
+     * Client side URL without hostname and protocol
+     *
+     * @return string
+     */
     public function getPath()
     {
         $config = config('interadmin.storage');

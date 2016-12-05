@@ -50,9 +50,15 @@ abstract class RecordAbstract
     {
         if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
-        } else {
-            return $null;
         }
+        $value = null;
+        // Mutators
+        $mutator = 'get'.Str::studly($name).'Attribute';
+        if (method_exists($this, $mutator)) {
+            $value = $this->$mutator($value);
+            return $value;
+        }
+        return $value;
     }
     /**
      * Magic set acessor.
