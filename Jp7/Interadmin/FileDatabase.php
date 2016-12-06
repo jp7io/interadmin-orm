@@ -49,7 +49,7 @@ class FileDatabase extends RecordAbstract
     public function getUrlAttribute()
     {
         return config('interadmin.storage.backend_path').'/upload/'.
-            ($this->getType()->nome ? toId($this->getType()->nome).'/' : '').
+            (empty($this->getType()->nome) ? '' : toId($this->getType()->nome).'/').
             $this->basename().
             ($this->versao ? '?v='.$this->versao : '');
     }
