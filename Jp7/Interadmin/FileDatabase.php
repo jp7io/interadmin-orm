@@ -14,7 +14,11 @@ namespace Jp7\Interadmin;
  * zoom         (obsoleto)
  * lang
  * versao       (contagem de mudanças)
- * Adicionar campos: data, tamanho, deleted
+ * ## Adicionar campos:
+ * date_modify
+ * width
+ * height
+ * deleted
  */
 
 /**
@@ -49,12 +53,12 @@ class FileDatabase extends RecordAbstract
     public function getUrlAttribute()
     {
         return config('interadmin.storage.backend_path').'/upload/'.
-            (empty($this->getType()->nome) ? '' : toId($this->getType()->nome).'/').
-            $this->basename().
+            ($this->getType()->nome ? toId($this->getType()->nome).'/' : '').
+            $this->getBasename().
             ($this->versao ? '?v='.$this->versao : '');
     }
 
-    public function basename()
+    public function getBasename()
     {
         return str_pad($this->id_arquivo_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
     }
