@@ -1108,7 +1108,7 @@ class Type extends RecordAbstract
 
         foreach ($rs as $row) {
             $tipo = self::getInstance($row->id_tipo, [
-                'db' => $options['db'],
+                'db' => isset($options['db']) ? $options['db'] : null,
                 'class' => isset($options['class']) ? $options['class'] : null,
             ]);
             $instance->_getAttributesFromRow($row, $tipo, $options);
