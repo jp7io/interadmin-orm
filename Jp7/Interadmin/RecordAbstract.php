@@ -555,7 +555,7 @@ abstract class RecordAbstract
                 $len = strlen($termo);
                 $table = 'main';
                 if (strpos($termo, '.') !== false) {
-                    @list($table, $termo, $subtermo) = explode('.', $termo);
+                    list($table, $termo, $subtermo) = explode('.', $termo) + [2 => null];
                 }
                 if ($table === 'main') {
                     $campo = $this->_aliasToColumn($termo, $aliases);
@@ -599,7 +599,7 @@ abstract class RecordAbstract
                         if (isset($options['joins'][$table])) {
                             $joinTipo = $options['joins'][$table][1];
                         // Joins de select
-                        } elseif (isset($campos[@$aliases[$joinNome.'_id']])) {
+                        } elseif (isset($aliases[$joinNome.'_id']) && isset($campos[$aliases[$joinNome.'_id']])) {
                             $joinNome = $aliases[$joinNome.'_id'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->_addJoinAlias($options, $table, $campos[$joinNome]);
