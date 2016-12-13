@@ -420,7 +420,7 @@ abstract class RecordAbstract
      *
      * @return
      */
-    protected function _resolveSqlClausesAlias(&$options = [], $use_published_filters)
+    protected function _resolveSqlClausesAlias(array &$options, $use_published_filters)
     {
         $resolvedWhere = $this->_resolveSql($options['where'], $options, $use_published_filters);
         if (isset($options['order'])) {
@@ -442,7 +442,7 @@ abstract class RecordAbstract
             ((isset($resolvedOrder)) ? ' ORDER BY '.$resolvedOrder : '');
     }
 
-    protected function _resolveSql($clause, &$options = [], $use_published_filters)
+    protected function _resolveSql($clause, array &$options, $use_published_filters)
     {
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
@@ -779,7 +779,7 @@ abstract class RecordAbstract
     /**
      * Helper function to add a join.
      */
-    protected function _addJoinAlias(&$options = [], $alias, $campo, $table = 'main')
+    protected function _addJoinAlias(array &$options, $alias, $campo, $table = 'main')
     {
         $joinTipo = $this->getCampoTipo($campo);
         if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
@@ -808,7 +808,7 @@ abstract class RecordAbstract
      */
     protected function _getAttributesFromRow($row, $object, $options)
     {
-        $campos = &$options['campos'];
+        //$campos = &$options['campos'];
         $attributes = &$object->attributes;
 
         foreach ($row as $key => $value) {
