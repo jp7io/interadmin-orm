@@ -14,8 +14,8 @@ namespace Jp7\Interadmin;
  * zoom         (obsoleto)
  * lang
  * versao       (contagem de mudanças)
- * ## Adicionar campos:
  * date_modify
+ * directory    (noticias, mediabox, can't be the type's name because it can change)
  * width
  * height
  * deleted
@@ -52,8 +52,12 @@ class FileDatabase extends RecordAbstract
      */
     public function getUrlAttribute()
     {
+        if ($this->directory === '' && $this->getType()) {
+            // TODO: remove after migration
+            $this->directory = toId($this->getType()->nome);
+        }
         return config('interadmin.storage.backend_path').'/upload/'.
-            (empty($this->getType()->nome) ? '' : toId($this->getType()->nome).'/').
+            ($this->directory ? $this->directory.'/' : '').
             $this->getBasename().
             ($this->versao ? '?v='.$this->versao : '');
     }
