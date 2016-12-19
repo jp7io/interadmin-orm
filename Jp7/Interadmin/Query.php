@@ -295,7 +295,7 @@ class Query extends Query\BaseQuery
         return $this->providerFind($this->options);
     }
 
-    public function lists($column, $key = null)
+    public function pluck($column, $key = null)
     {
         $array = $this->providerFind([
             'fields' => array_filter([$column, $key]),

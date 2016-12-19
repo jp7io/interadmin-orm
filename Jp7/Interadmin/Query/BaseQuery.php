@@ -61,6 +61,14 @@ abstract class BaseQuery
         return $this->get();
     }
 
+    /**
+     * @deprecated use pluck() instead
+     */
+    public function lists($column, $key = null)
+    {
+        return $this->pluck($column, $key);
+    }
+
     public function where($column, $operator = null, $value = null)
     {
         if (is_array($column)) {

@@ -96,7 +96,7 @@ class TypeQuery extends BaseQuery
         return $result;
     }
 
-    public function lists($column, $key = null)
+    public function pluck($column, $key = null)
     {
         $array = $this->provider->deprecatedGetChildren([
             'fields' => array_filter([$column, $key]),
