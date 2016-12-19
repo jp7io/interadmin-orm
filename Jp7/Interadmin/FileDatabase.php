@@ -71,7 +71,6 @@ class FileDatabase extends RecordAbstract
     public function save()
     {
         $this->attributes['date_modify'] = new \Date;
-        $this->attributes['versao']++;
         return parent::save();
     }
 
