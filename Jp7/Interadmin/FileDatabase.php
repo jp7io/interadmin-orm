@@ -2,27 +2,23 @@
 
 namespace Jp7\Interadmin;
 
-/*
- * ## Campos:
- * id_arquivo_banco (PK)
- * id_tipo
- * id
- * parte        (0, 2, 3 - Abas "arquivos")
- * tipo         (gif, bmp - Extensão)
- * keywords
- * thumb        (obsoleto)
- * zoom         (obsoleto)
- * lang
- * versao       (contagem de mudanças)
- * date_modify
- * directory    (noticias, mediabox, can't be the type's name because it can change)
- * width
- * height
- * deleted
- */
-
 /**
- * @property string url
+ * @property int $id_arquivo_banco  PK
+ * @property int $id_tipo
+ * @property int $id    Parent record ID
+ * @property int $parte  0, 2, 3 - Abas "arquivos"
+ * @property string $tipo gif, bmp - Extensão
+ * @property string $keywords
+ * @property string $thumb obsoleto
+ * @property string $zoom obsoleto
+ * @property string $lang
+ * @property int $versao  contagem de mudanças
+ * @property Date $date_modify
+ * @property string $directory noticias, mediabox, can't be the type's name because it can change
+ * @property int $width
+ * @property int $height
+ * @property string $deleted   'S' or ''
+ * @property string $url    getUrlAttribute() mutator
  */
 class FileDatabase extends RecordAbstract
 {
@@ -62,9 +58,21 @@ class FileDatabase extends RecordAbstract
             ($this->versao ? '?v='.$this->versao : '');
     }
 
+    public function setDateModifyAttribute($value)
+    {
+        $this->attributes['date_modify'] = new \Date($value);
+    }
+
     public function getBasename()
     {
         return str_pad($this->id_arquivo_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
+    }
+
+    public function save()
+    {
+        $this->attributes['date_modify'] = new \Date;
+        $this->attributes['versao']++;
+        return parent::save();
     }
 
     /**
@@ -76,8 +84,8 @@ class FileDatabase extends RecordAbstract
      */
     public function getType()
     {
-        if (!$this->_tipo && $this->id_tipo) {
-            $this->_tipo = Type::getInstance($this->id_tipo, [
+        if (!$this->_tipo && $this->attributes['id_tipo']) {
+            $this->_tipo = Type::getInstance($this->attributes['id_tipo'], [
                 'db' => $this->_db
             ]);
         }
@@ -90,7 +98,7 @@ class FileDatabase extends RecordAbstract
      */
     public function setType($tipo)
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
     }
     /**
@@ -102,8 +110,8 @@ class FileDatabase extends RecordAbstract
      */
     public function getParent($options = [])
     {
-        if (!$this->_parent && $this->id) {
-            $this->_parent = Record::getInstance($this->id, $options, $this->getType());
+        if (!$this->_parent && $this->attributes['id']) {
+            $this->_parent = Record::getInstance($this->attributes['id'], $options, $this->getType());
         }
         return $this->_parent;
     }
@@ -114,7 +122,7 @@ class FileDatabase extends RecordAbstract
      */
     public function setParent($parent)
     {
-        $this->id = $parent->id;
+        $this->attributes['id'] = $parent->id;
         $this->_parent = $parent;
     }
 
