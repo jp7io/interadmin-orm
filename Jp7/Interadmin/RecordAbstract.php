@@ -392,7 +392,7 @@ abstract class RecordAbstract
             if (isset($trace[$i]['file'])) {
                 $sql .= PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
             }
-            \Log::info($sql);
+            \Log::debug($sql);
         }
 
         $rs = $db->select($sql);
