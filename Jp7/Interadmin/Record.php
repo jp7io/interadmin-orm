@@ -15,6 +15,11 @@ use RecordUrl;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
+ *
+ * @method static Query where(string $column, string $operator = null, mixed $value = null)
+ * @method static Query whereRaw(string $where)
+ * @method static static build(array $attributes = [])
+ * @method static static create(array $attributes = [])
  */
 class Record extends RecordAbstract implements Arrayable
 {
