@@ -13,10 +13,22 @@ engines:
     checks:
       CleanCode/StaticAccess:
         enabled: false
+      CleanCode/ElseExpression:
+        enabled: false
       Controversial/CamelCaseVariableName:
+        enabled: false
+      Controversial/CamelCaseParameterName:
+        enabled: false
+      Controversial/CamelCasePropertyName:
         enabled: false
       Naming/ShortVariable:
         enabled: false
+  eslint:
+    checks:
+      global-require:
+        enabled: false # we use requirejs which has asynchronous require()
+      no-redeclare:
+        enabled: false # false positives about variables in different scopes
 ratings:
   paths:
   - "**.js"
