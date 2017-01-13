@@ -13,5 +13,3 @@ App::setLocale('pt-BR');
 class_alias(Carbon\Carbon::class, 'Date');
 
 Jp7\Interadmin\DynamicLoader::register();
-
-require BASE_PATH . '/vendor/jp7internet/inc/7.functions.php';
