@@ -24,6 +24,7 @@ engines:
       Naming/ShortVariable:
         enabled: false
   eslint:
+    enabled: true
     checks:
       global-require:
         enabled: false # we use requirejs which has asynchronous require()
