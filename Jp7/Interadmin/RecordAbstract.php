@@ -372,7 +372,7 @@ abstract class RecordAbstract
         }
 
         if (isset($options['skip'])) {
-            $options['limit'] = $options['skip'].','.$options['limit'];
+            $options['limit'] = $options['skip'].','.($options['limit'] ?? '18446744073709551615');
         }
 
         // Sql
