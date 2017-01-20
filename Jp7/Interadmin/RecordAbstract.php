@@ -384,15 +384,7 @@ abstract class RecordAbstract
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
 
         if (getenv('APP_DEBUG')) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-            $i = 0;
-            while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
-                $i++;
-            }
-            if (isset($trace[$i]['file'])) {
-                $sql .= PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
-            }
-            \Log::debug($sql);
+            $this->_debugQuery($sql, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
         }
 
         $rs = $db->select($sql);
@@ -402,7 +394,6 @@ abstract class RecordAbstract
             if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
                 $erro .= ". Available fields: \n\t\t- ".implode("\n\t\t- ", array_keys($options['aliases']));
             }
-
             throw new Exception($erro.' - SQL: '.$sql);
         }
 
@@ -413,6 +404,24 @@ abstract class RecordAbstract
         // $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
         return $rs;
     }
+
+    private function _debugQuery($sql, $trace)
+    {
+        $i = 0;
+        $caller = '';
+        while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
+            $i++;
+        }
+        if (isset($trace[$i]['file'])) {
+            $caller = PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
+        }
+        if (!isset($GLOBALS['__queries'])) {
+            $GLOBALS['__queries'] = 0;
+        }
+        $GLOBALS['__queries']++;
+        \Log::debug($sql.$caller);
+    }
+
     /**
      * Resolves the aliases on clause using regex.
      *
