@@ -213,36 +213,36 @@ class Type extends RecordAbstract
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
         }
-        return Cache::remember('Type::children,'.serialize($options), 5, function () use ($options) {
-            if (empty($options['where'])) {
-                $options['where'] = ['1=1'];
-            }
-            if (empty($options['fields'])) {
-                $options['fields'] = $this->getAttributesNames();
-            } else {
-                $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
-            }
-            // Internal use
-            $options['from'] = $this->getTableName().' AS main';
-            $options['aliases'] = $this->getAttributesAliases();
-            $options['campos'] = $this->getAttributesCampos();
+        //return Cache::remember('Type::children,'.serialize($options), 5, function () use ($options) {
+        if (empty($options['where'])) {
+            $options['where'] = ['1=1'];
+        }
+        if (empty($options['fields'])) {
+            $options['fields'] = $this->getAttributesNames();
+        } else {
+            $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
+        }
+        // Internal use
+        $options['from'] = $this->getTableName().' AS main';
+        $options['aliases'] = $this->getAttributesAliases();
+        $options['campos'] = $this->getAttributesCampos();
 
-            $rs = $this->_executeQuery($options);
+        $rs = $this->_executeQuery($options);
 
-            $tipos = [];
-            foreach ($rs as $row) {
-                $tipo = self::getInstance($row->id_tipo, [
-                    'db' => $this->_db,
-                    'class' => isset($options['class']) ? $options['class'] : null,
-                    'default_namespace' => static::DEFAULT_NAMESPACE,
-                ]);
-                $tipo->setParent($this);
-                $this->_getAttributesFromRow($row, $tipo, $options);
-                $tipos[] = $tipo;
-            }
-            // $rs->Close();
-            return new Collection($tipos);
-        });
+        $tipos = [];
+        foreach ($rs as $row) {
+            $tipo = self::getInstance($row->id_tipo, [
+                'db' => $this->_db,
+                'class' => isset($options['class']) ? $options['class'] : null,
+                'default_namespace' => static::DEFAULT_NAMESPACE,
+            ]);
+            $tipo->setParent($this);
+            $this->_getAttributesFromRow($row, $tipo, $options);
+            $tipos[] = $tipo;
+        }
+        // $rs->Close();
+        return new Collection($tipos);
+        //});
     }
 
     public function children()
