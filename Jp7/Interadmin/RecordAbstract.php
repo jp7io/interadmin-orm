@@ -387,14 +387,14 @@ abstract class RecordAbstract
             $this->_debugQuery($sql, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
         }
 
-        $rs = $db->select($sql);
-
-        if (!$rs && !is_array($rs)) {
-            $erro = $db->ErrorMsg();
-            if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
-                $erro .= ". Available fields: \n\t\t- ".implode("\n\t\t- ", array_keys($options['aliases']));
+        try {
+            $rs = $db->select($sql);
+        } catch (\Illuminate\Database\QueryException $e) {
+            $availableFields = '';
+            if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
+                $availableFields .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
             }
-            throw new Exception($erro.' - SQL: '.$sql);
+            throw new \Illuminate\Database\QueryException($sql.$availableFields, $e->getBindings(), $e);
         }
 
         if (!empty($options['debug'])) {
