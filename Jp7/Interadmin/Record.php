@@ -1042,7 +1042,7 @@ class Record extends RecordAbstract implements Arrayable
             $stringValue[] = $this->$campoCombo;
         }
 
-        return implode(' - ', $stringValue);
+        return implode(' - ', array_filter($stringValue));
     }
 
     public function toArray()
