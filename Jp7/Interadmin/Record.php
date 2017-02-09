@@ -1057,6 +1057,11 @@ class Record extends RecordAbstract implements Arrayable
         return $array;
     }
 
+    public function __debugInfo()
+    {
+        return array_merge((array) $this, $this->getAliasedAttributes());
+    }
+
     public function getRules()
     {
         $rules = [];

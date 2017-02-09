@@ -119,7 +119,7 @@ class Type extends RecordAbstract
      * @param int   $id_tipo This record's 'id_tipo'.
      * @param array $options Default array of options. Available keys: class, default_class.
      *
-     * @return Type Returns an Type or a child class in case it's defined on its 'class_tipo' property.
+     * @return static Returns an Type or a child class in case it's defined on its 'class_tipo' property.
      */
     public static function getInstance($id_tipo, $options = [])
     {
