@@ -20,6 +20,7 @@ use RecordUrl;
  * @method static Query whereRaw(string $where)
  * @method static static build(array $attributes = [])
  * @method static static create(array $attributes = [])
+ * @method Query\FileQuery arquivos
  */
 class Record extends RecordAbstract implements Arrayable
 {
@@ -442,7 +443,7 @@ class Record extends RecordAbstract implements Arrayable
         foreach (array_keys($children) as $childName) {
             $message .= "\t\t- ".lcfirst($childName)."()\n";
         }
-        if ($this->getType()->arquivos || $this->getType()->arquivos_2) {
+        if ($this->hasArquivosTab()) {
             $message .= "\t\t- arquivos()\n";
         }
 
@@ -459,7 +460,7 @@ class Record extends RecordAbstract implements Arrayable
             }
 
             return new Query($childrenTipo);
-        } elseif ($name === 'arquivos' && ($this->getType()->arquivos || $this->getType()->arquivos_2)) {
+        } elseif ($name === 'arquivos' && $this->hasArquivosTab()) {
             return new Query\FileQuery($this);
         }
     }
@@ -589,6 +590,11 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return false;
+    }
+
+    public function hasArquivosTab()
+    {
+        return $this->getType()->arquivos || $this->getType()->arquivos_2;
     }
 
     /**
