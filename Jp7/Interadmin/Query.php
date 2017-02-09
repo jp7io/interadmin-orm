@@ -176,6 +176,9 @@ class Query extends Query\BaseQuery
         }
     }
 
+    /**
+     * @return Record|null
+     */
     public function first()
     {
         if (func_num_args() > 0) {
@@ -263,6 +266,10 @@ class Query extends Query\BaseQuery
         }
     }
 
+    /**
+     * @param $id string|int
+     * @return Record|null
+     */
     public function find($id)
     {
         if (func_num_args() != 1) {
