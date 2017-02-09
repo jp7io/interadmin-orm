@@ -568,6 +568,18 @@ class Record extends RecordAbstract implements Arrayable
         return $childrenTipo;
     }
 
+    /**
+     * @return Type[]
+     */
+    public function getChildrenTipos()
+    {
+        $childrenTypes = $this->getType()->getInterAdminsChildrenTipos();
+        foreach ($childrenTypes as $childType) {
+            $childType->setParent($this);
+        }
+        return $childrenTypes;
+    }
+
     public function hasChildrenTipo($id_tipo)
     {
         foreach ($this->getType()->getInterAdminsChildren() as $childrenArr) {
