@@ -940,6 +940,12 @@ abstract class RecordAbstract
             ->delete();
     }
 
+    public function restore()
+    {
+        $this->deleted = '';
+        return $this->save();
+    }
+
     /**
      * @param array $where
      *                     FIXME temporário para wheres que eram com string

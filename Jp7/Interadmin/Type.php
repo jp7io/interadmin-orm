@@ -733,6 +733,13 @@ class Type extends RecordAbstract
         $this->deleted_tipo = 'S';
         $this->save();
     }
+
+    public function restore()
+    {
+        $this->deleted_tipo = '';
+        $this->save();
+    }
+
     /**
      * Deletes all the Records.
      *
