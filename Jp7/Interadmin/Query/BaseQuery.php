@@ -11,7 +11,13 @@ use BadMethodCallException;
 
 abstract class BaseQuery
 {
+    /**
+     * @var RecordAbstract
+     */
     protected $provider;
+    /**
+     * @var array
+     */
     protected $options;
     protected $or = false;
     protected $prefix = '';
