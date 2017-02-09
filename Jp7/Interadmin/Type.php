@@ -269,7 +269,11 @@ class Type extends RecordAbstract
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
         $options['where'][] = 'id_tipo = '.$this->id_tipo;
         if ($this->_parent instanceof Record) {
+            // NULL to avoid finding children for invalid parents without ID
             $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
+            if ($this->_parent->id_tipo) {
+                $options['where'][] = 'parent_id_tipo = '.$this->_parent->id_tipo;
+            }
         }
 
         $rs = $this->_executeQuery($options);
