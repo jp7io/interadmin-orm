@@ -5,6 +5,7 @@ namespace Jp7\Interadmin\Query;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Jp7\Interadmin\Type;
 use Jp7\Interadmin\RecordAbstract;
 use BadMethodCallException;
