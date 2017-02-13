@@ -57,7 +57,9 @@ class Record extends RecordAbstract implements Arrayable
      *
      * @var string
      */
-    protected static $log_user = null;
+    protected static $log_user = 'site';
+
+    protected static $log_action = '';
     /**
      * If TRUE the records will be filtered using the method getPublishedFilters().
      *
@@ -808,8 +810,12 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         // log
-        $this->log = date('d/m/Y H:i').' - '.self::getLogUser().' - '.Request::ip().
-            chr(13).$this->log;
+        $this->log = date('d/m/Y H:i').' - '.
+            self::$log_user.' - '.
+            (self::$log_action ? self::$log_action.' - ' : '').
+            Request::ip().
+            chr(13).
+            $this->log;
 
         // date_modify
         $this->date_modify = date('c');
@@ -887,14 +893,15 @@ class Record extends RecordAbstract implements Arrayable
      */
     public static function getLogUser()
     {
-        return self::$log_user ?: 'site';
+        return self::$log_user;
     }
+
     /**
      * Sets $log_user and returns the old value.
      *
      * @see     Record::$log_user
      *
-     * @param object $log_user
+     * @param string $log_user
      *
      * @return string Old value.
      */
@@ -905,6 +912,20 @@ class Record extends RecordAbstract implements Arrayable
 
         return $old_user;
     }
+
+    public static function getLogAction()
+    {
+        return self::$log_action;
+    }
+
+    public static function setLogAction($log_action)
+    {
+        $old_action = self::$log_action;
+        self::$log_action = $log_action;
+
+        return $old_action;
+    }
+
     /**
      * Enables or disables published filters.
      *
