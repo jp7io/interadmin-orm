@@ -67,6 +67,111 @@ abstract class BaseQuery
         return $this->get();
     }
 
+    abstract protected function providerFind($options);
+
+    /**
+     * @return RecordAbstract|null
+     */
+    public function first()
+    {
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+        }
+
+        return $this->providerFind(['limit' => 1] + $this->options)->first();
+    }
+
+    public function firstOrFail()
+    {
+        $result = $this->first();
+        if (!$result) {
+            throw new ModelNotFoundException('Unable to find first record.');
+        }
+        return $result;
+    }
+
+    /**
+     * Get a single column's value from the first result of a query.
+     *
+     * @param  string  $column
+     * @return mixed
+     */
+    public function value($column)
+    {
+        $result = $this->select($column)->first();
+        if ($result) {
+            return $result->{$column};
+        }
+    }
+
+    /**
+     * @return Collection
+     */
+    public function get()
+    {
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+        }
+
+        return $this->providerFind($this->options);
+    }
+
+    public function pluck($column, $key = null)
+    {
+        $array = $this->providerFind([
+                'fields' => array_filter([$column, $key]),
+            ] + $this->options);
+
+        return jp7_collect(array_pluck($array, $column, $key));
+    }
+
+    /**
+     * List to be used on json, with {key: 1, value: 'Lorem'}.
+     */
+    public function jsonList($column, $key)
+    {
+        $items = $this->providerFind([
+                'fields' => array_filter([$column, $key]),
+            ] + $this->options);
+
+        return $items->jsonList($column, $key);
+    }
+
+    /**
+     * Set deleted = 'S' and update the records.
+     *
+     * @return int
+     */
+    public function delete()
+    {
+        $records = $this->get();
+        foreach ($records as $record) {
+            $record->delete();
+        }
+        return count($records);
+    }
+
+    /**
+     * Remove permanently from the database.
+     */
+    public function forceDelete()
+    {
+        $records = $this->get();
+        foreach ($records as $record) {
+            $record->forceDelete();
+        }
+        return count($records);
+    }
+
+    public function restore()
+    {
+        $records = $this->get();
+        foreach ($records as $record) {
+            $record->restore();
+        }
+        return count($records);
+    }
+
     /**
      * @deprecated use pluck() instead
      */

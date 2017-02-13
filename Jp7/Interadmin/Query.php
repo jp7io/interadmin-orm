@@ -56,24 +56,6 @@ class Query extends Query\BaseQuery
         return $this->build($attributes)->save();
     }
 
-    /**
-     * Set deleted = 'S' and update the records.
-     *
-     * @return int
-     */
-    public function delete()
-    {
-        return $this->provider->deprecated_deleteInterAdmins($this->options);
-    }
-
-    /**
-     * Remove permanently from the database.
-     */
-    public function forceDelete()
-    {
-        return $this->provider->deprecated_deleteInterAdminsForever($this->options);
-    }
-
     protected function _isChar($field)
     {
         if (str_contains($field, '.')) {
@@ -148,53 +130,6 @@ class Query extends Query\BaseQuery
         }
 
         return $this;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function get()
-    {
-        if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
-        }
-
-        return $this->providerFind($this->options);
-    }
-
-    /**
-     * Get a single column's value from the first result of a query.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function value($column)
-    {
-        $result = $this->select($column)->first();
-        if ($result) {
-            return $result->{$column};
-        }
-    }
-
-    /**
-     * @return Record|null
-     */
-    public function first()
-    {
-        if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
-        }
-
-        return $this->provider->deprecatedFindFirst($this->options);
-    }
-
-    public function firstOrFail()
-    {
-        $result = $this->first();
-        if (!$result) {
-            throw new ModelNotFoundException('Unable to find first record.');
-        }
-        return $result;
     }
 
     public function count()
@@ -300,27 +235,6 @@ class Query extends Query\BaseQuery
         $this->whereIn($key, $ids);
 
         return $this->providerFind($this->options);
-    }
-
-    public function pluck($column, $key = null)
-    {
-        $array = $this->providerFind([
-            'fields' => array_filter([$column, $key]),
-        ] + $this->options);
-
-        return jp7_collect(array_pluck($array, $column, $key));
-    }
-
-    /**
-     * List to be used on json, with {key: 1, value: 'Lorem'}.
-     */
-    public function jsonList($column, $key)
-    {
-        $items = $this->providerFind([
-            'fields' => array_filter([$column, $key]),
-        ] + $this->options);
-
-        return $items->jsonList($column, $key);
     }
 
     public function findOrFail($id)

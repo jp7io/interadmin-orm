@@ -947,8 +947,7 @@ abstract class RecordAbstract
     }
 
     /**
-     * @param array $where
-     *                     FIXME temporário para wheres que eram com string
+     * @param array $where FIXME temporário para wheres que eram com string
      */
     protected function _whereArrayFix(&$where)
     {
