@@ -849,13 +849,9 @@ class Record extends RecordAbstract implements Arrayable
             $id_slug = '--'.$id_slug;
         }
 
-        $query = function () {
-            return $this->typeSiblings()->published(true);
-        };
-
-        if ($query()->where('id_slug', $id_slug)->exists()) {
+        if ($this->typeSiblings()->where('id_slug', $id_slug)->exists()) {
             // Add an index if it already exists
-            $max = $query()
+            $max = $this->typeSiblings()
                 ->where('id_slug', 'REGEXP', '^'.$id_slug.'[0-9]*$')
                 ->orderByRaw('LENGTH(id_slug) DESC, id_slug DESC')
                 ->value('id_slug');
