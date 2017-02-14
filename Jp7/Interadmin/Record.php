@@ -526,6 +526,9 @@ class Record extends RecordAbstract implements Arrayable
                 $parentTipo = Type::getInstance($this->parent_id_tipo);
                 $this->_parent = $parentTipo->records()->find($this->parent_id);
                 if ($this->_parent) {
+                    if (!$this->getType()->getParent() instanceof Record) {
+                        \Log::notice('Dangerous side effect changing Type\'s parent record. Set it explicitly whenever possible.');
+                    }
                     $this->getType()->setParent($this->_parent);
                 }
             }
@@ -606,6 +609,18 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function siblings()
     {
+        return $this->getType()->records()->where('id', '<>', $this->id);
+    }
+
+    /**
+     * Returns siblings records on the same id_tipo, but don't filter by parent_id
+     *
+     * @return Query
+     */
+    protected function typeSiblings()
+    {
+        $orphanType = clone $this->getType();
+        $orphanType->setParent(null);
         return $this->getType()->records()->where('id', '<>', $this->id);
     }
 
@@ -835,7 +850,7 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         $query = function () {
-            return $this->siblings()->published(true);
+            return $this->typeSiblings()->published(true);
         };
 
         if ($query()->where('id_slug', $id_slug)->exists()) {
@@ -1123,6 +1138,28 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return $rules;
+    }
+
+    public function getUniqueRule($column, array $whereHash = [])
+    {
+        $aliases = $this->_aliases;
+        $params = [
+            // unique:table
+            str_replace($this->getDb()->getTablePrefix(), '', $this->getTableName()),
+            // column
+            array_search($column, $aliases) ?: $column,
+            // except
+            $this->id,
+            // idColumn
+            'id',
+            // WHERE:
+            'id_tipo', $this->id_tipo,
+        ];
+        foreach ($whereHash as $column => $value) {
+            $params[] = $column;
+            $params[] = $value;
+        }
+        return 'unique:'.implode(',', $params);
     }
 
     public function getFillable()
