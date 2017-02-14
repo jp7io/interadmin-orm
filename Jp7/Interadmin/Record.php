@@ -815,12 +815,11 @@ class Record extends RecordAbstract implements Arrayable
             // Add an index if it already exists
             $max = $query()
                 ->where('id_slug', 'REGEXP', '^'.$id_slug.'[0-9]*$')
-                ->max('id_slug');
+                ->orderByRaw('LENGTH(id_slug) DESC, id_slug DESC')
+                ->value('id_slug');
 
-            $next = preg_replace('~^'.$id_slug.'~', '', $max);
-            $next = max($next, 1) + 1;
-
-            $id_slug = $id_slug.$next;
+            $max = replace_prefix($id_slug, '', $max) ?: 1;
+            $id_slug .= $max + 1;
         }
 
         return $id_slug;
