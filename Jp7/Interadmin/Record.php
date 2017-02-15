@@ -729,20 +729,15 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_setTags(array $tags)
     {
-        kd('not implemented');
         $db = $this->getDb();
-        $sql = 'DELETE FROM '.$this->getDb()->getTablePrefix().'tags WHERE parent_id = '.$this->id;
-        if (!$db->Execute($sql)) {
-            throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
-        }
-
+        $sql = 'DELETE FROM '.$db->getTablePrefix().'tags WHERE parent_id = '.$this->id;
         foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
+            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
-                (($tag instanceof Record) ? $tag->id : 0).','.
-                (($tag instanceof Record) ? $tag->id_tipo : $tag->id_tipo).')';
-            if (!$db->Execute($sql)) {
-                throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
+                ($tag instanceof self ? $tag->id : 0).','.
+                ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
+            if (!$db->insert($sql)) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
         }
     }
@@ -755,29 +750,24 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_getTags($options = [])
     {
-        kd('not implemented');
         if (!$this->_tags || $options) {
             $db = $this->getDb();
-
             $options['where'][] = 'parent_id = '.$this->id;
-            $sql = 'SELECT * FROM '.$this->getDb()->getTablePrefix().'tags '.
-                'WHERE '.implode(' AND ', $options['where']).
+            $sql = 'SELECT * FROM '.$db->getTablePrefix().'tags '.
+                //'WHERE '.implode(' AND ', $options['where']).
                 (($options['group']) ? ' GROUP BY '.$options['group'] : '').
                 (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
-            if (!$rs = $db->Execute($sql)) {
-                throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
-            }
-
+            $rs = $db->select($sql);
             $this->_tags = [];
-            while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE])) {
+            foreach ($rs as $row) {
+                if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
                     $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
                             'where' => ['id = '.$row->id],
                         ];
-                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
+                        if ($tag_registro = $tag_tipo->findFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
@@ -788,14 +778,12 @@ class Record extends RecordAbstract implements Arrayable
                     }
                 }
             }
-            $rs->Close();
         } else {
             $retorno = $this->_tags;
         }
         if (!$options) {
             $this->_tags = $retorno; // cache somente para getTags sem $options
         }
-
         return (array) $retorno;
     }
     /**
