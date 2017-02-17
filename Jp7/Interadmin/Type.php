@@ -13,6 +13,7 @@ use Request;
 use App;
 use Cache;
 use RecordUrl;
+use DB;
 
 /**
  * JP7's PHP Functions.
@@ -37,6 +38,7 @@ class Type extends RecordAbstract
     use \Jp7\Laravel\Routable;
 
     const ID_TIPO = 0;
+    const CACHE_TAG = 'type';
 
     private static $inheritedFields = [
         'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
@@ -77,9 +79,11 @@ class Type extends RecordAbstract
         if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
-            $cacheKey = $this->getCacheKey('attributes');
-            $this->attributes += Cache::remember($cacheKey, 5, function () {
-                return (array) $this->getDb()->table('tipos')->where('id_tipo', $this->id_tipo)->first();
+            $this->attributes += $this->getCache('attributes', function () {
+                return (array) $this->getDb()
+                    ->table('tipos')
+                    ->where('id_tipo', $this->id_tipo)
+                    ->first();
             });
             return $this->attributes[$name];
         }
@@ -214,7 +218,6 @@ class Type extends RecordAbstract
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
         }
-        //return Cache::remember('Type::children,'.serialize($options), 5, function () use ($options) {
         if (empty($options['where'])) {
             $options['where'] = ['1=1'];
         }
@@ -243,7 +246,6 @@ class Type extends RecordAbstract
         }
         // $rs->Close();
         return new Collection($tipos);
-        //});
     }
 
     public function children()
@@ -452,8 +454,7 @@ class Type extends RecordAbstract
      */
     public function getCampos()
     {
-        $cacheKey = $this->getCacheKey('campos');
-        return Cache::remember($cacheKey, 5, function () {
+        return $this->getCache('campos', function () {
             $campos_parameters = [
                 'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
                 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
@@ -534,8 +535,7 @@ class Type extends RecordAbstract
      */
     public function getCamposAlias($fields = null)
     {
-        $cacheKey = $this->getCacheKey('campos_alias');
-        $aliases = Cache::remember($cacheKey, 5, function () {
+        $aliases = $this->getCache('campos_alias', function () {
             $aliases = [];
             foreach ($this->getCampos() as $campo => $array) {
                 if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
@@ -564,7 +564,7 @@ class Type extends RecordAbstract
     {
         // getCampoTipo might be different for each class
         $cacheKey = static::class.','.$this->getCacheKey('relationships');
-        return Cache::remember($cacheKey, 5, function () {
+        return Cache::tag(self::CACHE_TAG)->remember($cacheKey, 5, function () {
             $relationships = [];
 
             foreach ($this->getCampos() as $campo => $array) {
@@ -687,13 +687,7 @@ class Type extends RecordAbstract
     protected function _update($attributes)
     {
         parent::_update($attributes);
-        // clear attributes cache
-        Cache::forget($this->getCacheKey('attributes'));
-        Cache::forget($this->getCacheKey('campos'));
-        Cache::forget($this->getCacheKey('children'));
-        Cache::forget($this->getCacheKey('order'));
-        Cache::forget($this->getCacheKey('relationships'));
-        Cache::forget($this->getCacheKey('campos_alias'));
+        $this->clearCache();
         return $this;
     }
 
@@ -811,8 +805,7 @@ class Type extends RecordAbstract
     }
     public function getInterAdminsOrder()
     {
-        $cacheKey = $this->getCacheKey('order');
-        return Cache::remember($cacheKey, 5, function () {
+        return $this->getCache('order', function () {
             $order = [];
             $campos = $this->getCampos();
             if ($campos) {
@@ -886,9 +879,47 @@ class Type extends RecordAbstract
         return $table;
     }
 
+    protected function clearCache()
+    {
+        // clear only this instance's cache
+        $cache = Cache::tag(self::CACHE_TAG);
+        $cache->forget($this->getCacheKey('attributes'));
+        $cache->forget($this->getCacheKey('campos'));
+        $cache->forget($this->getCacheKey('campos_alias'));
+        $cache->forget($this->getCacheKey('children'));
+        $cache->forget($this->getCacheKey('order'));
+        // different values for getTipo() depending on class
+        $cache->forget(static::class.','.$this->getCacheKey('relationships'));
+    }
+
+    protected function getCache($varname, $callback)
+    {
+        $cacheKey = $this->getCacheKey($varname);
+        return Cache::tag(self::CACHE_TAG)->remember($cacheKey, 5, $callback);
+    }
+
     protected function getCacheKey($varname)
     {
-        return 'Type,'.$varname.','.$this->_db.','.$this->id_tipo;
+        return $varname.','.$this->_db.','.$this->id_tipo;
+    }
+
+    public static function checkCache()
+    {
+        $cache = Cache::tag(self::CACHE_TAG);
+        // don't query too often
+        if ($cache->get('modified:check') > time() - 10) {
+            return; // too soon
+        }
+        $cache->forever('modified:check', time());
+        // check if types changed
+        $modified = strtotime(DB::table('tipos')
+            ->select(DB::raw('MAX(date_modify) AS modified'))
+            ->value('modified'));
+
+        if ($modified !== $cache->get('modified')) {
+            $cache->flush(); // flush tagged cache
+            $cache->forever('modified', $modified);
+        }
     }
 
     /**
@@ -898,8 +929,7 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsChildren()
     {
-        $cacheKey = $this->getCacheKey('children');
-        return Cache::remember($cacheKey, 5, function () {
+        return $this->getCache('children', function () {
             $children = [];
             $childrenArr = explode('{;}', $this->children);
             for ($i = 0; $i < count($childrenArr) - 1; $i++) {
