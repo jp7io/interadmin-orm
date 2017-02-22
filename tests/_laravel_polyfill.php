@@ -17,6 +17,11 @@ class Cache extends Illuminate\Support\Facades\Cache
         }
         return $cache;
     }
+
+    public static function store()
+    {
+        return self::resolveFacadeInstance('');
+    }
 }
 
 class DB extends Illuminate\Support\Facades\DB
