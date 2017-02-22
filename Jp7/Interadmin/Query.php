@@ -202,6 +202,15 @@ class Query extends Query\BaseQuery
     }
 
     /**
+     * @param array $values
+     * @return int
+     */
+    public function update(array $values)
+    {
+        return $this->provider->deprecated_updateInterAdmins($values, $this->options);
+    }
+
+    /**
      * @param $id string|int
      * @return Record|null
      */
