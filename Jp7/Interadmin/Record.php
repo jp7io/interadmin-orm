@@ -15,6 +15,12 @@ use RecordUrl;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
+ *
+ * @method static Query where(string $column, string $operator = null, mixed $value = null)
+ * @method static Query whereRaw(string $where)
+ * @method static static build(array $attributes = [])
+ * @method static static create(array $attributes = [])
+ * @method Query\FileQuery arquivos
  */
 class Record extends RecordAbstract implements Arrayable
 {
@@ -51,7 +57,9 @@ class Record extends RecordAbstract implements Arrayable
      *
      * @var string
      */
-    protected static $log_user = null;
+    protected static $log_user = 'site';
+
+    protected static $log_action = '';
     /**
      * If TRUE the records will be filtered using the method getPublishedFilters().
      *
@@ -437,7 +445,7 @@ class Record extends RecordAbstract implements Arrayable
         foreach (array_keys($children) as $childName) {
             $message .= "\t\t- ".lcfirst($childName)."()\n";
         }
-        if ($this->getType()->arquivos) {
+        if ($this->hasArquivosTab()) {
             $message .= "\t\t- arquivos()\n";
         }
 
@@ -454,7 +462,7 @@ class Record extends RecordAbstract implements Arrayable
             }
 
             return new Query($childrenTipo);
-        } elseif ($name === 'arquivos' && $this->getType()->arquivos) {
+        } elseif ($name === 'arquivos' && $this->hasArquivosTab()) {
             return new Query\FileQuery($this);
         }
     }
@@ -518,6 +526,9 @@ class Record extends RecordAbstract implements Arrayable
                 $parentTipo = Type::getInstance($this->parent_id_tipo);
                 $this->_parent = $parentTipo->records()->find($this->parent_id);
                 if ($this->_parent) {
+                    if (!$this->getType()->getParent() instanceof Record) {
+                        \Log::notice('Dangerous side effect changing Type\'s parent record. Set it explicitly whenever possible.');
+                    }
                     $this->getType()->setParent($this->_parent);
                 }
             }
@@ -563,6 +574,18 @@ class Record extends RecordAbstract implements Arrayable
         return $childrenTipo;
     }
 
+    /**
+     * @return Type[]
+     */
+    public function getChildrenTipos()
+    {
+        $childrenTypes = $this->getType()->getInterAdminsChildrenTipos();
+        foreach ($childrenTypes as $childType) {
+            $childType->setParent($this);
+        }
+        return $childrenTypes;
+    }
+
     public function hasChildrenTipo($id_tipo)
     {
         foreach ($this->getType()->getInterAdminsChildren() as $childrenArr) {
@@ -574,6 +597,11 @@ class Record extends RecordAbstract implements Arrayable
         return false;
     }
 
+    public function hasArquivosTab()
+    {
+        return $this->getType()->arquivos || $this->getType()->arquivos_2;
+    }
+
     /**
      * Returns siblings records.
      *
@@ -581,6 +609,18 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function siblings()
     {
+        return $this->getType()->records()->where('id', '<>', $this->id);
+    }
+
+    /**
+     * Returns siblings records on the same id_tipo, but don't filter by parent_id
+     *
+     * @return Query
+     */
+    protected function typeSiblings()
+    {
+        $orphanType = clone $this->getType();
+        $orphanType->setParent(null);
         return $this->getType()->records()->where('id', '<>', $this->id);
     }
 
@@ -689,20 +729,15 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_setTags(array $tags)
     {
-        kd('not implemented');
         $db = $this->getDb();
-        $sql = 'DELETE FROM '.$this->getDb()->getTablePrefix().'tags WHERE parent_id = '.$this->id;
-        if (!$db->Execute($sql)) {
-            throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
-        }
-
+        $sql = 'DELETE FROM '.$db->getTablePrefix().'tags WHERE parent_id = '.$this->id;
         foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$this->getDb()->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
+            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
                 ('.$this->id.','.
-                (($tag instanceof Record) ? $tag->id : 0).','.
-                (($tag instanceof Record) ? $tag->id_tipo : $tag->id_tipo).')';
-            if (!$db->Execute($sql)) {
-                throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
+                ($tag instanceof self ? $tag->id : 0).','.
+                ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
+            if (!$db->insert($sql)) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
         }
     }
@@ -715,29 +750,24 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function deprecated_getTags($options = [])
     {
-        kd('not implemented');
         if (!$this->_tags || $options) {
             $db = $this->getDb();
-
             $options['where'][] = 'parent_id = '.$this->id;
-            $sql = 'SELECT * FROM '.$this->getDb()->getTablePrefix().'tags '.
-                'WHERE '.implode(' AND ', $options['where']).
+            $sql = 'SELECT * FROM '.$db->getTablePrefix().'tags '.
+                //'WHERE '.implode(' AND ', $options['where']).
                 (($options['group']) ? ' GROUP BY '.$options['group'] : '').
                 (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
-            if (!$rs = $db->Execute($sql)) {
-                throw new Exception($db->ErrorMsg().' - SQL: '.$sql);
-            }
-
+            $rs = $db->select($sql);
             $this->_tags = [];
-            while ($row = $rs->FetchNextObj()) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE])) {
+            foreach ($rs as $row) {
+                if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
                     $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
                             'where' => ['id = '.$row->id],
                         ];
-                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
+                        if ($tag_registro = $tag_tipo->findFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
@@ -748,14 +778,12 @@ class Record extends RecordAbstract implements Arrayable
                     }
                 }
             }
-            $rs->Close();
         } else {
             $retorno = $this->_tags;
         }
         if (!$options) {
             $this->_tags = $retorno; // cache somente para getTags sem $options
         }
-
         return (array) $retorno;
     }
     /**
@@ -765,11 +793,9 @@ class Record extends RecordAbstract implements Arrayable
      */
     public function isPublished()
     {
-        global $s_session;
-
         return $this->char_key &&
             !$this->deleted &&
-            ($this->parent_id || $this->publish || $s_session['preview'] || !config('interadmin.preview')) &&
+            ($this->parent_id || $this->publish || !config('interadmin.preview')) &&
             $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
             ($this->date_expire->getTimestamp() >= Record::getTimestamp() || $this->date_expire->format('Y') < 1);
     }
@@ -787,8 +813,12 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         // log
-        $this->log = date('d/m/Y H:i').' - '.self::getLogUser().' - '.Request::ip().
-            chr(13).$this->log;
+        $this->log = date('d/m/Y H:i').' - '.
+            self::$log_user.' - '.
+            (self::$log_action ? self::$log_action.' - ' : '').
+            Request::ip().
+            chr(13).
+            $this->log;
 
         // date_modify
         $this->date_modify = date('c');
@@ -807,13 +837,9 @@ class Record extends RecordAbstract implements Arrayable
             $id_slug = '--'.$id_slug;
         }
 
-        $query = function () {
-            return $this->siblings()->published(true);
-        };
-
-        if ($query()->where('id_slug', $id_slug)->exists()) {
+        if ($this->typeSiblings()->where('id_slug', $id_slug)->exists()) {
             // Add an index if it already exists
-            $max = $query()
+            $max = $this->typeSiblings()
                 ->where('id_slug', 'REGEXP', '^'.$id_slug.'[0-9]*$')
                 ->orderByRaw('LENGTH(id_slug) DESC, id_slug DESC')
                 ->value('id_slug');
@@ -857,8 +883,7 @@ class Record extends RecordAbstract implements Arrayable
     }
 
     /**
-     * Returns $log_user. If $log_user is NULL, returns $s_user['login'] on
-     * applications and 'site' otherwise.
+     * Returns $log_user. If $log_user is NULL, returns 'site'.
      *
      * @see Record::$log_user
      *
@@ -866,19 +891,15 @@ class Record extends RecordAbstract implements Arrayable
      */
     public static function getLogUser()
     {
-        global $jp7_app, $s_user;
-        if (is_null(self::$log_user)) {
-            return ($jp7_app) ? $s_user['login'] : 'site';
-        }
-
         return self::$log_user;
     }
+
     /**
      * Sets $log_user and returns the old value.
      *
      * @see     Record::$log_user
      *
-     * @param object $log_user
+     * @param string $log_user
      *
      * @return string Old value.
      */
@@ -889,6 +910,20 @@ class Record extends RecordAbstract implements Arrayable
 
         return $old_user;
     }
+
+    public static function getLogAction()
+    {
+        return self::$log_action;
+    }
+
+    public static function setLogAction($log_action)
+    {
+        $old_action = self::$log_action;
+        self::$log_action = $log_action;
+
+        return $old_action;
+    }
+
     /**
      * Enables or disables published filters.
      *
@@ -1044,7 +1079,7 @@ class Record extends RecordAbstract implements Arrayable
             $stringValue[] = $this->$campoCombo;
         }
 
-        return implode(' - ', $stringValue);
+        return implode(' - ', array_filter($stringValue));
     }
 
     public function toArray()
@@ -1057,6 +1092,11 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return $array;
+    }
+
+    public function __debugInfo()
+    {
+        return array_merge((array) $this, $this->getAliasedAttributes());
     }
 
     public function getRules()
@@ -1082,6 +1122,28 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return $rules;
+    }
+
+    public function getUniqueRule($column, array $whereHash = [])
+    {
+        $aliases = $this->_aliases;
+        $params = [
+            // unique:table
+            str_replace($this->getDb()->getTablePrefix(), '', $this->getTableName()),
+            // column
+            array_search($column, $aliases) ?: $column,
+            // except
+            $this->id,
+            // idColumn
+            'id',
+            // WHERE:
+            'id_tipo', $this->id_tipo,
+        ];
+        foreach ($whereHash as $column => $value) {
+            $params[] = $column;
+            $params[] = $value;
+        }
+        return 'unique:'.implode(',', $params);
     }
 
     public function getFillable()

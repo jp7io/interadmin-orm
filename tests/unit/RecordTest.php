@@ -2,10 +2,10 @@
 
 namespace Tests;
 
-use InterAdmin;
+use Jp7\Interadmin\Record;
 use stdClass;
 
-class InterAdminTest extends \PHPUnit_Framework_TestCase
+class RecordTest extends \PHPUnit_Framework_TestCase
 {
     private $oldTimestamp;
     private $oldConfig;
@@ -14,19 +14,19 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
     {
         global $config;
         $this->oldConfig = $config;
-        $this->oldTimestamp = InterAdmin::getTimestamp();
+        $this->oldTimestamp = Record::getTimestamp();
 
         $config = $config ? clone $config : new stdClass;
         $config->interadmin_preview = true;
 
-        InterAdmin::setTimestamp(strtotime('2016-01-01 02:00:00'));
+        Record::setTimestamp(strtotime('2016-01-01 02:00:00'));
     }
 
     public function tearDown()
     {
         global $config;
         $config = $this->oldConfig;
-        InterAdmin::setTimestamp($this->oldTimestamp);
+        Record::setTimestamp($this->oldTimestamp);
     }
 
     /**
@@ -34,8 +34,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
      */
     public function testPublished(array $attributes)
     {
-        $record = new InterAdmin;
-        $record->setAttributes($attributes);
+        $record = new Record($attributes);
         $this->assertTrue($record->isPublished());
     }
 
@@ -44,8 +43,7 @@ class InterAdminTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnpublished(array $attributes)
     {
-        $record = new InterAdmin;
-        $record->setAttributes($attributes);
+        $record = new Record($attributes);
         $this->assertFalse($record->isPublished());
     }
 

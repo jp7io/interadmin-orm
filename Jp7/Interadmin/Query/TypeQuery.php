@@ -34,24 +34,9 @@ class TypeQuery extends BaseQuery
         return in_array($field, $chars);
     }
 
-    public function get()
+    protected function providerFind($options)
     {
-        if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
-        }
-
-        return $this->provider->deprecatedGetChildren($this->options);
-    }
-
-    public function first()
-    {
-        if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
-        }
-
-        $this->options['limit'] = 1;
-
-        return $this->provider->deprecatedGetChildren($this->options)->first();
+        return $this->provider->deprecatedGetChildren($options);
     }
 
     public function count()
@@ -95,16 +80,6 @@ class TypeQuery extends BaseQuery
 
         return $result;
     }
-
-    public function lists($column, $key = null)
-    {
-        $array = $this->provider->deprecatedGetChildren([
-            'fields' => array_filter([$column, $key]),
-        ] + $this->options);
-
-        return collect(array_pluck($array, $column, $key));
-    }
-
 
     public function build(array $attributes = [])
     {

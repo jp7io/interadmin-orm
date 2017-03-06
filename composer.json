@@ -3,6 +3,7 @@
     "description": "JP7 InterAdmin ORM",
     "keywords": [],
     "license": "proprietary",
+    "version": "3.2.x-dev",
     "repositories" : [
         {
             "type": "composer",
@@ -10,18 +11,18 @@
         }
     ],
     "require": {
-        "jdorn/sql-formatter": "~1.2",
-        "codeclimate/php-test-reporter": "^0.3.2"
+        "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
         "jp7internet/classes": "3.2.x-dev",
-        "jp7internet/inc": "dev-master",
         "illuminate/support": "~5.2",
         "illuminate/database": "~5.2",
         "illuminate/cache": "~5.2",
         "illuminate/config": "~5.2",
-        "symfony/var-dumper": "~3.0.4",
-        "codeception/codeception": "^2.2"
+        "symfony/var-dumper": "~3.0",
+        "codeception/codeception": "^2.2",
+        "codeclimate/php-test-reporter": "^0.3.2",
+        "vlucas/phpdotenv": "^2.4"
     },
     "autoload": {
         "psr-4": {

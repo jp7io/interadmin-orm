@@ -162,12 +162,11 @@ class Log extends RecordAbstract
     }
     public static function create($attributes = [])
     {
-        global $s_user, $lang;
         $log = new self;
 
-        $log->lang = $lang->lang;
+        //$log->lang = $lang->lang;
         $log->ip = Request::ip();
-        $log->select_user = $s_user['id'];
+        //$log->select_user = $s_user['id'];
         $log->date_insert = new Date;
         $log->fill($attributes);
 

@@ -2,7 +2,7 @@
 
 namespace Jp7\Interadmin\Query;
 
-use Jp7\Interadmin\Record;
+use Jp7\Interadmin\FileRecord;
 
 class FileQuery extends BaseQuery
 {
@@ -18,23 +18,25 @@ class FileQuery extends BaseQuery
         return in_array($field, $chars);
     }
 
-    public function get()
+    /**
+     * @return FileRecord[]
+     */
+    protected function providerFind($options)
     {
-        return $this->provider->deprecated_getArquivos($this->options);
+        return $this->provider->deprecated_getArquivos($options);
     }
 
-    public function first()
-    {
-        $this->options['limit'] = 1;
-
-        return $this->provider->deprecated_getArquivos($this->options)->first();
-    }
-
+    /**
+     * @return FileRecord|null
+     */
     public function build(array $attributes = [])
     {
         return $this->provider->deprecated_createArquivo($attributes);
     }
 
+    /**
+     * @return FileRecord|null
+     */
     public function create(array $attributes = [])
     {
         return $this->build($attributes)->save();

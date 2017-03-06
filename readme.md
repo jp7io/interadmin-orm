@@ -27,5 +27,6 @@ InterAdmin ORM.
 ## Tests
 
 ```
+cp .env.example .env.testing
 php vendor/bin/codecept run --coverage
 ```

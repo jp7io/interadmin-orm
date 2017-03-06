@@ -17,6 +17,11 @@ class Query extends Query\BaseQuery
         return $this->provider;
     }
 
+    protected function providerFind($options)
+    {
+        return $this->provider->deprecatedFind($options);
+    }
+
     /**
      * Returns a instance with id 0, to get scopes, rules, and so on.
      *
@@ -49,24 +54,6 @@ class Query extends Query\BaseQuery
     public function create(array $attributes = [])
     {
         return $this->build($attributes)->save();
-    }
-
-    /**
-     * Set deleted = 'S' and update the records.
-     *
-     * @return int
-     */
-    public function delete()
-    {
-        return $this->provider->deprecated_deleteInterAdmins($this->options);
-    }
-
-    /**
-     * Remove permanently from the database.
-     */
-    public function forceDelete()
-    {
-        return $this->provider->deprecated_deleteInterAdminsForever($this->options);
     }
 
     protected function _isChar($field)
@@ -145,50 +132,6 @@ class Query extends Query\BaseQuery
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
-    public function get()
-    {
-        if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
-        }
-
-        return $this->provider->deprecatedFind($this->options);
-    }
-
-    /**
-     * Get a single column's value from the first result of a query.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function value($column)
-    {
-        $result = $this->select($column)->first();
-        if ($result) {
-            return $result->{$column};
-        }
-    }
-
-    public function first()
-    {
-        if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
-        }
-
-        return $this->provider->deprecatedFindFirst($this->options);
-    }
-
-    public function firstOrFail()
-    {
-        $result = $this->first();
-        if (!$result) {
-            throw new ModelNotFoundException('Unable to find first record.');
-        }
-        return $result;
-    }
-
     public function count()
     {
         if (func_num_args() > 0) {
@@ -258,6 +201,19 @@ class Query extends Query\BaseQuery
         }
     }
 
+    /**
+     * @param array $values
+     * @return int
+     */
+    public function update(array $values)
+    {
+        return $this->provider->deprecated_updateInterAdmins($values, $this->options);
+    }
+
+    /**
+     * @param $id string|int
+     * @return Record|null
+     */
     public function find($id)
     {
         if (func_num_args() != 1) {
@@ -273,7 +229,7 @@ class Query extends Query\BaseQuery
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
         }
 
-        return $this->provider->deprecatedFindFirst($this->options);
+        return $this->first();
     }
 
     public function findMany($ids)
@@ -287,28 +243,7 @@ class Query extends Query\BaseQuery
 
         $this->whereIn($key, $ids);
 
-        return $this->provider->deprecatedFind($this->options);
-    }
-
-    public function lists($column, $key = null)
-    {
-        $array = $this->provider->deprecatedFind([
-            'fields' => array_filter([$column, $key]),
-        ] + $this->options);
-
-        return jp7_collect(array_pluck($array, $column, $key));
-    }
-
-    /**
-     * List to be used on json, with {key: 1, value: 'Lorem'}.
-     */
-    public function jsonList($column, $key)
-    {
-        $items = $this->provider->deprecatedFind([
-            'fields' => array_filter([$column, $key]),
-        ] + $this->options);
-
-        return $items->jsonList($column, $key);
+        return $this->providerFind($this->options);
     }
 
     public function findOrFail($id)
@@ -319,6 +254,30 @@ class Query extends Query\BaseQuery
         }
 
         return $result;
+    }
+
+    public function save(Record $model)
+    {
+        if (!$this->provider->getParent() instanceof Record) {
+            throw new BadMethodCallException('This method can only save children to a parent.');
+        }
+        $model->setParent($this->provider->getParent());
+        return $model->save() ? $model : false;
+    }
+
+    /**
+     * Attach a collection of models to the parent instance.
+     *
+     * @param  \Traversable|array  $models
+     * @return \Traversable|array
+     */
+    public function saveMany($models)
+    {
+        foreach ($models as $model) {
+            $this->save($model);
+        }
+
+        return $models;
     }
 
     public function __call($method_name, $params)

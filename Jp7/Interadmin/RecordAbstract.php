@@ -50,9 +50,15 @@ abstract class RecordAbstract
     {
         if (array_key_exists($name, $this->attributes)) {
             return $this->attributes[$name];
-        } else {
-            return $null;
         }
+        $value = null;
+        // Mutators
+        $mutator = 'get'.Str::studly($name).'Attribute';
+        if (method_exists($this, $mutator)) {
+            $value = $this->$mutator($value);
+            return $value;
+        }
+        return $value;
     }
     /**
      * Magic set acessor.
@@ -354,16 +360,19 @@ abstract class RecordAbstract
         $joins = '';
         if (isset($options['joins']) && $options['joins']) {
             foreach ($options['joins'] as $alias => $join) {
-                list($joinType, $tipo, $on) = $join;
+                @list($joinType, $tipo, $on, $typeless) = $join;
                 $table = $tipo->getInterAdminsTableName();
                 $joins .= ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
-                    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '').
-                    $alias.'.id_tipo = '.$tipo->id_tipo.' AND '.$this->_resolveSql($on, $options, $use_published_filters);
+                    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
+                if (!$typeless) {
+                    $joins .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
+                }
+                $joins .= $this->_resolveSql($on, $options, $use_published_filters);
             }
         }
 
         if (isset($options['skip'])) {
-            $options['limit'] = $options['skip'].','.$options['limit'];
+            $options['limit'] = $options['skip'].','.($options['limit'] ?? '18446744073709551615');
         }
 
         // Sql
@@ -375,26 +384,17 @@ abstract class RecordAbstract
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
 
         if (getenv('APP_DEBUG')) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-            $i = 0;
-            while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
-                $i++;
-            }
-            if (isset($trace[$i]['file'])) {
-                $sql .= PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
-            }
-            \Log::info($sql);
+            $this->_debugQuery($sql, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
         }
 
-        $rs = $db->select($sql);
-
-        if (!$rs && !is_array($rs)) {
-            $erro = $db->ErrorMsg();
-            if (strpos($erro, 'Unknown column') === 0 && $options['aliases']) {
-                $erro .= ". Available fields: \n\t\t- ".implode("\n\t\t- ", array_keys($options['aliases']));
+        try {
+            $rs = $db->select($sql);
+        } catch (\Illuminate\Database\QueryException $e) {
+            $availableFields = '';
+            if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
+                $availableFields .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
             }
-
-            throw new Exception($erro.' - SQL: '.$sql);
+            throw new \Illuminate\Database\QueryException($sql.$availableFields, $e->getBindings(), $e);
         }
 
         if (!empty($options['debug'])) {
@@ -404,6 +404,24 @@ abstract class RecordAbstract
         // $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
         return $rs;
     }
+
+    private function _debugQuery($sql, $trace)
+    {
+        $i = 0;
+        $caller = '';
+        while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
+            $i++;
+        }
+        if (isset($trace[$i]['file'])) {
+            $caller = PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
+        }
+        if (!isset($GLOBALS['__queries'])) {
+            $GLOBALS['__queries'] = 0;
+        }
+        $GLOBALS['__queries']++;
+        \Log::debug($sql.$caller);
+    }
+
     /**
      * Resolves the aliases on clause using regex.
      *
@@ -411,7 +429,7 @@ abstract class RecordAbstract
      *
      * @return
      */
-    protected function _resolveSqlClausesAlias(&$options = [], $use_published_filters)
+    protected function _resolveSqlClausesAlias(array &$options, $use_published_filters)
     {
         $resolvedWhere = $this->_resolveSql($options['where'], $options, $use_published_filters);
         if (isset($options['order'])) {
@@ -433,7 +451,7 @@ abstract class RecordAbstract
             ((isset($resolvedOrder)) ? ' ORDER BY '.$resolvedOrder : '');
     }
 
-    protected function _resolveSql($clause, &$options = [], $use_published_filters)
+    protected function _resolveSql($clause, array &$options, $use_published_filters)
     {
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
@@ -770,7 +788,7 @@ abstract class RecordAbstract
     /**
      * Helper function to add a join.
      */
-    protected function _addJoinAlias(&$options = [], $alias, $campo, $table = 'main')
+    protected function _addJoinAlias(array &$options, $alias, $campo, $table = 'main')
     {
         $joinTipo = $this->getCampoTipo($campo);
         if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
@@ -799,7 +817,7 @@ abstract class RecordAbstract
      */
     protected function _getAttributesFromRow($row, $object, $options)
     {
-        $campos = &$options['campos'];
+        //$campos = &$options['campos'];
         $attributes = &$object->attributes;
 
         foreach ($row as $key => $value) {
@@ -922,9 +940,14 @@ abstract class RecordAbstract
             ->delete();
     }
 
+    public function restore()
+    {
+        $this->deleted = '';
+        return $this->save();
+    }
+
     /**
-     * @param array $where
-     *                     FIXME temporário para wheres que eram com string
+     * @param array $where FIXME temporário para wheres que eram com string
      */
     protected function _whereArrayFix(&$where)
     {
@@ -966,8 +989,6 @@ abstract class RecordAbstract
 
     public static function getPublishedFilters($table, $alias)
     {
-        global $s_session;
-
         $tableParts = explode('_', $table);
         $table = end($tableParts);
         // Tipos
@@ -986,7 +1007,7 @@ abstract class RecordAbstract
                 ' AND '.$alias.".char_key <> ''".
                 ' AND '.$alias.".deleted = ''".
                 ' AND ';
-            if (config('interadmin.preview') && !$s_session['preview']) {
+            if (config('interadmin.preview')) {
                 $return .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';
             }
 

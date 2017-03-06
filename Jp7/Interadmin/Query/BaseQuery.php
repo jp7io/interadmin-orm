@@ -4,13 +4,21 @@ namespace Jp7\Interadmin\Query;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Jp7\Interadmin\Type;
 use Jp7\Interadmin\RecordAbstract;
 use BadMethodCallException;
 
 abstract class BaseQuery
 {
+    /**
+     * @var RecordAbstract
+     */
     protected $provider;
+    /**
+     * @var array
+     */
     protected $options;
     protected $or = false;
     protected $prefix = '';
@@ -58,6 +66,119 @@ abstract class BaseQuery
             trigger_error('all() is deprecated, use get() instead', E_USER_DEPRECATED);
         }
         return $this->get();
+    }
+
+    abstract protected function providerFind($options);
+
+    /**
+     * @return RecordAbstract|null
+     */
+    public function first()
+    {
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+        }
+
+        return $this->providerFind(['limit' => 1] + $this->options)->first();
+    }
+
+    public function firstOrFail()
+    {
+        $result = $this->first();
+        if (!$result) {
+            throw new ModelNotFoundException('Unable to find first record.');
+        }
+        return $result;
+    }
+
+    /**
+     * Get a single column's value from the first result of a query.
+     *
+     * @param  string  $column
+     * @return mixed
+     */
+    public function value($column)
+    {
+        $result = $this->select($column)->first();
+        if ($result) {
+            return $result->{$column};
+        }
+    }
+
+    /**
+     * @return Collection
+     */
+    public function get()
+    {
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+        }
+
+        return $this->providerFind($this->options);
+    }
+
+    public function pluck($column, $key = null)
+    {
+        $array = $this->providerFind([
+                'fields' => array_filter([$column, $key]),
+            ] + $this->options);
+
+        return jp7_collect(array_pluck($array, $column, $key));
+    }
+
+    /**
+     * List to be used on json, with {key: 1, value: 'Lorem'}.
+     */
+    public function jsonList($column, $key)
+    {
+        $items = $this->providerFind([
+                'fields' => array_filter([$column, $key]),
+            ] + $this->options);
+
+        return $items->jsonList($column, $key);
+    }
+
+    /**
+     * Set deleted = 'S' and update the records.
+     *
+     * @return int
+     */
+    public function delete()
+    {
+        $records = $this->get();
+        foreach ($records as $record) {
+            $record->delete();
+        }
+        return count($records);
+    }
+
+    /**
+     * Remove permanently from the database.
+     */
+    public function forceDelete()
+    {
+        $records = $this->get();
+        foreach ($records as $record) {
+            $record->forceDelete();
+        }
+        return count($records);
+    }
+
+    public function restore()
+    {
+        $records = $this->get();
+        foreach ($records as $record) {
+            $record->restore();
+        }
+        return count($records);
+    }
+
+    /**
+     * @deprecated use pluck() instead
+     */
+    public function lists($column, $key = null)
+    {
+        return $this->pluck($column, $key);
     }
 
     public function where($column, $operator = null, $value = null)
@@ -109,10 +230,13 @@ abstract class BaseQuery
         return $this->_addWhere($where);
     }
 
-    public function whereIn($column, $values)
+    public function whereIn($column, $values, $_not = false)
     {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
         $values = array_map([$this, '_escapeParam'], $values);
-        $where = $column.' IN ('.implode(',', $values).')';
+        $where = $this->prefix.$column.($_not ? ' NOT' : '').' IN ('.implode(',', $values).')';
 
         return $this->_addWhere($where);
     }
@@ -120,17 +244,14 @@ abstract class BaseQuery
     public function whereFindInSet($column, $value)
     {
         $value = $this->_escapeParam($value);
-        $where = 'FIND_IN_SET ('.$value.', '.$column.')';
+        $where = 'FIND_IN_SET ('.$value.', '.$this->prefix.$column.')';
 
         return $this->_addWhere($where);
     }
 
     public function whereNotIn($column, $values)
     {
-        $values = array_map([$this, '_escapeParam'], $values);
-        $where = $column.' NOT IN ('.implode(',', $values).')';
-
-        return $this->_addWhere($where);
+        return $this->whereIn($column, $values, true);
     }
 
     public function has($relationship)
@@ -158,28 +279,28 @@ abstract class BaseQuery
 
     public function whereYear($column, $operator, $value = null)
     {
-        $where = $this->_parseComparison('YEAR('.$column.')', $operator, $value);
+        $where = $this->_parseComparison('YEAR('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
     public function whereMonth($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('MONTH('.$column.')', $operator, $value);
+        $where =  $this->_parseComparison('MONTH('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
     public function whereDay($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('DAY('.$column.')', $operator, $value);
+        $where =  $this->_parseComparison('DAY('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
 
     public function whereDate($column, $operator, $value = null)
     {
-        $where =  $this->_parseComparison('DATE('.$column.')', $operator, $value);
+        $where =  $this->_parseComparison('DATE('.$this->prefix.$column.')', $operator, $value);
 
         return $this->_addWhere($where);
     }
@@ -281,7 +402,11 @@ abstract class BaseQuery
             $value = $value->__toString();
         }
         if (is_string($value)) {
-            $value = \DB::connection()->getPdo()->quote($value);
+            $db = \DB::connection();
+            if (!$db->getPdo()) {
+                $db->reconnect();
+            }
+            $value = $db->getPdo()->quote($value);
         }
         if (is_null($value)) {
             $value = 'NULL';
@@ -325,6 +450,15 @@ abstract class BaseQuery
     public function rightJoin($alias, $className, $conditions)
     {
         return $this->join($alias, $className, $conditions, 'RIGHT');
+    }
+
+    public function typelessJoin($alias, $className, $conditions, $_joinType = 'INNER')
+    {
+        $type = $this->_resolveType($className);
+        $joinOn = $this->_parseConditions($conditions, $type, $alias)[0];
+        $this->options['joins'][$alias] = [$_joinType, $type, $joinOn, true];
+
+        return $this;
     }
 
     public function skip($offset)

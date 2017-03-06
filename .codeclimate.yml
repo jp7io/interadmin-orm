@@ -1,0 +1,38 @@
+---
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+      - php
+  fixme:
+    enabled: true
+  phpmd:
+    enabled: true
+    checks:
+      CleanCode/StaticAccess:
+        enabled: false
+      CleanCode/ElseExpression:
+        enabled: false
+      Controversial/CamelCaseVariableName:
+        enabled: false
+      Controversial/CamelCaseParameterName:
+        enabled: false
+      Controversial/CamelCasePropertyName:
+        enabled: false
+      Naming/ShortVariable:
+        enabled: false
+  eslint:
+    enabled: true
+    checks:
+      global-require:
+        enabled: false # we use requirejs which has asynchronous require()
+      no-redeclare:
+        enabled: false # false positives about variables in different scopes
+ratings:
+  paths:
+  - "**.js"
+  - "**.php"
+exclude_paths:
+  - tests/

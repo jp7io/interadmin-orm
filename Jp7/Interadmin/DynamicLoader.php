@@ -25,18 +25,7 @@ class DynamicLoader
         if (!App::bound('config')) {
             return false; // there was a problem with codeception after running all tests
         }
-        $code = null;
-        if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo($class)) {
-            $tipo = new Type($id_tipo);
-            $tipo->class = $class;
-
-            $code = self::generateRecordClass($tipo);
-        } elseif ($id_tipo = TypeClassMap::getInstance()->getClassIdTipo($class)) {
-            $tipo = new Type($id_tipo);
-            $tipo->class_tipo = $class;
-
-            $code = self::generateTypeClass($tipo);
-        }
+        $code = self::getCode($class);
         if ($code) {
             try {
                 eval('?>'.$code);
@@ -85,6 +74,22 @@ class DynamicLoader
             $prefixClass.'Type',
             "const ID_TIPO = {$type->id_tipo};"
         );
+    }
+
+    protected static function getCode($class)
+    {
+        if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo($class)) {
+            $tipo = new Type($id_tipo);
+            $tipo->class = $class;
+
+            return self::generateRecordClass($tipo);
+        }
+        if ($id_tipo = TypeClassMap::getInstance()->getClassIdTipo($class)) {
+            $tipo = new Type($id_tipo);
+            $tipo->class_tipo = $class;
+
+            return self::generateTypeClass($tipo);
+        }
     }
 
     protected static function getNamespaceAndClass($className)
