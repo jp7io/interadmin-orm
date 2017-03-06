@@ -1,5 +1,5 @@
-## development
-* TODO
+## 3.2
+* Split into 3 packages: classes, classes-deprecated and interadmin-orm
 
 ## 3.1
 * Fixed bugs after the merge of the ORM
