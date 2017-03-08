@@ -661,6 +661,9 @@ class Record extends RecordAbstract implements Arrayable
         } else {
             $className = static::DEFAULT_NAMESPACE.'FileRecord';
         }
+        if (!class_exists($className)) {
+            $className = 'Jp7\\Interadmin\\FileRecord';
+        }
         $arquivoModel = new $className(0);
         $arquivoModel->setType($this->getType());
 
