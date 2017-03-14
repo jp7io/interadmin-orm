@@ -613,18 +613,6 @@ class Record extends RecordAbstract implements Arrayable
     }
 
     /**
-     * Returns siblings records on the same id_tipo, but don't filter by parent_id
-     *
-     * @return Query
-     */
-    protected function typeSiblings()
-    {
-        $orphanType = clone $this->getType();
-        $orphanType->setParent(null);
-        return $this->getType()->records()->where('id', '<>', $this->id);
-    }
-
-    /**
      * Creates a new FileRecord with id_tipo, id and mostrar set.
      *
      * @param array $attributes [optional]
@@ -840,9 +828,10 @@ class Record extends RecordAbstract implements Arrayable
             $id_slug = '--'.$id_slug;
         }
 
-        if ($this->typeSiblings()->where('id_slug', $id_slug)->exists()) {
-            // Add an index if it already exists
-            $max = $this->typeSiblings()
+        if ($this->siblings()->where('id_slug', $id_slug)->exists()) {
+            // Add 1 if it already exists
+            // REGEXP used to avoid multiple queries
+            $max = $this->siblings()
                 ->where('id_slug', 'REGEXP', '^'.$id_slug.'[0-9]*$')
                 ->orderByRaw('LENGTH(id_slug) DESC, id_slug DESC')
                 ->value('id_slug');
