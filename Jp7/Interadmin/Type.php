@@ -707,11 +707,9 @@ class Type extends RecordAbstract
                 $modelo = new $className();
             }
             foreach (self::$inheritedFields as $field) {
-                if ($modelo->$field) {
-                    if (!$this->$field || in_array($field, self::$privateFields)) {
-                        $this->inherited[] = $field;
-                        $this->$field = $modelo->$field;
-                    }
+                if (($modelo->$field && !$this->$field) || in_array($field, self::$privateFields)) {
+                    $this->inherited[] = $field;
+                    $this->$field = $modelo->$field;
                 }
             }
         }
