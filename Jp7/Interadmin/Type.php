@@ -1199,6 +1199,10 @@ class Type extends RecordAbstract
         $options['model'] = $recordModel;
         $options['eager_load'] = [];
 
+        if (!$options['campos']) {
+            \Log::notice('Querying a type without "campos" - id_tipo: '.$this->id_tipo);
+        }
+
         if (isset($options['with'])) {
             foreach ($options['with'] as $withRelationship) {
                 // Isso aqui é mais uma validação
