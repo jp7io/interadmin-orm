@@ -17,6 +17,12 @@ class Query extends Query\BaseQuery
         return $this->provider;
     }
 
+    public function class($class)
+    {
+        $this->options['class'] = $class;
+        return $this;
+    }
+
     protected function providerFind($options)
     {
         return $this->provider->deprecatedFind($options);

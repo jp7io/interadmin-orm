@@ -139,6 +139,26 @@ abstract class RecordAbstract
     }
 
     /**
+     * Get the value of the model's primary key.
+     *
+     * @return mixed
+     */
+    public function getKey()
+    {
+        return $this->{$this->_primary_key};
+    }
+
+    /**
+     * Get the primary key for the model.
+     *
+     * @return string
+     */
+    public function getKeyName()
+    {
+        return $this->_primary_key;
+    }
+
+    /**
      * Converts to date or file
      *
      * @param string $name  The name of the field.

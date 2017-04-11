@@ -346,7 +346,7 @@ class Record extends RecordAbstract implements Arrayable
     // called by EloquentUserProvider
     public function newQuery()
     {
-        return self::query();
+        return static::query();
     }
 
     public static function type()
