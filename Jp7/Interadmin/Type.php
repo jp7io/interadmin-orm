@@ -392,7 +392,7 @@ class Type extends RecordAbstract
             throw new Exception('GROUP BY is not supported when using count().');
         }
 
-        $rows = $this->deprecatedFind(['limit' => 2] + $options);
+        $rows = $this->deprecatedFind(['limit' => 2, 'skip' => 0] + $options);
 
         if (count($rows) > 1) {
             throw new Exception('Could not resolve groupBy() before count().');
