@@ -168,18 +168,22 @@ abstract class RecordAbstract
     protected function getMutatedAttribute($name, $value)
     {
         if (strpos($name, 'date_') === 0) {
-            return new \Date($value);
+           return new \Date($value);
         }
         if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
-            if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
-                $class_name = static::DEFAULT_NAMESPACE.'InterAdminFieldFile';
-            } else {
-                $class_name = static::DEFAULT_NAMESPACE.'FileField';
+            static $fileClassName = [];
+            if (!isset($fileClassName[static::DEFAULT_NAMESPACE])) {
+                if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
+                    $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'InterAdminFieldFile';
+                } else {
+                    $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'FileField';
+                }
+                if (!class_exists($fileClassName[static::DEFAULT_NAMESPACE])) {
+                    $fileClassName[static::DEFAULT_NAMESPACE] = 'Jp7\\Interadmin\\FileField';
+                }
             }
-            if (!class_exists($class_name)) {
-                $class_name = 'Jp7\\Interadmin\\FileField';
-            }
-            $file = new $class_name($value);
+            $className = $fileClassName[static::DEFAULT_NAMESPACE];
+            $file = new $className($value);
             $file->setParent($this);
             return $file;
         }
@@ -336,6 +340,7 @@ abstract class RecordAbstract
     {
         //global $debugger;
         $db = $this->getDb();
+        $APP_DEBUG = getenv('APP_DEBUG');
 
         // Type casting
         if (!is_array($options['from'])) {
@@ -403,8 +408,8 @@ abstract class RecordAbstract
             ' WHERE '.$filters.$clauses.
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
 
-        if (getenv('APP_DEBUG')) {
-            $this->_debugQuery($sql, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10));
+        if ($APP_DEBUG) {
+            $startQuery = microtime(true);
         }
 
         try {
@@ -417,6 +422,10 @@ abstract class RecordAbstract
             throw new \Illuminate\Database\QueryException($sql.$availableFields, $e->getBindings(), $e);
         }
 
+        if ($APP_DEBUG) {
+            $this->_debugQuery($sql, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10), $startQuery);
+        }
+
         if (!empty($options['debug'])) {
             // $time = $debugger->getTime($options['debug']);
             echo SqlFormatter::format($sql);
@@ -425,15 +434,19 @@ abstract class RecordAbstract
         return $rs;
     }
 
-    private function _debugQuery($sql, $trace)
+    private function _debugQuery($sql, $trace, $startQuery)
     {
+        $ms = function ($start) {
+            return number_format((microtime(true)-$start)*1000).'ms';
+        };
         $i = 0;
         $caller = '';
         while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
             $i++;
         }
         if (isset($trace[$i]['file'])) {
-            $caller = PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].' */';
+            $caller = PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].
+                ' - '.$ms($startQuery).' */';
         }
         if (!isset($GLOBALS['__queries'])) {
             $GLOBALS['__queries'] = 0;
@@ -728,7 +741,7 @@ abstract class RecordAbstract
         foreach ($fields as $join => $campo) {
             // Com join
             if (is_array($campo)) {
-                $nome = isset($aliases[$join]) ? $aliases[$join] : $join;
+                //$nome = isset($aliases[$join]) ? $aliases[$join] : $join;
 
                 // Join e Recursividade
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
@@ -823,7 +836,8 @@ abstract class RecordAbstract
             return 'tipo';
         } else {
             $options['from'][] = $joinTipo->getInterAdminsTableName().
-                ' AS '.$alias.' ON '.$table.'.'.$campo['tipo'].' = '.$alias.'.id';
+                ' AS '.$alias.' ON '.$table.'.'.$campo['tipo'].' = '.$alias.'.id'.
+                ' AND '.$alias.'.id_tipo = '.$joinTipo->id_tipo;
 
             return 'interadmin';
         }

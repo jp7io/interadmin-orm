@@ -37,6 +37,7 @@ abstract class BaseQuery
             'fields' => [],
             'where' => [],
             'having' => [],
+            'with' => [],
             'order' => null,
             'group' => null,
             'limit' => null,
@@ -564,7 +565,7 @@ abstract class BaseQuery
 
     public function with($_)
     {
-        $this->options['with'] = func_get_args();
+        $this->options['with'] = array_merge($this->options['with'], func_get_args());
 
         return $this;
     }

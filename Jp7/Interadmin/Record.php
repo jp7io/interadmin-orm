@@ -50,7 +50,7 @@ class Record extends RecordAbstract implements Arrayable
      */
     protected $_aliases = [];
 
-    protected $relations;
+    protected $relations = [];
 
     /**
      * Username to be inserted in the log when saving this record.
@@ -298,8 +298,9 @@ class Record extends RecordAbstract implements Arrayable
         if (!$fk) {
             return null;
         }
+        $keyExists = array_key_exists($name, $this->relations);
         $loaded = &$this->relations[$name];
-        if (!$loaded || $loaded->id != $fk) {
+        if (!$keyExists || ($keyExists && $loaded && $loaded->id != $fk)) {
             /// stale data or not loaded
             if ($data['type']) {
                 $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
@@ -378,7 +379,7 @@ class Record extends RecordAbstract implements Arrayable
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
-            $className = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
+            $className = $tipo->class;
             if (!$className) {
                 $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
@@ -460,7 +461,6 @@ class Record extends RecordAbstract implements Arrayable
             if (isset($this->relations[$name])) {
                 return new EagerLoaded($childrenTipo, $this->relations[$name]);
             }
-
             return new Query($childrenTipo);
         } elseif ($name === 'arquivos' && $this->hasArquivosTab()) {
             return new Query\FileQuery($this);
@@ -1035,6 +1035,11 @@ class Record extends RecordAbstract implements Arrayable
         $this->relations[$relation] = $value;
 
         return $this;
+    }
+
+    public function hasLoadedRelation($relation)
+    {
+        return array_key_exists($relation, $this->relations);
     }
 
     /**

@@ -62,6 +62,13 @@ class Type extends RecordAbstract
     protected $_tiposUsingThisModel;
 
     /**
+     * Cached aliases.
+     *
+     * @var array
+     */
+    protected $_interadminAliases = [];
+
+    /**
      * Construct.
      *
      * @param int $id_tipo [optional] This record's 'id_tipo'.
@@ -290,25 +297,27 @@ class Type extends RecordAbstract
             $this->_getAttributesFromRow($row, $record, $options);
             $records[] = $record;
         }
+
         if ($options['eager_load']) {
             foreach ($options['eager_load'] as $relationshipData) {
-                if ($relationshipData['type'] == 'select') {
-                    // Any eager load level missing?
-                    if ($relationshipData['levels']) {
-                        $selects = [];
-                        $attribute = $relationshipData['name'];
-                        foreach ($records as $item) {
-                            if ($item->$attribute) {
-                                $selects[] = $item->$attribute;
-                            }
-                        }
-                        CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
-                    }
-                } else {
+//                if ($relationshipData['type'] == 'select' && !$relationshipData['multi']) {
+//                    // Any eager load level missing?
+//                    if ($relationshipData['levels']) {
+//                        $selects = [];
+//                        $attribute = $relationshipData['name'];
+//                        foreach ($records as $item) {
+//                            if ($item->$attribute) {
+//                                $selects[] = $item->$attribute;
+//                            }
+//                        }
+//                        CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
+//                    }
+//                } else {
                     CollectionUtil::eagerLoad($records, $relationshipData['levels']);
-                }
+//                }
             }
         }
+
         // // $rs->Close();
         return new Collection($records);
     }
@@ -485,7 +494,7 @@ class Type extends RecordAbstract
                     // Gerar nome_id
                     $alias = $array['nome'];
                     if (is_object($alias)) {
-                        $alias = $array['label'] ?: $alias->nome;
+                        $alias = $array['label'] ?? $alias->nome;
                     }
                     if (!$alias) {
                         throw new UnexpectedValueException('An alias was expected.');
@@ -535,22 +544,24 @@ class Type extends RecordAbstract
      */
     public function getCamposAlias($fields = null)
     {
-        $aliases = $this->getCache('campos_alias', function () {
-            $aliases = [];
-            foreach ($this->getCampos() as $campo => $array) {
-                if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
-                    continue;
+        if (!$this->_interadminAliases) {
+            $this->_interadminAliases = $this->getCache('campos_alias', function () {
+                $aliases = [];
+                foreach ($this->getCampos() as $campo => $array) {
+                    if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
+                        continue;
+                    }
+                    $aliases[$campo] = $array['nome_id'];
                 }
-                $aliases[$campo] = $array['nome_id'];
-            }
-            return $aliases;
-        });
-
-        if (is_null($fields)) {
-            return $aliases;
+                return $aliases;
+            });
         }
 
-        return isset($aliases[$fields]) ? $aliases[$fields] : null;
+        if (is_null($fields)) {
+            return $this->_interadminAliases;
+        }
+
+        return isset($this->_interadminAliases[$fields]) ? $this->_interadminAliases[$fields] : null;
     }
 
     public function getCamposCombo()
@@ -564,7 +575,7 @@ class Type extends RecordAbstract
     {
         // getCampoTipo might be different for each class
         $cacheKey = static::class.','.$this->getCacheKey('relationships');
-        return Cache::tag(self::CACHE_TAG)->remember($cacheKey, 5, function () {
+        return self::getCacheRepository()->remember($cacheKey, 5, function () {
             $relationships = [];
 
             foreach ($this->getCampos() as $campo => $array) {
@@ -880,7 +891,7 @@ class Type extends RecordAbstract
     protected function clearCache()
     {
         // clear only this instance's cache
-        $cache = Cache::tag(self::CACHE_TAG);
+        $cache = self::getCacheRepository();
         $cache->forget($this->getCacheKey('attributes'));
         $cache->forget($this->getCacheKey('campos'));
         $cache->forget($this->getCacheKey('campos_alias'));
@@ -893,7 +904,14 @@ class Type extends RecordAbstract
     protected function getCache($varname, $callback)
     {
         $cacheKey = $this->getCacheKey($varname);
-        return Cache::tag(self::CACHE_TAG)->remember($cacheKey, 5, $callback);
+        return self::getCacheRepository()->remember($cacheKey, 5, $callback);
+    }
+
+    protected static function getCacheRepository()
+    {
+        static $cacheRepository;
+        $cacheRepository = $cacheRepository ?: Cache::tag(self::CACHE_TAG);
+        return $cacheRepository;
     }
 
     protected function getCacheKey($varname)
@@ -903,7 +921,7 @@ class Type extends RecordAbstract
 
     public static function checkCache()
     {
-        $cache = Cache::tag(self::CACHE_TAG);
+        $cache = self::getCacheRepository();
         // don't query too often
         if ($cache->get('modified:check') > time() - 10) {
             return; // too soon
@@ -990,10 +1008,11 @@ class Type extends RecordAbstract
             $data = $relationships[$relationship];
             return [
                 'type' => 'select',
-                'tipo' => $data['query']->type(),
+                'tipo' => is_object($data['query']) ? $data['query']->type() : $data['query'],
                 'name' => $relationship,
                 'alias' => true,
-                'multi' => $data['multi']
+                'multi' => $data['multi'],
+                'has_type' => $data['type'],
             ];
         }
         // As children
@@ -1004,7 +1023,8 @@ class Type extends RecordAbstract
                 'tipo' => $childrenTipo,
                 'name' => $relationship,
                 'alias' => true,
-                'multi' => true
+                'multi' => true,
+                'has_type' => false,
             ];
         }
         // As method
@@ -1210,15 +1230,14 @@ class Type extends RecordAbstract
                 $levels = explode('.', $withRelationship);
 
                 if ($relationshipData = $this->getRelationshipData($levels[0])) {
-                    if ($relationshipData['type'] === 'select') {
-                        // select.* - Esse carregamento é feito com join para aproveitar código existente
-                        // E também porque join é mais rápido para hasOne() do que um novo select
-                        if (!$relationshipData['multi']) {
-                            // select_multi resolve eager_load depois no _loadRelationship()
-                            $options['fields'][$levels[0]] = ['*'];
-                        }
-                        array_shift($levels);
-                    }
+//                    if ($relationshipData['type'] === 'select') {
+//                        // select.* - Esse carregamento é feito com join para aproveitar código existente
+//                        // E também porque join é mais rápido para hasOne() do que um novo select
+//                        if (!$relationshipData['multi']) {
+//                            $options['fields'][$levels[0]] = ['*'];
+//                            array_shift($levels);
+//                        }
+//                    }
                     $options['eager_load'][] = $relationshipData + [
                         'levels' => $levels,
                     ];
