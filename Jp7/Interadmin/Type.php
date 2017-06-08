@@ -214,7 +214,7 @@ class Type extends RecordAbstract
      *
      * @param array $options Default array of options. Available keys: fields, where, order, class.
      *
-     * @return array Array of Type objects.
+     * @return Collection Array of Type objects.
      *
      * @deprecated Actually its being used by TypeQuery to find any type
      */

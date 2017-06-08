@@ -12,6 +12,9 @@ class BaseClassMap
         // singleton
     }
 
+    /**
+     * @return static
+     */
     public static function getInstance()
     {
         // singleton

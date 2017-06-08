@@ -44,6 +44,8 @@ abstract class BaseQuery
         ];
     }
 
+    public abstract function count();
+
     public function __call($method_name, $params)
     {
         if (starts_with($method_name, 'or')) {
@@ -182,6 +184,9 @@ abstract class BaseQuery
         return $this->pluck($column, $key);
     }
 
+    /**
+     * @return static
+     */
     public function where($column, $operator = null, $value = null)
     {
         if (is_array($column)) {
@@ -231,6 +236,9 @@ abstract class BaseQuery
         return $this->_addWhere($where);
     }
 
+    /**
+     * @return static
+     */
     public function whereIn($column, $values, $_not = false)
     {
         if ($values instanceof Arrayable) {
@@ -432,7 +440,7 @@ abstract class BaseQuery
      * @param array                 $conditions
      * @param string                $_joinType  ex.: INNER, LEFT, RIGHT
      *
-     * @return \Jp7\Interadmin\Query\BaseQuery
+     * @return static
      */
     public function join($alias, $className, $conditions, $_joinType = 'INNER')
     {
@@ -527,6 +535,9 @@ abstract class BaseQuery
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function orderBy($column, $direction = 'asc')
     {
         if (str_contains($column, ' ') || str_contains($column, '(')) {
