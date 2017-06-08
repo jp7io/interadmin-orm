@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Jp7\Interadmin\Type;
 use Jp7\Interadmin\RecordAbstract;
 use BadMethodCallException;
+use Jp7\Interadmin\Collection;
 
 abstract class BaseQuery
 {
@@ -442,14 +443,15 @@ abstract class BaseQuery
      * @param string|Type           $className
      * @param array                 $conditions
      * @param string                $_joinType  ex.: INNER, LEFT, RIGHT
+     * @param bool                  $_typeless  Whether to filter by 'id_tipo' or not
      *
      * @return static
      */
-    public function join($alias, $className, $conditions, $_joinType = 'INNER')
+    public function join($alias, $className, $conditions, $_joinType = 'INNER', $_typeless = false)
     {
         $type = $this->_resolveType($className);
         $joinOn = $this->_parseConditions($conditions, $type, $alias)[0];
-        $this->options['joins'][$alias] = [$_joinType, $type, $joinOn];
+        $this->options['joins'][$alias] = [$_joinType, $type, $joinOn, $_typeless];
 
         return $this;
     }
@@ -464,13 +466,19 @@ abstract class BaseQuery
         return $this->join($alias, $className, $conditions, 'RIGHT');
     }
 
-    public function typelessJoin($alias, $className, $conditions, $_joinType = 'INNER')
+    public function typelessJoin($alias, $className, $conditions)
     {
-        $type = $this->_resolveType($className);
-        $joinOn = $this->_parseConditions($conditions, $type, $alias)[0];
-        $this->options['joins'][$alias] = [$_joinType, $type, $joinOn, true];
+        return $this->join($alias, $className, $conditions, 'INNER', true);
+    }
 
-        return $this;
+    public function typelessLeftJoin($alias, $className, $conditions)
+    {
+        return $this->join($alias, $className, $conditions, 'LEFT', true);
+    }
+
+    public function typelessRightJoin($alias, $className, $conditions)
+    {
+        return $this->join($alias, $className, $conditions, 'RIGHT', true);
     }
 
     public function skip($offset)
