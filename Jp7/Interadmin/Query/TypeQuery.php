@@ -2,13 +2,25 @@
 
 namespace Jp7\Interadmin\Query;
 
-use Jp7\Interadmin\Record;
 use Jp7\Interadmin\Type;
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TypeQuery extends BaseQuery
 {
+    /**
+     * @var Type
+     */
+    protected $provider;
+
+    public function __construct(Type $provider = null)
+    {
+        if (is_null($provider)) {
+            $provider = new Type;
+        }
+        parent::__construct($provider);
+    }
+
     protected function _isChar($field)
     {
         $chars = [
