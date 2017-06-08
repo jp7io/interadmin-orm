@@ -247,7 +247,9 @@ class Type extends RecordAbstract
                 'class' => isset($options['class']) ? $options['class'] : null,
                 'default_namespace' => static::DEFAULT_NAMESPACE,
             ]);
-            $tipo->setParent($this);
+            if ($this->id_tipo) {
+                $tipo->setParent($this);
+            }
             $this->_getAttributesFromRow($row, $tipo, $options);
             $tipos[] = $tipo;
         }
