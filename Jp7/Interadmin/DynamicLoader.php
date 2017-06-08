@@ -56,39 +56,77 @@ class DynamicLoader
         return false;
     }
 
-    public static function generateRecordClass(Type $type)
+    protected static function getPhpDocCampo($tipo, $campo)
+    {
+        if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
+//            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
+//            $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
+//            $retorno = self::_getCampoTypeClass($tipo->getCampoTipo($campo), $isTipo, $isMulti);
+            $type = 'int';
+        } elseif (strpos($campo['tipo'], 'select_') === 0) {
+//            $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
+//            $isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
+//            $retorno = self::_getCampoTypeClass($campo['nome'], $isTipo, $isMulti);
+            $type = 'int';
+        } elseif (strpos($campo['tipo'], 'int') === 0 || strpos($campo['tipo'], 'id') === 0) {
+            $type = 'string';
+        } elseif (strpos($campo['tipo'], 'char') === 0) {
+            $type = 'string';
+        } elseif (strpos($campo['tipo'], 'date') === 0) {
+            $type = 'Date';
+        } else {
+            $type = 'string';
+        }
+        return $type.' $'.$campo['nome_id'].' '.$campo['ajuda'];
+    }
+
+    public static function generateRecordClass(Type $type, $addPhpDoc = false)
     {
         $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
+
+        $phpdoc = '';
+        if ($addPhpDoc) {
+            $phpdoc = '/**'."\r\n";
+            foreach ($type->getCampos() as $campo) {
+                $phpdoc .= ' * @property '.self::getPhpDocCampo($type, $campo)."\r\n";
+            }
+            $phpdoc .= ' * @property Date $date_publish'."\r\n";
+            $phpdoc .= ' */';
+        }
+
         return self::buildClass(
             $type->getRecordClass(),
             $prefixClass.'Record',
-            ''
+            '',
+            $phpdoc
         );
     }
 
-    public static function generateTypeClass(Type $type)
+    public static function generateTypeClass(Type $type, $addPhpDoc = false)
     {
         $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $phpdoc = $addPhpDoc ? '/**  */ */' : '';
         return self::buildClass(
             $type->getTypeClass(),
             $prefixClass.'Type',
-            "const ID_TIPO = {$type->id_tipo};"
+            "const ID_TIPO = {$type->id_tipo};",
+            $phpdoc
         );
     }
 
-    protected static function getCode($class)
+    public static function getCode($class, $addPhpDoc = false)
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo($class)) {
             $tipo = new Type($id_tipo);
             $tipo->class = $class;
 
-            return self::generateRecordClass($tipo);
+            return self::generateRecordClass($tipo, $addPhpDoc);
         }
         if ($id_tipo = TypeClassMap::getInstance()->getClassIdTipo($class)) {
             $tipo = new Type($id_tipo);
             $tipo->class_tipo = $class;
 
-            return self::generateTypeClass($tipo);
+            return self::generateTypeClass($tipo, $addPhpDoc);
         }
     }
 
@@ -100,7 +138,7 @@ class DynamicLoader
         return [$namespace, $className];
     }
 
-    protected static function buildClass($className, $parentClass, $classBody)
+    protected static function buildClass($className, $parentClass, $classBody, $phpdoc)
     {
         list($namespace, $className) = self::getNamespaceAndClass($className);
         if ($namespace) {
@@ -110,7 +148,7 @@ class DynamicLoader
 <?php
 
 {$namespace}
-
+{$phpdoc}
 class {$className} extends \\{$parentClass} {
     {$classBody}
 }
