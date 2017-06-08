@@ -45,11 +45,26 @@ class TypeQuery extends BaseQuery
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
         $options = $this->options;
-        $options['limit'] = 1;
-        $options['fields'] = "COUNT(*)";
 
-        $result = $this->provider->deprecatedGetChildren($options)->first();
-        return $result->count;
+        if (empty($options['group'])) {
+            $options['fields'] = ['COUNT(id_tipo) AS count_id_tipo'];
+        } elseif ($options['group'] == 'id_tipo') {
+            // O COUNT() precisa trazer a contagem total em 1 linha
+            // Caso exista GROUP BY id_tipo, ele traria em várias linhas
+            // Esse é um tratamento especial apenas para o id_tipo
+            $options['fields'] = ['COUNT(DISTINCT id_tipo) AS count_id_tipo'];
+            unset($options['group']);
+        } else {
+            // Se houver GROUP BY com outro campo, retornará a contagem errada
+            throw new \Exception('GROUP BY is not supported when using count().');
+        }
+
+        $rows = $this->provider->deprecatedGetChildren(['limit' => 2, 'skip' => 0] + $options);
+        if (count($rows) > 1) {
+            throw new \Exception('Could not resolve groupBy() before count().');
+        }
+
+        return isset($rows[0]->count_id_tipo) ? intval($rows[0]->count_id_tipo) : 0;
     }
 
     public function find($id)
