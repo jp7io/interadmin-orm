@@ -386,7 +386,11 @@ abstract class RecordAbstract
         if (isset($options['joins']) && $options['joins']) {
             foreach ($options['joins'] as $alias => $join) {
                 @list($joinType, $tipo, $on, $typeless) = $join;
+                if ($tipo === Type::class) {
+                    $table = (new Type)->getTableName();
+                } else {
                 $table = $tipo->getInterAdminsTableName();
+                }
                 $joins .= ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
                     ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
                 if (!$typeless) {
@@ -662,7 +666,7 @@ abstract class RecordAbstract
                                 $this->_addJoinAlias($options, $table, $campos[$joinNome]);
                             }
                             $joinTipo = $this->getCampoTipo($campos[$joinNome]);
-                        } elseif (method_exists($options['model'], $joinNome)) {
+                        } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
                             $relationshipData = $options['model']->$joinNome()->getRelationshipData();
 
                             $joinTipo = $relationshipData['tipo'];
@@ -681,7 +685,11 @@ abstract class RecordAbstract
                         } else {
                             throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
                         }
-                        $joinAliases = array_flip($joinTipo->getCamposAlias());
+                        if ($joinTipo instanceof Type) {
+                            $joinAliases = array_flip($joinTipo->getCamposAlias());
+                        } else {
+                            $joinAliases = [];
+                        }
                     }
                     // TEMPORARIO FIXME, necessario melhor maneira
                     if ($subtermo) {

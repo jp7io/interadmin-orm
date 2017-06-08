@@ -387,6 +387,9 @@ abstract class BaseQuery
     protected function _resolveType($var)
     {
         if (is_string($var)) {
+            if ($var === Type::class) {
+                return $var;
+            }
             return call_user_func([$var, 'type']);
         }
         if ($var instanceof Type) {
