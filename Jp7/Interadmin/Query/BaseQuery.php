@@ -31,6 +31,26 @@ abstract class BaseQuery
         'rlike', 'regexp', 'not regexp',
     ];
 
+    protected $typeChars = [
+        'mostrar',
+        'language',
+        'menu',
+        'busca',
+        'restrito',
+        'admin',
+        'editar',
+        'unico',
+        'versoes',
+        'hits',
+        'tags',
+        'tags_list',
+        'tags_tipo',
+        'tags_registros',
+        'publish_tipo',
+        'visualizar',
+        'deleted_tipo',
+    ];
+
     public function __construct(RecordAbstract $provider)
     {
         $this->provider = $provider;
@@ -383,6 +403,40 @@ abstract class BaseQuery
         }
 
         return $this->prefix.$column.' '.$operator.' '.$this->_escapeParam($value);
+    }
+
+    protected function _isChar($field)
+    {
+        if (str_contains($field, '.')) {
+            list($relationship, $field) = explode('.', $field);
+
+            if (isset($this->options['joins'][$relationship])) {
+                $joinType = $this->options['joins'][$relationship][1];
+                $data = [
+                    'tipo' => $joinType,
+                    'has_type' => $joinType === Type::class
+                ];
+            } else {
+                $data = $this->provider->getRelationshipData($relationship);
+            }
+            if ($data['has_type']) {
+                return in_array($field, $this->typeChars);
+            }
+            $type = $data['tipo'];
+        } elseif ($this instanceof TypeQuery) {
+            return in_array($field, $this->typeChars);
+        } elseif (in_array($field, ['deleted', 'publish'])) {
+            return true;
+        } else {
+            $type = $this->provider;
+        }
+
+        $aliases = array_flip($type->getCamposAlias());
+        if (isset($aliases[$field])) {
+            return strpos($aliases[$field], 'char_') === 0;
+        } else {
+            return strpos($field, 'char_') === 0;
+        }
     }
 
     protected function _resolveType($var)

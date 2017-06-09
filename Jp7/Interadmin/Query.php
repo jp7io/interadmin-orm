@@ -62,30 +62,6 @@ class Query extends Query\BaseQuery
         return $this->build($attributes)->save();
     }
 
-    protected function _isChar($field)
-    {
-        if (str_contains($field, '.')) {
-            list($relationship, $field) = explode('.', $field);
-
-            $data = $this->provider->getRelationshipData($relationship);
-
-            $type = $data['tipo'];
-        } else {
-            $type = $this->provider;
-        }
-
-        if (in_array($field, ['deleted', 'publish'])) {
-            return true;
-        }
-
-        $aliases = array_flip($type->getCamposAlias());
-        if (isset($aliases[$field])) {
-            return strpos($aliases[$field], 'char_') === 0;
-        } else {
-            return strpos($field, 'char_') === 0;
-        }
-    }
-
     /**
      * Example: TipoDeCurso::joinThrough('Ci_Escola', 'escola.cursos.tipo');.
      *

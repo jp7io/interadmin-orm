@@ -21,31 +21,6 @@ class TypeQuery extends BaseQuery
         parent::__construct($provider);
     }
 
-    protected function _isChar($field)
-    {
-        $chars = [
-            'mostrar',
-            'language',
-            'menu',
-            'busca',
-            'restrito',
-            'admin',
-            'editar',
-            'unico',
-            'versoes',
-            'hits',
-            'tags',
-            'tags_list',
-            'tags_tipo',
-            'tags_registros',
-            'publish_tipo',
-            'visualizar',
-            'deleted_tipo',
-        ];
-
-        return in_array($field, $chars);
-    }
-
     protected function providerFind($options)
     {
         return $this->provider->deprecatedGetChildren($options);
