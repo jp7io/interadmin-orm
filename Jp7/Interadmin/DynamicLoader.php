@@ -105,7 +105,7 @@ class DynamicLoader
     public static function generateTypeClass(Type $type, $addPhpDoc = false)
     {
         $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
-        $phpdoc = $addPhpDoc ? '/**  */ */' : '';
+        $phpdoc = $addPhpDoc ? '/** --- */' : '';
         return self::buildClass(
             $type->getTypeClass(),
             $prefixClass.'Type',
@@ -149,7 +149,8 @@ class DynamicLoader
 
 {$namespace}
 {$phpdoc}
-class {$className} extends \\{$parentClass} {
+class {$className} extends \\{$parentClass}
+{
     {$classBody}
 }
 STR;

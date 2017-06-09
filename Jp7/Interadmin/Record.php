@@ -20,6 +20,7 @@ use RecordUrl;
  * @method static Query whereRaw(string $where)
  * @method static static build(array $attributes = [])
  * @method static static create(array $attributes = [])
+ * @method static static find(int|string $id)
  * @method Query\FileQuery arquivos
  */
 class Record extends RecordAbstract implements Arrayable
@@ -350,6 +351,9 @@ class Record extends RecordAbstract implements Arrayable
         return static::query();
     }
 
+    /**
+     * @return Type
+     */
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {

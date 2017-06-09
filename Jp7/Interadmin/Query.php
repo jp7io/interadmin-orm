@@ -89,7 +89,7 @@ class Query extends Query\BaseQuery
     /**
      * Example: TipoDeCurso::joinThrough('Ci_Escola', 'escola.cursos.tipo');.
      *
-     * @param string $className
+     * @param string|Type $className
      * @param string $relationshipPath
      *
      * @throws BadMethodCallException
