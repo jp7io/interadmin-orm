@@ -100,19 +100,27 @@ class Type extends RecordAbstract
 
     public function __call($methodName, $args)
     {
-        $childrenType = $this->children()
-            ->where('id_slug', snake_case($methodName, '-'))
-            ->first();
-
-        if ($childrenType) {
-            return $childrenType->records();
+        $childrenBySlug = $this->getCache('__call', function () {
+            return $this->children()
+                ->select('id_slug')
+                ->get()
+                ->each(function (Type $childType) {
+                    $childType->setParent(null); // reduce cache size and recursive unserializing
+                })
+                ->keyBy('id_slug') // for faster key searches
+                ->all(); // to plain array
+        });
+        $childSlug = snake_case($methodName, '-');
+        if (array_key_exists($childSlug, $childrenBySlug)) {
+            $childrenBySlug[$childSlug]->setParent($this);
+            return $childrenBySlug[$childSlug]->records();
         }
         // Default error when method doesn´t exist
         $message = 'Call to undefined method '.get_class($this).'->'.
             $methodName.'(). Available magic methods: '."\n";
 
-        foreach ($this->children()->get() as $child) {
-            $message .= "\t\t- ".lcfirst(camel_case($child->id_slug))."()\n";
+        foreach ($childrenBySlug as $slug => $child) {
+            $message .= "\t\t- ".lcfirst(camel_case($slug))."()\n";
         }
         throw new BadMethodCallException($message);
     }
@@ -894,6 +902,7 @@ class Type extends RecordAbstract
     {
         // clear only this instance's cache
         $cache = self::getCacheRepository();
+        $cache->forget($this->getCacheKey('__call'));
         $cache->forget($this->getCacheKey('attributes'));
         $cache->forget($this->getCacheKey('campos'));
         $cache->forget($this->getCacheKey('campos_alias'));
