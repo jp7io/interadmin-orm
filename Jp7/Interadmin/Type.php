@@ -504,7 +504,7 @@ class Type extends RecordAbstract
                     // Gerar nome_id
                     $alias = $array['nome'];
                     if (is_object($alias)) {
-                        $alias = $array['label'] ?? $alias->nome;
+                        $alias = empty($array['label']) ? $alias->nome : $array['label'];
                     }
                     if (!$alias) {
                         throw new UnexpectedValueException('An alias was expected.');
