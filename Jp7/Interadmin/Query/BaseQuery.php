@@ -389,12 +389,17 @@ abstract class BaseQuery
                 // short circuit operator
                 list($operator, $value) = ['=', $operator];
             } else {
-                throw new \InvalidArgumentException('Invalid operator.');
+                throw new \InvalidArgumentException('Invalid operator: '.$operator);
             }
         }
         if (is_bool($value) && $this->_isChar($column)) {
-            if ($operator != '=') {
-                throw new \InvalidArgumentException('Invalid operator.');
+            if ($operator !== '=') {
+                if (in_array($operator , ['<>', '!='])) {
+                    $operator = '=';
+                    $value = !$value;
+                } else {
+                    throw new \InvalidArgumentException('Invalid operator for boolean: '.$operator);
+                }
             }
             $operator = ($value ? '<>' : '=');
             $value = '';
