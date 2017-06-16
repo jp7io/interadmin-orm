@@ -383,7 +383,7 @@ class Record extends RecordAbstract implements Arrayable
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
-            $className = $tipo->class;
+            $className = $tipo->getRecordClass();
             if (!$className) {
                 $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
