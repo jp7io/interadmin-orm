@@ -41,4 +41,11 @@ class FileQuery extends BaseQuery
     {
         return $this->build($attributes)->save();
     }
+
+    public function count()
+    {
+        return count($this->provider->deprecated_getArquivos(['fields' => 'id_arquivo'] + $this->options));
+    }
+
+
 }
