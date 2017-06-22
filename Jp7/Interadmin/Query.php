@@ -25,6 +25,14 @@ class Query extends Query\BaseQuery
 
     protected function providerFind($options)
     {
+        if (empty($options['class'])) {
+            // performance, check class once and not for every instance
+            $recordClass = $this->provider->getRecordClass();
+            if (class_exists($recordClass)) {
+                $options['class'] = $recordClass;
+            }
+        }
+
         return $this->provider->deprecatedFind($options);
     }
 
