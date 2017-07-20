@@ -1183,7 +1183,7 @@ class Record extends RecordAbstract implements Arrayable
             $parameters[] = $parent;
         }
 
-        return $parameters;
+        return array_reverse($parameters);
     }
 
     public function getUrl($action = 'show')
