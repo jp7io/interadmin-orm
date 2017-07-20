@@ -49,7 +49,8 @@ class EagerLoaded extends Query
             dump('Returning first eager loaded children record.');
         }
 
-        return reset($this->data);
+        foreach ($this->data as $first) // array or traversable
+            return $first;
     }
 
     public function debug($debug = true)
