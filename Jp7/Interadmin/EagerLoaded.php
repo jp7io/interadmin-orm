@@ -18,6 +18,9 @@ class EagerLoaded extends Query
 
     public function get()
     {
+        if ($this->options !== $this->initialOptions) {
+            return parent::get();
+        }
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
@@ -30,6 +33,9 @@ class EagerLoaded extends Query
 
     public function count()
     {
+        if ($this->options !== $this->initialOptions) {
+            return parent::count();
+        }
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }
@@ -42,6 +48,9 @@ class EagerLoaded extends Query
 
     public function first()
     {
+        if ($this->options !== $this->initialOptions) {
+            return parent::first();
+        }
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
         }

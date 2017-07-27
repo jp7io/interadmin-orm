@@ -51,10 +51,7 @@ abstract class BaseQuery
         'deleted_tipo',
     ];
 
-    public function __construct(RecordAbstract $provider)
-    {
-        $this->provider = $provider;
-        $this->options = [
+    protected $initialOptions = [
             'fields' => [],
             'where' => [],
             'having' => [],
@@ -63,6 +60,11 @@ abstract class BaseQuery
             'group' => null,
             'limit' => null,
         ];
+
+    public function __construct(RecordAbstract $provider)
+    {
+        $this->provider = $provider;
+        $this->options = $this->initialOptions;
     }
 
     public abstract function count();

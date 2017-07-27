@@ -234,7 +234,11 @@ class Record extends RecordAbstract implements Arrayable
         }
         // children most likely
         if ($query = $this->_loadManyRelationship($name)) {
-            return $query->get();
+            $manyRecords = $query->get();
+            if (!array_key_exists($name, $this->relations)) {
+                $this->relations[$name] = $manyRecords;
+            }
+            return $manyRecords;
         }
 
         // Lazy loading
