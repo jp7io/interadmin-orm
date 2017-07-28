@@ -44,6 +44,7 @@ class HasMany
         return [
             'tipo' => $type,
             'conditions' => $conditions,
+            'has_type' => false,
         ];
     }
 
