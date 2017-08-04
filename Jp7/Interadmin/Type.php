@@ -396,7 +396,7 @@ class Type extends RecordAbstract
      *
      * @return int Count of Records found.
      */
-    public function deprecatedCount($options = [])
+    public function deprecatedCount($options = [], $_typeless = false)
     {
         if (empty($options['group'])) {
             $options['fields'] = ['COUNT(id) AS count_id'];
@@ -410,9 +410,11 @@ class Type extends RecordAbstract
             // Se houver GROUP BY com outro campo, retornará a contagem errada
             throw new Exception('GROUP BY is not supported when using count().');
         }
-
-        $rows = $this->deprecatedFind(['limit' => 2, 'skip' => 0] + $options);
-
+        if ($_typeless) {
+            $rows = $this->deprecatedTypelessFind(['limit' => 2, 'skip' => 0] + $options);
+        } else {
+            $rows = $this->deprecatedFind(['limit' => 2, 'skip' => 0] + $options);
+        }
         if (count($rows) > 1) {
             throw new Exception('Could not resolve groupBy() before count().');
         }
@@ -1292,9 +1294,12 @@ class Type extends RecordAbstract
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $type = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
-
-            $record = Record::getInstance($row->id, $optionsInstance, $type);
+            if (isset($row->id_tipo)) {
+                $type = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
+            } else {
+                $type = $this;
+            }
+            $record = Record::getInstance($row->id ?? null, $optionsInstance, $type);
             $this->_getAttributesFromRow($row, $record, $options);
             $records[] = $record;
         }

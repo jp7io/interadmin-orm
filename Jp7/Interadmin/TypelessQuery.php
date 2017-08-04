@@ -11,10 +11,10 @@ class TypelessQuery extends Query
 
     public function count()
     {
-        $options = $this->options;
-        $options['fields'] = "COUNT(*)";
-        $options['limit'] = 1;
-        $result = $this->provider->deprecatedTypelessFind($options)->first();
-        return $result->count;
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+        }
+
+        return $this->provider->deprecatedCount($this->options, true);
     }
 }
