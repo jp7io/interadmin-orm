@@ -632,7 +632,8 @@ abstract class RecordAbstract
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
                             $options['from'][] = $joinTipo->getInterAdminsTableName().
-                                ' AS '.$table.' ON '.$table.'.parent_id = main.id AND '.$table.'.id_tipo = '.$joinTipo->id_tipo;
+                                ' AS '.$table.' ON '.$table.'.parent_id = main.id'.
+                                ' AND '.$table.'.id_tipo = '.$joinTipo->id_tipo;
 
                             $options['auto_group_flag'] = true;
                         }
@@ -656,6 +657,13 @@ abstract class RecordAbstract
                         // Joins de select
                         } elseif (isset($aliases[$joinNome.'_id']) && isset($campos[$aliases[$joinNome.'_id']])) {
                             $joinNome = $aliases[$joinNome.'_id'];
+                            if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
+                                $this->_addJoinAlias($options, $table, $campos[$joinNome]);
+                            }
+                            $joinTipo = $this->getCampoTipo($campos[$joinNome]);
+                        // Joins de select_multi
+                        } elseif (isset($aliases[$joinNome.'_ids']) && isset($campos[$aliases[$joinNome.'_ids']])) {
+                            $joinNome = $aliases[$joinNome.'_ids'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->_addJoinAlias($options, $table, $campos[$joinNome]);
                             }
@@ -703,7 +711,8 @@ abstract class RecordAbstract
                         if (!in_array($subtable, $options['from_alias'])) {
                             $options['from_alias'][] = $subtable;
                             $options['from'][] = $subJoinTipo->getInterAdminsTableName().
-                                ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$termo].' AND '.$subtable.'.id_tipo = '.$subJoinTipo->id_tipo;
+                                ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$termo].
+                                ' AND '.$subtable.'.id_tipo = '.$subJoinTipo->id_tipo;
                         }
 
                         $table = $subtable;
@@ -754,7 +763,7 @@ abstract class RecordAbstract
                 // Join e Recursividade
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
                     $joinTipo = $options['joins'][$join][1];
-                } elseif (isset($aliases[$join.'_ids']) || strpos($join, 'select_multi_') === 0) {
+                } elseif (strpos($join, 'select_multi_') === 0) {
                     $joinTipo = null; // Just ignore select_multi used on legacy code, lazy load them
                     /*
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
@@ -765,12 +774,17 @@ abstract class RecordAbstract
                         'fields_alias' => $options['fields_alias'],
                     ];
                     */
+                } elseif (isset($aliases[$join.'_ids'])) {
+                    throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
                 } else {
                     // Select
                     $nome = isset($aliases[$join.'_id']) ? $aliases[$join.'_id'] : $join;
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                     // Join e Recursividade
                     if (empty($options['from_alias']) || !in_array($join, (array) $options['from_alias'])) {
+                        if (!isset($campos[$nome])) {
+                            throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
+                        }
                         $joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
                         if ($joinClasse !== 'tipo') {
                             $fields[$join][] = 'id';
@@ -832,19 +846,30 @@ abstract class RecordAbstract
     protected function _addJoinAlias(array &$options, $alias, $campo, $table = 'main')
     {
         $joinTipo = $this->getCampoTipo($campo);
-        if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
+        if (!$joinTipo ) { //  || strpos($campo['tipo'], 'select_multi_') === 0
             throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
 
-        if (in_array($campo['xtra'], FieldUtil::getSelectTipoXtras()) || in_array($campo['xtra'], FieldUtil::getSpecialTipoXtras())) {
+        $column = $campo['tipo'];
+        $xtra = $campo['xtra'];
+        $isMulti = strpos($column, 'select_multi_') === 0 || in_array($xtra, FieldUtil::getSpecialMultiXtras());
+        if (in_array($xtra, FieldUtil::getSelectTipoXtras()) || in_array($xtra, FieldUtil::getSpecialTipoXtras())) {
             $options['from'][] = $joinTipo->getTableName().
-                ' AS '.$alias.' ON '.$table.'.'.$campo['tipo'].' = '.$alias.'.id_tipo';
+                ' AS '.$alias.' ON '.
+                ($isMulti ?
+                    'FIND_IN_SET('.$alias.'.id_tipo, '.$table.'.'.$column.')' :
+                    $table.'.'.$column.' = '.$alias.'.id_tipo'
+                );
 
             return 'tipo';
         } else {
             $options['from'][] = $joinTipo->getInterAdminsTableName().
-                ' AS '.$alias.' ON '.$table.'.'.$campo['tipo'].' = '.$alias.'.id'.
+                ' AS '.$alias.' ON '.
+                ($isMulti ?
+                    'FIND_IN_SET('.$alias.'.id, '.$table.'.'.$column.')' :
+                    $table.'.'.$column.' = '.$alias.'.id'
+                ).
                 ' AND '.$alias.'.id_tipo = '.$joinTipo->id_tipo;
 
             return 'interadmin';
