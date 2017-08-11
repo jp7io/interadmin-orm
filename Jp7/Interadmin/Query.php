@@ -212,7 +212,9 @@ class Query extends Query\BaseQuery
         if (is_array($id)) {
             throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use get() instead of find().');
         }
-
+        if (!$id) {
+            return null; // save a query
+        }
         if (is_string($id) && !is_numeric($id) && $id) {
             $this->options['where'][] = $this->_parseComparison('id_slug', '=', $id);
         } else {
@@ -224,6 +226,9 @@ class Query extends Query\BaseQuery
 
     public function findMany($ids)
     {
+        if (!$ids) {
+            return jp7_collect();  // save a query
+        }
         $sample = reset($ids);
         if (is_string($sample) && !is_numeric($sample)) {
             $key = 'id_slug';
