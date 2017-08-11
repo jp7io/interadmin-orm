@@ -268,8 +268,11 @@ abstract class BaseQuery
             $values = $values->toArray();
         }
         $values = array_map([$this, '_escapeParam'], $values);
-        $where = $this->prefix.$column.($_not ? ' NOT' : '').' IN ('.implode(',', $values).')';
-
+        if ($values) {
+            $where = $this->prefix.$column.($_not ? ' NOT' : '').' IN ('.implode(',', $values).')';
+        } else {
+            $where = ($_not ? '1' : '0').' = 1';
+        }
         return $this->_addWhere($where);
     }
 
