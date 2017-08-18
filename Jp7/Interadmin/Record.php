@@ -21,6 +21,7 @@ use RecordUrl;
  * @method static static build(array $attributes = [])
  * @method static static create(array $attributes = [])
  * @method static static find(int|string $id)
+ * @method static static findOrFail(int|string $id)
  * @method Query\FileQuery arquivos
  */
 class Record extends RecordAbstract implements Arrayable
