@@ -532,13 +532,15 @@ class Record extends RecordAbstract implements Arrayable
                 if (!$this->parent_id_tipo) {
                     throw new Exception('Field parent_id_tipo is required. Id: '.$this->id);
                 }
-                $parentTipo = Type::getInstance($this->parent_id_tipo);
-                $this->_parent = $parentTipo->records()->find($this->parent_id);
+                $this->_parent = Type::getInstance($this->parent_id_tipo)
+                    ->records()
+                    ->find($this->parent_id);
                 if ($this->_parent) {
-                    if (!$this->getType()->getParent() instanceof Record) {
-                        \Log::notice('Dangerous side effect changing Type\'s parent record. Set it explicitly whenever possible.');
+                    if (!$this->getType()->hasLoadedParent() || !$this->_tipo->getParent() instanceof Record) {
+                        // Dangerous side effect changing Type's parent record, clone to mitigate side effect
+                        $this->_tipo = clone $this->_tipo;
                     }
-                    $this->getType()->setParent($this->_parent);
+                    $this->_tipo->setParent($this->_parent);
                 }
             }
         }

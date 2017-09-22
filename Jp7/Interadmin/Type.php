@@ -196,6 +196,12 @@ class Type extends RecordAbstract
             return $this->_parent = self::getInstance($this->parent_id_tipo, $options);
         }
     }
+
+    public function hasLoadedParent()
+    {
+        return $this->_parent !== null;
+    }
+
     public function getAncestors()
     {
         $parents = [];
