@@ -321,6 +321,12 @@ abstract class RecordAbstract
                 case 'NULL':
                     $valuesToSave[$key] = '';
                     break;
+                case 'boolean':
+                    if (starts_with($key, 'char_')) {
+                        $valuesToSave[$key] = $value ? 'S' : '';
+                        break;
+                    }
+                    // fall through
                 default:
                     $valuesToSave[$key] = $value;
                     break;
