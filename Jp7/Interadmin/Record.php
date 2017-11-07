@@ -74,7 +74,10 @@ class Record extends RecordAbstract implements Arrayable
      * @var int
      */
     protected static $timestamp;
-
+    /**
+     * @var bool
+     */
+    protected static $lazy_loading_debug = false;
     /**
      * Public Constructor.
      *
@@ -249,11 +252,7 @@ class Record extends RecordAbstract implements Arrayable
             return;
         }
         if (getenv('APP_DEBUG')) {
-            $caller = debug_backtrace(false, 2)[1];
-            \Log::notice('N+1 query: Loading attribute "'.$name.'".'.PHP_EOL.
-                '- Class: '.get_class($this).PHP_EOL.
-                '- ID: '.$this->id.PHP_EOL.
-                '- File: '.$caller['file'].' - Line: '.$caller['line']);
+            $this->_debugLazyLoading('N+1 query: Loading attribute', $name, debug_backtrace(false, 2)[1]);
         }
         // not all columns are loaded by default / most types use same table
         $attributes = array_keys($aliases);
@@ -267,6 +266,19 @@ class Record extends RecordAbstract implements Arrayable
         $this->loadAttributes($attributes);
 
         return $this->attributes[$name];
+    }
+
+    private function _debugLazyLoading($msg, $name, $caller)
+    {
+        $msg = $msg.' "'.$name.'".'.PHP_EOL.
+            '- Class: '.get_class($this).PHP_EOL.
+            '- ID: '.$this->id.PHP_EOL.
+            '- File: '.$caller['file'].' - Line: '.$caller['line'];
+        if (self::$lazy_loading_debug){
+            throw new \Exception($msg);
+        } else {
+            \Log::notice($msg);
+        }
     }
 
     protected function _loadRelationship($relationships, $name)
@@ -284,6 +296,9 @@ class Record extends RecordAbstract implements Arrayable
             }
             if ($loaded->fks != $fks) {
                 // stale data or not loaded
+                if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
+                    $this->_debugLazyLoading('N+1 query: Loading relation', $name, debug_backtrace(false, 2)[1]);
+                }
                 $loaded->fks = $fks;
                 $fksArray = is_array($fks) ? $fks : array_filter(explode(',', $fks));
                 if ($data['type']) {
@@ -308,6 +323,9 @@ class Record extends RecordAbstract implements Arrayable
         $loaded = &$this->relations[$name];
         if (!$keyExists || ($keyExists && $loaded && $loaded->id != $fk)) {
             /// stale data or not loaded
+            if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
+                $this->_debugLazyLoading('N+1 query: Loading relation', $name, debug_backtrace(false, 2)[1]);
+            }
             if ($data['type']) {
                 $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
             } else {
@@ -949,6 +967,9 @@ class Record extends RecordAbstract implements Arrayable
     public static function isPublishedFiltersEnabled()
     {
         return self::$publish_filters_enabled;
+    }
+    public static function debugLazyLoading(bool $bool = true) {
+        self::$lazy_loading_debug = $bool;
     }
     public static function getTimestamp()
     {
