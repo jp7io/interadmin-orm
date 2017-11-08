@@ -192,10 +192,10 @@ class Log extends RecordAbstract
         }
         $options['from'] = $instance->getTableName().' AS main';
 
-        if (!$options['where']) {
+        if (empty($options['where'])) {
             $options['where'][] = '1 = 1';
         }
-        if (!$options['order']) {
+        if (empty($options['order'])) {
             $options['order'] = 'date_insert DESC';
         }
         // Internal use
@@ -216,7 +216,7 @@ class Log extends RecordAbstract
 
     public static function findFirstLog($options = [])
     {
-        return static::findLogs($options)[0];
+        return static::findLogs($options + ['limit' => 1])[0];
     }
 
     public static function getPublishedFilters($table, $alias)
