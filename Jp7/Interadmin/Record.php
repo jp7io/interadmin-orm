@@ -4,6 +4,7 @@ namespace Jp7\Interadmin;
 
 use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
 use BadMethodCallException;
 use UnexpectedValueException;
@@ -24,7 +25,7 @@ use RecordUrl;
  * @method static static findOrFail(int|string $id)
  * @method Query\FileQuery arquivos
  */
-class Record extends RecordAbstract implements Arrayable
+class Record extends RecordAbstract implements Arrayable, Jsonable
 {
     /**
      * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
@@ -1121,6 +1122,11 @@ class Record extends RecordAbstract implements Arrayable
         }
 
         return $array;
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 
     public function __debugInfo()
