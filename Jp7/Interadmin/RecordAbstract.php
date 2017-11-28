@@ -339,10 +339,10 @@ abstract class RecordAbstract
      * Executes a SQL Query based on the values passed by $options.
      *
      * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
-     *
+     * @param bool $_delete Performs a DELETE instead of a SELECT
      * @return ADORecordSet
      */
-    protected function _executeQuery($options) // , &$select_multi_fields = []
+    protected function _executeQuery($options, $_delete = false) // , &$select_multi_fields = []
     {
         //global $debugger;
         $db = $this->getDb();
@@ -411,8 +411,9 @@ abstract class RecordAbstract
         }
 
         // Sql
-        $sql = 'SELECT '.implode(',', $options['fields']).
-            ' FROM '.array_shift($options['from']).
+        $from = array_shift($options['from']);
+        $sql = 'SELECT '.($_delete ? 'main.id' : implode(',', $options['fields'])).
+            ' FROM '.$from.
             $joins.
             ($options['from'] ? ' LEFT JOIN '.implode(' LEFT JOIN ', $options['from']) : '').
             ' WHERE '.$filters.$clauses.
@@ -423,7 +424,13 @@ abstract class RecordAbstract
         }
 
         try {
-            $rs = $db->select($sql);
+            if ($_delete) {
+                $table = explode(' AS ', $from)[0];
+                $sql = 'DELETE FROM '.$table.' WHERE id IN (SELECT id FROM ('.$sql.') AS temp)';
+                $rs = $db->delete($sql);
+            } else {
+                $rs = $db->select($sql);
+            }
         } catch (\Illuminate\Database\QueryException $e) {
             $availableFields = '';
             if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {

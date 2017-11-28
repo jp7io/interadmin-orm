@@ -291,15 +291,7 @@ class Type extends RecordAbstract
      */
     public function deprecatedFind($options = [])
     {
-        $this->_prepareInterAdminsOptions($options, $optionsInstance);
-        $options['where'][] = 'id_tipo = '.$this->id_tipo;
-        if ($this->_parent instanceof Record) {
-            // NULL to avoid finding children for invalid parents without ID
-            $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
-            if ($this->_parent->id_tipo) {
-                $options['where'][] = 'parent_id_tipo = '.$this->_parent->id_tipo;
-            }
-        }
+        $this->_prepareInterAdminsOptions($options, $optionsInstance, true);
 
         $rs = $this->_executeQuery($options);
 
@@ -373,17 +365,12 @@ class Type extends RecordAbstract
 
     public function deprecated_aggregate($function, $column, $options)
     {
-        $this->_prepareInterAdminsOptions($options, $optionsInstance);
+        $this->_prepareInterAdminsOptions($options, $optionsInstance, true);
 
         $options['fields'] = $function.'('.$column.') AS values';
-        $options['where'][] = 'id_tipo = '.$this->id_tipo;
 
         if (isset($options['group'])) {
             throw new Exception('This method cannot be used with GROUP BY.');
-        }
-
-        if ($this->_parent instanceof Record) {
-            $options['where'][] =  'parent_id = '.intval($this->_parent->id);
         }
 
         $rs = $this->_executeQuery($options);
@@ -787,12 +774,8 @@ class Type extends RecordAbstract
      */
     public function deprecated_deleteInterAdminsForever($options = [])
     {
-        $records = $this->deprecatedFind($options);
-        foreach ($records as $record) {
-            $record->forceDelete();
-        }
-
-        return count($records);
+        $this->_prepareInterAdminsOptions($options, $optionsInstance, true);
+        return $this->_executeQuery($options, true);
     }
 
     /**
@@ -1197,7 +1180,7 @@ class Type extends RecordAbstract
         return $tipos;
     }
 
-    protected function _prepareInterAdminsOptions(&$options, &$optionsInstance)
+    protected function _prepareInterAdminsOptions(&$options, &$optionsInstance, $filterType = false)
     {
         $this->_whereArrayFix($options['where']); // FIXME
 
@@ -1262,6 +1245,16 @@ class Type extends RecordAbstract
                     ];
                 } else {
                     throw new Exception('Unknown relationship: '.$levels[0]);
+                }
+            }
+        }
+        if ($filterType) {
+            $options['where'][] = 'id_tipo = '.$this->id_tipo;
+            if ($this->_parent instanceof Record) {
+                // NULL to avoid finding children for invalid parents without ID
+                $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
+                if ($this->_parent->id_tipo) {
+                    $options['where'][] = 'parent_id_tipo = '.$this->_parent->id_tipo;
                 }
             }
         }

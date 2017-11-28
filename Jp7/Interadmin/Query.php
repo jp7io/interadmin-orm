@@ -201,6 +201,14 @@ class Query extends Query\BaseQuery
     }
 
     /**
+     * Remove permanently from the database.
+     */
+    public function forceDelete()
+    {
+        return $this->provider->deprecated_deleteInterAdminsForever($this->options);
+    }
+
+    /**
      * @param $id string|int
      * @return Record|null
      */
