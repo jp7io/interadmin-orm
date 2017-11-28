@@ -425,8 +425,7 @@ abstract class RecordAbstract
 
         try {
             if ($_delete) {
-                $table = explode(' AS ', $from)[0];
-                $sql = 'DELETE FROM '.$table.' WHERE id IN (SELECT id FROM ('.$sql.') AS temp)';
+                $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.$sql.') AS temp ON main.id = temp.id';
                 $rs = $db->delete($sql);
             } else {
                 $rs = $db->select($sql);
