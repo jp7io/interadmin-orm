@@ -69,6 +69,10 @@ abstract class BaseQuery
 
     public abstract function count();
 
+    public abstract function build(array $attributes = []);
+
+    public abstract function create(array $attributes = []);
+
     public function __call($method_name, $params)
     {
         if (starts_with($method_name, 'or')) {
@@ -115,6 +119,38 @@ abstract class BaseQuery
             throw new ModelNotFoundException('Unable to find first record.');
         }
         return $result;
+    }
+
+    /**
+     * Get the first record matching the attributes or instantiate it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return RecordAbstract
+     */
+    public function firstOrNew(array $attributes, array $values = [])
+    {
+        $instance = $this->where($attributes)->first();
+        if ($instance) {
+            return $instance;
+        }
+        return $this->build($attributes + $values);
+    }
+
+    /**
+     * Get the first record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return RecordAbstract
+     */
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        $instance = $this->where($attributes)->first();
+        if ($instance) {
+            return $instance;
+        }
+        return $this->create($attributes + $values);
     }
 
     /**
