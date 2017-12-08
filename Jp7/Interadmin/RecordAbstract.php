@@ -414,8 +414,8 @@ abstract class RecordAbstract
         $from = array_shift($options['from']);
         $sql = 'SELECT '.($_delete ? 'main.id' : implode(',', $options['fields'])).
             ' FROM '.$from.
-            $joins.
             ($options['from'] ? ' LEFT JOIN '.implode(' LEFT JOIN ', $options['from']) : '').
+            $joins.
             ' WHERE '.$filters.$clauses.
             ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
 
