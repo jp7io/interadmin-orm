@@ -1207,7 +1207,7 @@ class Type extends RecordAbstract
 
         $this->_resolveWildcard($options['fields'], $recordModel);
 
-        if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
+        if (count($options['fields']) != 1 || strpos($options['fields'][0] ?? '', 'COUNT(') === false) {
             $requiredFields = array_intersect(['id', 'id_tipo', 'id_slug'], $recordModel->getColumns());
             $options['fields'] = array_merge($requiredFields, (array) $options['fields']);
         }
