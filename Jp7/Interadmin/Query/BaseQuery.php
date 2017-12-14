@@ -447,8 +447,8 @@ abstract class BaseQuery
             }
             $operator = ($value ? '<>' : '=');
             $value = '';
-        } elseif (is_null($value) && $operator == '=') {
-            $operator = 'IS';
+        } elseif (is_null($value) && in_array($operator, ['=', '<>', '!='])) {
+            $operator = 'IS' . ($operator === '=' ? '' : ' NOT');
         }
 
         return $this->prefix.$column.' '.$operator.' '.$this->_escapeParam($value);
@@ -506,7 +506,7 @@ abstract class BaseQuery
     {
         $isOperator = in_array($operator, $this->operators);
 
-        return ($isOperator && $operator != '=' && is_null($value));
+        return is_null($value) && $isOperator && !in_array($operator, ['=', '<>', '!=']);
     }
 
     protected function _escapeParam($value)
