@@ -335,6 +335,9 @@ abstract class BaseQuery
         try {
             $type = $this->provider->getRelationshipData($relationship)['tipo'];
         } catch (\InvalidArgumentException $e) {
+            if ($relationship !== 'tags') {
+                throw $e;
+            }
             // Temporario para tags
             $type = $this->provider;
         }
