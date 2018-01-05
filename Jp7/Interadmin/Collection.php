@@ -9,6 +9,7 @@ class Collection extends BaseCollection
 {
     /**
      * Converts from $item->subitems to $subitem->items.
+     * @deprecated Don't extend Collection
      */
     public function flips($property, $keepItemsAs = 'items')
     {
@@ -28,16 +29,9 @@ class Collection extends BaseCollection
         return new self($subitems);
     }
 
-    public function split($parts)
-    {
-        $size = ceil(count($this) / $parts);
-        if ($size > 0) {
-            return $this->chunk($size);
-        }
-
-        return $this;
-    }
-
+    /**
+     * @deprecated Don't extend Collection
+     */
     public function jsonList($column, $key)
     {
         $array = [];
@@ -50,6 +44,17 @@ class Collection extends BaseCollection
         return $array;
     }
 
+    /**
+     * @deprecated use pluck() instead
+     */
+    public function lists($value, $key = null)
+    {
+        return $this->pluck($value, $key);
+    }
+
+    /**
+     * @deprecated Don't extend Collection
+     */
     public function radioList($column, $key)
     {
         $array = [];
@@ -61,6 +66,9 @@ class Collection extends BaseCollection
         return $array;
     }
 
+    /**
+     * @deprecated Don't extend Collection
+     */
     public function humanImplode($column, $glue, $lastGlue)
     {
         if ($items = $this->lists($column)) {
@@ -71,6 +79,9 @@ class Collection extends BaseCollection
         return $items->implode($glue);
     }
 
+    /**
+     * @deprecated Don't extend Collection
+     */
     public function keySort(\Closure $callback)
     {
         uksort($this->items, $callback);
