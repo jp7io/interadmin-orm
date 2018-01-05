@@ -375,6 +375,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return static::query();
     }
 
+    // called by FactoryBuilder
+    public function newCollection(array $models = [])
+    {
+        return new Collection($models);
+    }
+
     /**
      * @return Type
      */
