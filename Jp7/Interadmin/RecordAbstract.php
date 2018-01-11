@@ -968,6 +968,7 @@ abstract class RecordAbstract
             $fields = [$fields];
         }
         if (!is_array($fields)) {
+            $fields = (array) $fields;
             return;
         }
         $position = array_search('*', $fields);
