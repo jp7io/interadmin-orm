@@ -63,14 +63,16 @@ class TypeQuery extends BaseQuery
         if (is_array($id)) {
             throw new BadMethodCallException('Wrong argument on find(). If you´re trying to get records, use get() instead of find().');
         }
-
-        if (is_string($id) && !is_numeric($id) && $id) {
+        if (!$id) {
+            return null; // save a query
+        }
+        if (is_string($id) && !is_numeric($id)) {
             $this->options['where'][] = $this->_parseComparison('id_slug', '=', $id);
         } else {
             $this->options['where'][] = $this->_parseComparison('id_tipo', '=', $id);
         }
 
-        return $this->provider->deprecatedGetChildren($this->options)->first();
+        return $this->first();
     }
 
     public function findOrFail($id)

@@ -73,6 +73,8 @@ abstract class BaseQuery
 
     public abstract function create(array $attributes = []);
 
+    public abstract function find($id);
+
     public function __call($method_name, $params)
     {
         if (starts_with($method_name, 'or')) {
@@ -120,6 +122,22 @@ abstract class BaseQuery
         }
         return $result;
     }
+
+    /**
+     * Find a model by its primary key or return fresh model instance.
+     *
+     * @param  mixed  $id
+     * @return RecordAbstract
+     */
+    public function findOrNew($id)
+    {
+        $instance = $this->find($id);
+        if ($instance) {
+            return $instance;
+        }
+        return $this->build();
+    }
+
 
     /**
      * Get the first record matching the attributes or instantiate it.
