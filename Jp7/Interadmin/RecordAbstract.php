@@ -426,9 +426,9 @@ abstract class RecordAbstract
         try {
             if ($_delete) {
                 $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.$sql.') AS temp ON main.id = temp.id';
-                $rs = $db->delete($sql);
+                $rs = $db->delete($sql, $options['bindings'] ?? []);
             } else {
-                $rs = $db->select($sql);
+                $rs = $db->select($sql, $options['bindings'] ?? []);
             }
         } catch (\Illuminate\Database\QueryException $e) {
             $availableFields = '';
@@ -506,7 +506,7 @@ abstract class RecordAbstract
         $aliases = &$options['aliases'];
 
         $quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
-        $keyword = '\b[a-zA-Z0-9_.]+\b';
+        $keyword = ':?\b[a-zA-Z0-9_.]+\b';
         // not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
         $not_function = '(?![ ]?\()';
         $reserved = [
@@ -618,7 +618,7 @@ abstract class RecordAbstract
                 }
             }
 
-            if ($termo[0] != "'" && !is_numeric($termo) && !in_array(strtoupper($termo), $reserved)) {
+            if (!in_array($termo[0], ["'", ":"]) && !is_numeric($termo) && !in_array(strtoupper($termo), $reserved)) {
                 $len = strlen($termo);
                 $table = 'main';
                 if (strpos($termo, '.') !== false) {

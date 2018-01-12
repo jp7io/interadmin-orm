@@ -59,6 +59,7 @@ abstract class BaseQuery
             'order' => null,
             'group' => null,
             'limit' => null,
+            'bindings' => []
         ];
 
     public function __construct(RecordAbstract $provider)
@@ -437,9 +438,10 @@ abstract class BaseQuery
         $innerQuery->prefix = $relationship.'.';
 
         if (is_array($conditions)) {
-            return [$innerQuery->_whereHash($conditions)];
+            $innerQuery->_addWhere($innerQuery->_whereHash($conditions));
+            return $innerQuery->getOptionsArray()['where'];
         } elseif ($conditions instanceof \Closure) {
-            return [$innerQuery->_whereClosure($conditions)];
+            return [$innerQuery->_whereClosure($conditions)]; 
         }
         throw new \InvalidArgumentException('Invalid conditions.');
     }
@@ -535,12 +537,10 @@ abstract class BaseQuery
             }
             $value = $value->__toString();
         }
-        if (is_string($value)) {
-            $db = \DB::connection();
-            if (!$db->getPdo()) {
-                $db->reconnect();
-            }
-            $value = $db->getPdo()->quote($value);
+        if (is_string($value) && !ctype_digit($value)) {
+            $binding = ':val'.count($this->options['bindings']);
+            $this->options['bindings'][$binding] = $value;
+            $value = $binding;
         }
         if (is_null($value)) {
             $value = 'NULL';
@@ -701,9 +701,38 @@ abstract class BaseQuery
         return $this;
     }
 
-    public function getOptionsArray()
+    public function getOptionsArray($replaceBinding = true)
     {
-        return $this->options;
+        $array = $this->options;
+        if ($replaceBinding && $this->options['bindings']) { 
+            // backwards compatibility, use quote instead of bindings
+            $db = \DB::connection();
+            $pdo = $db->getPdo();
+            if (!$pdo) {
+                $db->reconnect();
+                $pdo = $db->getPdo();
+            }
+            $bindinds = array_map(function ($value) use ($pdo) {
+                return $pdo->quote($value);
+            }, $array['bindings']);
+            unset($array['bindings']);
+
+            foreach ($array['where'] as &$where) {
+                $where = $this->replaceBinding($bindinds, $where);
+            }
+            foreach ($array['joins'] ?? [] as &$join) {
+                $join = $this->replaceBinding($bindinds, $join);
+            }
+        }
+        return $array;
+    }
+
+    protected function replaceBinding($bindinds, $item)
+    {
+        foreach ($bindinds as $key => $value) {
+            $item = preg_replace('~(\s)'.$key.'\b~', '\1'.$value, $item, 1);
+        }
+        return $item;
     }
 
     public function with($_)

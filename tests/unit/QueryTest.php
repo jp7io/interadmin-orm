@@ -28,6 +28,11 @@ class QueryTest extends \Codeception\Test\Unit
         $userQueryShouldFail = Test_User::where('varchar_key', '=', 'blablabla')->get();
         $this->assertEmpty($userQueryShouldFail);
 
+        $this->assertEquals(
+            "varchar_key = 'blablabla'",
+            Test_User::where('varchar_key', '=', 'blablabla')->getOptionsArray()['where'][0]
+        );
+
         $userCompositeQuery = Test_User::where('varchar_key', '=', $newUser->username)
             ->where('char_key', '=', 'S')
             ->first();
