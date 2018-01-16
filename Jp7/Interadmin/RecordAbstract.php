@@ -355,6 +355,9 @@ abstract class RecordAbstract
         if (!is_array($options['where'])) {
             $options['where'] = (array) $options['where'];
         }
+        if (!is_array($options['bindings'])) {
+            $options['bindings'] = [];
+        }
         $options['where'] = implode(' AND ', $options['where']);
         if (!is_array($options['fields'])) {
             $options['fields'] = (array) $options['fields'];
@@ -426,16 +429,18 @@ abstract class RecordAbstract
         try {
             if ($_delete) {
                 $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.$sql.') AS temp ON main.id = temp.id';
-                $rs = $db->delete($sql, $options['bindings'] ?? []);
+                $rs = $db->delete($sql, $options['bindings']);
             } else {
-                $rs = $db->select($sql, $options['bindings'] ?? []);
+                $rs = $db->select($sql, $options['bindings']);
             }
         } catch (\Illuminate\Database\QueryException $e) {
-            $availableFields = '';
-            if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
-                $availableFields .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
+            foreach ($options['bindings'] as $binding => $value) {
+                $sql = Str::replaceFirst($binding, "'$value'", $sql);
             }
-            throw new \Illuminate\Database\QueryException($sql.$availableFields, $e->getBindings(), $e);
+            if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
+                $sql .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
+            }
+            throw new \Illuminate\Database\QueryException($sql, $options['bindings'], $e->getPrevious());
         }
 
         if ($APP_DEBUG) {
