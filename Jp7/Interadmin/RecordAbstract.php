@@ -355,7 +355,7 @@ abstract class RecordAbstract
         if (!is_array($options['where'])) {
             $options['where'] = (array) $options['where'];
         }
-        if (!is_array($options['bindings'])) {
+        if (!array_key_exists('bindings', $options)) {
             $options['bindings'] = [];
         }
         $options['where'] = implode(' AND ', $options['where']);
