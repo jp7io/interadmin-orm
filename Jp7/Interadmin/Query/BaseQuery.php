@@ -705,34 +705,15 @@ abstract class BaseQuery
     {
         $array = $this->options;
         if ($replaceBinding && $this->options['bindings']) { 
-            // backwards compatibility, use quote instead of bindings
-            $db = \DB::connection();
-            $pdo = $db->getPdo();
-            if (!$pdo) {
-                $db->reconnect();
-                $pdo = $db->getPdo();
-            }
-            $bindinds = array_map(function ($value) use ($pdo) {
-                return $pdo->quote($value);
-            }, $array['bindings']);
-            unset($array['bindings']);
-
             foreach ($array['where'] as &$where) {
-                $where = $this->replaceBinding($bindinds, $where);
+                $where = RecordAbstract::replaceBindings($array['bindings'], $where);
             }
             foreach ($array['joins'] ?? [] as &$join) {
-                $join = $this->replaceBinding($bindinds, $join);
+                $join = RecordAbstract::replaceBindings($array['bindings'], $join);
             }
+            unset($array['bindings']);
         }
         return $array;
-    }
-
-    protected function replaceBinding($bindinds, $item)
-    {
-        foreach ($bindinds as $key => $value) {
-            $item = preg_replace('~(\s)'.$key.'\b~', '\1'.$value, $item, 1);
-        }
-        return $item;
     }
 
     public function with($_)

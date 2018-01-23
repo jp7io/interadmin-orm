@@ -434,9 +434,7 @@ abstract class RecordAbstract
                 $rs = $db->select($sql, $options['bindings']);
             }
         } catch (\Illuminate\Database\QueryException $e) {
-            foreach ($options['bindings'] as $binding => $value) {
-                $sql = Str::replaceFirst($binding, "'$value'", $sql);
-            }
+            $sql = self::replaceBindings($options['bindings'], $sql);
             if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
                 $sql .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
             }
@@ -444,12 +442,16 @@ abstract class RecordAbstract
         }
 
         if ($APP_DEBUG) {
-            $this->_debugQuery($sql, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10), $startQuery);
+            $this->_debugQuery(
+                self::replaceBindings($options['bindings'], $sql),
+                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10), 
+                $startQuery
+            );
         }
 
         if (!empty($options['debug'])) {
             // $time = $debugger->getTime($options['debug']);
-            echo SqlFormatter::format($sql);
+            echo SqlFormatter::format(self::replaceBindings($options['bindings'], $sql));
         }
         // $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
         return $rs;
@@ -1151,5 +1153,27 @@ abstract class RecordAbstract
     public static function reguard()
     {
         static::$unguarded = false;
+    }
+
+    public static function replaceBindings($bindinds, $sql)
+    {
+        // backwards compatibility, use quote instead of bindings
+        $db = \DB::connection();
+        $pdo = $db->getPdo();
+        if (!$pdo) {
+            $db->reconnect();
+            $pdo = $db->getPdo();
+        }
+        foreach ($bindinds as $key => $value) {
+            $sql = preg_replace_callback(
+                '~(\s)'.$key.'\b~', // pattern
+                function ($matches) use ($pdo, $value) { // callback
+                    return $matches[1].$pdo->quote($value);
+                }, 
+                $sql, // subject
+                1 // limit
+            );
+        }
+        return $sql;
     }
 }
