@@ -9,16 +9,18 @@
 
 InterAdmin ORM. Before version 3.2 it was a part of [jp7internet/classes](https://github.com/jp7internet/classes).
 
-The API is heavily inspired by Laravel Eloquent and most methods are available here too: https://laravel.com/docs/5.3/eloquent
+The API is heavily inspired by Laravel Eloquent, most methods and arguments are exactly the same.
 
 * [CHANGELOG](CHANGELOG.md)
 
 ## Docs
 
-* https://wiki.jp7.com.br:81/jp7/ORM
-* https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
 * [Extending Record and Type](https://github.com/jp7internet/interadmin-orm/wiki/Extending-Record-and-Type)
 * [Query](https://github.com/jp7internet/interadmin-orm/wiki/Query)
+* External:
+  * https://wiki.jp7.com.br:81/jp7/ORM
+  * https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
+  * https://laravel.com/docs/5.3/eloquent  
 
 ## Sample code
 
