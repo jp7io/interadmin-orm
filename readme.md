@@ -27,15 +27,13 @@ The API is heavily inspired by Laravel Eloquent and most methods are available h
 
 ## Mass Assignment
 
-Ao usar create($array) ou fill($array), os campos somente serão preenchidos se estiverem na whitelist fornecida pelo método getFillable().
+Just like Laravel Eloquent, the create($array) and fill($array) methods can only receive attributes listed on getFillable() - whitelisted attributes.
 
-### getFillable
-
-* O método getFillable() só retorna os campos que estiverem com 'form' marcado no InterAdmin.
+* getFillable() - by default returns the fields checked as 'form' on InterAdmin.
 
 ### unguard e reguard
 
-* É possível desativar temporariamente a proteção de mass assignment:
+* You can temporarily disable mass assignment protection:
 
 ```php
 \Jp7\Interadmin\Record::unguard();
@@ -44,7 +42,6 @@ Classe::create(['idade' => 12, 'nome' => 'teste']);
 
 \Jp7\Interadmin\Record::reguard();
 ```
-
 
 
 ## Tests
