@@ -7,7 +7,7 @@
 
 ## Description
 
-InterAdmin ORM.
+InterAdmin ORM. Before version 3.2 it was a part of [jp7internet/classes](https://github.com/jp7internet/classes).
 
 * [CHANGELOG](CHANGELOG.md)
 
