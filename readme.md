@@ -26,9 +26,7 @@ Just like Laravel Eloquent, the create($array) and fill($array) methods can only
 
 * getFillable() - by default returns the fields checked as 'form' on InterAdmin.
 
-### unguard e reguard
-
-* You can temporarily disable mass assignment protection:
+You can temporarily disable mass assignment protection:
 
 ```php
 \Jp7\Interadmin\Record::unguard();
