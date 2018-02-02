@@ -17,7 +17,7 @@ The API is heavily inspired by Laravel Eloquent and most methods are available h
 
 * https://wiki.jp7.com.br:81/jp7/ORM
 * https://wiki.jp7.com.br:81/jp7/ORM:Query
-* [Extending a Type](https://github.com/jp7internet/interadmin-orm/wiki/Extending-a-Type)
+* [Extending Record and Type](https://github.com/jp7internet/interadmin-orm/wiki/Extending-Record-and-Type)
 * https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
 
 ## Mass Assignment
