@@ -17,7 +17,6 @@ The API is heavily inspired by Laravel Eloquent and most methods are available h
 
 * https://wiki.jp7.com.br:81/jp7/ORM
 * https://wiki.jp7.com.br:81/jp7/ORM:Query
-* https://wiki.jp7.com.br:81/jp7/ORM:Mass_Assignment
 * [Extending a Type](https://github.com/jp7internet/interadmin-orm/wiki/Extending-a-Type)
 * https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
 
@@ -25,6 +24,28 @@ The API is heavily inspired by Laravel Eloquent and most methods are available h
 
 * https://wiki.jp7.com.br:81/jp7/index.php?title=ORM&oldid=4164
 * https://wiki.jp7.com.br:81/jp7/index.php?title=ORM:Query&oldid=4274
+
+## Mass Assignment
+
+Ao usar create($array) ou fill($array), os campos somente serão preenchidos se estiverem na whitelist fornecida pelo método getFillable().
+
+### getFillable
+
+* O método getFillable() só retorna os campos que estiverem com 'form' marcado no InterAdmin.
+
+### unguard e reguard
+
+* É possível desativar temporariamente a proteção de mass assignment:
+
+```php
+\Jp7\Interadmin\Record::unguard();
+
+Classe::create(['idade' => 12, 'nome' => 'teste']);
+
+\Jp7\Interadmin\Record::reguard();
+```
+
+
 
 ## Tests
 
