@@ -13,17 +13,12 @@ The API is heavily inspired by Laravel Eloquent and most methods are available h
 
 * [CHANGELOG](CHANGELOG.md)
 
-## Docs v3.*
+## Docs
 
 * https://wiki.jp7.com.br:81/jp7/ORM
 * https://wiki.jp7.com.br:81/jp7/ORM:Query
 * [Extending a Type](https://github.com/jp7internet/interadmin-orm/wiki/Extending-a-Type)
 * https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
-
-## Docs v2.*
-
-* https://wiki.jp7.com.br:81/jp7/index.php?title=ORM&oldid=4164
-* https://wiki.jp7.com.br:81/jp7/index.php?title=ORM:Query&oldid=4274
 
 ## Mass Assignment
 
@@ -42,6 +37,12 @@ Classe::create(['idade' => 12, 'nome' => 'teste']);
 
 \Jp7\Interadmin\Record::reguard();
 ```
+
+
+## Docs for v2.* versions
+
+* https://wiki.jp7.com.br:81/jp7/index.php?title=ORM&oldid=4164
+* https://wiki.jp7.com.br:81/jp7/index.php?title=ORM:Query&oldid=4274
 
 
 ## Tests
