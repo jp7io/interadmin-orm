@@ -1,3 +1,11 @@
+## 3.3
+* UNDER DEVELOPMENT
+* getParent() on Record will not change the Record's Type `_parent` property anymore. This side-effect might have been relied upon on code written bettwen versions 1.0 to 2.0
+* Several improvements for eager loading and performance
+* Custom Joins order changed. It was before the automatic joins, now it's after them.
+* Removed Collection->split() to use Laravel 5.3 original method. If your project is Laravel 5.2, make sure you're not using this method
+* Use SQL bind by default instead of quote. Improve security by using the proper mechanism to avoid SQL injection. Calls to getOptionsArray() convert back to quoted and should be avoided.
+
 ## 3.2
 * Split into 3 packages: classes, classes-deprecated and interadmin-orm
 
