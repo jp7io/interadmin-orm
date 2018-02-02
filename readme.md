@@ -9,6 +9,8 @@
 
 InterAdmin ORM. Before version 3.2 it was a part of [jp7internet/classes](https://github.com/jp7internet/classes).
 
+The API is heavily inspired by Laravel Eloquent and most methods are available here too: https://laravel.com/docs/5.3/eloquent
+
 * [CHANGELOG](CHANGELOG.md)
 
 ## Docs v3.*
