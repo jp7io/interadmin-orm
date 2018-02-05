@@ -69,6 +69,13 @@ class Type extends RecordAbstract
     protected $_interadminAliases = [];
 
     /**
+     * Cached relationships.
+     *
+     * @var array
+     */
+    protected $_interadminRelationships;
+
+    /**
      * Construct.
      *
      * @param int $id_tipo [optional] This record's 'id_tipo'.
@@ -578,50 +585,53 @@ class Type extends RecordAbstract
 
     public function getRelationships()
     {
-        // getCampoTipo might be different for each class
-        $cacheKey = static::class.','.$this->getCacheKey('relationships');
-        return self::getCacheRepository()->remember($cacheKey, 5, function () {
-            $relationships = [];
+        if ($this->_interadminRelationships === null) {
+            // getCampoTipo might be different for each class
+            $cacheKey = static::class.','.$this->getCacheKey('relationships');
+            $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, 5, function () {
+                $relationships = [];
 
-            foreach ($this->getCampos() as $campo => $array) {
-                if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
-                    continue;
+                foreach ($this->getCampos() as $campo => $array) {
+                    if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
+                        continue;
+                    }
+                    if (strpos($campo, 'select_') === 0) {
+                        $multi = strpos($campo, 'select_multi_') === 0;
+                        $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
+                        if ($multi) {
+                            $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
+                        } else {
+                            $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                        }
+                        $relationships[$relation] = [
+                            'query' => $hasType ? $array['nome'] : $array['nome']->records(),
+                            'type' => $hasType,
+                            'multi' => $multi,
+                        ];
+                    } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
+                        $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
+                        $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
+                        if ($multi) {
+                            $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
+                        } else {
+                            $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                        }
+                        if ($specialTipo = $this->getCampoTipo($array)) {
+                            $query = $specialTipo->records();
+                        } else {
+                            $query = new TypelessQuery(static::getInstance(0));
+                        }
+                        $relationships[$relation] = [
+                            'query' => $query,
+                            'type' => $hasType,
+                            'multi' => $multi,
+                        ];
+                    }
                 }
-                if (strpos($campo, 'select_') === 0) {
-                    $multi = strpos($campo, 'select_multi_') === 0;
-                    $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
-                    if ($multi) {
-                        $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
-                    } else {
-                        $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
-                    }
-                    $relationships[$relation] = [
-                        'query' => $hasType ? $array['nome'] : $array['nome']->records(),
-                        'type' => $hasType,
-                        'multi' => $multi,
-                    ];
-                } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
-                    $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
-                    $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
-                    if ($multi) {
-                        $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
-                    } else {
-                        $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
-                    }
-                    if ($specialTipo = $this->getCampoTipo($array)) {
-                        $query = $specialTipo->records();
-                    } else {
-                        $query = new TypelessQuery(static::getInstance(0));
-                    }
-                    $relationships[$relation] = [
-                        'query' => $query,
-                        'type' => $hasType,
-                        'multi' => $multi,
-                    ];
-                }
-            }
-            return $relationships;
-        });
+                return $relationships;
+            });
+        }
+        return $this->_interadminRelationships;
     }
 
     /**
