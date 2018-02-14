@@ -24,35 +24,56 @@ class BaseClassMap
 
     protected static function prepareMap($attr)
     {
-        $tipos = DB::table('tipos')
-            ->select($attr, 'id_tipo', 'inherited')
-            ->where($attr, '<>', '')
-            ->where('deleted_tipo', '=', '')
-            ->where('mostrar', '<>', '')
-            ->orderByRaw("inherited LIKE '%".$attr."%'")
-            ->get();
-
         $arr = [];
-        foreach ($tipos as $tipo) {
-            if (config('interadmin.psr-4')) {
-                $arr[$tipo->id_tipo] = str_replace('_', '\\', $tipo->$attr);
-            } else {
-                $arr[$tipo->id_tipo] = $tipo->$attr;
+        try {
+            $tipos = DB::table('tipos')
+                ->select($attr, 'id_tipo', 'inherited')
+                ->where($attr, '<>', '')
+                ->where('deleted_tipo', '=', '')
+                ->where('mostrar', '<>', '')
+                ->orderByRaw("inherited LIKE '%".$attr."%'")
+                ->get();
+
+            foreach ($tipos as $tipo) {
+                if (config('interadmin.psr-4')) {
+                    $arr[$tipo->id_tipo] = str_replace('_', '\\', $tipo->$attr);
+                } else {
+                    $arr[$tipo->id_tipo] = $tipo->$attr;
+                }
             }
+        } catch (\PDOException $e) {
+            $message = "InterAdmin database not connected";
+            if (!\App::runningInConsole()) {
+                throw new DbNotConnectedException($message, 0, $e);
+            }
+            // Exception is not thrown because artisan commands would stop working
+            \Log::error($e);
+            echo '[Skipped ClassMap] '.$message.PHP_EOL;
         }
         return $arr;
     }
 
     public function clearCache()
     {
+        static::$classes = null;
         Cache::forget(static::CACHE_KEY);
     }
 
     public function getClasses()
     {
-        return Cache::remember(static::CACHE_KEY, 5, function () {
-            return static::prepareMap(static::CLASS_ATTRIBUTE);
-        });
+        if (static::$classes === null) {
+            // check cache first
+            static::$classes = Cache::get(static::CACHE_KEY);
+            if (!static::$classes) {
+                // not cached: call method
+                static::$classes = static::prepareMap(static::CLASS_ATTRIBUTE);
+                if (static::$classes) {
+                    // only cache if it has classes
+                    Cache::put(static::CACHE_KEY, static::$classes, 5);
+                }
+            }
+        }
+        return static::$classes;
     }
 
     /**
