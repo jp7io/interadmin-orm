@@ -57,14 +57,17 @@ class Log extends RecordAbstract
 
     public function &__get($name)
     {
+        $value = null;
         if (isset($this->attributes[$name])) {
-            return $this->attributes[$name];
+            $value = $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $this->loadAttributes($this->getAttributesNames(), false);
-            return $this->attributes[$name];
+            $value = $this->attributes[$name];
         }
-
-        return $null; // Needs to be variable to be returned as reference
+        if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
+            $value = $this->getMutatedAttribute($name, $value);
+        }
+        return $value;
     }
 
     /**

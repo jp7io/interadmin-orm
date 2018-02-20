@@ -48,10 +48,14 @@ abstract class RecordAbstract
      */
     public function &__get($name)
     {
-        if (array_key_exists($name, $this->attributes)) {
-            return $this->attributes[$name];
-        }
         $value = null;
+        if (array_key_exists($name, $this->attributes)) {
+            $value = $this->attributes[$name];
+            if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
+                $value = $this->getMutatedAttribute($name, $value);
+            }
+            return $value;
+        }    
         // Mutators
         $mutator = 'get'.Str::studly($name).'Attribute';
         if (method_exists($this, $mutator)) {
