@@ -184,7 +184,7 @@ abstract class RecordAbstract
                     }
                 }
                 $className = $fileClassName[static::DEFAULT_NAMESPACE];
-                $file = new $className($value);
+                $file = new $className($value, $this->{$name.'_text'});
                 $file->setParent($this);
                 return $file;
             }
