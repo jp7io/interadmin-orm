@@ -87,8 +87,9 @@ class Type extends RecordAbstract
 
     public function &__get($name)
     {
+        $value = null;
         if (array_key_exists($name, $this->attributes)) {
-            return $this->attributes[$name];
+            $value = $this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $this->attributes += $this->getCache('attributes', function () {
                 return (array) $this->getDb()
@@ -96,10 +97,14 @@ class Type extends RecordAbstract
                     ->where('id_tipo', $this->id_tipo)
                     ->first();
             });
-            return $this->attributes[$name];
+            if (array_key_exists($name, $this->attributes)) {
+                $value = $this->attributes[$name];    
+            }            
         }
-
-        return $null; // Needs to be variable to be returned as reference
+        if (strpos($name, 'date_') === 0 /*|| strpos($name, 'file_') === 0*/) {
+            $value = $this->getMutatedAttribute($name, $value);
+        }
+        return $value;
     }
 
     public function __call($methodName, $args)

@@ -167,25 +167,27 @@ abstract class RecordAbstract
      */
     protected function getMutatedAttribute($name, $value)
     {
-        if (strpos($name, 'date_') === 0) {
-           return new \Date($value);
-        }
-        if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
-            static $fileClassName = [];
-            if (!isset($fileClassName[static::DEFAULT_NAMESPACE])) {
-                if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
-                    $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'InterAdminFieldFile';
-                } else {
-                    $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'FileField';
-                }
-                if (!class_exists($fileClassName[static::DEFAULT_NAMESPACE])) {
-                    $fileClassName[static::DEFAULT_NAMESPACE] = 'Jp7\\Interadmin\\FileField';
-                }
+        if (is_string($value)) {
+            if (strpos($name, 'date_') === 0) {
+               return new \Date($value);
             }
-            $className = $fileClassName[static::DEFAULT_NAMESPACE];
-            $file = new $className($value);
-            $file->setParent($this);
-            return $file;
+            if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
+                static $fileClassName = [];
+                if (!isset($fileClassName[static::DEFAULT_NAMESPACE])) {
+                    if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
+                        $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'InterAdminFieldFile';
+                    } else {
+                        $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'FileField';
+                    }
+                    if (!class_exists($fileClassName[static::DEFAULT_NAMESPACE])) {
+                        $fileClassName[static::DEFAULT_NAMESPACE] = 'Jp7\\Interadmin\\FileField';
+                    }
+                }
+                $className = $fileClassName[static::DEFAULT_NAMESPACE];
+                $file = new $className($value);
+                $file->setParent($this);
+                return $file;
+            }
         }
         return $value;
     }
@@ -907,18 +909,14 @@ abstract class RecordAbstract
         $attributes = &$object->attributes;
 
         foreach ($row as $key => $value) {
-            $parts = explode('.', $key);
-            if (count($parts) == 1) {
-                list($table, $field) = ['main', $parts[0]];
+            if (strpos($key, '.') === false) {
+                $table = 'main';
+                $field = $key;
             } else {
-                list($table, $field) = $parts;
+                list($table, $field) = explode('.', $key); // $table might be 'main'?
             }
-            if ($table == 'main') {
-                if (isset($attributes[$field]) && is_object($attributes[$field])) {
-                    throw new UnexpectedValueException('relations and attributes are separate things now');
-                    continue;
-                }
-                $attributes[$field] = $object->getMutatedAttribute($field, $value);
+            if ($table === 'main') {
+                $attributes[$field] = $value;
                 /*
                 if (!empty($options['select_multi_fields'])) {
                     if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
@@ -958,7 +956,7 @@ abstract class RecordAbstract
                     }
                 }
                 if ($loaded) {
-                    $loaded->attributes[$field] = $loaded->getMutatedAttribute($field, $value);
+                    $loaded->attributes[$field] = $value;
                 }
             }
         }

@@ -108,6 +108,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // Attributes
         if (array_key_exists($name, $this->attributes)) {
             $value = &$this->attributes[$name];
+            if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
+                $value = $this->getMutatedAttribute($name, $value);
+            }
             return $value;
         }
         // Mutators
@@ -123,6 +126,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($column !== false && array_key_exists($column, $this->attributes)) {
             // column is present, alias requested
             $value = &$this->attributes[$column];
+            if (strpos($column, 'date_') === 0 || strpos($column, 'file_') === 0) {
+                $value = $this->getMutatedAttribute($column, $value);
+            }
             return $value;
         }
         // FIXME remove when old code is validated
@@ -160,9 +166,6 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 }
                 $name = $column;
             }
-        }
-        if (is_string($value)) {
-            $value = $this->getMutatedAttribute($name, $value);
         }
         $this->attributes[$name] = $value;
     }
