@@ -336,7 +336,7 @@ class Type extends RecordAbstract
         }
 
         // // $rs->Close();
-        return new Collection($records);
+        return $options['model']->newCollection($records);
     }
 
     public function deprecated_distinct($column, $options = [])

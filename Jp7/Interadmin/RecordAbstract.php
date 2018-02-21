@@ -465,23 +465,29 @@ abstract class RecordAbstract
 
     private function _debugQuery($sql, $trace, $startQuery)
     {
+        //$sql = explode('FROM ', str_replace(self::getPublishedFilters('registros', 'main'), '/* ... */ ', $sql))[1];
         $ms = function ($start) {
             return number_format((microtime(true)-$start)*1000).'ms';
         };
-        $i = 0;
         $caller = '';
-        while (isset($trace[$i]) && (empty($trace[$i]['file']) || str_contains($trace[$i]['file'], '/vendor/'))) {
-            $i++;
+        foreach ($trace as $item) {
+            if (!empty($item['file']) && !str_contains($item['file'], '/vendor/')) {
+                $caller = str_replace(base_path(), '', $item['file']).':'.$item['line'];
+                break;
+            }
         }
-        if (isset($trace[$i]['file'])) {
-            $caller = PHP_EOL.'/* '.str_replace(base_path(), '', $trace[$i]['file']).'@'.$trace[$i]['line'].
-                ' - '.$ms($startQuery).' */';
-        }
+        $callee = '';
+        //foreach (array_reverse($trace) as $item) {
+        //    if (!empty($item['class']) && starts_with($item['class'], 'Jp7\Interadmin\Query') && $item['function'] !== '__call') {
+        //        $callee = str_replace('Jp7\\Interadmin\\', '', $item['class']).'@'.$item['function'];
+        //        break;
+        //    }
+        //}
         if (!isset($GLOBALS['__queries'])) {
             $GLOBALS['__queries'] = 0;
         }
         $GLOBALS['__queries']++;
-        \Log::debug($sql.$caller);
+        \Log::debug($sql.PHP_EOL.'/* '.$caller.' - '.$ms($startQuery).' - '.$callee.' */');
     }
 
     /**
