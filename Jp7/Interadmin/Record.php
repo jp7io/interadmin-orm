@@ -2,6 +2,7 @@
 
 namespace Jp7\Interadmin;
 
+use Jp7\CollectionUtil;
 use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -79,6 +80,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      * @var bool
      */
     protected static $lazy_loading_debug = false;
+
+    protected static $lazy_loading_optimizer = true;
+
+    protected static $_collections = [];
+
+    protected $_collection_id;
     /**
      * Public Constructor.
      *
@@ -300,9 +307,6 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             }
             if ($loaded->fks != $fks) {
                 // stale data or not loaded
-                if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
-                    $this->_debugLazyLoading('N+1 query: Loading relation', $name, debug_backtrace(false, 2)[1]);
-                }
                 $loaded->fks = $fks;
                 $fksArray = is_array($fks) ? $fks : array_filter(explode(',', $fks));
                 if ($data['type']) {
@@ -311,7 +315,15 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                         $multi[] = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     }
                     $loaded->values = $multi;
+                } elseif ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
+                    // Optimize lazy loading
+                    unset($this->relations[$name]);
+                    CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                    $loaded = &$this->relations[$name];
                 } else {
+                    if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
+                        $this->_debugLazyLoading('N+1 query: Loading relation', $name, debug_backtrace(false, 2)[1]);
+                    }
                     $query = clone $data['query'];
                     $loaded->values = $query->findMany($fksArray);
                 }
@@ -327,12 +339,17 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $loaded = &$this->relations[$name];
         if (!$keyExists || ($keyExists && $loaded && $loaded->id != $fk)) {
             /// stale data or not loaded
-            if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
-                $this->_debugLazyLoading('N+1 query: Loading relation', $name, debug_backtrace(false, 2)[1]);
-            }
             if ($data['type']) {
                 $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
+            } elseif ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
+                // Optimize lazy loading
+                unset($this->relations[$name]);
+                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                $loaded = &$this->relations[$name];
             } else {
+                if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
+                    $this->_debugLazyLoading('N+1 query: Loading relation', $name, debug_backtrace(false, 2)[1]);
+                }
                 $query = clone $data['query'];
                 $loaded = $query->find($fk);
             }
@@ -381,7 +398,19 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     // called by FactoryBuilder
     public function newCollection(array $models = [])
     {
-        return new Collection($models);
+        $collection = new Collection($models);
+        if (self::$lazy_loading_optimizer && count($models) > 2) {
+            $collection_id = microtime();
+            self::$_collections[$collection_id] = $collection;
+            foreach ($models as $record) {
+                $record->_collection_id = $collection_id;
+            }
+            if (count(self::$_collections) > 50) {
+                // don't increase memory too much
+                array_splice(self::$_collections, 0, 10);
+            }
+        }
+        return $collection;
     }
 
     /**
@@ -981,6 +1010,14 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public static function debugLazyLoading(bool $bool = true) {
         self::$lazy_loading_debug = $bool;
     }
+
+    public static function setLazyLoadingOptimizerEnabled(bool $bool) {
+        $oldValue = self::$lazy_loading_optimizer;
+        self::$lazy_loading_optimizer = $bool;
+
+        return $oldValue;
+    }
+
     public static function getTimestamp()
     {
         return isset(self::$timestamp) ? self::$timestamp : time();
