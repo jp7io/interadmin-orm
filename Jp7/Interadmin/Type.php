@@ -1345,7 +1345,7 @@ class Type extends RecordAbstract
             $records[] = $record;
         }
 
-        return new Collection($records);
+        return $options['model']->newCollection($records);
     }
 
     public function getTagFilters()

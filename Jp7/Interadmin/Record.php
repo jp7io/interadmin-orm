@@ -250,7 +250,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // children most likely
         if ($query = $this->_loadManyRelationship($name)) {
             $manyRecords = $query->get();
-            if (!array_key_exists($name, $this->relations)) {
+            if (!array_key_exists($name, $this->relations)) { // can be EagerLoaded or Query
                 $this->relations[$name] = $manyRecords;
             }
             return $manyRecords;
@@ -524,7 +524,14 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // childName() - relacionamento
         if ($child = $this->_findChild(ucfirst($name))) {
             $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-            if (isset($this->relations[$name])) {
+            if (!array_key_exists($name, $this->relations) &&
+                $this->_collection_id &&
+                array_key_exists($this->_collection_id, self::$_collections)
+            ) {
+                // Lazy loading optimizer
+                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+            }
+            if (array_key_exists($name, $this->relations)) {
                 return new EagerLoaded($childrenTipo, $this->relations[$name]);
             }
             return new Query($childrenTipo);
