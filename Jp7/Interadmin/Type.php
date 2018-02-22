@@ -59,8 +59,6 @@ class Type extends RecordAbstract
      */
     protected $_parent;
 
-    protected $_tiposUsingThisModel;
-
     /**
      * Cached aliases.
      *
@@ -244,6 +242,7 @@ class Type extends RecordAbstract
     public function deprecatedGetChildren($options = [])
     {
         $this->_whereArrayFix($options['where']); // FIXME
+        $cacheKey = __METHOD__.serialize($options);
 
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
@@ -261,7 +260,9 @@ class Type extends RecordAbstract
         $options['aliases'] = $this->getAttributesAliases();
         $options['campos'] = $this->getAttributesCampos();
 
-        $rs = $this->_executeQuery($options);
+        $rs = self::getCacheRepository()->remember($cacheKey, 5, function () use ($options) {
+            return $this->_executeQuery($options);
+        });
 
         $tipos = [];
         foreach ($rs as $row) {
@@ -911,6 +912,8 @@ class Type extends RecordAbstract
         $cache->forget($this->getCacheKey('campos_alias'));
         $cache->forget($this->getCacheKey('children'));
         $cache->forget($this->getCacheKey('order'));
+        $cache->forget($this->getCacheKey('tiposUsingThisModel'));
+
         // different values for getTipo() depending on class
         $cache->forget(static::class.','.$this->getCacheKey('relationships'));
     }
@@ -1108,7 +1111,7 @@ class Type extends RecordAbstract
      */
     public function getTiposUsingThisModel($options = [])
     {
-        if (!isset($this->_tiposUsingThisModel)) {
+        $tiposUsingThisModel = $this->getCache('tiposUsingThisModel', function () {
             $options2 = [
                 'fields' => 'id_tipo',
                 'from' => $this->getTableName().' AS main',
@@ -1119,14 +1122,14 @@ class Type extends RecordAbstract
             $rs = $this->_executeQuery($options2);
 
             $options['default_namespace'] = static::DEFAULT_NAMESPACE;
-            $this->_tiposUsingThisModel = [];
+            $tiposUsingThisModel = [];
             foreach ($rs as $row) {
-                $this->_tiposUsingThisModel[$row->id_tipo] = Type::getInstance($row->id_tipo, $options);
+                $tiposUsingThisModel[$row->id_tipo] = Type::getInstance($row->id_tipo, $options);
             }
-            $this->_tiposUsingThisModel[$this->id_tipo] = $this;
-        }
-
-        return $this->_tiposUsingThisModel;
+            return $tiposUsingThisModel;
+        });
+        $tiposUsingThisModel[$this->id_tipo] = $this;
+        return $tiposUsingThisModel;
     }
     /**
      * Retrieves the first Type from the database.
@@ -1327,9 +1330,13 @@ class Type extends RecordAbstract
 
         $rs = $this->_executeQuery($options);
         $records = [];
+        $types = [];
         foreach ($rs as $row) {
             if (isset($row->id_tipo)) {
-                $type = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
+                if (empty($types[$row->id_tipo])) {
+                    $types[$row->id_tipo] = Type::getInstance($row->id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
+                }
+                $type = $types[$row->id_tipo];
             } else {
                 $type = $this;
             }
