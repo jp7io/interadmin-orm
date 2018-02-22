@@ -937,7 +937,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $aliases = $this->_aliases;
         foreach ($this->attributes as $column => $value) {
             $alias = isset($aliases[$column]) ? $aliases[$column] : $column;
-            $return[$alias] = $value;
+            $return[$alias] = $this->getMutatedAttribute($column, $value);
         }
         return $return;
     }
