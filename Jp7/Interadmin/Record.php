@@ -275,7 +275,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $attributes[] = $name;
         }
         $this->loadAttributes($attributes);
-
+        if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
+            $this->attributes[$name] = $this->getMutatedAttribute($name, $this->attributes[$name]);
+        }
         return $this->attributes[$name];
     }
 
