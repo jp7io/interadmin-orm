@@ -4,7 +4,7 @@ namespace Jp7\Interadmin;
 
 use BadMethodCallException;
 
-class EagerLoaded extends Query
+class EagerLoadedQuery extends Query
 {
     protected $data;
     protected $type;

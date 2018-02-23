@@ -249,8 +249,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
         // children most likely
         if ($query = $this->_loadManyRelationship($name)) {
-            $manyRecords = $query->get();
-            if (!array_key_exists($name, $this->relations)) { // can be EagerLoaded or Query
+            $manyRecords = $query->get(); // EagerLoadedQuery or Query
+            if (!array_key_exists($name, $this->relations)) { // if EagerLoadedQuery, don't overwrite
                 $this->relations[$name] = $manyRecords;
             }
             return $manyRecords;
