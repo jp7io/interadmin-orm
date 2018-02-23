@@ -5,6 +5,7 @@ namespace Jp7\Interadmin;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Str;
+use Illuminate\Database\QueryException;
 use Jp7\CollectionUtil;
 use Jp7\TryMethod;
 use Exception;
@@ -397,8 +398,9 @@ abstract class RecordAbstract
             }
         }
 
-        $joins = '';
+        $from = array_shift($options['from']); // main table
         if (isset($options['joins']) && $options['joins']) {
+            $pre_joins = $options['pre_joins'] ?? [];
             foreach ($options['joins'] as $alias => $join) {
                 @list($joinType, $tipo, $on, $typeless) = $join;
                 if ($tipo === Type::class) {
@@ -406,12 +408,22 @@ abstract class RecordAbstract
                 } else {
                 $table = $tipo->getInterAdminsTableName();
                 }
-                $joins .= ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
+                $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
                     ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
                 if (!$typeless) {
-                    $joins .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
+                    $joinSql .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
                 }
-                $joins .= $this->_resolveSql($on, $options, $use_published_filters);
+                $preIndex = count($options['from']);
+                $joinSql .= $this->_resolveSql($on, $options, $use_published_filters);
+                if (isset($pre_joins[$alias])) {
+                    $after = array_splice($options['from'], $preIndex);
+                    // it's on pre_join so it's a dependency for some FROM join
+                    array_unshift($options['from'], $joinSql);
+                    // it was inserted after, so it's a dependency
+                    $options['from'] = array_merge($after, $options['from']);
+                } else {
+                    $options['from'][] = $joinSql;
+                }
             }
         }
 
@@ -420,13 +432,11 @@ abstract class RecordAbstract
         }
 
         // Sql
-        $from = array_shift($options['from']);
         $sql = 'SELECT '.($_delete ? 'main.id' : implode(',', $options['fields'])).
             ' FROM '.$from.
-            ($options['from'] ? ' LEFT JOIN '.implode(' LEFT JOIN ', $options['from']) : '').
-            $joins.
+            ($options['from'] ? implode('', $options['from']) : '').
             ' WHERE '.$filters.$clauses.
-            ((!empty($options['limit'])) ? ' LIMIT '.$options['limit'] : '');
+            (!empty($options['limit']) ? ' LIMIT '.$options['limit'] : '');
 
         if ($APP_DEBUG) {
             $startQuery = microtime(true);
@@ -439,12 +449,12 @@ abstract class RecordAbstract
             } else {
                 $rs = $db->select($sql, $options['bindings']);
             }
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             $sql = self::replaceBindings($options['bindings'], $sql);
             if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
                 $sql .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
             }
-            throw new \Illuminate\Database\QueryException($sql, $options['bindings'], $e->getPrevious());
+            throw new QueryException($sql, $options['bindings'], $e->getPrevious());
         }
 
         if ($APP_DEBUG) {
@@ -662,7 +672,7 @@ abstract class RecordAbstract
 
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
-                            $options['from'][] = $joinTipo->getInterAdminsTableName().
+                            $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
                                 ' AS '.$table.' ON '.$table.'.parent_id = main.id'.
                                 ' AND '.$table.'.id_tipo = '.$joinTipo->id_tipo;
 
@@ -674,7 +684,7 @@ abstract class RecordAbstract
                     } elseif ($table == 'tags') {
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
-                            $options['from'][] = $this->getDb()->getTablePrefix().'tags AS '.$table.
+                            $options['from'][] = ' LEFT JOIN '.$this->getDb()->getTablePrefix().'tags AS '.$table.
                                 ' ON '.$table.'.parent_id = main.id';
 
                             $options['auto_group_flag'] = true;
@@ -684,6 +694,9 @@ abstract class RecordAbstract
                         $joinNome = isset($aliases[$table]) ? $aliases[$table] : $table;
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (isset($options['joins'][$table])) {
+                            if ($subtermo) {
+                                $options['pre_joins'][$table] = true;
+                            }
                             $joinTipo = $options['joins'][$table][1];
                         // Joins de select
                         } elseif (isset($aliases[$joinNome.'_id']) && isset($campos[$aliases[$joinNome.'_id']])) {
@@ -715,7 +728,7 @@ abstract class RecordAbstract
                                 }, $relationshipData['conditions']);
 
                                 $options['from_alias'][] = $table;
-                                $options['from'][] = $joinTipo->getInterAdminsTableName().
+                                $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
                                     ' AS '.$table.' ON '.implode(' AND ', $conditions).
                                     ' AND '.$table.'.id_tipo = '.$joinTipo->id_tipo;
 
@@ -741,7 +754,7 @@ abstract class RecordAbstract
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (!in_array($subtable, $options['from_alias'])) {
                             $options['from_alias'][] = $subtable;
-                            $options['from'][] = $subJoinTipo->getInterAdminsTableName().
+                            $options['from'][] = ' LEFT JOIN '.$subJoinTipo->getInterAdminsTableName().
                                 ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$termo].
                                 ' AND '.$subtable.'.id_tipo = '.$subJoinTipo->id_tipo;
                         }
@@ -886,7 +899,7 @@ abstract class RecordAbstract
         $xtra = $campo['xtra'];
         $isMulti = strpos($column, 'select_multi_') === 0 || in_array($xtra, FieldUtil::getSpecialMultiXtras());
         if (in_array($xtra, FieldUtil::getSelectTipoXtras()) || in_array($xtra, FieldUtil::getSpecialTipoXtras())) {
-            $options['from'][] = $joinTipo->getTableName().
+            $options['from'][] = ' LEFT JOIN '.$joinTipo->getTableName().
                 ' AS '.$alias.' ON '.
                 ($isMulti ?
                     'FIND_IN_SET('.$alias.'.id_tipo, '.$table.'.'.$column.')' :
@@ -895,7 +908,7 @@ abstract class RecordAbstract
 
             return 'tipo';
         } else {
-            $options['from'][] = $joinTipo->getInterAdminsTableName().
+            $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
                 ' AS '.$alias.' ON '.
                 ($isMulti ?
                     'FIND_IN_SET('.$alias.'.id, '.$table.'.'.$column.')' :
