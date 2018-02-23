@@ -43,6 +43,7 @@ class DB extends Illuminate\Support\Facades\DB
                 'collation' => 'utf8_unicode_ci',
                 'prefix'    => 'interadmin_teste_',
                 'strict' => false,
+                'timezone'  => '-03:00'
             ]);
 
             $db->setAsGlobal();
