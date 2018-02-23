@@ -64,9 +64,7 @@ class Log extends RecordAbstract
             $this->loadAttributes($this->getAttributesNames(), false);
             $value = $this->attributes[$name];
         }
-        if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
-            $value = $this->getMutatedAttribute($name, $value);
-        }
+        $value = $this->getMutatedAttribute($name, $value);
         return $value;
     }
 

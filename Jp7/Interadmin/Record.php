@@ -115,9 +115,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // Attributes
         if (array_key_exists($name, $this->attributes)) {
             $value = &$this->attributes[$name];
-            if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
-                $value = $this->getMutatedAttribute($name, $value);
-            }
+            $value = $this->getMutatedAttribute($name, $value);
             return $value;
         }
         // Mutators
@@ -133,9 +131,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($column !== false && array_key_exists($column, $this->attributes)) {
             // column is present, alias requested
             $value = &$this->attributes[$column];
-            if (strpos($column, 'date_') === 0 || strpos($column, 'file_') === 0) {
-                $value = $this->getMutatedAttribute($column, $value);
-            }
+            $value = $this->getMutatedAttribute($column, $value);
             return $value;
         }
         // FIXME remove when old code is validated
@@ -275,9 +271,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $attributes[] = $name;
         }
         $this->loadAttributes($attributes);
-        if (strpos($name, 'date_') === 0 || strpos($name, 'file_') === 0) {
-            $this->attributes[$name] = $this->getMutatedAttribute($name, $this->attributes[$name]);
-        }
+        $this->attributes[$name] = $this->getMutatedAttribute($name, $this->attributes[$name]);
         return $this->attributes[$name];
     }
 
@@ -534,7 +528,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
             }
             if (array_key_exists($name, $this->relations)) {
-                return new EagerLoaded($childrenTipo, $this->relations[$name]);
+                return new EagerLoadedQuery($childrenTipo, $this->relations[$name]);
             }
             return new Query($childrenTipo);
         } elseif ($name === 'arquivos' && $this->hasArquivosTab()) {
