@@ -52,6 +52,8 @@ class Type extends RecordAbstract
 
     protected $_primary_key = 'id_tipo';
 
+    protected static $_cachedIds = [];
+
     /**
      * Contains the parent Type object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
      *
@@ -299,19 +301,43 @@ class Type extends RecordAbstract
      */
     public function deprecatedFind($options = [])
     {
+        $cacheId = null;
+        if (is_array($options['where']) && count($options['where']) === 1 && strpos($options['where'][0], 'id = ') === 0) {
+            // Optimize subsequent find($id) queries
+            $cacheId = substr($options['where'][0], 5);
+            if (!is_numeric($cacheId)) {
+                $cacheId = null;
+            }
+        }
+
         $this->_prepareInterAdminsOptions($options, $optionsInstance, true);
 
-        $rs = $this->_executeQuery($options);
+        if ($cacheId) {
+            $cacheId = $this->_db.serialize($options['where']);
+        }
 
         $records = [];
-        foreach ($rs as $row) {
-            $_id = isset($row->id) ? $row->id : null;
-            $record = Record::getInstance($_id, $optionsInstance, $this);
-            if ($this->_parent instanceof Record) {
-                $record->setParent($this->_parent);
+
+        if ($cacheId) { // Optimize subsequent find($id) queries
+            $record = self::$_cachedIds[$cacheId] ?? null;
+            if ($record) {
+                $records[] = clone $record;
             }
-            $this->_getAttributesFromRow($row, $record, $options);
-            $records[] = $record;
+        }
+        if (!$records) {
+            $rs = $this->_executeQuery($options);
+            foreach ($rs as $row) {
+                $_id = isset($row->id) ? $row->id : null;
+                $record = Record::getInstance($_id, $optionsInstance, $this);
+                if ($this->_parent instanceof Record) {
+                    $record->setParent($this->_parent);
+                }
+                $this->_getAttributesFromRow($row, $record, $options);
+                $records[] = $record;
+            }
+        }
+        if ($cacheId) { // Optimize subsequent find($id) queries
+            self::$_cachedIds[$cacheId] = $records[0];
         }
 
         if ($options['eager_load']) {
