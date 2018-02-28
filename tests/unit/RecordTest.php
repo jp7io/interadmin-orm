@@ -1,17 +1,22 @@
 <?php
 
-namespace Tests;
-
 use Jp7\Interadmin\Record;
-use stdClass;
+use Jp7\Interadmin\RecordClassMap;
 
-class RecordTest extends \PHPUnit_Framework_TestCase
+class RecordTest extends \Codeception\Test\Unit
 {
+    /**
+     * @var \UnitTester
+     */
+    protected $tester;
+
     private $oldTimestamp;
     private $oldConfig;
 
     public function setUp()
     {
+        parent::setUp();
+
         global $config;
         $this->oldConfig = $config;
         $this->oldTimestamp = Record::getTimestamp();
@@ -27,6 +32,48 @@ class RecordTest extends \PHPUnit_Framework_TestCase
         global $config;
         $config = $this->oldConfig;
         Record::setTimestamp($this->oldTimestamp);
+
+        parent::tearDown();
+    }
+
+    public function testSetAndGet()
+    {
+        $userType = $this->tester->createUserType();
+        $this->assertFalse(isset($userType->newProp));
+        $userType->newProp = [];
+        $this->assertTrue(isset($userType->newProp));
+
+        $userType->newProp[] = 1;
+        $userType->newProp[] = 2;
+        $this->assertEquals($userType->newProp, [1, 2]);
+
+        unset($userType->newProp);
+        $this->assertFalse(isset($userType->newProp));
+
+        $userType->date_modify = date('c');
+        $this->assertInstanceOf('Date', $userType->date_modify);
+
+        RecordClassMap::getInstance()->clearCache();
+
+        $user = Test_User::build();
+        $username = 'jp7_kant';
+        $user->username = $username;
+        $this->assertEquals($user->username, $username);
+        $this->assertEquals($user->varchar_key, $username);
+
+        $this->assertFalse(isset($user->newProp));
+        $user->newProp = [];
+        $this->assertTrue(isset($user->newProp));
+
+        $user->newProp[] = 1;
+        $user->newProp[] = 2;
+        $this->assertEquals($user->newProp, [1, 2]);
+
+        unset($user->newProp);
+        $this->assertFalse(isset($user->newProp));
+
+        $user->date_publish = date('c');
+        $this->assertInstanceOf('Date', $user->date_publish);
     }
 
     /**
