@@ -87,7 +87,7 @@ class Type extends RecordAbstract
     {
         $value = null;
         if (array_key_exists($name, $this->attributes)) {
-            $value = $this->attributes[$name];
+            $value = &$this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $this->attributes += $this->getCache('attributes', function () {
                 return (array) $this->getDb()
@@ -96,7 +96,7 @@ class Type extends RecordAbstract
                     ->first();
             });
             if (array_key_exists($name, $this->attributes)) {
-                $value = $this->attributes[$name];    
+                $value = &$this->attributes[$name];
             }            
         }
         $value = $this->getMutatedAttribute($name, $value);

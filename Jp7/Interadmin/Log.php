@@ -59,10 +59,10 @@ class Log extends RecordAbstract
     {
         $value = null;
         if (isset($this->attributes[$name])) {
-            $value = $this->attributes[$name];
+            $value = &$this->attributes[$name];
         } elseif (in_array($name, $this->getAttributesNames())) {
             $this->loadAttributes($this->getAttributesNames(), false);
-            $value = $this->attributes[$name];
+            $value = &$this->attributes[$name];
         }
         $value = $this->getMutatedAttribute($name, $value);
         return $value;
