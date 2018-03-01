@@ -812,24 +812,25 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function deprecated_getTags($options = [])
     {
+        $retorno = [];
         if (!$this->_tags || $options) {
             $db = $this->getDb();
             $options['where'][] = 'parent_id = '.$this->id;
             $sql = 'SELECT * FROM '.$db->getTablePrefix().'tags '.
-                //'WHERE '.implode(' AND ', $options['where']).
-                (($options['group']) ? ' GROUP BY '.$options['group'] : '').
-                (($options['limit']) ? ' LIMIT '.$options['limit'] : '');
+                'WHERE '.implode(' AND ', $options['where']).
+                (!empty($options['group']) ? ' GROUP BY '.$options['group'] : '').
+                (!empty($options['limit']) ? ' LIMIT '.$options['limit'] : '');
             $rs = $db->select($sql);
             $this->_tags = [];
             foreach ($rs as $row) {
-                if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
+                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
                     $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
                             'where' => ['id = '.$row->id],
                         ];
-                        if ($tag_registro = $tag_tipo->findFirst($options)) {
+                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
                             $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
