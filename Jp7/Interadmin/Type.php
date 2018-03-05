@@ -948,23 +948,25 @@ class Type extends RecordAbstract
         }
         $cache->forever('modified:check', time());
 
-        $previousModifified = $cache->get('modified');
         // check if types changed
         $modified = strtotime(DB::table('tipos')
             ->select(DB::raw('MAX(date_modify) AS modified'))
             ->value('modified'));
-        if ($modified === $previousModifified) {
+        if ($modified === $cache->get('modified')) {
             return; // not changed
         }
         // flush tagged cache
         $cache->flush();
-            $cache->forever('modified', $modified);
+        $cache->forever('modified', $modified);
 
         // check inheritance of types
         $unsyncedTypes = DB::table('tipos AS child')
-            ->join('tipos AS model', function ($join) use ($previousModifified) {
+            ->join('tipos AS model', function ($join) {
                 $join->on('model.id_tipo', '=', 'child.model_id_tipo')
-                    ->where('model.date_modify', '>', date('c', $previousModifified));
+                    ->on(function ($q) {
+                        $q->on('model.campos', '<>', 'child.campos')
+                            ->orOn('model.children', '<>', 'child.children');
+                    });
             })
             ->get();
         \Log::notice('Resyncing '.count($unsyncedTypes).' types');
