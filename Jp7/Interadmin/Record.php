@@ -244,10 +244,16 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             return; // data below depends on an ID
         }
         // children most likely
-        if ($query = $this->_loadManyRelationship($name)) {
-            $manyRecords = $query->get(); // EagerLoadedQuery or Query
-            if (!array_key_exists($name, $this->relations)) { // if EagerLoadedQuery, don't overwrite
-                $this->relations[$name] = $manyRecords;
+        if ($query = $this->_getManyRelationship($name)) {
+            if ($query instanceof Query && $this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
+                // Lazy loading optimizer
+                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                $manyRecords = $this->relations[$name];
+            } else {
+                $manyRecords = $query->get(); // EagerLoadedQuery or Query
+                if (!$query instanceof EagerLoadedQuery) { // if EagerLoadedQuery, don't overwrite
+                    $this->relations[$name] = $manyRecords;
+                }
             }
             return $manyRecords;
         }
@@ -494,7 +500,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function __call($methodName, $args)
     {
-        if ($query = $this->_loadManyRelationship($methodName)) {
+        if ($query = $this->_getManyRelationship($methodName)) {
             return $query;
         }
         $relationships = $this->getType()->getRelationships();
@@ -515,18 +521,15 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         throw new BadMethodCallException($message);
     }
 
-    protected function _loadManyRelationship($name)
+    /**
+     * @param $name
+     * @return EagerLoadedQuery|Query|Query\FileQuery
+     */
+    protected function _getManyRelationship($name)
     {
         // childName() - relacionamento
         if ($child = $this->_findChild(ucfirst($name))) {
             $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
-            if (!array_key_exists($name, $this->relations) &&
-                $this->_collection_id &&
-                array_key_exists($this->_collection_id, self::$_collections)
-            ) {
-                // Lazy loading optimizer
-                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
-            }
             if (array_key_exists($name, $this->relations)) {
                 return new EagerLoadedQuery($childrenTipo, $this->relations[$name]);
             }
