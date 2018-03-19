@@ -1391,6 +1391,22 @@ class Type extends RecordAbstract
         return new Query($this);
     }
 
+    /**
+     * Parameters to be used with URL::route().
+     *
+     * @param array $variables
+     *
+     * @return array
+     */
+    public function getUrlParameters(array $variables)
+    {
+        $parameters = [];
+        if ($this->getParent() instanceof Record) {
+            array_unshift($parameters, $this->getParent());
+        }
+        return $parameters;
+    }
+    
     public function getUrl() // $action = 'index', array $parameters = []
     {
         $args = func_get_args();
