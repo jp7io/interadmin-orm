@@ -91,11 +91,13 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @param int $id This record's 'id'.
      */
-    public function __construct(array $attributes = [])
+    public function __construct(array $attributes = [], $type = null)
     {
         $this->attributes['id'] = 0; // initialize ID
         // id_tipo needs to be set first because of aliases
-        if (isset($attributes['id_tipo'])) {
+        if ($type) {
+            $this->setType($type);
+        } elseif (isset($attributes['id_tipo'])) {
             $this->setIdTipoAttribute($attributes['id_tipo']);
             unset($attributes['id_tipo']);
         }
@@ -453,8 +455,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             }
         }
 
-        $instance = new $className(['id' => $id]);
-        $instance->setType($tipo);
+        $instance = new $className(['id' => $id], $tipo);
         $instance->setDb($tipo->getDbName());
 
         return $instance;
