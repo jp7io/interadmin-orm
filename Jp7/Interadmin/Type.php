@@ -98,12 +98,29 @@ class Type extends RecordAbstract
             if (array_key_exists($name, $this->attributes)) {
                 $value = &$this->attributes[$name];
             }            
+        } elseif ($query = $this->_getManyRelationship($name)) {
+            $value = $query->get(); // not memoized, unlike Record implementation
         }
         $value = $this->getMutatedAttribute($name, $value);
         return $value;
     }
 
     public function __call($methodName, $args)
+    {
+        if ($query = $this->_getManyRelationship($methodName)) {
+            return $query;
+        }
+        // Default error when method doesn´t exist
+        $message = 'Call to undefined method '.get_class($this).'->'.
+            $methodName.'(). Available magic methods: '."\n";
+
+        foreach ($childrenBySlug as $slug => $child) {
+            $message .= "\t\t- ".lcfirst(camel_case($slug))."()\n";
+        }
+        throw new BadMethodCallException($message);
+    }
+
+    protected function _getManyRelationship($name)
     {
         $childrenBySlug = $this->getCache('__call', function () {
             return $this->children()
@@ -115,19 +132,11 @@ class Type extends RecordAbstract
                 ->keyBy('id_slug') // for faster key searches
                 ->all(); // to plain array
         });
-        $childSlug = snake_case($methodName, '-');
+        $childSlug = snake_case($name, '-');
         if (array_key_exists($childSlug, $childrenBySlug)) {
             $childrenBySlug[$childSlug]->setParent($this);
             return $childrenBySlug[$childSlug]->records();
         }
-        // Default error when method doesn´t exist
-        $message = 'Call to undefined method '.get_class($this).'->'.
-            $methodName.'(). Available magic methods: '."\n";
-
-        foreach ($childrenBySlug as $slug => $child) {
-            $message .= "\t\t- ".lcfirst(camel_case($slug))."()\n";
-        }
-        throw new BadMethodCallException($message);
     }
 
     public function __isset($name)
