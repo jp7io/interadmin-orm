@@ -114,15 +114,25 @@ class Type extends RecordAbstract
         $message = 'Call to undefined method '.get_class($this).'->'.
             $methodName.'(). Available magic methods: '."\n";
 
-        foreach ($childrenBySlug as $slug => $child) {
-            $message .= "\t\t- ".lcfirst(camel_case($slug))."()\n";
+        foreach ($this->_getChildrenBySlug() as $child) {
+            $message .= "\t\t- ".lcfirst(camel_case($child->id_slug))."()\n";
         }
         throw new BadMethodCallException($message);
     }
 
     protected function _getManyRelationship($name)
     {
-        $childrenBySlug = $this->getCache('__call', function () {
+        $childrenBySlug = $this->_getChildrenKeyBySlug();
+        $childSlug = snake_case($name, '-');
+        if (array_key_exists($childSlug, $childrenBySlug)) {
+            $childrenBySlug[$childSlug]->setParent($this);
+            return $childrenBySlug[$childSlug]->records();
+        }
+    }
+
+    protected function _getChildrenKeyBySlug()
+    {
+        return $this->getCache('__call', function () {
             return $this->children()
                 ->select('id_slug')
                 ->get()
@@ -132,11 +142,6 @@ class Type extends RecordAbstract
                 ->keyBy('id_slug') // for faster key searches
                 ->all(); // to plain array
         });
-        $childSlug = snake_case($name, '-');
-        if (array_key_exists($childSlug, $childrenBySlug)) {
-            $childrenBySlug[$childSlug]->setParent($this);
-            return $childrenBySlug[$childSlug]->records();
-        }
     }
 
     public function __isset($name)
