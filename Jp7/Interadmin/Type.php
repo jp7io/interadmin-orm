@@ -1062,6 +1062,7 @@ class Type extends RecordAbstract
             $data = $relationships[$relationship];
             return [
                 'type' => 'select',
+                'query' => $data['query'],
                 'tipo' => is_object($data['query']) ? $data['query']->type() : $data['query'],
                 'name' => $relationship,
                 'alias' => true,
