@@ -114,8 +114,8 @@ class Type extends RecordAbstract
         $message = 'Call to undefined method '.get_class($this).'->'.
             $methodName.'(). Available magic methods: '."\n";
 
-        foreach ($this->_getChildrenBySlug() as $child) {
-            $message .= "\t\t- ".lcfirst(camel_case($child->id_slug))."()\n";
+        foreach ($this->_getChildrenKeyBySlug() as $slug => $child) {
+            $message .= "\t\t- ".lcfirst(camel_case($slug))."()\n";
         }
         throw new BadMethodCallException($message);
     }
