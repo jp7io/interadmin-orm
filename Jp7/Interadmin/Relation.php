@@ -64,8 +64,7 @@ class Relation
                 $rows[$id] = Type::getInstance($id);
             }
         } else {
-            $rows = $data['tipo']
-                ->records()
+            $rows = $data['query']
                 ->select($select)
                 ->whereIn('id', $ids)
                 ->get()
@@ -113,8 +112,7 @@ class Relation
                 $rows[$id] = Type::getInstance($id);
             }
         } else {
-            $rows = $data['tipo']
-                ->records()
+            $rows = $data['query']
                 ->select($select)
                 ->whereIn('id', $ids)
                 ->get()
