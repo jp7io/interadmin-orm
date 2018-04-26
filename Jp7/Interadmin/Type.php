@@ -815,7 +815,7 @@ class Type extends RecordAbstract
     {
         $records = $this->deprecatedFind($options);
         foreach ($records as $record) {
-            $record->updateAttributes($attributes);
+            $record->updateRawAttributes($attributes);
         }
 
         return count($records);
