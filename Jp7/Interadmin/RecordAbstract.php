@@ -261,6 +261,17 @@ abstract class RecordAbstract
     }
 
     /**
+     * Updates all the attributes from the passed-in array and saves the record.
+     *
+     * @param array $attributes Array with fields names and values.
+     */
+    public function updateRawAttributes($attributes)
+    {
+        $this->setRawAttributes($attributes);
+        $this->_update($attributes);
+    }
+    
+    /**
      * Increments a numeric attribute.
      *
      * @param string $attribute
