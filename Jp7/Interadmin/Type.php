@@ -426,9 +426,9 @@ class Type extends RecordAbstract
             throw new Exception('GROUP BY is not supported when using count().');
         }
         if ($_typeless) {
-            $rows = $this->deprecatedTypelessFind(['limit' => 2, 'skip' => 0] + $options);
+            $rows = $this->deprecatedTypelessFind(['limit' => 2, 'skip' => 0, 'with' => []] + $options);
         } else {
-            $rows = $this->deprecatedFind(['limit' => 2, 'skip' => 0] + $options);
+            $rows = $this->deprecatedFind(['limit' => 2, 'skip' => 0, 'with' => []] + $options);
         }
         if (count($rows) > 1) {
             throw new Exception('Could not resolve groupBy() before count().');
