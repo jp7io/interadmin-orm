@@ -288,7 +288,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $msg = $msg.' "'.$name.'".'.PHP_EOL.
             '- Class: '.get_class($this).PHP_EOL.
             '- ID: '.$this->id.PHP_EOL.
-            '- File: '.$caller['file'].' - Line: '.$caller['line'];
+            '- File: '.($caller['file'] ?? '').' - Line: '.($caller['line'] ?? '');
         if (self::$lazy_loading_debug){
             throw new \Exception($msg);
         } else {
