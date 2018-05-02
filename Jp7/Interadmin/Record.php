@@ -895,7 +895,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     public function generateSlug()
     {
-        if (!$this->varchar_key) {
+        if (!array_key_exists('varchar_key', $this->_aliases) || !$this->varchar_key) {
             return '';
         }
 
