@@ -877,7 +877,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if (empty($this->attributes['id_tipo'])) {
             throw new Exception('Saving a record without id_tipo.');
         }
-        if (empty($this->attributes['id_slug']) && in_array('id_slug', $this->getColumns())) {
+        if (array_key_exists('varchar_key', $this->attributes) && in_array('id_slug', $this->getColumns()) && !$this->id_slug) {
             $this->id_slug = $this->generateSlug();
         }
 
@@ -897,7 +897,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     public function generateSlug()
     {
-        if (!array_key_exists('varchar_key', $this->_aliases) || !$this->varchar_key) {
+        if (!$this->varchar_key) {
             return '';
         }
 
