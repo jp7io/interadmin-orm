@@ -100,6 +100,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         } elseif (isset($attributes['id_tipo'])) {
             $this->setIdTipoAttribute($attributes['id_tipo']);
             unset($attributes['id_tipo']);
+        } elseif ($type = static::type()) {
+            $this->setType($type);
         }
         $this->setRawAttributes($attributes);
     }
