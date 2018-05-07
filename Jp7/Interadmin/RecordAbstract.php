@@ -983,7 +983,7 @@ abstract class RecordAbstract
                     if ($data['type']) {
                         $loaded = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     } else {
-                        $loaded = $data['query']->getModel();
+                        $loaded = (clone $data['query'])->getModel();
                         $loaded->id = $fk;
                     }
                 }
