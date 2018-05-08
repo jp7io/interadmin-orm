@@ -7,6 +7,8 @@ use DB;
 
 class BaseClassMap
 {
+    protected $classes;
+
     protected function __construct()
     {
         // singleton
@@ -55,25 +57,25 @@ class BaseClassMap
 
     public function clearCache()
     {
-        static::$classes = null;
         Cache::forget(static::CACHE_KEY);
+        static::getInstance()->classes = null;
     }
 
     public function getClasses()
     {
-        if (static::$classes === null) {
+        if ($this->classes === null) {
             // check cache first
-            static::$classes = Cache::get(static::CACHE_KEY);
-            if (!static::$classes) {
+            $this->classes = Cache::get(static::CACHE_KEY);
+            if (!$this->classes) {
                 // not cached: call method
-                static::$classes = static::prepareMap(static::CLASS_ATTRIBUTE);
-                if (static::$classes) {
+                $this->classes = static::prepareMap(static::CLASS_ATTRIBUTE);
+                if ($this->classes) {
                     // only cache if it has classes
-                    Cache::put(static::CACHE_KEY, static::$classes, 5);
+                    Cache::put(static::CACHE_KEY, $this->classes, 5);
                 }
             }
         }
-        return static::$classes;
+        return $this->classes;
     }
 
     /**
