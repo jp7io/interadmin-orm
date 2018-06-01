@@ -975,6 +975,7 @@ class Type extends RecordAbstract
 
         // check inheritance of types
         $unsyncedTypes = DB::table('tipos AS child')
+            ->select('child.*')
             ->join('tipos AS model', function ($join) {
                 $join->on('model.id_tipo', '=', 'child.model_id_tipo')
                     ->on(function ($q) {
@@ -983,7 +984,7 @@ class Type extends RecordAbstract
                     });
             })
             ->get();
-        \Log::notice('Resyncing '.count($unsyncedTypes).' types');
+        \Log::notice('Resyncing '.count($unsyncedTypes).' types: '.$unsyncedTypes->implode('id_tipo', ','));
         foreach ($unsyncedTypes as $unsyncedType) {
             $type = new self($unsyncedType->id_tipo);
             $type->setRawAttributes(get_object_vars($unsyncedType));
