@@ -543,7 +543,7 @@ abstract class RecordAbstract
         $campos = &$options['campos'];
         $aliases = &$options['aliases'];
 
-        $quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
+        $quoted = '(\'((?<=\\\\)\'|[^\'])*\'|"((?<=\\\\)"|[^"])*")';
         $keyword = ':?\b[a-zA-Z0-9_.]+\b';
         // not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
         $not_function = '(?![ ]?\()';
@@ -656,7 +656,7 @@ abstract class RecordAbstract
                 }
             }
 
-            if (!in_array($termo[0], ["'", ":"]) && !is_numeric($termo) && !in_array(strtoupper($termo), $reserved)) {
+            if (!in_array($termo[0], ["'", '"', ":"]) && !is_numeric($termo) && !in_array(strtoupper($termo), $reserved)) {
                 $len = strlen($termo);
                 $table = 'main';
                 if (strpos($termo, '.') !== false) {
