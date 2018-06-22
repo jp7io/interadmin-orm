@@ -984,6 +984,9 @@ class Type extends RecordAbstract
                     });
             })
             ->get();
+        if (is_array($unsyncedTypes)) {
+            $unsyncedTypes = collect($unsyncedTypes); // <= Laravel 5.2
+        } 
         \Log::notice('Resyncing '.count($unsyncedTypes).' types: '.$unsyncedTypes->implode('id_tipo', ','));
         foreach ($unsyncedTypes as $unsyncedType) {
             $type = new self($unsyncedType->id_tipo);
