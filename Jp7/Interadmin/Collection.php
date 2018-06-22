@@ -7,6 +7,8 @@ use Illuminate\Support\Arr;
 
 class Collection extends BaseCollection
 {
+    private $onDestruct;
+    
     /**
      * Converts from $item->subitems to $subitem->items.
      * @deprecated Don't extend Collection
@@ -85,5 +87,17 @@ class Collection extends BaseCollection
     public function keySort(\Closure $callback)
     {
         uksort($this->items, $callback);
+    }
+
+    public function onDestruct($closure)
+    {
+        $this->onDestruct = $closure;
+    }
+
+    public function __destruct()
+    {
+        if ($this->onDestruct) {
+            ($this->onDestruct)();
+        }
     }
 }

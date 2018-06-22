@@ -407,7 +407,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $collection = new Collection($models);
         if (self::$lazy_loading_optimizer && count($models) > 2) {
             $collection_id = microtime();
-            self::$_collections[$collection_id] = $collection;
+            self::$_collections[$collection_id] = new Collection($models); // other ref to let original be released
             foreach ($models as $record) {
                 $record->_collection_id = $collection_id;
             }
@@ -415,6 +415,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 // don't increase memory too much
                 array_splice(self::$_collections, 0, 10);
             }
+            $collection->onDestruct(function () use ($collection_id) {
+                unset(self::$_collections[$collection_id]);
+            });
         }
         return $collection;
     }
