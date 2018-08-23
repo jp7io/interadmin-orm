@@ -551,7 +551,8 @@ abstract class RecordAbstract
             'SELECT', 'WHERE',
             'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
             'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
-            'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END', 'BINARY'
+            'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END', 'BINARY',
+            'HOUR', 'MINUTE', 'SECOND',
         ];
 
         $offset = 0;
