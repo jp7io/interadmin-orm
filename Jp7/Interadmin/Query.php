@@ -223,7 +223,7 @@ class Query extends Query\BaseQuery
         if (!$id) {
             return null; // save a query
         }
-        if (is_string($id) && !is_numeric($id)) {
+        if (is_string($id) && !is_numeric($id) && in_array('id_slug', $this->getModel()->getColumns())) {
             $this->options['where'][] = $this->_parseComparison('id_slug', '=', $id);
         } else {
             $this->options['where'][] = $this->_parseComparison('id', '=', $id);
