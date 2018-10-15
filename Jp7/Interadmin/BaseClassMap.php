@@ -57,21 +57,22 @@ class BaseClassMap
 
     public function clearCache()
     {
-        Cache::forget(static::CACHE_KEY);
+        Cache::tag(Type::CACHE_TAG)->forget(static::CACHE_KEY);
         static::getInstance()->classes = null;
     }
 
     public function getClasses()
     {
         if ($this->classes === null) {
+        	$cache = Cache::tag(Type::CACHE_TAG);
             // check cache first
-            $this->classes = Cache::get(static::CACHE_KEY);
+            $this->classes = $cache->get(static::CACHE_KEY);
             if (!$this->classes) {
                 // not cached: call method
                 $this->classes = static::prepareMap(static::CLASS_ATTRIBUTE);
                 if ($this->classes) {
                     // only cache if it has classes
-                    Cache::put(static::CACHE_KEY, $this->classes, 5);
+                    $cache->put(static::CACHE_KEY, $this->classes, 5);
                 }
             }
         }
