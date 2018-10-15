@@ -42,14 +42,15 @@ class BaseClassMap
 
     public function clearCache()
     {
-        Cache::forget(static::CACHE_KEY);
+        Cache::tag(Type::CACHE_TAG)->forget(static::CACHE_KEY);
     }
 
     public function getClasses()
     {
-        return Cache::remember(static::CACHE_KEY, 5, function () {
-            return static::prepareMap(static::CLASS_ATTRIBUTE);
-        });
+        return Cache::tag(Type::CACHE_TAG)
+            ->remember(static::CACHE_KEY, 5, function () {
+                return static::prepareMap(static::CLASS_ATTRIBUTE);
+            });
     }
 
     /**
