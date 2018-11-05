@@ -349,6 +349,27 @@ class Record extends RecordAbstract implements Arrayable
         return static::query();
     }
 
+    // called by FactoryBuilder
+    public function newQueryWithoutScopes()
+    {
+        return static::query();
+    }
+
+    // called by FactoryBuilder
+    public function newCollection(array $models = [])
+    {
+        return new Collection($models);
+    }
+
+    // called by FactoryBuilder
+    public function each($closure)
+    {
+        return $closure($this);
+    }
+
+    /**
+     * @return Type
+     */
     public static function type()
     {
         if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
