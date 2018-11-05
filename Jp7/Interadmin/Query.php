@@ -50,6 +50,10 @@ class Query extends Query\BaseQuery
         return $this->model;
     }
 
+    public function getConnection() {
+        return $this->provider->getDb();
+    }
+
     /**
      * Create a record without saving.
      *

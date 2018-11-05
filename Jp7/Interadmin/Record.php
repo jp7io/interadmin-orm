@@ -402,6 +402,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
 
     // called by FactoryBuilder
+    public function newQueryWithoutScopes()
+    {
+        return static::query();
+    }
+
+    // called by FactoryBuilder
     public function newCollection(array $models = [])
     {
         $collection = new Collection($models);
@@ -420,6 +426,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             });
         }
         return $collection;
+    }
+
+    // called by FactoryBuilder
+    public function each($closure)
+    {
+        return $closure($this);
     }
 
     /**

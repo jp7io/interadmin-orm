@@ -1165,6 +1165,11 @@ abstract class RecordAbstract
         }
     }
 
+    public function setConnection($name)
+    {
+        $this->setDb($name);
+    }
+
     public function getDbName()
     {
         return $this->_db;
