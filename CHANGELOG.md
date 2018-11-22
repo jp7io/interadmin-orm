@@ -6,6 +6,12 @@
   * Use SQL bind by default instead of quote. Improve security by using the proper mechanism to avoid SQL injection. Calls to getOptionsArray() convert back to quoted and should be avoided.
   * Calls to getAttributes() might return date_* and file_* attributes as string, not objects.
 
+## 3.2.2
+* Small fixes for Laravel 5.7
+
+## 3.2.1
+* Small fixes, support for Laravel Socialite login
+
 ## 3.2
 * Split into 3 packages: classes, classes-deprecated and interadmin-orm
 
