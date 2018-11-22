@@ -1,5 +1,4 @@
 ## 3.3
-* UNDER DEVELOPMENT
 * Several improvements for eager loading and performance
 * Breaking changes:
   * getParent() on Record will not change the Record's Type `_parent` property anymore. This side-effect might have been relied upon on code written bettwen versions 1.0 to 2.0
