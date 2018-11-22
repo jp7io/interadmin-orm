@@ -80,3 +80,6 @@
 * getInterAdminsByTags -> findByTags
 * getInterAdminsCount -> count
 
+## 2.0 
+* Add parent_id_tipo to conditionals (importante if the parents are on different tables, two records with the same parent_id, might have different parent_id_tipo)
+* Add "inherited" as a pre-calculated field to InterAdminTipo to avoid long recursive searches for all the values inherited  from models.
