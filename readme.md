@@ -15,11 +15,12 @@ The API is heavily inspired by Laravel Eloquent, most methods and arguments are 
 
 ## Docs
 
+* [Wiki](https://github.com/jp7internet/interadmin-orm/wiki)
 * [Extending Record and Type](https://github.com/jp7internet/interadmin-orm/wiki/Extending-Record-and-Type)
 * [Query](https://github.com/jp7internet/interadmin-orm/wiki/Query)
-* External:
-  * https://wiki.jp7.com.br:81/jp7/ORM
-  * https://wiki.jp7.com.br:81/jp7/ORM:Cheat_Sheet
+* [Cheat Sheet](https://github.com/jp7internet/interadmin-orm/wiki/Cheat-Sheet)
+* Eloquent documentation (most methods and arguments are exactly the same):
+  * https://learninglaravel.net/cheatsheet/#eloquent
   * https://laravel.com/docs/5.3/eloquent  
 
 ## Sample code
