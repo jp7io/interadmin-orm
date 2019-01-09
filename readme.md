@@ -34,22 +34,6 @@ $usedCeltas = Carro::where('modelo', 'Celta')
     ->get(); // get all cars, first() would only bring the first car
 ```
 
-## Mass Assignment
-
-Just like Laravel Eloquent, the create($array) and fill($array) methods can only receive attributes listed on getFillable() - whitelisted attributes.
-
-* getFillable() - by default returns the fields checked as 'form' on InterAdmin.
-
-You can temporarily disable mass assignment protection when data is safe, on seeds or tests, for example:
-
-```php
-\Jp7\Interadmin\Record::unguard();
-
-Classe::create(['idade' => 12, 'nome' => 'teste']);
-
-\Jp7\Interadmin\Record::reguard();
-```
-
 
 ## Docs for v2.* versions
 
