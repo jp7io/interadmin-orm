@@ -100,4 +100,10 @@ class Collection extends BaseCollection
             ($this->onDestruct)();
         }
     }
+    
+    public function __sleep()
+    {
+        $this->onDestruct = null; // PHP can't serialize Closures
+        return array_keys(get_object_vars($this));
+    }
 }
