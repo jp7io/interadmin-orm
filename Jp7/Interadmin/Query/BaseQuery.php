@@ -349,6 +349,11 @@ abstract class BaseQuery
         return $this->whereHas($relationship, '1 = 1');
     }
 
+    public function doesntHave($relationship)
+    {
+        return $this->whereDoesntHave($relationship, '1 = 1');
+    }
+    
     public function whereHas($relationship, $conditions = null, $_not = false)
     {
         try {
