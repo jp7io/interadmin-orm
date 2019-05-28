@@ -401,6 +401,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return static::query();
     }
 
+    // called by EloquentUserProvider
+    public function where(...$args)
+    {
+        return static::query()->where(...$args);
+    }
+    
     // called by FactoryBuilder
     public function newQueryWithoutScopes()
     {
