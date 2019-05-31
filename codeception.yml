@@ -6,6 +6,7 @@ paths:
     support: tests/_support
     envs: tests/_envs
 settings:
+    error_level: E_ALL
     bootstrap: _bootstrap.php
     colors: true
     memory_limit: 1024M
