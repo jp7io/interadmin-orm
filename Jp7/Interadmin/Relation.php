@@ -6,17 +6,17 @@ class Relation
 {
     public static function eagerLoad($records, $relationships, $selectStack = null)
     {
-        if (!is_array($records)) {
-            $records = $records->all();
+        if (is_array($records)) {
+            $records = jp7_collect($records);
         }
-        if (!$records) {
+        if (!count($records)) {
             return;
         }
         if (!is_array($relationships)) {
             $relationships = [$relationships];
         }
         $relation = array_shift($relationships);
-        $model = reset($records);
+        $model = $records->first();
         if ($relation === '_parent') {
             return self::eagerLoadParent($records, $relationships, $relation, $selectStack);
         }
@@ -37,11 +37,9 @@ class Relation
     protected static function eagerLoadParent($records, $relationships, $relation, $selectStack = null)
     {
         $select = $selectStack ? array_shift($selectStack) : [];
-        if (reset($records)->hasLoadedParent()) {
+        if ($records->first()->hasLoadedParent()) {
             if ($relationships) { // still has things to eager load
-                $rows = array_filter(array_map(function ($x) {
-                    return $x->getParent();
-                }, $records));
+                $rows = $records->map->getParent()->filter();
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
             return; // already loaded
@@ -64,6 +62,9 @@ class Relation
                 ->select($select)
                 ->whereIn('id', array_keys($parentIdMap))
                 ->get();
+            if (property_exists($records, '_refs')) {
+                $records->_refs[] = $parentRecords; // avoid $rows be removed from memory too soon
+            }
             foreach ($parentRecords as $parent) {
                 $rows[$parent->id_tipo.','.$parent->id] = $parent;
             }
@@ -82,9 +83,9 @@ class Relation
     protected static function eagerLoadSelectMulti($records, $relationships, $relation, $data, $selectStack = null)
     {
         $select = $selectStack ? array_shift($selectStack) : [];
-        if (reset($records)->hasLoadedRelation($relation)) {
+        if ($records->first()->hasLoadedRelation($relation)) {
             if ($relationships) { // still has things to eager load
-                $rows = collect(array_column($records, $relation))->flatten();
+                $rows = $records->pluck($relation)->flatten();
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
             return; // already loaded
@@ -112,8 +113,11 @@ class Relation
             $rows = (clone $data['query'])
                 ->select($select)
                 ->whereIn('id', $ids)
-                ->get()
-                ->keyBy('id');
+                ->get();
+            if (property_exists($records, '_refs')) {
+                $records->_refs[] = $rows; // avoid $rows be removed from memory too soon
+            }
+            $rows = $rows->keyBy('id');
         }
         if ($relationships) { // still has things to eager load
             self::eagerLoad($rows, $relationships, $selectStack);
@@ -136,9 +140,9 @@ class Relation
     protected static function eagerLoadSelect($records, $relationships, $relation, $data, $selectStack = null)
     {
         $select = $selectStack ? array_shift($selectStack) : [];
-        if (reset($records)->hasLoadedRelation($relation)) {
+        if ($records->first()->hasLoadedRelation($relation)) {
             if ($relationships) { // still has things to eager load
-                $rows = array_filter(array_column($records, $relation));
+                $rows = $records->pluck($relation)->filter();
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
             return; // already loaded
@@ -146,7 +150,7 @@ class Relation
 
         // select.id = record.select_id
         $alias = $relation.'_id';
-        $ids = array_filter(array_unique(array_column($records, $alias)));
+        $ids = $records->pluck($alias)->unique()->filter()->all();
         if (!$ids) {
             return;
         }
@@ -160,8 +164,11 @@ class Relation
             $rows = (clone $data['query'])
                 ->select($select)
                 ->whereIn('id', $ids)
-                ->get()
-                ->keyBy('id');
+                ->get();
+            if (property_exists($records, '_refs')) {
+                $records->_refs[] = $rows; // avoid $rows be removed from memory too soon
+            }
+            $rows = $rows->keyBy('id');
         }
         if ($relationships) { // still has things to eager load
             self::eagerLoad($rows, $relationships, $selectStack);
@@ -175,9 +182,9 @@ class Relation
     protected static function eagerLoadChildren($records, $relationships, $relation, $data, $selectStack = null)
     {
         $select = $selectStack ? array_shift($selectStack) : [];
-        if (reset($records)->hasLoadedRelation($relation)) {
+        if ($records->first()->hasLoadedRelation($relation)) {
             if ($relationships) { // still has things to eager load
-                $rows = collect(array_column($records, $relation))->flatten();
+                $rows = $records->pluck($relation)->flatten();
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
             return; // already loaded
@@ -188,10 +195,13 @@ class Relation
         $children = $data['tipo']
             ->records()
             ->select($select)
-            ->whereIn('parent_id', $records)
+            ->whereIn('parent_id', $records->all())
             ->get();
         if ($relationships) { // still has things to eager load
             self::eagerLoad($children, $relationships, $selectStack);
+        }
+        if (property_exists($records, '_refs')) {
+            $records->_refs[] = $children; // avoid $children be removed from memory too soon
         }
         $children = $children->groupBy('parent_id');
 

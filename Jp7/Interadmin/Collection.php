@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 class Collection extends BaseCollection
 {
     private $onDestruct;
+    public $_refs;
     
     /**
      * Converts from $item->subitems to $subitem->items.
