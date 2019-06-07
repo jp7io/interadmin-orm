@@ -272,7 +272,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $this->_debugLazyLoading('N+1 query: Loading attribute', $name, debug_backtrace(false, 2)[1]);
         }
         // not all columns are loaded by default / most types use same table
-        $attributes = array_keys($aliases);
+        $attributes = array_merge(array_keys($aliases), $this->getAdminAttributes());
         // Fixes lazy loading of fields that are aliases
         if ($column = array_search($name, $aliases)) {
             $name = $column;
@@ -606,13 +606,18 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.
      *
-     * @param array $options Default array of options. Available keys: fields, fields_alias, class.
+     * @param array $options [DEPRECATED] Default array of options. Available keys: fields, fields_alias, class.
      *
      * @return Record
      */
     public function getParent($options = [])
     {
         if (!$this->_parent) {
+            if ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
+                // Lazy loading optimizer
+                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], '_parent');
+                return $this->_parent;
+            }
             $this->loadAttributes(['parent_id', 'parent_id_tipo'], false);
 
             if ($this->parent_id) {
@@ -1145,6 +1150,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $this->relations[$relation] = $value;
 
         return $this;
+    }
+
+    public function hasLoadedParent()
+    {
+        return !is_null($this->_parent);
     }
 
     public function hasLoadedRelation($relation)

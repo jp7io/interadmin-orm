@@ -17,20 +17,65 @@ class Relation
         }
         $relation = array_shift($relationships);
         $model = reset($records);
+        if ($relation === '_parent') {
+            return self::eagerLoadParent($records, $relationships, $relation, $selectStack);
+        }
         if ($data = $model->getType()->getRelationshipData($relation)) {
             if ($data['type'] == 'select') {
                 if ($data['multi']) {
-                    self::eagerLoadSelectMulti($records, $relationships, $relation, $data, $selectStack);
-                } else {
-                    self::eagerLoadSelect($records, $relationships, $relation, $data, $selectStack);
+                    return self::eagerLoadSelectMulti($records, $relationships, $relation, $data, $selectStack);
                 }
+                return self::eagerLoadSelect($records, $relationships, $relation, $data, $selectStack);
             } elseif ($data['type'] == 'children') {
-                self::eagerLoadChildren($records, $relationships, $relation, $data, $selectStack);
-            } else {
-                throw new \Exception('Unsupported relationship type: "'.$data['type'].'" for class '.get_class($model).' - ID: '.$model->id);
+                return self::eagerLoadChildren($records, $relationships, $relation, $data, $selectStack);
             }
-        } else {
-            throw new \Exception('Unknown relationship: "'.$relation.'" for class '.get_class($model).' - ID: '.$model->id);
+            throw new \Exception('Unsupported relationship type: "'.$data['type'].'" for class '.get_class($model).' - ID: '.$model->id);
+        }
+        throw new \Exception('Unknown relationship: "'.$relation.'" for class '.get_class($model).' - ID: '.$model->id);
+    }
+
+    protected static function eagerLoadParent($records, $relationships, $relation, $selectStack = null)
+    {
+        $select = $selectStack ? array_shift($selectStack) : [];
+        if (reset($records)->hasLoadedParent()) {
+            if ($relationships) { // still has things to eager load
+                $rows = array_filter(array_map(function ($x) {
+                    return $x->getParent();
+                }, $records));
+                self::eagerLoad($rows, $relationships, $selectStack);
+            }
+            return; // already loaded
+        }
+
+        $parentTypeIds = [];
+        foreach ($records as $record) {
+            $record->loadAttributes(['parent_id', 'parent_id_tipo'], false);
+            if (!$record->parent_id_tipo) {
+                throw new \Exception('Field parent_id_tipo is required. Id: '.$record->id);
+            }
+            $parentTypeIds[$record->parent_id_tipo] = $parentTypeIds[$record->parent_id_tipo] ?? [];
+            $parentTypeIds[$record->parent_id_tipo][$record->parent_id] = true;
+        }
+
+        $rows = [];
+        foreach ($parentTypeIds as $parentTypeId => $parentIdMap) {
+            $parentRecords = Type::getInstance($parentTypeId)
+                ->records()
+                ->select($select)
+                ->whereIn('id', array_keys($parentIdMap))
+                ->get();
+            foreach ($parentRecords as $parent) {
+                $rows[$parent->id_tipo.','.$parent->id] = $parent;
+            }
+        }
+
+        if ($relationships) { // still has things to eager load
+            self::eagerLoad($rows, $relationships, $selectStack);
+        }
+
+        foreach ($records as $record) {
+            $key = $record->parent_id_tipo.','.$record->parent_id;
+            $record->setParent($rows[$key] ?? null);
         }
     }
 
@@ -38,11 +83,11 @@ class Relation
     {
         $select = $selectStack ? array_shift($selectStack) : [];
         if (reset($records)->hasLoadedRelation($relation)) {
-            if ($relationships) {
+            if ($relationships) { // still has things to eager load
                 $rows = collect(array_column($records, $relation))->flatten();
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
-            return;
+            return; // already loaded
         }
 
         // select_multi.id IN (record.select_multi_ids)
@@ -70,7 +115,7 @@ class Relation
                 ->get()
                 ->keyBy('id');
         }
-        if ($relationships) {
+        if ($relationships) { // still has things to eager load
             self::eagerLoad($rows, $relationships, $selectStack);
         }
         foreach ($records as $record) {
@@ -92,11 +137,11 @@ class Relation
     {
         $select = $selectStack ? array_shift($selectStack) : [];
         if (reset($records)->hasLoadedRelation($relation)) {
-            if ($relationships) {
+            if ($relationships) { // still has things to eager load
                 $rows = array_filter(array_column($records, $relation));
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
-            return;
+            return; // already loaded
         }
 
         // select.id = record.select_id
@@ -118,7 +163,7 @@ class Relation
                 ->get()
                 ->keyBy('id');
         }
-        if ($relationships) {
+        if ($relationships) { // still has things to eager load
             self::eagerLoad($rows, $relationships, $selectStack);
         }
         foreach ($records as $record) {
@@ -131,11 +176,11 @@ class Relation
     {
         $select = $selectStack ? array_shift($selectStack) : [];
         if (reset($records)->hasLoadedRelation($relation)) {
-            if ($relationships) {
+            if ($relationships) { // still has things to eager load
                 $rows = collect(array_column($records, $relation))->flatten();
                 self::eagerLoad($rows, $relationships, $selectStack);
             }
-            return;
+            return; // already loaded
         }
 
         // child.parent_id = parent.id
@@ -145,7 +190,7 @@ class Relation
             ->select($select)
             ->whereIn('parent_id', $records)
             ->get();
-        if ($relationships) {
+        if ($relationships) { // still has things to eager load
             self::eagerLoad($children, $relationships, $selectStack);
         }
         $children = $children->groupBy('parent_id');
