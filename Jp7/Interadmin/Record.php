@@ -653,9 +653,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             if (!isset($parent->id_tipo)) {
                 $parent->id_tipo = 0; // Necessário para que a referência funcione
             }
+            $this->attributes['parent_id'] = &$parent->id;
+            $this->attributes['parent_id_tipo'] = &$parent->id_tipo;
+        } else {
+            $this->attributes['parent_id'] = 0;
+            $this->attributes['parent_id_tipo'] = 0;
         }
-        $this->attributes['parent_id'] = &$parent->id;
-        $this->attributes['parent_id_tipo'] = &$parent->id_tipo;
         $this->_parent = $parent;
     }
 

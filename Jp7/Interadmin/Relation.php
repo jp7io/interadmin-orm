@@ -49,7 +49,7 @@ class Relation
         foreach ($records as $record) {
             $record->loadAttributes(['parent_id', 'parent_id_tipo'], false);
             if (!$record->parent_id_tipo) {
-                throw new \Exception('Field parent_id_tipo is required. Id: '.$record->id);
+                continue;
             }
             $parentTypeIds[$record->parent_id_tipo] = $parentTypeIds[$record->parent_id_tipo] ?? [];
             $parentTypeIds[$record->parent_id_tipo][$record->parent_id] = true;
@@ -76,7 +76,9 @@ class Relation
 
         foreach ($records as $record) {
             $key = $record->parent_id_tipo.','.$record->parent_id;
-            $record->setParent($rows[$key] ?? null);
+            if ($rows[$key]) {
+                $record->setParent($rows[$key]);
+            }
         }
     }
 
