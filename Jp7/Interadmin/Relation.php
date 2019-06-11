@@ -76,7 +76,7 @@ class Relation
 
         foreach ($records as $record) {
             $key = $record->parent_id_tipo.','.$record->parent_id;
-            if ($rows[$key]) {
+            if (isset($rows[$key])) {
                 $record->setParent($rows[$key]);
             }
         }
