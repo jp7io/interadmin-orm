@@ -272,7 +272,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $this->_debugLazyLoading('N+1 query: Loading attribute', $name, debug_backtrace(false, 2)[1]);
         }
         // not all columns are loaded by default / most types use same table
-        $attributes = array_merge(array_keys($aliases), $this->getAdminAttributes());
+        $attributes = array_keys($aliases);
         // Fixes lazy loading of fields that are aliases
         if ($column = array_search($name, $aliases)) {
             $name = $column;
