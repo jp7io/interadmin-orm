@@ -646,20 +646,13 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function setParent(Record $parent = null)
     {
-        if (isset($parent)) {
-            if (!isset($parent->id)) {
-                $parent->id = 0; // Necessário para que a referência funcione
-            }
-            if (!isset($parent->id_tipo)) {
-                $parent->id_tipo = 0; // Necessário para que a referência funcione
-            }
-            $this->attributes['parent_id'] = &$parent->id;
-            $this->attributes['parent_id_tipo'] = &$parent->id_tipo;
-        } else {
-            $this->attributes['parent_id'] = 0;
-            $this->attributes['parent_id_tipo'] = 0;
-        }
-        $this->_parent = $parent;
+        $this->_parent = $parent; // Record or null
+        $parent = $parent ?? new \stdClass;
+        $parent->id = $parent->id ?? 0; // needed for reference
+        $parent->id_tipo = $parent->id_tipo ?? 0; // needed for reference
+        // by reference, allows parent to be saved after child is created
+        $this->attributes['parent_id'] = &$parent->id;
+        $this->attributes['parent_id_tipo'] = &$parent->id_tipo;
     }
 
     /**
