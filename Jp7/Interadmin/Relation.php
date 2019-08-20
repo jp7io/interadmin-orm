@@ -102,37 +102,37 @@ class Relation
             $ids = array_merge($ids, $fksArray);
         }
         $ids = array_unique($ids);
-        if (!$ids) {
-            return;
-        }
-
-        if ($data['has_type']) {
-            $rows = jp7_collect([]);
-            foreach ($ids as $id) {
-                $rows[$id] = Type::getInstance($id);
+        if ($ids) {
+            if ($data['has_type']) {
+                $rows = jp7_collect([]);
+                foreach ($ids as $id) {
+                    $rows[$id] = Type::getInstance($id);
+                }
+            } else {
+                $rows = (clone $data['query'])
+                    ->select($select)
+                    ->whereIn('id', $ids)
+                    ->get();
+                if (property_exists($records, '_refs')) {
+                    $records->_refs[] = $rows; // avoid $rows be removed from memory too soon
+                }
+                $rows = $rows->keyBy('id');
             }
-        } else {
-            $rows = (clone $data['query'])
-                ->select($select)
-                ->whereIn('id', $ids)
-                ->get();
-            if (property_exists($records, '_refs')) {
-                $records->_refs[] = $rows; // avoid $rows be removed from memory too soon
+            if ($relationships) { // still has things to eager load
+                self::eagerLoad($rows, $relationships, $selectStack);
             }
-            $rows = $rows->keyBy('id');
-        }
-        if ($relationships) { // still has things to eager load
-            self::eagerLoad($rows, $relationships, $selectStack);
         }
         foreach ($records as $record) {
             $loaded = (object) [
                 'fks' => $record->$alias,
                 'values' => jp7_collect([])
             ];
-            $fksArray = is_array($loaded->fks) ? $loaded->fks : array_filter(explode(',', $loaded->fks));
-            foreach ($fksArray as $fk) {
-                if (isset($rows[$fk])) {
-                    $loaded->values[] = $rows[$fk];
+            if (isset($rows)) {
+                $fksArray = is_array($loaded->fks) ? $loaded->fks : array_filter(explode(',', $loaded->fks));
+                foreach ($fksArray as $fk) {
+                    if (isset($rows[$fk])) {
+                        $loaded->values[] = $rows[$fk];
+                    }
                 }
             }
             $record->setRelation($relation, $loaded);
