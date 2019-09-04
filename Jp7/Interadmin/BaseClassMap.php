@@ -27,6 +27,7 @@ class BaseClassMap
     protected static function prepareMap($attr)
     {
         $arr = [];
+        $roots = []; // keep track of duplicated classes
         try {
             $tipos = DB::table('tipos')
                 ->select($attr, 'id_tipo', 'inherited')
@@ -37,11 +38,17 @@ class BaseClassMap
                 ->get();
 
             foreach ($tipos as $tipo) {
+                $class = $tipo->$attr;
                 if (config('interadmin.psr-4')) {
-                    $arr[$tipo->id_tipo] = str_replace('_', '\\', $tipo->$attr);
-                } else {
-                    $arr[$tipo->id_tipo] = $tipo->$attr;
+                    $class = str_replace('_', '\\', $class);
                 }
+                if (!$tipo->inherited || !in_array($attr, explode(',', $tipo->inherited))) {
+                    if (array_key_exists($class, $roots)) {
+                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in id_tipo: '.$tipo->id_tipo);
+                    }
+                    $roots[$class] = true;
+                }
+                $arr[$tipo->id_tipo] = $class;
             }
         } catch (\PDOException $e) {
             $message = "InterAdmin database not connected";
