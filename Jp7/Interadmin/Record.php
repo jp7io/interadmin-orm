@@ -1050,6 +1050,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return $oldValue;
     }
 
+    public static function hasTimestamp()
+    {
+        return isset(self::$timestamp);
+    }
     public static function getTimestamp()
     {
         return isset(self::$timestamp) ? self::$timestamp : time();

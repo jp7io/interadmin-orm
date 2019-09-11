@@ -19,7 +19,7 @@ class RecordTest extends \Codeception\Test\Unit
 
         global $config;
         $this->oldConfig = $config;
-        $this->oldTimestamp = Record::getTimestamp();
+        $this->oldTimestamp = Record::hasTimestamp() ? Record::getTimestamp() : null;
 
         $config = $config ? clone $config : new stdClass;
         $config->interadmin_preview = true;

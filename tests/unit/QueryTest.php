@@ -27,7 +27,7 @@ class QueryTest extends \Codeception\Test\Unit
 
         $userQueryShouldFail = Test_User::where('varchar_key', '=', 'blablabla')->get();
         $this->assertEmpty($userQueryShouldFail);
-        
+
         $userCompositeQuery = Test_User::where('varchar_key', '=', $newUser->username)
             ->where('char_key', '=', 'S')
             ->first();
@@ -188,7 +188,7 @@ class QueryTest extends \Codeception\Test\Unit
      */
     public function testPublished(array $attributes)
     {
-        $this->oldTimestamp = Record::getTimestamp();
+        $this->oldTimestamp = Record::hasTimestamp() ? Record::getTimestamp() : null;
         Record::setTimestamp(strtotime('2016-01-01 02:00:00'));
 
         $user = Test_User::build();
@@ -206,7 +206,7 @@ class QueryTest extends \Codeception\Test\Unit
      */
     public function testUnpublished(array $attributes)
     {
-        $this->oldTimestamp = Record::getTimestamp();
+        $this->oldTimestamp = Record::hasTimestamp() ? Record::getTimestamp() : null;
         Record::setTimestamp(strtotime('2016-01-01 02:00:00'));
 
         $user = Test_User::build();

@@ -63,6 +63,11 @@ class App
     {
         Lang::setLocale($locale);
     }
+
+    public static function runningInConsole()
+    {
+        return true;
+    }
 }
 
 class Lang
@@ -113,6 +118,14 @@ class Request
     public static function ip()
     {
         return $_SERVER['REMOTE_ADDR'] ?? '::1';
+    }
+}
+
+class Log
+{
+    public static function error($e)
+    {
+        echo 'Log@error: '.$e->getMessage().PHP_EOL;
     }
 }
 
