@@ -190,6 +190,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function setIdAttribute($value)
     {
         $this->attributes['id'] = $value;
+        $this->exists = (bool) $value;
     }
 
     public function setIdTipoAttribute($value)

@@ -1118,7 +1118,9 @@ class Type extends RecordAbstract
             $record->setParent($this->_parent);
         }
 
-        return $record->fill($attributes);
+        $record->fill($attributes);
+        $record->exists = false;
+        return $record;
     }
 
     /**

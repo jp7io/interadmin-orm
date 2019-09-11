@@ -41,6 +41,13 @@ abstract class RecordAbstract
     protected $_db = '';
 
     /**
+     * Indicates if the model exists.
+     *
+     * @var bool
+     */
+    public $exists = false;
+
+    /**
      * Magic get acessor.
      *
      * @param string $attributeName
@@ -73,6 +80,9 @@ abstract class RecordAbstract
     {
         if ($name === 'attributes') {
             throw new Exception("attributes is protected"); // FIXME remove when old code is validated
+        }
+        if ($name === $this->_primary_key) {
+            $this->exists = (bool) $value;
         }
         $mutator = 'set' . Str::studly($name) . 'Attribute';
         if (method_exists($this, $mutator)) {
@@ -302,15 +312,15 @@ abstract class RecordAbstract
         $pk = $this->_primary_key;
         $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
-        if ($this->$pk) {
-            if ($db->table($table)->where($pk, $this->$pk)->update($valuesToSave) === false) {
-                throw new Exception('Error while updating values in `'.$this->getTableName().'` '.
-                    $db->getPdo()->errorCode(), print_r($valuesToSave, true));
+        if ($this->exists) {
+            if (!$db->table($table)->where($pk, $this->$pk)->update($valuesToSave)) {
+                throw new Exception('Error while updating values in `'.$this->getTableName().'` Code: '.
+                    $db->getPdo()->errorCode().' - '.print_r($valuesToSave, true));
             }
         } else {
-            if ($db->table($table)->insert($valuesToSave) === false) {
-                throw new Exception('Error while inserting data into `'.$this->getTableName().'` '.
-                    $db->getPdo()->errorCode(), print_r($valuesToSave, true));
+            if (!$db->table($table)->insert($valuesToSave)) {
+                throw new Exception('Error while inserting data into `'.$this->getTableName().'` Code: '.
+                    $db->getPdo()->errorCode().' - '.print_r($valuesToSave, true));
             }
 
             $this->$pk = $db->getPdo()->lastInsertId();
