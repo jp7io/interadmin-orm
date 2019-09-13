@@ -1204,20 +1204,26 @@ abstract class RecordAbstract
     public static function replaceBindings($bindinds, $sql)
     {
         // backwards compatibility, use quote instead of bindings
+        // used only for debugging and some subqueries that could not be converted
         $db = \DB::connection();
         $pdo = $db->getPdo();
         if (!$pdo) {
             $db->reconnect();
             $pdo = $db->getPdo();
         }
+        $quoted = '(?<quoted>\'((?<=\\\\)\'|[^\'])*\'|"((?<=\\\\)"|[^"])*")';
         foreach ($bindinds as $key => $value) {
+            $found = false;
             $sql = preg_replace_callback(
-                '~(\s)'.$key.'\b~', // pattern
-                function ($matches) use ($pdo, $value) { // callback
-                    return $matches[1].$pdo->quote($value);
-                }, 
-                $sql, // subject
-                1 // limit
+                '~'.$quoted.'|(?<before>\W)'.$key.'\b~', // pattern
+                function ($matches) use ($pdo, $value, &$found) { // callback
+                    if ($found || $matches['quoted']) {
+                        return $matches[0]; // quoted, unchanged
+                    }
+                    $found = true; // replace only first occurrence
+                    return $matches['before'].$pdo->quote($value);
+                },
+                $sql // subject
             );
         }
         return $sql;
