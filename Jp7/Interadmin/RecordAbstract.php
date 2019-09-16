@@ -313,15 +313,9 @@ abstract class RecordAbstract
         $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
         if ($this->exists) {
-            if (!$db->table($table)->where($pk, $this->$pk)->update($valuesToSave)) {
-                throw new Exception('Error while updating values in `'.$this->getTableName().'` Code: '.
-                    $db->getPdo()->errorCode().' - '.print_r($valuesToSave, true));
-            }
+            $db->table($table)->where($pk, $this->$pk)->update($valuesToSave);
         } else {
-            if (!$db->table($table)->insert($valuesToSave)) {
-                throw new Exception('Error while inserting data into `'.$this->getTableName().'` Code: '.
-                    $db->getPdo()->errorCode().' - '.print_r($valuesToSave, true));
-            }
+            $db->table($table)->insert($valuesToSave);
 
             $this->$pk = $db->getPdo()->lastInsertId();
         }
