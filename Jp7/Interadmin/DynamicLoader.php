@@ -73,7 +73,7 @@ class DynamicLoader
         } elseif (strpos($campo['tipo'], 'char') === 0) {
             $type = 'string';
         } elseif (strpos($campo['tipo'], 'date') === 0) {
-            $type = 'Date';
+            $type = '\\Date';
         } else {
             $type = 'string';
         }
@@ -90,7 +90,7 @@ class DynamicLoader
             foreach ($type->getCampos() as $campo) {
                 $phpdoc .= ' * @property '.self::getPhpDocCampo($type, $campo)."\r\n";
             }
-            $phpdoc .= ' * @property Date $date_publish'."\r\n";
+            $phpdoc .= ' * @property \\Date $date_publish'."\r\n";
             $phpdoc .= ' */';
         }
 
@@ -146,7 +146,7 @@ class DynamicLoader
         }
         return <<<STR
 <?php
-
+// THIS IS A GENERATED FILE, BE CAREFUL TO EDIT THIS
 {$namespace}
 {$phpdoc}
 class {$className} extends \\{$parentClass}
