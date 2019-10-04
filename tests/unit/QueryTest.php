@@ -13,7 +13,7 @@ class QueryTest extends \Codeception\Test\Unit
     protected function _before()
     {
         $this->tester->seeNumRecords(0, 'interadmin_teste_tipos');
-        $this->userType = $this->tester->createUserType();
+        $this->tester->createUserType();
 
         RecordClassMap::getInstance()->clearCache();
     }

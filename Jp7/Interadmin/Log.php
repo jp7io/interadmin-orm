@@ -52,7 +52,7 @@ class Log extends RecordAbstract
      */
     public function __construct(array $attributes = [])
     {
-        $this->attributes = $attributes + ['id_log' => 0];
+        $this->setRawAttributes($attributes + ['id_log' => 0]);
     }
 
     public function &__get($name)

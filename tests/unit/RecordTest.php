@@ -38,21 +38,7 @@ class RecordTest extends \Codeception\Test\Unit
 
     public function testSetAndGet()
     {
-        $userType = $this->tester->createUserType();
-        $this->assertFalse(isset($userType->newProp));
-        $userType->newProp = [];
-        $this->assertTrue(isset($userType->newProp));
-
-        $userType->newProp[] = 1;
-        $userType->newProp[] = 2;
-        $this->assertEquals($userType->newProp, [1, 2]);
-
-        unset($userType->newProp);
-        $this->assertFalse(isset($userType->newProp));
-
-        $userType->date_modify = date('c');
-        $this->assertInstanceOf('Date', $userType->date_modify);
-
+        $this->tester->createUserType();
         RecordClassMap::getInstance()->clearCache();
 
         $user = Test_User::build();

@@ -82,7 +82,7 @@ class Type extends RecordAbstract
      */
     public function __construct($id_tipo = null)
     {
-        $this->attributes['id_tipo'] = $id_tipo ?? static::ID_TIPO;
+        $this->id_tipo = $id_tipo ?? static::ID_TIPO;
     }
 
     public function &__get($name)
