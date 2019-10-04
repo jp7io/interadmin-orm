@@ -73,8 +73,6 @@ class Type extends RecordAbstract
      */
     protected $_interadminRelationships;
 
-    private static $touchedTypes = [];
-
     /**
      * Construct.
      *
@@ -99,29 +97,12 @@ class Type extends RecordAbstract
             });
             if (array_key_exists($name, $this->attributes)) {
                 $value = &$this->attributes[$name];
-            }
-            // Only if "touched" column exists:
-            if (isset($this->attributes['touched'])) {
-                if (!empty($this->attributes['id_tipo']) && empty($this->attributes['touched'])) {
-                    self::$touchedTypes[$this->attributes['id_tipo']] = $this->attributes['nome'] ?? '';
-                    self::getCacheRepository()->forget($this->getCacheKey('attributes'));
-                }
-            }
+            }            
         } elseif ($query = $this->_getManyRelationship($name)) {
             $value = $query->get(); // not memoized, unlike Record implementation
         }
         $value = $this->getMutatedAttribute($name, $value);
-
         return $value;
-    }
-
-    public static function updateTouched()
-    {
-        if (count(self::$touchedTypes)) {
-            $ids = implode(',', array_keys(self::$touchedTypes));
-            $affected = \DB::update("UPDATE interadmin_ci_tipos SET touched = true WHERE id_tipo IN (".$ids.")");
-            \Log::debug("Touched ".count(self::$touchedTypes)." types - updated ".$affected);
-        }
     }
 
     public function __call($methodName, $args)
@@ -1005,7 +986,7 @@ class Type extends RecordAbstract
             ->get();
         if (is_array($unsyncedTypes)) {
             $unsyncedTypes = collect($unsyncedTypes); // <= Laravel 5.2
-        }
+        } 
         \Log::notice('Resyncing '.count($unsyncedTypes).' types: '.$unsyncedTypes->implode('id_tipo', ','));
         foreach ($unsyncedTypes as $unsyncedType) {
             $type = new self($unsyncedType->id_tipo);
@@ -1446,7 +1427,7 @@ class Type extends RecordAbstract
         }
         return $parameters;
     }
-
+    
     public function getUrl() // $action = 'index', array $parameters = []
     {
         $args = func_get_args();
