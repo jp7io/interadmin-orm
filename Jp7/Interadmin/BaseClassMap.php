@@ -43,7 +43,7 @@ class BaseClassMap
                     $class = str_replace('_', '\\', $class);
                 }
                 if (!$tipo->inherited || !in_array($attr, explode(',', $tipo->inherited))) {
-                    if (array_key_exists($class, $roots)) {
+                    if (array_key_exists($class, $roots) && config('interadmin.namespace')) {
                         throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in id_tipo: '.$tipo->id_tipo);
                     }
                     $roots[$class] = true;
