@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14ba707169c889dd7a356c3c86480cf6",
+    "content-hash": "23909fcdb95d701031b3510c2730065e",
     "packages": [
         {
             "name": "jdorn/sql-formatter",
@@ -1054,16 +1054,16 @@
         },
         {
             "name": "jp7internet/classes",
-            "version": "3.2.x-dev",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jp7internet/classes",
-                "reference": "209b4a1b96edfdea63c92cc5824ad21f9e05f0da"
+                "url": "git@github.com:jp7internet/classes.git",
+                "reference": "36797be8611cd80177cc8b666383df3c7ca4b8d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/classes/zipball/209b4a1b96edfdea63c92cc5824ad21f9e05f0da",
-                "reference": "209b4a1b96edfdea63c92cc5824ad21f9e05f0da",
+                "url": "https://api.github.com/repos/jp7internet/classes/zipball/36797be8611cd80177cc8b666383df3c7ca4b8d7",
+                "reference": "36797be8611cd80177cc8b666383df3c7ca4b8d7",
                 "shasum": ""
             },
             "require-dev": {
@@ -1084,7 +1084,7 @@
                 "proprietary"
             ],
             "description": "JP7 Classes",
-            "time": "2017-02-23T14:31:38+00:00"
+            "time": "2019-09-25T16:59:08+00:00"
         },
         {
             "name": "myclabs/deep-copy",

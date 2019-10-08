@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
-use Jp7\CollectionUtil;
 use Jp7\TryMethod;
 use Exception;
 use UnexpectedValueException;
@@ -959,7 +958,7 @@ abstract class RecordAbstract
                     if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
                         $multi_options = $options['select_multi_fields'][$alias];
                         if ($multi_options) {
-                            CollectionUtil::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
+                            Relation::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
                         }
                     }
                 }

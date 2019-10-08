@@ -2,7 +2,6 @@
 
 namespace Jp7\Interadmin;
 
-use Jp7\CollectionUtil;
 use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use InvalidArgumentException;
@@ -340,10 +339,10 @@ class Type extends RecordAbstract
 //                                $selects[] = $item->$attribute;
 //                            }
 //                        }
-//                        CollectionUtil::eagerLoad($selects, $relationshipData['levels']);
+//                        Relation::eagerLoad($selects, $relationshipData['levels']);
 //                    }
 //                } else {
-                    CollectionUtil::eagerLoad($records, $relationshipData['levels']);
+                    Relation::eagerLoad($records, $relationshipData['levels']);
 //                }
             }
         }

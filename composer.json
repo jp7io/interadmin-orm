@@ -13,7 +13,7 @@
         "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
-        "jp7internet/classes": "3.2.x-dev",
+        "jp7internet/classes": "dev-master",
         "illuminate/support": "~5.2",
         "illuminate/database": "~5.2",
         "illuminate/cache": "~5.2",

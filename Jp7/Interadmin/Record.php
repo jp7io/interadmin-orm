@@ -2,7 +2,6 @@
 
 namespace Jp7\Interadmin;
 
-use Jp7\CollectionUtil;
 use Jp7\Interadmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -11,14 +10,12 @@ use BadMethodCallException;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Exception;
-use DB;
 use Request;
 use RecordUrl;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
  *
- * @method static Query where(string $column, string $operator = null, mixed $value = null)
  * @method static Query whereRaw(string $where)
  * @method static static build(array $attributes = [])
  * @method static static create(array $attributes = [])
@@ -252,7 +249,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($query = $this->_getManyRelationship($name)) {
             if (!$query instanceof EagerLoadedQuery && $this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
                 // Lazy loading optimizer
-                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                Relation::eagerLoad(self::$_collections[$this->_collection_id], $name);
                 $manyRecords = $this->relations[$name];
             } else {
                 $manyRecords = $query->get(); // EagerLoadedQuery or Query
@@ -325,7 +322,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 } elseif ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
                     // Optimize lazy loading
                     unset($this->relations[$name]);
-                    CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                    Relation::eagerLoad(self::$_collections[$this->_collection_id], $name);
                     $loaded = &$this->relations[$name];
                 } else {
                     if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
@@ -351,7 +348,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             } elseif ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
                 // Optimize lazy loading
                 unset($this->relations[$name]);
-                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                Relation::eagerLoad(self::$_collections[$this->_collection_id], $name);
                 $loaded = &$this->relations[$name];
             } else {
                 if (getenv('APP_DEBUG') && self::$lazy_loading_debug) {
@@ -616,7 +613,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if (!$this->_parent) {
             if ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
                 // Lazy loading optimizer
-                CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], '_parent');
+                Relation::eagerLoad(self::$_collections[$this->_collection_id], '_parent');
                 return $this->_parent;
             }
             $this->loadAttributes(['parent_id', 'parent_id_tipo'], false);
