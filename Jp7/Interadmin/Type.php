@@ -148,6 +148,24 @@ class Type extends RecordAbstract
         return isset($this->attributes[$name]) || in_array($name, $this->getAttributesNames());
     }
 
+    public static function __callStatic($name, array $arguments)
+    {
+        if ($query = static::query()) {
+            return call_user_func_array([$query, $name], $arguments);
+        }
+        throw new BadMethodCallException('Call to undefined method '.get_called_class().'::'.$name);
+    }
+
+    public static function all()
+    {
+        return static::query()->get();
+    }
+
+    public static function query()
+    {
+        return new Query\TypeQuery;
+    }
+
     /**
      * Returns an Type instance. If $options['class'] is passed,
      * it will be returned an object of the given class, otherwise it will search
@@ -712,7 +730,8 @@ class Type extends RecordAbstract
 
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->id_tipo) {
-            $inheritingTipos = self::findTiposByModel($this->id_tipo, [
+            $inheritingTipos = $this->deprecatedGetChildren([
+                'where' => ["model_id_tipo = '".$this->id_tipo."'"],
                 'class' => self::class,
             ]);
             foreach ($inheritingTipos as $tipo) {
