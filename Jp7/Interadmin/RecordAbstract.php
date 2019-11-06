@@ -312,6 +312,9 @@ abstract class RecordAbstract
         $table = str_replace($db->getTablePrefix(), '', $this->getTableName()); // FIXME
 
         if ($this->exists) {
+            if (getenv('APP_DEBUG') && !$db->table($table)->where($pk, $this->$pk)->exists()) {
+                throw new UnexpectedValueException('No record found before update with PK ('.$pk.'): '.$this->$pk);
+            }
             $db->table($table)->where($pk, $this->$pk)->update($valuesToSave);
         } else {
             $db->table($table)->insert($valuesToSave);
