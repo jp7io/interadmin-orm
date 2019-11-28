@@ -242,9 +242,6 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $related = $this->_loadRelationship($relationships, $name);
             return $related; // returned as reference
         }
-        if (!$this->attributes['id']) {
-            return; // data below depends on an ID
-        }
         // children most likely
         if ($query = $this->_getManyRelationship($name)) {
             if (!$query instanceof EagerLoadedQuery && $this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
@@ -258,8 +255,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 }
             }
             return $manyRecords;
+        if (!$this->attributes['id']) {
+            return; // data below depends on an ID
         }
-
         // Lazy loading
         $columns = $this->getColumns();
         $aliases = $this->_aliases;
