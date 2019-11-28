@@ -244,17 +244,16 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
         // children most likely
         if ($query = $this->_getManyRelationship($name)) {
-            if (!$query instanceof EagerLoadedQuery && $this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
-                // Lazy loading optimizer
-                Relation::eagerLoad(self::$_collections[$this->_collection_id], $name);
-                $manyRecords = $this->relations[$name];
-            } else {
-                $manyRecords = $query->get(); // EagerLoadedQuery or Query
-                if (!$query instanceof EagerLoadedQuery) { // if EagerLoadedQuery, don't overwrite
-                    $this->relations[$name] = $manyRecords;
+            if (!array_key_exists($name, $this->relations)) {
+                if ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
+                    // Lazy loading optimizer // It fills $this->relations[$name]
+                    CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                } else {
+                    $this->relations[$name] = $query->get();
                 }
             }
-            return $manyRecords;
+            return $this->relations[$name];
+        }
         if (!$this->attributes['id']) {
             return; // data below depends on an ID
         }
