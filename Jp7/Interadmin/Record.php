@@ -247,7 +247,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             if (!array_key_exists($name, $this->relations)) {
                 if ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
                     // Lazy loading optimizer // It fills $this->relations[$name]
-                    CollectionUtil::eagerLoad(self::$_collections[$this->_collection_id], $name);
+                    Relation::eagerLoad(self::$_collections[$this->_collection_id], $name);
                 } else {
                     $this->relations[$name] = $query->get();
                 }
