@@ -129,9 +129,9 @@ class Relation
             ];
             if (isset($rows)) {
                 $fksArray = is_array($loaded->fks) ? $loaded->fks : array_filter(explode(',', $loaded->fks));
-                foreach ($fksArray as $fk) {
-                    if (isset($rows[$fk])) {
-                        $loaded->values[] = $rows[$fk];
+                foreach ($rows as $fk => $row) {
+                    if (in_array($fk, $fksArray)) {
+                        $loaded->values[] = $row;
                     }
                 }
             }
