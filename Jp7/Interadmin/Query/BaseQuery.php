@@ -408,14 +408,19 @@ abstract class BaseQuery
         return $this->whereHas($relationship, $conditions, true);
     }
 
-    protected function _whereHash($hash, $reverse = false)
+    protected function _whereHash($hash)
     {
-        if (array_key_exists(0, $hash)) {
-            throw new \InvalidArgumentException('Invalid column.');
-        }
         $where = [];
         foreach ($hash as $key => $value) {
-            $where[] = $this->_parseComparison($key, '=', $value);
+            if (is_integer($key)) {
+                if (is_array($value)) {
+                    $where[] = $this->_parseComparison(...$value);
+                } else {
+                    throw new \InvalidArgumentException('Invalid column.');
+                }
+            } else {
+                $where[] = $this->_parseComparison($key, '=', $value);
+            }
         }
         if ($where) {
             return '('.implode(' AND ', $where).')';
