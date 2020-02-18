@@ -21,6 +21,7 @@ abstract class BaseQuery
      * @var array
      */
     protected $options;
+    protected $inner = false;
     protected $or = false;
     protected $prefix = '';
 
@@ -81,6 +82,10 @@ abstract class BaseQuery
         if (starts_with($method_name, 'or')) {
             $original = lcfirst(substr($method_name, 2));
             if (method_exists($this, $original)) {
+                if (!$this->inner) {
+                    throw new BadMethodCallException('You should always group '.$method_name.' calls,
+                        see https://laravel.com/docs/5.8/queries#parameter-grouping');
+                }
                 $this->or = true;
 
                 return call_user_func_array([$this, $original], $params);
@@ -289,6 +294,9 @@ abstract class BaseQuery
 
     public function orWhere($column, $operator = null, $value = null)
     {
+        if (!$this->inner) {
+            throw new BadMethodCallException('You should always group orWhere calls, see https://laravel.com/docs/5.8/queries#parameter-grouping');
+        }
         $this->or = true;
 
         return $this->where($column, $operator, $value);
@@ -353,7 +361,7 @@ abstract class BaseQuery
     {
         return $this->whereDoesntHave($relationship, '1 = 1');
     }
-    
+
     public function whereHas($relationship, $conditions = null, $_not = false)
     {
         try {
@@ -430,6 +438,7 @@ abstract class BaseQuery
     protected function _whereClosure($closure)
     {
         $innerQuery = new static($this->provider);
+        $innerQuery->inner = true;
         $innerQuery->prefix = $this->prefix;
         $closure($innerQuery);
 
@@ -445,13 +454,14 @@ abstract class BaseQuery
         }
 
         $innerQuery = new static($type);
+        $innerQuery->inner = true;
         $innerQuery->prefix = $relationship.'.';
 
         if (is_array($conditions)) {
             $innerQuery->_addWhere($innerQuery->_whereHash($conditions));
             return $innerQuery->getOptionsArray()['where'];
         } elseif ($conditions instanceof \Closure) {
-            return [$innerQuery->_whereClosure($conditions)]; 
+            return [$innerQuery->_whereClosure($conditions)];
         }
         throw new \InvalidArgumentException('Invalid conditions.');
     }
@@ -714,7 +724,7 @@ abstract class BaseQuery
     public function getOptionsArray($replaceBinding = true)
     {
         $array = $this->options;
-        if ($replaceBinding && $this->options['bindings']) { 
+        if ($replaceBinding && $this->options['bindings']) {
             foreach ($array['where'] as &$where) {
                 $where = RecordAbstract::replaceBindings($array['bindings'], $where);
             }
