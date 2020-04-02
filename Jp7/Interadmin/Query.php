@@ -205,11 +205,51 @@ class Query extends Query\BaseQuery
     }
 
     /**
+     * Set deleted = 'S' and update the records.
+     *
+     * @return int
+     */
+    public function delete()
+    {
+        return $this->provider->deprecated_updateInterAdmins([
+            'deleted' => 'S',
+        ], $this->options);
+    }
+
+    /**
      * Remove permanently from the database.
      */
     public function forceDelete()
     {
         return $this->provider->deprecated_deleteInterAdminsForever($this->options);
+    }
+
+    /**
+     * Increment a column's value by a given amount.
+     *
+     * @param  string  $column
+     * @param  float|int  $amount
+     * @return int
+     */
+    public function increment($column, $amount = 1)
+    {
+        return $this->provider->deprecated_updateInterAdmins([
+            $column => \DB::raw($column.' + '.$amount),
+        ], $this->options);
+    }
+
+    /**
+     * Decrement a column's value by a given amount.
+     *
+     * @param  string  $column
+     * @param  float|int  $amount
+     * @return int
+     */
+    public function decrement($column, $amount = 1)
+    {
+        return $this->provider->deprecated_updateInterAdmins([
+            $column => \DB::raw($column.' - '.$amount)
+        ], $this->options);
     }
 
     /**

@@ -89,7 +89,8 @@ class UnitTester extends \Codeception\Actor
             'password_key' => '123',
             'varchar_2' => 'pamela@jp7.com.br',
             'char_key' => 'S',
-            'publish' => 'S'
+            'publish' => 'S',
+            'ordem' => 0,
         ];
         $user->setRawAttributes($attributes);
         $user->save();
@@ -101,7 +102,8 @@ class UnitTester extends \Codeception\Actor
             ['tipo' => 'varchar_key', 'nome' => 'Username'],
             ['tipo' => 'password_key', 'nome' => 'Password'],
             ['tipo' => 'varchar_2', 'nome' => 'E-mail'],
-            ['tipo' => 'char_key', 'nome' => 'Mostrar']
+            ['tipo' => 'char_key', 'nome' => 'Mostrar'],
+            ['tipo' => 'int_key', 'nome' => 'Ordem']
         ]);
     }
 
@@ -124,7 +126,8 @@ class UnitTester extends \Codeception\Actor
         $list = [];
         for ($i = 0; $i < $count; $i++) {
             $user = $this->createUser([
-                'varchar_key' => 'User #' . $i
+                'varchar_key' => 'User #' . $i,
+                'ordem' => $i
             ]);
 
             $list[] = $user;

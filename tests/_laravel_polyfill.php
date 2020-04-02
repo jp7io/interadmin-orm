@@ -26,6 +26,11 @@ class Cache extends Illuminate\Support\Facades\Cache
 
 class DB extends Illuminate\Support\Facades\DB
 {
+    public static function raw($string)
+    {
+        return new Illuminate\Database\Query\Expression($string);
+    }
+
     protected static function resolveFacadeInstance($name)
     {
         static $db;

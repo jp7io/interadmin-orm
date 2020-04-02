@@ -91,60 +91,24 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereIn()
     {
-        $alovelace = $this->tester->createUser([
-            'varchar_key' => 'alovelace',
-            'varchar_2' => 'alovelace@byron.com'
-        ]);
+        $this->tester->createUsersBulk(4);
 
-        $aturing = $this->tester->createUser([
-            'varchar_key' => 'aturing',
-            'varchar_2' => 'aturing@compsci.org'
-        ]);
-
-        $atanenbaum = $this->tester->createUser([
-            'varchar_key' => 'atanenbaum',
-            'varchar_2' => 'atanenbaum@vua.edu'
-        ]);
-
-        $cbabbage = $this->tester->createUser([
-            'varchar_key' => 'cbabbage',
-            'varchar_2' => 'cbabbage@cbi.org'
-        ]);
-
-        $users = Test_User::whereIn('varchar_key', ['aturing', 'alovelace'])->get();
-        $this->assertTrue($users->contains('username', 'alovelace'));
-        $this->assertTrue($users->contains('username', 'aturing'));
-        $this->assertFalse($users->contains('username', 'cbabbage'));
-        $this->assertFalse($users->contains('username', 'atanenbaum'));
+        $users = Test_User::whereIn('varchar_key', ['User #0', 'User #1'])->get();
+        $this->assertTrue($users->contains('username', 'User #0'));
+        $this->assertTrue($users->contains('username', 'User #1'));
+        $this->assertFalse($users->contains('username', 'User #2'));
+        $this->assertFalse($users->contains('username', 'User #3'));
     }
 
     public function testWhereNotIn()
     {
-        $this->tester->createUser([
-            'varchar_key' => 'alovelace',
-            'varchar_2' => 'alovelace@byron.com'
-        ]);
+        $this->tester->createUsersBulk(4);
 
-        $this->tester->createUser([
-            'varchar_key' => 'aturing',
-            'varchar_2' => 'aturing@compsci.org'
-        ]);
-
-        $this->tester->createUser([
-            'varchar_key' => 'atanenbaum',
-            'varchar_2' => 'atanenbaum@vua.edu'
-        ]);
-
-        $this->tester->createUser([
-            'varchar_key' => 'cbabbage',
-            'varchar_2' => 'cbabbage@cbi.org'
-        ]);
-
-        $users = Test_User::whereNotIn('varchar_key', ['aturing', 'alovelace'])->get();
-        $this->assertFalse($users->contains('varchar_key', 'alovelace'));
-        $this->assertFalse($users->contains('varchar_key', 'aturing'));
-        $this->assertTrue($users->contains('varchar_key', 'cbabbage'));
-        $this->assertTrue($users->contains('varchar_key', 'atanenbaum'));
+        $users = Test_User::whereNotIn('varchar_key', ['User #0', 'User #1'])->get();
+        $this->assertFalse($users->contains('varchar_key', 'User #0'));
+        $this->assertFalse($users->contains('varchar_key', 'User #1'));
+        $this->assertTrue($users->contains('varchar_key', 'User #2'));
+        $this->assertTrue($users->contains('varchar_key', 'User #3'));
     }
 
     public function testOrderBy()
@@ -181,6 +145,59 @@ class QueryTest extends \Codeception\Test\Unit
         foreach ($users as $user) {
             $this->assertEquals($list->pop()->username, $user->username);
         }
+    }
+
+    public function testDelete()
+    {
+        $this->tester->createUsersBulk(10);
+
+        Test_User::where('username', 'User #0')->orderBy('username')->delete();
+        $this->assertEquals(9, Test_User::count());
+
+        Test_User::limit(2)->delete();
+        $this->assertEquals(7, Test_User::count());
+
+        Test_User::query()->delete();
+        $this->assertEquals(0, Test_User::count());
+        $this->tester->seeNumRecords(10, 'interadmin_teste_registros');
+    }
+
+    public function testForceDelete()
+    {
+        $this->tester->createUsersBulk(10);
+
+        Test_User::where('username', 'User #0')->orderBy('username')->forceDelete();
+        $this->tester->seeNumRecords(9, 'interadmin_teste_registros');
+
+        Test_User::limit(2)->forceDelete();
+        $this->tester->seeNumRecords(7, 'interadmin_teste_registros');
+
+        Test_User::query()->forceDelete();
+        $this->tester->seeNumRecords(0, 'interadmin_teste_registros');
+    }
+
+    public function testUpdate()
+    {
+        $this->tester->createUsersBulk(10);
+
+        Test_User::where('ordem', '<', 5)->update([
+            'e_mail' => 'updated@jp7.com.br',
+            'ordem' => 0,
+            'username' => \DB::raw('CONCAT(username, \' suffix\')'),
+        ]);
+
+        $this->assertEquals('User #0 suffix', Test_User::orderBy('username')->first()->username);
+        $this->assertEquals(5, Test_User::where('e_mail', 'updated@jp7.com.br')->count());
+        $this->assertEquals(5, Test_User::where('username', 'LIKE', '%suffix')->count());
+        $this->assertEquals('0,0,0,0,0,5,6,7,8,9', Test_User::pluck('ordem')->implode(','));
+    }
+
+    public function testIncrement()
+    {
+        $this->tester->createUsersBulk(10);
+
+        Test_User::where('ordem', '>=', 5)->increment('ordem', 10);
+        $this->assertEquals('0,1,2,3,4,15,16,17,18,19', Test_User::pluck('ordem')->implode(','));
     }
 
     /**

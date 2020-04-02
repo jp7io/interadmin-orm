@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Query\Expression;
 use Jp7\TryMethod;
 use Exception;
 use UnexpectedValueException;
@@ -60,7 +61,7 @@ abstract class RecordAbstract
             $value = $this->attributes[$name];
             $value = $this->getMutatedAttribute($name, $value);
             return $value;
-        }    
+        }
         // Mutators
         $mutator = 'get'.Str::studly($name).'Attribute';
         if (method_exists($this, $mutator)) {
@@ -279,7 +280,7 @@ abstract class RecordAbstract
         $this->setRawAttributes($attributes);
         $this->_update($attributes);
     }
-    
+
     /**
      * Increments a numeric attribute.
      *
@@ -332,9 +333,13 @@ abstract class RecordAbstract
             $key = isset($aliases[$key]) ? $aliases[$key] : $key;
             switch (gettype($value)) {
                 case 'object':
-                    $valuesToSave[$key] = (string) $value;
-                    if ($value instanceof FileField) {
-                        $valuesToSave[$key.'_text'] = $value->text;
+                    if ($value instanceof Expression) {
+                        $valuesToSave[$key] = $value;
+                    } else {
+                        $valuesToSave[$key] = (string) $value;
+                        if ($value instanceof FileField) {
+                            $valuesToSave[$key.'_text'] = $value->text;
+                        }
                     }
                     break;
                 case 'array':
@@ -361,10 +366,11 @@ abstract class RecordAbstract
      * Executes a SQL Query based on the values passed by $options.
      *
      * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
-     * @param bool $_delete Performs a DELETE instead of a SELECT
+     * @param string $_stmt Performs DELETE or UPDATE instead of a SELECT
+     * @param array $_valuesToSave On UPDATE calls SET these values
      * @return ADORecordSet
      */
-    protected function _executeQuery($options, $_delete = false) // , &$select_multi_fields = []
+    protected function _executeQuery($options, $_stmt = false, $_valuesToSave = []) // , &$select_multi_fields = []
     {
         //global $debugger;
         $db = $this->getDb();
@@ -421,7 +427,7 @@ abstract class RecordAbstract
                 if ($tipo === Type::class) {
                     $table = (new Type)->getTableName();
                 } else {
-                $table = $tipo->getInterAdminsTableName();
+                    $table = $tipo->getInterAdminsTableName();
                 }
                 $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
                     ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
@@ -447,10 +453,7 @@ abstract class RecordAbstract
         }
 
         // Sql
-        $sql = 'SELECT '.($_delete ? 'main.id' : implode(',', $options['fields'])).
-            ' FROM '.$from.
-            ($options['from'] ? implode('', $options['from']) : '').
-            ' WHERE '.$filters.$clauses.
+        $sql = ' WHERE '.$filters.$clauses.
             (!empty($options['limit']) ? ' LIMIT '.$options['limit'] : '');
 
         if ($APP_DEBUG) {
@@ -458,10 +461,34 @@ abstract class RecordAbstract
         }
 
         try {
-            if ($_delete) {
-                $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.$sql.') AS temp ON main.id = temp.id';
+            if ($_stmt === 'UPDATE') {
+                foreach ($_valuesToSave as $key => $value) {
+                    if ($value instanceof Expression) {
+                        $_valuesToSave[$key] = $key.' = '.$this->_resolveSql($value, $options, $use_published_filters);
+                    } else {
+                        $binding = ':val'.count($options['bindings']);
+                        $options['bindings'][$binding] = $value;
+                        $_valuesToSave[$key] = $key.' = '.$binding;
+                    }
+                }
+                $sql = 'UPDATE '.$from.
+                    ($options['from'] ? implode('', $options['from']) : '').
+                    ' SET '.implode(', ', $_valuesToSave).
+                    $sql;
+                $rs = $db->update($sql, $options['bindings']);
+            } elseif ($_stmt === 'DELETE') {
+                // Temp table needed for LIMIT
+                $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.
+                    'SELECT main.id FROM '.$from.
+                    ($options['from'] ? implode('', $options['from']) : '').
+                    $sql.
+                    ') AS temp ON main.id = temp.id';
                 $rs = $db->delete($sql, $options['bindings']);
             } else {
+                $sql = 'SELECT '.implode(',', $options['fields']).
+                    ' FROM '.$from.
+                    ($options['from'] ? implode('', $options['from']) : '').
+                    $sql;
                 $rs = $db->select($sql, $options['bindings']);
             }
         } catch (QueryException $e) {
@@ -475,7 +502,7 @@ abstract class RecordAbstract
         if ($APP_DEBUG) {
             $this->_debugQuery(
                 self::replaceBindings($options['bindings'], $sql),
-                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10), 
+                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10),
                 $startQuery
             );
         }
