@@ -20,6 +20,7 @@ The API is heavily inspired by Laravel Eloquent, most methods and arguments are 
 * [Query](https://github.com/jp7internet/interadmin-orm/wiki/Query)
 * [Mass Assignment](https://github.com/jp7internet/interadmin-orm/wiki/Mass-Assignment)
 * [Cheat Sheet](https://github.com/jp7internet/interadmin-orm/wiki/Cheat-Sheet)
+* [Route, mapping types and getUrl](https://docs.google.com/document/d/1vWUk7g9HonOo8szRJn90r9c1rsWFzxDC3GfQ1s1QehY)
 * Eloquent documentation (most methods and arguments are exactly the same):
   * https://learninglaravel.net/cheatsheet/#eloquent
   * https://laravel.com/docs/5.3/eloquent  
