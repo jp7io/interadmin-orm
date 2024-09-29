@@ -1,19 +1,19 @@
 {
-    "name": "jp7internet/interadmin-orm",
+    "name": "jp7io/interadmin-orm",
     "description": "JP7 InterAdmin ORM",
     "keywords": [],
     "license": "proprietary",
     "repositories" : [
         {
             "type": "composer",
-            "url": "https://satis.jp7.com.br"
+            "url": "https://satis.jp7.io"
         }
     ],
     "require": {
         "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
-        "jp7internet/classes": "dev-master",
+        "jp7io/classes": "dev-main",
         "illuminate/support": "~5.2",
         "illuminate/database": "~5.2",
         "illuminate/cache": "~5.2",
