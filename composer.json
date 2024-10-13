@@ -3,7 +3,7 @@
     "description": "JP7 InterAdmin ORM",
     "keywords": [],
     "license": "proprietary",
-    "repositories" : [
+    "repositories": [
         {
             "type": "composer",
             "url": "https://satis.jp7.io"
@@ -13,24 +13,21 @@
         "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
-        "jp7io/classes": "dev-main",
-        "illuminate/support": "~5.2",
-        "illuminate/database": "~5.2",
-        "illuminate/cache": "~5.2",
-        "illuminate/config": "~5.2",
-        "symfony/var-dumper": "~3.0",
-        "codeception/codeception": "^2.2",
-        "codeclimate/php-test-reporter": "^0.3.2",
-        "vlucas/phpdotenv": "^2.4"
+        "jp7io/classes": "dev-docker-2024",
+        "illuminate/support": "^8.75",
+        "illuminate/database": "^8.75",
+        "illuminate/cache": "^8.75",
+        "illuminate/config": "^8.75",
+        "symfony/var-dumper": "^5.4",
+        "codeception/codeception": "^4.2",
+        "vlucas/phpdotenv": "^5.6"
     },
     "autoload": {
         "psr-4": {
             "Jp7\\Interadmin\\": "Jp7/Interadmin/"
         }
     },
-    "scripts": {
-
-    },
+    "scripts": {},
     "config": {
         "preferred-install": "dist",
         "component-dir": "vendor/components-installed"
