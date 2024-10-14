@@ -50,7 +50,7 @@
   * "werkint/jsmin": "~1.0.0”
 * Replace Jp7_InterAdmin by Jp7_Interadmin
 * Replace InterAdmin_ by Interadmin_
-* Replace startsWith($needle, $haystack) by starts_with($haystack, $needle)
+* Replace startsWith($needle, $haystack) by Str::startsWith($haystack, $needle)
 * Replace endsWith($needle, $haystack) by ends_with($haystack, $needle)
 * Replace jp7_replace_beginning() by replace_prefix()
 * Main table is interadmin_CLIENT_registros, it was interadmin_CLIENT
@@ -80,6 +80,6 @@
 * getInterAdminsByTags -> findByTags
 * getInterAdminsCount -> count
 
-## 2.0 
+## 2.0
 * Add parent_id_tipo to conditionals (important if the parents are on different tables, two records with the same parent_id, might have different parent_id_tipo)
 * Add "inherited" as a pre-calculated field to InterAdminTipo to avoid long recursive searches for all the values inherited  from models.

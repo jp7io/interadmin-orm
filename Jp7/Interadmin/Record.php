@@ -361,9 +361,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function relationFromColumn($column)
     {
         $alias = $this->_aliases[$column];
-        if (starts_with($column, 'select_multi_')) {
+        if (Str::startsWith($column, 'select_multi_')) {
             $relation = substr($alias, 0, -4); // _ids = 4 chars
-        } elseif (starts_with($column, 'select_')) {
+        } elseif (Str::startsWith($column, 'select_')) {
             $relation = substr($alias, 0, -3); // _id = 3 chars
         } else {
             throw new InvalidArgumentException('$column must start with select_ or select_multi_.');
@@ -1118,7 +1118,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $aliases = array_flip($this->_aliases);
         $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 
-        if (!starts_with($nomeCampo, 'select_')) {
+        if (!Str::startsWith($nomeCampo, 'select_')) {
             throw new Exception('The field '.$attribute.' is not a select. It was expected a select field on setAttributeBySearch.');
         }
 
@@ -1126,7 +1126,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $record = $campoTipo->deprecatedFindFirst([
             'where' => [$searchColumn." = '".$searchValue."'"],
         ]);
-        if (starts_with($nomeCampo, 'select_multi_')) {
+        if (Str::startsWith($nomeCampo, 'select_multi_')) {
             $this->$attribute = [$record];
         } else {
             $this->$attribute = $record;
@@ -1179,10 +1179,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
         $stringValue = [];
         foreach ($camposCombo as $campoCombo) {
-            if (starts_with($campoCombo, 'file_')) {
+            if (Str::startsWith($campoCombo, 'file_')) {
                 continue;
             }
-            if (starts_with($campoCombo, 'select_')) {
+            if (Str::startsWith($campoCombo, 'select_')) {
                 if ($relation = $this->relationFromColumn($campoCombo)) {
                     $stringValue[] = $relation->getName();
                 }
@@ -1229,10 +1229,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 if ($campo['xtra'] === 'email' || $campo['xtra'] === 'id_email') {
                     $rules[$alias][] = 'email';
                 }
-                if (starts_with($campo['tipo'], 'int_')) {
+                if (Str::startsWith($campo['tipo'], 'int_')) {
                     $rules[$alias][] = 'integer';
                 }
-                if (starts_with($campo['tipo'], 'date_')) {
+                if (Str::startsWith($campo['tipo'], 'date_')) {
                     $rules[$alias][] = 'date_format:Y-m-d';
                 }
             }

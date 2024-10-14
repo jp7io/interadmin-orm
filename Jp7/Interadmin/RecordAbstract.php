@@ -349,7 +349,7 @@ abstract class RecordAbstract
                     $valuesToSave[$key] = '';
                     break;
                 case 'boolean':
-                    if (starts_with($key, 'char_')) {
+                    if (Str::startsWith($key, 'char_')) {
                         $valuesToSave[$key] = $value ? 'S' : '';
                         break;
                     }
@@ -530,7 +530,7 @@ abstract class RecordAbstract
         }
         $callee = '';
         //foreach (array_reverse($trace) as $item) {
-        //    if (!empty($item['class']) && starts_with($item['class'], 'Jp7\Interadmin\Query') && $item['function'] !== '__call') {
+        //    if (!empty($item['class']) && Str::startsWith($item['class'], 'Jp7\Interadmin\Query') && $item['function'] !== '__call') {
         //        $callee = str_replace('Jp7\\Interadmin\\', '', $item['class']).'@'.$item['function'];
         //        break;
         //    }
@@ -637,7 +637,7 @@ abstract class RecordAbstract
                         $childrenArr = $this->getInterAdminsChildren();
                     }
 
-                    $joinNome = studly_case($table);
+                    $joinNome = Str::studly($table);
                     if (isset($childrenArr[$joinNome])) {
                         // Children
                         $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
@@ -704,7 +704,7 @@ abstract class RecordAbstract
                     }
 
                     // Joins com children
-                    $joinNome = studly_case($table);
+                    $joinNome = Str::studly($table);
                     // Support for old join alias: ChildrenLojas => Lojas
                     $joinNome = replace_prefix('Children', '', $joinNome);
                     if (isset($childrenArr[$joinNome]) || isset($childrenArr[$joinNome])) {

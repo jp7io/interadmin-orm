@@ -79,7 +79,7 @@ abstract class BaseQuery
 
     public function __call($method_name, $params)
     {
-        if (starts_with($method_name, 'or')) {
+        if (Str::startsWith($method_name, 'or')) {
             $original = lcfirst(substr($method_name, 2));
             if (method_exists($this, $original)) {
                 if (!$this->inner) {
