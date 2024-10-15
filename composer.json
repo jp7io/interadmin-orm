@@ -14,10 +14,10 @@
     },
     "require-dev": {
         "jp7io/classes": "dev-docker-2024",
-        "illuminate/support": "^8.75",
-        "illuminate/database": "^8.75",
-        "illuminate/cache": "^8.75",
-        "illuminate/config": "^8.75",
+        "illuminate/support": "^10.10",
+        "illuminate/database": "^10.10",
+        "illuminate/cache": "^10.10",
+        "illuminate/config": "^10.10",
         "symfony/var-dumper": "^5.4",
         "codeception/codeception": "^4.2",
         "vlucas/phpdotenv": "^5.6"
