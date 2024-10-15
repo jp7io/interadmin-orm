@@ -1338,18 +1338,18 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:jp7io/classes.git",
-                "reference": "cb579585c3f1047da1ac1cce16e0818ad371f032"
+                "reference": "dcccc1dc005894c252d52a3e7d19345f2a10d7fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7io/classes/zipball/cb579585c3f1047da1ac1cce16e0818ad371f032",
-                "reference": "cb579585c3f1047da1ac1cce16e0818ad371f032",
+                "url": "https://api.github.com/repos/jp7io/classes/zipball/dcccc1dc005894c252d52a3e7d19345f2a10d7fb",
+                "reference": "dcccc1dc005894c252d52a3e7d19345f2a10d7fb",
                 "shasum": ""
             },
             "require-dev": {
-                "illuminate/support": "^8.75",
-                "jp7io/classes-deprecated": "^3.2",
-                "phpunit/phpunit": "^4.8"
+                "illuminate/support": "^10.10",
+                "jp7io/classes-deprecated": "dev-docker-2024",
+                "phpunit/phpunit": "^9.6"
             },
             "type": "library",
             "autoload": {
@@ -1368,7 +1368,7 @@
                 "source": "https://github.com/jp7io/classes/tree/docker-2024",
                 "issues": "https://github.com/jp7io/classes/issues"
             },
-            "time": "2024-10-14T22:27:27+00:00"
+            "time": "2024-10-15T01:17:30+00:00"
         },
         {
             "name": "myclabs/deep-copy",
