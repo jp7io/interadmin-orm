@@ -115,7 +115,7 @@ class Type extends RecordAbstract
             $methodName.'(). Available magic methods: '."\n";
 
         foreach ($this->_getChildrenKeyBySlug() as $slug => $child) {
-            $message .= "\t\t- ".lcfirst(Str::camel_case($slug))."()\n";
+            $message .= "\t\t- ".lcfirst(Str::camel($slug))."()\n";
         }
         throw new BadMethodCallException($message);
     }
@@ -123,7 +123,7 @@ class Type extends RecordAbstract
     protected function _getManyRelationship($name)
     {
         $childrenBySlug = $this->_getChildrenKeyBySlug();
-        $childSlug = Str::snake_case($name, '-');
+        $childSlug = Str::snake($name, '-');
         if (array_key_exists($childSlug, $childrenBySlug)) {
             $childrenBySlug[$childSlug]->setParent($this);
             return $childrenBySlug[$childSlug]->records();
