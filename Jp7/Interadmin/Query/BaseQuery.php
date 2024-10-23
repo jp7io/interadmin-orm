@@ -520,7 +520,7 @@ abstract class BaseQuery
             $type = $this->provider;
         }
 
-        $aliases = array_flip($type->getCamposAlias());
+        $aliases = array_flip($type->getFieldsAlias());
         if (isset($aliases[$field])) {
             return strpos($aliases[$field], 'char_') === 0;
         } else {

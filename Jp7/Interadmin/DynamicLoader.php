@@ -87,7 +87,7 @@ class DynamicLoader
         $phpdoc = '';
         if ($addPhpDoc) {
             $phpdoc = '/**'."\r\n";
-            foreach ($type->getCampos() as $campo) {
+            foreach ($type->getFields() as $campo) {
                 $phpdoc .= ' * @property '.self::getPhpDocCampo($type, $campo)."\r\n";
             }
             $phpdoc .= ' * @property \\Date $date_publish'."\r\n";

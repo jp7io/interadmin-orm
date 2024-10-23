@@ -73,6 +73,14 @@ class Type extends RecordAbstract
      */
     protected $_interadminRelationships;
 
+
+    /**
+     * Attributes.
+     *
+     * @var array
+     */
+    public $attributes;
+
     /**
      * Construct.
      *
@@ -506,7 +514,7 @@ class Type extends RecordAbstract
      *
      * @return array
      */
-    public function getCampos()
+    public function getFields()
     {
         return $this->getCache('campos', function () {
             $campos_parameters = [
@@ -569,9 +577,9 @@ class Type extends RecordAbstract
      *
      * @return array
      */
-    public function getCamposNames()
+    public function getFieldsNames()
     {
-        $fields = array_keys($this->getCampos());
+        $fields = array_keys($this->getFields());
         foreach ($fields as $key => $field) {
             if (strpos($field, 'tit_') === 0 || strpos($field, 'func_') === 0) {
                 unset($fields[$key]);
@@ -587,12 +595,12 @@ class Type extends RecordAbstract
      *
      * @return array|string Resulting alias(es).
      */
-    public function getCamposAlias($fields = null)
+    public function getFieldsAlias($fields = null)
     {
         if (!$this->_interadminAliases) {
             $this->_interadminAliases = $this->getCache('campos_alias', function () {
                 $aliases = [];
-                foreach ($this->getCampos() as $campo => $array) {
+                foreach ($this->getFields() as $campo => $array) {
                     if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
                         continue;
                     }
@@ -609,9 +617,9 @@ class Type extends RecordAbstract
         return isset($this->_interadminAliases[$fields]) ? $this->_interadminAliases[$fields] : null;
     }
 
-    public function getCamposCombo()
+    public function getFieldsCombo()
     {
-        return array_keys(array_filter($this->getCampos(), function ($campo) {
+        return array_keys(array_filter($this->getFields(), function ($campo) {
             return (bool) $campo['combo'] || $campo['tipo'] === 'varchar_key';
         }));
     }
@@ -624,7 +632,7 @@ class Type extends RecordAbstract
             $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, 5, function () {
                 $relationships = [];
 
-                foreach ($this->getCampos() as $campo => $array) {
+                foreach ($this->getFields() as $campo => $array) {
                     if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
                         continue;
                     }
@@ -685,8 +693,8 @@ class Type extends RecordAbstract
 
     public function getCampoTipoByAlias($alias)
     {
-        $campos = $this->getCampos();
-        $aliases = array_flip($this->getCamposAlias());
+        $campos = $this->getFields();
+        $aliases = array_flip($this->getFieldsAlias());
 
         $nomeCampo = $aliases[$alias] ? $aliases[$alias] : $alias;
 
@@ -864,7 +872,7 @@ class Type extends RecordAbstract
     {
         return $this->getCache('order', function () {
             $order = [];
-            $campos = $this->getCampos();
+            $campos = $this->getFields();
             if ($campos) {
                 foreach ($campos as $key => $row) {
                     if (!$row['orderby'] || strpos($key, 'func_') !== false) {
@@ -1128,7 +1136,7 @@ class Type extends RecordAbstract
     {
         $options = ['default_namespace' => static::DEFAULT_NAMESPACE];
         $record = Record::getInstance(0, $options, $this);
-        if ($mostrar = $this->getCamposAlias('char_key')) {
+        if ($mostrar = $this->getFieldsAlias('char_key')) {
             $record->$mostrar = 'S';
         }
         $record->date_publish = date('c');

@@ -721,7 +721,7 @@ abstract class RecordAbstract
 
                             $options['auto_group_flag'] = true;
                         }
-                        $joinAliases = array_flip($joinTipo->getCamposAlias());
+                        $joinAliases = array_flip($joinTipo->getFieldsAlias());
 
                     // Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
                     } elseif ($table == 'tags') {
@@ -781,7 +781,7 @@ abstract class RecordAbstract
                             throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
                         }
                         if ($joinTipo instanceof Type) {
-                            $joinAliases = array_flip($joinTipo->getCamposAlias());
+                            $joinAliases = array_flip($joinTipo->getFieldsAlias());
                         } else {
                             $joinAliases = [];
                         }
@@ -791,7 +791,7 @@ abstract class RecordAbstract
                         $subtable = $table.'__'.$termo;
                         $termo = $termo.'_id';
 
-                        $subCampos = $joinTipo->getCampos();
+                        $subCampos = $joinTipo->getFields();
                         $subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
 
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
@@ -804,7 +804,7 @@ abstract class RecordAbstract
 
                         $table = $subtable;
                         $termo = $subtermo;
-                        $joinAliases = array_flip($subJoinTipo->getCamposAlias());
+                        $joinAliases = array_flip($subJoinTipo->getFieldsAlias());
                     }
                     $campo = $this->_aliasToColumn($termo, $joinAliases);
                 }
@@ -886,8 +886,8 @@ abstract class RecordAbstract
                     $joinOptions = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
-                        'campos' => $joinTipo->getCampos(),
-                        'aliases' => array_flip($joinTipo->getCamposAlias()),
+                        'campos' => $joinTipo->getFields(),
+                        'aliases' => array_flip($joinTipo->getFieldsAlias()),
                     ];
                     $this->_resolveFieldsAlias($joinOptions, $join.'.');
                     foreach ($joinOptions['fields'] as $joinField) {

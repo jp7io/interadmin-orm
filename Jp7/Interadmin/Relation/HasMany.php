@@ -25,7 +25,7 @@ class HasMany
     public function getRelationshipData()
     {
         $type = call_user_func([$this->className, 'type']);
-        $aliases = $type->getCamposAlias();
+        $aliases = $type->getFieldsAlias();
         $alias = array_search($this->foreign_key, $aliases);
         if (!$alias) {
             throw new InvalidArgumentException('Unknown alias: '.$this->foreign_key);

@@ -940,11 +940,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     public function getAttributesNames()
     {
-        return $this->getType()->getCamposNames();
+        return $this->getType()->getFieldsNames();
     }
     public function getAttributesCampos()
     {
-        return $this->getType()->getCampos();
+        return $this->getType()->getFields();
     }
     final public function getCampoTipo($campo)
     {
@@ -952,7 +952,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
     public function getAttributesAliases()
     {
-        return $this->getType()->getCamposAlias();
+        return $this->getType()->getFieldsAlias();
     }
     public function getTableName()
     {
@@ -1114,7 +1114,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function setAttributeBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')
     {
-        $campos = $this->getType()->getCampos();
+        $campos = $this->getType()->getFields();
         $aliases = array_flip($this->_aliases);
         $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 
@@ -1219,7 +1219,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function getRules()
     {
         $rules = [];
-        foreach ($this->getType()->getCampos() as $campo) {
+        foreach ($this->getType()->getFields() as $campo) {
             if ($campo['form']) {
                 $alias = $campo['nome_id'];
 
@@ -1267,7 +1267,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         $fillable = [];
 
-        foreach ($this->getType()->getCampos() as $campo) {
+        foreach ($this->getType()->getFields() as $campo) {
             if ($campo['form']) {
                 $fillable[] = $campo['nome_id'];
             }
