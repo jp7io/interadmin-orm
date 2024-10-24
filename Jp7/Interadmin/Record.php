@@ -1173,7 +1173,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function getStringValue()
     {
-        $camposCombo = $this->getType()->getCamposCombo();
+        $camposCombo = $this->getType()->getFieldsCombo();
         if (!$camposCombo) {
             return $this->id;
         }
