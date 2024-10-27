@@ -553,7 +553,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 return new EagerLoadedQuery($childrenTipo, $this->relations[$name]);
             }
             return new Query($childrenTipo);
-        } elseif ($name === 'arquivos' && $this->hasArquivosTab()) {
+        } elseif ($name === 'files' && $this->hasArquivosTab()) {
             return new Query\FileQuery($this);
         }
     }
@@ -693,7 +693,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     public function hasArquivosTab()
     {
-        return $this->getType()->arquivos || $this->getType()->arquivos_2;
+        return $this->getType()->arquivos || $this->getType()->files_2;
     }
 
     /**
@@ -719,12 +719,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if (!class_exists($className)) {
             $className = 'Jp7\\Interadmin\\FileRecord';
         }
-        $arquivo = new $className();
-        $arquivo->setParent($this);
-        $arquivo->setType($this->getType());
-        $arquivo->mostrar = 'S';
+        $file = new $className();
+        $file->setParent($this);
+        $file->setType($this->getType());
+        $file->mostrar = 'S';
 
-        return $arquivo->fill($attributes);
+        return $file->fill($attributes);
     }
     /**
      * Retrieves the uploaded files of this record.
@@ -737,7 +737,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function deprecated_getArquivos($options = [])
     {
-        $arquivos = [];
+        $files = [];
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
@@ -746,39 +746,39 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if (!class_exists($className)) {
             $className = 'Jp7\\Interadmin\\FileRecord';
         }
-        $arquivoModel = new $className(0);
-        $arquivoModel->setType($this->getType());
+        $fileModel = new $className(0);
+        $fileModel->setType($this->getType());
 
         if (empty($options['fields'])) {
             $options['fields'] = '*';
         }
 
-        $this->_resolveWildcard($options['fields'], $arquivoModel);
+        $this->_resolveWildcard($options['fields'], $fileModel);
         $this->_whereArrayFix($options['where']); // FIXME
 
-        $options['fields'] = array_merge(['id_arquivo'], (array) $options['fields']);
-        $options['from'] = $arquivoModel->getTableName().' AS main';
+        $options['fields'] = array_merge(['id_file'], (array) $options['fields']);
+        $options['from'] = $fileModel->getTableName().' AS main';
         $options['where'][] = 'type_id = '.intval($this->type_id);
         $options['where'][] = 'id = '.intval($this->id);
         $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' ordem';
         // Internal use
-        $options['aliases'] = $arquivoModel->getAttributesAliases();
-        $options['campos'] = $arquivoModel->getAttributesCampos();
+        $options['aliases'] = $fileModel->getAttributesAliases();
+        $options['campos'] = $fileModel->getAttributesCampos();
 
         $rs = $this->_executeQuery($options);
 
         $records = [];
         foreach ($rs as $row) {
-            $arquivo = new $className($row->id_arquivo, [
+            $file = new $className($row->id_file, [
                 'db' => $this->_db,
             ]);
-            $arquivo->setType($this->getType());
-            $arquivo->setParent($this);
-            $this->_getAttributesFromRow($row, $arquivo, $options);
-            $arquivos[] = $arquivo;
+            $file->setType($this->getType());
+            $file->setParent($this);
+            $this->_getAttributesFromRow($row, $file, $options);
+            $files[] = $file;
         }
 
-        return new Collection($arquivos);
+        return new Collection($files);
     }
 
     /**
@@ -790,12 +790,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function deprecated_deleteArquivos($options = [])
     {
-        $arquivos = $this->deprecated_getArquivos($options);
-        foreach ($arquivos as $arquivo) {
-            $arquivo->delete();
+        $files = $this->deprecated_getArquivos($options);
+        foreach ($files as $file) {
+            $file->delete();
         }
 
-        return count($arquivos);
+        return count($files);
     }
 
     public function deprecated_createLog(array $attributes = [])

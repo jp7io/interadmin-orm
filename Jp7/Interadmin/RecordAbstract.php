@@ -1150,7 +1150,7 @@ abstract class RecordAbstract
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // do nothing
         // Arquivos
-        } elseif ($table === 'arquivos') {
+        } elseif ($table === 'files') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
         // Registros
         } else {

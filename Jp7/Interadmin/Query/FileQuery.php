@@ -44,7 +44,7 @@ class FileQuery extends BaseQuery
 
     public function count()
     {
-        return count($this->provider->deprecated_getArquivos(['fields' => 'id_arquivo'] + $this->options));
+        return count($this->provider->deprecated_getArquivos(['fields' => 'id_file'] + $this->options));
     }
 
     /**
@@ -63,7 +63,7 @@ class FileQuery extends BaseQuery
             return null; // save a query
         }
 
-        $this->options['where'][] = $this->_parseComparison('id_arquivo', '=', $id);
+        $this->options['where'][] = $this->_parseComparison('id_file', '=', $id);
 
         return $this->first();
     }
