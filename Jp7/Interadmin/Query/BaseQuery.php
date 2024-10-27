@@ -584,7 +584,7 @@ abstract class BaseQuery
      * @param string|Type           $className
      * @param array                 $conditions
      * @param string                $_joinType  ex.: INNER, LEFT, RIGHT
-     * @param bool                  $_typeless  Whether to filter by 'id_tipo' or not
+     * @param bool                  $_typeless  Whether to filter by 'type_id' or not
      *
      * @return static
      */

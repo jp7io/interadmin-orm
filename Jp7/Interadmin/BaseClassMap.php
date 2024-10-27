@@ -30,7 +30,7 @@ class BaseClassMap
         $roots = []; // keep track of duplicated classes
         try {
             $tipos = DB::table('tipos')
-                ->select($attr, 'id_tipo', 'inherited')
+                ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
                 ->where('deleted_tipo', '=', '')
                 ->where('mostrar', '<>', '')
@@ -44,11 +44,11 @@ class BaseClassMap
                 }
                 if (!$tipo->inherited || !in_array($attr, explode(',', $tipo->inherited))) {
                     if (array_key_exists($class, $roots) && config('interadmin.namespace')) {
-                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in id_tipo: '.$tipo->id_tipo);
+                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in type_id: '.$tipo->type_id);
                     }
                     $roots[$class] = true;
                 }
-                $arr[$tipo->id_tipo] = $class;
+                $arr[$tipo->type_id] = $class;
             }
         } catch (\PDOException $e) {
             $message = "InterAdmin database not connected";
@@ -88,7 +88,7 @@ class BaseClassMap
 
     /**
      * @param  string $class
-     * @return int   id_tipo
+     * @return int   type_id
      */
     public function getClassIdTipo($class)
     {
@@ -96,12 +96,12 @@ class BaseClassMap
     }
 
     /**
-     * @param  int $id_tipo
+     * @param  int $type_id
      * @return string Class
      */
-    public function getClass($id_tipo)
+    public function getClass($type_id)
     {
         $classes = $this->getClasses();
-        return isset($classes[$id_tipo]) ? $classes[$id_tipo] : null;
+        return isset($classes[$type_id]) ? $classes[$type_id] : null;
     }
 }

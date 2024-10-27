@@ -36,7 +36,7 @@ class TypeTest extends \Codeception\Test\Unit
 
         $this->tester->seeNumRecords(1, 'interadmin_teste_tipos');
 
-        $type = new Type($userType->id_tipo);
+        $type = new Type($userType->type_id);
         $this->assertTrue($type->exists);
         $type->save();
 

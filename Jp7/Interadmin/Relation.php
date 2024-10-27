@@ -47,12 +47,12 @@ class Relation
 
         $parentTypeIds = [];
         foreach ($records as $record) {
-            $record->loadAttributes(['parent_id', 'parent_id_tipo'], false);
-            if (!$record->parent_id_tipo) {
+            $record->loadAttributes(['parent_id', 'parent_type_id'], false);
+            if (!$record->parent_type_id) {
                 continue;
             }
-            $parentTypeIds[$record->parent_id_tipo] = $parentTypeIds[$record->parent_id_tipo] ?? [];
-            $parentTypeIds[$record->parent_id_tipo][$record->parent_id] = true;
+            $parentTypeIds[$record->parent_type_id] = $parentTypeIds[$record->parent_type_id] ?? [];
+            $parentTypeIds[$record->parent_type_id][$record->parent_id] = true;
         }
 
         $rows = [];
@@ -66,7 +66,7 @@ class Relation
                 $records->_refs[] = $parentRecords; // avoid $rows be removed from memory too soon
             }
             foreach ($parentRecords as $parent) {
-                $rows[$parent->id_tipo.','.$parent->id] = $parent;
+                $rows[$parent->type_id.','.$parent->id] = $parent;
             }
         }
 
@@ -75,7 +75,7 @@ class Relation
         }
 
         foreach ($records as $record) {
-            $key = $record->parent_id_tipo.','.$record->parent_id;
+            $key = $record->parent_type_id.','.$record->parent_id;
             if (isset($rows[$key])) {
                 $record->setParent($rows[$key]);
             }

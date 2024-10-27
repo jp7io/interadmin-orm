@@ -8,7 +8,7 @@ namespace Jp7\Interadmin;
 class FieldUtil
 {
     public $id;
-    public $id_tipo;
+    public $type_id;
 
     /**
      * Construtor p￺úblico.

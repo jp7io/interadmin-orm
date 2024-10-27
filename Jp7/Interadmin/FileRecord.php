@@ -20,7 +20,7 @@ class FileRecord extends RecordAbstract
      */
     public $db_prefix;
     /**
-     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record�s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'type_id' equal to this record�s 'type_id'.
      *
      * @var Type
      */
@@ -51,11 +51,11 @@ class FileRecord extends RecordAbstract
     public function getType($options = [])
     {
         if (!$this->_tipo) {
-            if (!$this->id_tipo) {
-                kd('no id_tipo, not implemented');
-                $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
+            if (!$this->type_id) {
+                kd('no type_id, not implemented');
+                $this->type_id = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'type_id');
             }
-            $this->_tipo = Type::getInstance($this->id_tipo, [
+            $this->_tipo = Type::getInstance($this->type_id, [
                 'db' => $this->_db,
                 'class' => $options['class'],
             ]);
@@ -70,7 +70,7 @@ class FileRecord extends RecordAbstract
      */
     public function setType($tipo)
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->type_id = $tipo->type_id;
         $this->_tipo = $tipo;
     }
     /**
@@ -129,7 +129,7 @@ class FileRecord extends RecordAbstract
         global $lang;
         // Inserindo no banco de arquivos
         $fieldsValues = [
-            'id_tipo' => $this->id_tipo,
+            'type_id' => $this->type_id,
             'id' => $this->id,
             'tipo' => $this->getExtension(),
             'parte' => intval($this->parte),
@@ -200,11 +200,11 @@ class FileRecord extends RecordAbstract
 
     public function getAttributesNames()
     {
-        return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_arquivo', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
     public function getTableName()
     {
-        if ($this->id_tipo) {
+        if ($this->type_id) {
             return $this->getType()->getArquivosTableName();
         } else {
             return $this->db_prefix.'_arquivos';

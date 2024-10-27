@@ -24,7 +24,7 @@ class CreateTest extends \Codeception\Test\Unit
     public function testTypeWasSaved()
     {
         $this->tester->seeInDatabase('interadmin_teste_tipos', [
-            'id_tipo' => $this->userType->id_tipo,
+            'type_id' => $this->userType->type_id,
             'nome' => $this->userType->nome,
             'id_slug' => $this->userType->id_slug
         ]);
@@ -51,13 +51,13 @@ class CreateTest extends \Codeception\Test\Unit
     public function testBuildEntity()
     {
         $user = Test_User::build();
-        $this->assertNotNull($user->id_tipo);
+        $this->assertNotNull($user->type_id);
     }
 
     public function testSave()
     {
         $user = $this->tester->createUser();
-        $this->tester->seeInDatabase('interadmin_teste_registros', ['id_tipo' => $user->id_tipo]);
+        $this->tester->seeInDatabase('interadmin_teste_registros', ['type_id' => $user->type_id]);
     }
 
     public function testCreate()
@@ -70,7 +70,7 @@ class CreateTest extends \Codeception\Test\Unit
         ]);
 
         $this->tester->seeInDatabase('interadmin_teste_registros', [
-            'id_tipo' => $user->id_tipo,
+            'type_id' => $user->type_id,
             'varchar_key' => $user->username,
             'password_key' => $user->password,
         ]);

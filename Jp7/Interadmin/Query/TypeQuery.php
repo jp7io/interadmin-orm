@@ -34,12 +34,12 @@ class TypeQuery extends BaseQuery
         $options = $this->options;
 
         if (empty($options['group'])) {
-            $options['fields'] = ['COUNT(id_tipo) AS count_id_tipo'];
-        } elseif ($options['group'] == 'id_tipo') {
+            $options['fields'] = ['COUNT(type_id) AS count_type_id'];
+        } elseif ($options['group'] == 'type_id') {
             // O COUNT() precisa trazer a contagem total em 1 linha
-            // Caso exista GROUP BY id_tipo, ele traria em várias linhas
-            // Esse é um tratamento especial apenas para o id_tipo
-            $options['fields'] = ['COUNT(DISTINCT id_tipo) AS count_id_tipo'];
+            // Caso exista GROUP BY type_id, ele traria em várias linhas
+            // Esse é um tratamento especial apenas para o type_id
+            $options['fields'] = ['COUNT(DISTINCT type_id) AS count_type_id'];
             unset($options['group']);
         } else {
             // Se houver GROUP BY com outro campo, retornará a contagem errada
@@ -51,7 +51,7 @@ class TypeQuery extends BaseQuery
             throw new \Exception('Could not resolve groupBy() before count().');
         }
 
-        return isset($rows[0]->count_id_tipo) ? intval($rows[0]->count_id_tipo) : 0;
+        return isset($rows[0]->count_type_id) ? intval($rows[0]->count_type_id) : 0;
     }
 
     public function find($id)
@@ -69,7 +69,7 @@ class TypeQuery extends BaseQuery
         if (is_string($id) && !is_numeric($id)) {
             $this->options['where'][] = $this->_parseComparison('id_slug', '=', $id);
         } else {
-            $this->options['where'][] = $this->_parseComparison('id_tipo', '=', $id);
+            $this->options['where'][] = $this->_parseComparison('type_id', '=', $id);
         }
 
         return $this->first();
@@ -90,7 +90,7 @@ class TypeQuery extends BaseQuery
         $className = Type::getDefaultClass();
 
         $child = new $className();
-        $child->parent_id_tipo = $this->provider->id_tipo;
+        $child->parent_type_id = $this->provider->type_id;
         $child->mostrar = 'S';
 
         return $child->fill($attributes);

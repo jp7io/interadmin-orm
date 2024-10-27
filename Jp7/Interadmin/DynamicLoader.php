@@ -109,21 +109,21 @@ class DynamicLoader
         return self::buildClass(
             $type->getTypeClass(),
             $prefixClass.'Type',
-            "const ID_TIPO = {$type->id_tipo};",
+            "const ID_TIPO = {$type->type_id};",
             $phpdoc
         );
     }
 
     public static function getCode($class, $addPhpDoc = false)
     {
-        if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo($class)) {
-            $tipo = new Type($id_tipo);
+        if ($type_id = RecordClassMap::getInstance()->getClassIdTipo($class)) {
+            $tipo = new Type($type_id);
             $tipo->class = $class;
 
             return self::generateRecordClass($tipo, $addPhpDoc);
         }
-        if ($id_tipo = TypeClassMap::getInstance()->getClassIdTipo($class)) {
-            $tipo = new Type($id_tipo);
+        if ($type_id = TypeClassMap::getInstance()->getClassIdTipo($class)) {
+            $tipo = new Type($type_id);
             $tipo->class_tipo = $class;
 
             return self::generateTypeClass($tipo, $addPhpDoc);

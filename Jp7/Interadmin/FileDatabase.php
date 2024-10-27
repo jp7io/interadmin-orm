@@ -4,7 +4,7 @@ namespace Jp7\Interadmin;
 
 /**
  * @property int $id_arquivo_banco  PK
- * @property int $id_tipo
+ * @property int $type_id
  * @property int $id    Parent record ID
  * @property int $parte  0, 2, 3 - Abas "arquivos"
  * @property string $tipo gif, bmp - Extensão
@@ -26,7 +26,7 @@ class FileDatabase extends RecordAbstract
 
     protected $_primary_key = 'id_arquivo_banco';
      /**
-     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record�s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'type_id' equal to this record�s 'type_id'.
      *
      * @var Type
      */
@@ -83,8 +83,8 @@ class FileDatabase extends RecordAbstract
      */
     public function getType()
     {
-        if (!$this->_tipo && $this->attributes['id_tipo']) {
-            $this->_tipo = Type::getInstance($this->attributes['id_tipo'], [
+        if (!$this->_tipo && $this->attributes['type_id']) {
+            $this->_tipo = Type::getInstance($this->attributes['type_id'], [
                 'db' => $this->_db
             ]);
         }
@@ -97,7 +97,7 @@ class FileDatabase extends RecordAbstract
      */
     public function setType($tipo)
     {
-        $this->attributes['id_tipo'] = $tipo->id_tipo;
+        $this->attributes['type_id'] = $tipo->type_id;
         $this->_tipo = $tipo;
     }
     /**
@@ -141,7 +141,7 @@ class FileDatabase extends RecordAbstract
 
     public function getAttributesNames()
     {
-        return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_arquivo', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
 
     public function getTagFilters()

@@ -26,7 +26,7 @@ use RecordUrl;
 class Record extends RecordAbstract implements Arrayable, Jsonable
 {
     /**
-     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'type_id' equal to this record´s 'type_id'.
      *
      * @var Type
      */
@@ -91,12 +91,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function __construct(array $attributes = [], $type = null)
     {
         $this->attributes['id'] = 0; // initialize ID
-        // id_tipo needs to be set first because of aliases
+        // type_id needs to be set first because of aliases
         if ($type) {
             $this->setType($type);
-        } elseif (isset($attributes['id_tipo'])) {
-            $this->setIdTipoAttribute($attributes['id_tipo']);
-            unset($attributes['id_tipo']);
+        } elseif (isset($attributes['type_id'])) {
+            $this->setIdTipoAttribute($attributes['type_id']);
+            unset($attributes['type_id']);
         } elseif ($type = static::type()) {
             $this->setType($type);
         }
@@ -192,7 +192,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     public function setIdTipoAttribute($value)
     {
-        $this->attributes['id_tipo'] = $value;
+        $this->attributes['type_id'] = $value;
         if (!$this->_tipo) {
             $this->getType(); // Set Type and Aliases
         }
@@ -440,8 +440,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public static function type()
     {
-        if ($id_tipo = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
-            return Type::getInstance($id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
+        if ($type_id = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
+            return Type::getInstance($type_id, ['default_namespace' => static::DEFAULT_NAMESPACE]);
         }
     }
 
@@ -467,7 +467,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
-            $className = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
+            $className = RecordClassMap::getInstance()->getClass($tipo->type_id);
             if (!$className) {
                 $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
@@ -498,7 +498,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         $child = $this->_findChild($nome_id);
         if ($child) {
-            return $this->getChildrenTipo($child['id_tipo']);
+            return $this->getChildrenTipo($child['type_id']);
         }
     }
 
@@ -548,7 +548,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         // childName() - relacionamento
         if ($child = $this->_findChild(ucfirst($name))) {
-            $childrenTipo = $this->getChildrenTipo($child['id_tipo']);
+            $childrenTipo = $this->getChildrenTipo($child['type_id']);
             if (array_key_exists($name, $this->relations)) {
                 return new EagerLoadedQuery($childrenTipo, $this->relations[$name]);
             }
@@ -570,15 +570,15 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($this->_tipo) {
             return $this->_tipo;
         }
-        // Instance was not brought from DB, id_tipo is empty
-        if (empty($this->attributes['id_tipo'])) {
+        // Instance was not brought from DB, type_id is empty
+        if (empty($this->attributes['type_id'])) {
             // Record::type() -> Classes that have name
             $tipo = static::type();
             if (!$tipo) {
-                throw new UnexpectedValueException('Could not find id_tipo for record. Class: '.get_class($this).' - ID: ' . $this->id);
+                throw new UnexpectedValueException('Could not find type_id for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
         } else {
-            $tipo = Type::getInstance($this->attributes['id_tipo'], [
+            $tipo = Type::getInstance($this->attributes['type_id'], [
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
             ]);
@@ -594,7 +594,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function setType(Type $tipo = null)
     {
-        $this->attributes['id_tipo'] = $tipo->id_tipo;
+        $this->attributes['type_id'] = $tipo->type_id;
         $this->_tipo = $tipo;
         $this->_aliases = $tipo ? $this->getAttributesAliases() : [];
     }
@@ -613,13 +613,13 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 Relation::eagerLoad(self::$_collections[$this->_collection_id], '_parent');
                 return $this->_parent;
             }
-            $this->loadAttributes(['parent_id', 'parent_id_tipo'], false);
+            $this->loadAttributes(['parent_id', 'parent_type_id'], false);
 
             if ($this->parent_id) {
-                if (!$this->parent_id_tipo) {
-                    throw new Exception('Field parent_id_tipo is required. Id: '.$this->id);
+                if (!$this->parent_type_id) {
+                    throw new Exception('Field parent_type_id is required. Id: '.$this->id);
                 }
-                $this->_parent = Type::getInstance($this->parent_id_tipo)
+                $this->_parent = Type::getInstance($this->parent_type_id)
                     ->records()
                     ->find($this->parent_id);
                 if ($this->_parent) {
@@ -644,25 +644,25 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $this->_parent = $parent; // Record or null
         $parent = $parent ?? new \stdClass;
         $parent->id = $parent->id ?? 0; // needed for reference
-        $parent->id_tipo = $parent->id_tipo ?? 0; // needed for reference
+        $parent->type_id = $parent->type_id ?? 0; // needed for reference
         // by reference, allows parent to be saved after child is created
         $this->attributes['parent_id'] = &$parent->id;
-        $this->attributes['parent_id_tipo'] = &$parent->id_tipo;
+        $this->attributes['parent_type_id'] = &$parent->type_id;
     }
 
     /**
      * Instantiates an Type object and sets this record as its parent.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $options Default array of options. Available keys: class.
      *
      * @return Type
      */
-    public function getChildrenTipo($id_tipo, $options = [])
+    public function getChildrenTipo($type_id, $options = [])
     {
         $options['default_namespace'] = static::DEFAULT_NAMESPACE;
         $options['db'] = $this->_db;
-        $childrenTipo = Type::getInstance($id_tipo, $options);
+        $childrenTipo = Type::getInstance($type_id, $options);
         $childrenTipo->setParent($this);
 
         return $childrenTipo;
@@ -680,10 +680,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return $childrenTypes;
     }
 
-    public function hasChildrenTipo($id_tipo)
+    public function hasChildrenTipo($type_id)
     {
         foreach ($this->getType()->getInterAdminsChildren() as $childrenArr) {
-            if ($childrenArr['id_tipo'] == $id_tipo) {
+            if ($childrenArr['type_id'] == $type_id) {
                 return true;
             }
         }
@@ -707,7 +707,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
 
     /**
-     * Creates a new FileRecord with id_tipo, id and mostrar set.
+     * Creates a new FileRecord with type_id, id and mostrar set.
      *
      * @param array $attributes [optional]
      *
@@ -758,7 +758,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
         $options['fields'] = array_merge(['id_arquivo'], (array) $options['fields']);
         $options['from'] = $arquivoModel->getTableName().' AS main';
-        $options['where'][] = 'id_tipo = '.intval($this->id_tipo);
+        $options['where'][] = 'type_id = '.intval($this->type_id);
         $options['where'][] = 'id = '.intval($this->id);
         $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' ordem';
         // Internal use
@@ -817,10 +817,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $db = $this->getDb();
         $sql = 'DELETE FROM '.$db->getTablePrefix().'tags WHERE parent_id = '.$this->id;
         foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
+            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, type_id) VALUES
                 ('.$this->id.','.
                 ($tag instanceof self ? $tag->id : 0).','.
-                ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
+                ($tag instanceof self ? $tag->type_id : $tag->type_id).')';
             if (!$db->insert($sql)) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
@@ -846,7 +846,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $rs = $db->select($sql);
             $this->_tags = [];
             foreach ($rs as $row) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
+                if ($tag_tipo = Type::getInstance($row->type_id)) {
                     $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
@@ -891,8 +891,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function save()
     {
-        if (empty($this->attributes['id_tipo'])) {
-            throw new Exception('Saving a record without id_tipo.');
+        if (empty($this->attributes['type_id'])) {
+            throw new Exception('Saving a record without type_id.');
         }
         if (array_key_exists('varchar_key', $this->attributes) && in_array('id_slug', $this->getColumns()) && !$this->id_slug) {
             $this->id_slug = $this->generateSlug();
@@ -1091,7 +1091,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         return [
             'id' => $this->id,
-            'id_tipo' => intval($this->getType()->id_tipo),
+            'type_id' => intval($this->getType()->type_id),
         ];
     }
 
@@ -1254,7 +1254,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             // idColumn
             'id',
             // WHERE:
-            'id_tipo', $this->id_tipo,
+            'type_id', $this->type_id,
         ];
         foreach ($whereHash as $column => $value) {
             $params[] = $column;
