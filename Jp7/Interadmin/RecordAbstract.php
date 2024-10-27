@@ -423,16 +423,16 @@ abstract class RecordAbstract
         if (isset($options['joins']) && $options['joins']) {
             $pre_joins = $options['pre_joins'] ?? [];
             foreach ($options['joins'] as $alias => $join) {
-                @list($joinType, $tipo, $on, $typeless) = $join;
-                if ($tipo === Type::class) {
+                @list($joinType, $type, $on, $typeless) = $join;
+                if ($type === Type::class) {
                     $table = (new Type)->getTableName();
                 } else {
-                    $table = $tipo->getInterAdminsTableName();
+                    $table = $type->getInterAdminsTableName();
                 }
                 $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
                     ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
                 if (!$typeless) {
-                    $joinSql .= $alias.'.type_id = '.$tipo->type_id.' AND ';
+                    $joinSql .= $alias.'.type_id = '.$type->type_id.' AND ';
                 }
                 $preIndex = count($options['from']);
                 $joinSql .= $this->_resolveSql($on, $options, $use_published_filters);

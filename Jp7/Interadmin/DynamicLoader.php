@@ -56,12 +56,12 @@ class DynamicLoader
         return false;
     }
 
-    protected static function getPhpDocCampo($tipo, $campo)
+    protected static function getPhpDocCampo($type, $campo)
     {
         if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
 //            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
 //            $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
-//            $retorno = self::_getCampoTypeClass($tipo->getCampoTipo($campo), $isTipo, $isMulti);
+//            $retorno = self::_getCampoTypeClass($type->getCampoTipo($campo), $isTipo, $isMulti);
             $type = 'int';
         } elseif (strpos($campo['tipo'], 'select_') === 0) {
 //            $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
@@ -117,16 +117,16 @@ class DynamicLoader
     public static function getCode($class, $addPhpDoc = false)
     {
         if ($type_id = RecordClassMap::getInstance()->getClassIdTipo($class)) {
-            $tipo = new Type($type_id);
-            $tipo->class = $class;
+            $type = new Type($type_id);
+            $type->class = $class;
 
-            return self::generateRecordClass($tipo, $addPhpDoc);
+            return self::generateRecordClass($type, $addPhpDoc);
         }
         if ($type_id = TypeClassMap::getInstance()->getClassIdTipo($class)) {
-            $tipo = new Type($type_id);
-            $tipo->class_tipo = $class;
+            $type = new Type($type_id);
+            $type->class_tipo = $class;
 
-            return self::generateTypeClass($tipo, $addPhpDoc);
+            return self::generateTypeClass($type, $addPhpDoc);
         }
     }
 

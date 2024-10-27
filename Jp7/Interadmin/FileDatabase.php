@@ -7,7 +7,7 @@ namespace Jp7\Interadmin;
  * @property int $type_id
  * @property int $id    Parent record ID
  * @property int $parte  0, 2, 3 - Abas "arquivos"
- * @property string $tipo gif, bmp - Extensão
+ * @property string $type gif, bmp - Extensão
  * @property string $keywords
  * @property string $thumb obsoleto
  * @property string $zoom obsoleto
@@ -93,12 +93,12 @@ class FileDatabase extends RecordAbstract
     /**
      * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param Type $tipo
+     * @param Type $type
      */
-    public function setType($tipo)
+    public function setType($type)
     {
-        $this->attributes['type_id'] = $tipo->type_id;
-        $this->_tipo = $tipo;
+        $this->attributes['type_id'] = $type->type_id;
+        $this->_tipo = $type;
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.

@@ -29,7 +29,7 @@ class BaseClassMap
         $arr = [];
         $roots = []; // keep track of duplicated classes
         try {
-            $tipos = DB::table('tipos')
+            $types = DB::table('tipos')
                 ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
                 ->where('deleted_tipo', '=', '')
@@ -37,18 +37,18 @@ class BaseClassMap
                 ->orderByRaw("inherited LIKE '%".$attr."%'")
                 ->get();
 
-            foreach ($tipos as $tipo) {
-                $class = $tipo->$attr;
+            foreach ($types as $type) {
+                $class = $type->$attr;
                 if (config('interadmin.psr-4')) {
                     $class = str_replace('_', '\\', $class);
                 }
-                if (!$tipo->inherited || !in_array($attr, explode(',', $tipo->inherited))) {
+                if (!$type->inherited || !in_array($attr, explode(',', $type->inherited))) {
                     if (array_key_exists($class, $roots) && config('interadmin.namespace')) {
-                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in type_id: '.$tipo->type_id);
+                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in type_id: '.$type->type_id);
                     }
                     $roots[$class] = true;
                 }
-                $arr[$tipo->type_id] = $class;
+                $arr[$type->type_id] = $class;
             }
         } catch (\PDOException $e) {
             $message = "InterAdmin database not connected";

@@ -461,20 +461,20 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @return Record Returns an Record or a child class in case it's defined on the 'class' property of its Type.
      */
-    public static function getInstance($id, $options, Type $tipo)
+    public static function getInstance($id, $options, Type $type)
     {
         // Classe foi forçada
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
-            $className = RecordClassMap::getInstance()->getClass($tipo->type_id);
+            $className = RecordClassMap::getInstance()->getClass($type->type_id);
             if (!$className) {
                 $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
         }
 
-        $instance = new $className(['id' => $id], $tipo);
-        $instance->setDb($tipo->getDbName());
+        $instance = new $className(['id' => $id], $type);
+        $instance->setDb($type->getDbName());
 
         return $instance;
     }
@@ -573,30 +573,30 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // Instance was not brought from DB, type_id is empty
         if (empty($this->attributes['type_id'])) {
             // Record::type() -> Classes that have name
-            $tipo = static::type();
-            if (!$tipo) {
+            $type = static::type();
+            if (!$type) {
                 throw new UnexpectedValueException('Could not find type_id for record. Class: '.get_class($this).' - ID: ' . $this->id);
             }
         } else {
-            $tipo = Type::getInstance($this->attributes['type_id'], [
+            $type = Type::getInstance($this->attributes['type_id'], [
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
             ]);
         }
-        $this->setType($tipo);
+        $this->setType($type);
         return $this->_tipo;
     }
 
     /**
      * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param Type $tipo
+     * @param Type $type
      */
-    public function setType(Type $tipo = null)
+    public function setType(Type $type = null)
     {
-        $this->attributes['type_id'] = $tipo->type_id;
-        $this->_tipo = $tipo;
-        $this->_aliases = $tipo ? $this->getAttributesAliases() : [];
+        $this->attributes['type_id'] = $type->type_id;
+        $this->_tipo = $type;
+        $this->_aliases = $type ? $this->getAttributesAliases() : [];
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.
