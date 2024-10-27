@@ -99,7 +99,7 @@ class Type extends RecordAbstract
         } elseif (in_array($name, $this->getAttributesNames())) {
             $this->attributes += $this->getCache('attributes', function () {
                 return (array) $this->getDb()
-                    ->table('tipos')
+                    ->table('types')
                     ->where('type_id', $this->type_id)
                     ->first();
             });
@@ -866,7 +866,7 @@ class Type extends RecordAbstract
     }
     public function getTableName()
     {
-        return $this->getDb()->getTablePrefix().'tipos';
+        return $this->getDb()->getTablePrefix().'types';
     }
     public function getInterAdminsOrder()
     {
@@ -993,7 +993,7 @@ class Type extends RecordAbstract
         $cache->forever('modified:check', time());
 
         // check if types changed
-        $modified = strtotime(DB::table('tipos')
+        $modified = strtotime(DB::table('types')
             ->select(DB::raw('MAX(date_modify) AS modified'))
             ->value('modified'));
         if ($modified === $cache->get('modified')) {

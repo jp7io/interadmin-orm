@@ -42,7 +42,7 @@ class FieldUtil
      */
     public static function getSpecialTipoXtras()
     {
-        return ['tipos_multi', 'tipos'];
+        return ['tipos_multi', 'types'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam m￺últiplos registros.

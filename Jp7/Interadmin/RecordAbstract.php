@@ -1144,7 +1144,7 @@ abstract class RecordAbstract
         $tableParts = explode('_', $table);
         $table = end($tableParts);
         // Tipos
-        if ($table === 'tipos' && count($tableParts) === 3) {
+        if ($table === 'types' && count($tableParts) === 3) {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
         // Tags
         } elseif ($table === 'tags' && count($tableParts) === 3) {

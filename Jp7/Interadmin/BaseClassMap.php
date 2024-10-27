@@ -29,7 +29,7 @@ class BaseClassMap
         $arr = [];
         $roots = []; // keep track of duplicated classes
         try {
-            $types = DB::table('tipos')
+            $types = DB::table('types')
                 ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
                 ->where('deleted_tipo', '=', '')
