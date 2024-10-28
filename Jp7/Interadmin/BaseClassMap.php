@@ -32,7 +32,7 @@ class BaseClassMap
             $types = DB::table('types')
                 ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
-                ->where('deleted_tipo', '=', '')
+                ->where('deleted_type', '=', '')
                 ->where('mostrar', '<>', '')
                 ->orderByRaw("inherited LIKE '%".$attr."%'")
                 ->get();
@@ -51,7 +51,7 @@ class BaseClassMap
                 $arr[$type->type_id] = $class;
             }
         } catch (\PDOException $e) {
-            $message = "InterAdmin database not connected";
+            $message = "InterAdmin database not connected\n".$e->getMessage();
             if (!\App::runningInConsole()) {
                 throw new DbNotConnectedException($message, 0, $e);
             }

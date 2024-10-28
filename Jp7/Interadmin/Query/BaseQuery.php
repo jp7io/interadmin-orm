@@ -45,11 +45,11 @@ abstract class BaseQuery
         'hits',
         'tags',
         'tags_list',
-        'tags_tipo',
+        'tags_type',
         'tags_registros',
         'publish_tipo',
         'visualizar',
-        'deleted_tipo',
+        'deleted_type',
     ];
 
     protected $initialOptions = [

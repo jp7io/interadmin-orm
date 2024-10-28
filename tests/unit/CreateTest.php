@@ -41,11 +41,11 @@ class CreateTest extends \Codeception\Test\Unit
 
         spl_autoload_unregister([DynamicLoader::class, 'load']);
         $this->assertFalse(class_exists($type->class));
-        $this->assertFalse(class_exists($type->class_tipo));
+        $this->assertFalse(class_exists($type->class_type));
 
         spl_autoload_register([DynamicLoader::class, 'load']);
         $this->assertTrue(class_exists($type->class));
-        $this->assertTrue(class_exists($type->class_tipo));
+        $this->assertTrue(class_exists($type->class_type));
     }
 
     public function testBuildEntity()

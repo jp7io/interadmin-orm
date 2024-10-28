@@ -518,7 +518,7 @@ abstract class RecordAbstract
 
     private function _debugQuery($sql, $trace, $startQuery)
     {
-        //$sql = explode('FROM ', str_replace(self::getPublishedFilters('registros', 'main'), '/* ... */ ', $sql))[1];
+        //$sql = explode('FROM ', str_replace(self::getPublishedFilters('records', 'main'), '/* ... */ ', $sql))[1];
         $ms = function ($start) {
             return number_format((microtime(true)-$start)*1000).'ms';
         };
@@ -1145,7 +1145,7 @@ abstract class RecordAbstract
         $table = end($tableParts);
         // Tipos
         if ($table === 'types' && count($tableParts) === 3) {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
+            return $alias.".mostrar <> '' AND ".$alias.".deleted_type = '' AND ";
         // Tags
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // do nothing

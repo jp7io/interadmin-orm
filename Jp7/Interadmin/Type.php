@@ -41,7 +41,7 @@ class Type extends RecordAbstract
     const CACHE_TAG = 'type';
 
     private static $inheritedFields = [
-        'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
+        'class', 'class_type', 'icone', 'layout', 'layout_registros', 'tabela',
         'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo',
         'editpage', 'visualizar', 'template_inserir', 'tags_list', 'hits', 'texto',
         'xtra_disabledfields', 'xtra_disabledchildren', 'files'
@@ -183,7 +183,7 @@ class Type extends RecordAbstract
      * @param int   $type_id This record's 'type_id'.
      * @param array $options Default array of options. Available keys: class, default_class.
      *
-     * @return static Returns an Type or a child class in case it's defined on its 'class_tipo' property.
+     * @return static Returns an Type or a child class in case it's defined on its 'class_type' property.
      */
     public static function getInstance($type_id, $options = [])
     {
@@ -211,7 +211,7 @@ class Type extends RecordAbstract
     /*
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
         if (!isset($this->attributes['model_type_id'])) {
-            $eagerload = array('nome', 'language', 'parent_type_id', 'campos', 'model_type_id', 'tabela', 'class', 'class_tipo', 'template', 'children');
+            $eagerload = array('nome', 'language', 'parent_type_id', 'campos', 'model_type_id', 'tabela', 'class', 'class_type', 'template', 'children');
             $neededFields = array_unique(array_merge((array) $fields, $eagerload));
             $values = parent::getFieldsValues($neededFields);
             if (is_array($fields)) {
@@ -790,13 +790,13 @@ class Type extends RecordAbstract
      */
     public function delete()
     {
-        $this->deleted_tipo = 'S';
+        $this->deleted_type = 'S';
         $this->save();
     }
 
     public function restore()
     {
-        $this->deleted_tipo = '';
+        $this->deleted_type = '';
         $this->save();
     }
 
@@ -898,7 +898,7 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsTableName()
     {
-        return $this->_getTableLang().($this->tabela ?: 'registros');
+        return $this->_getTableLang().($this->tabela ?: 'records');
     }
     /**
      * Returns the table name for the files.
@@ -921,9 +921,9 @@ class Type extends RecordAbstract
     public function getTypeClass()
     {
         if (config('interadmin.psr-4')) {
-            return str_replace('_', '\\', $this->class_tipo);
+            return str_replace('_', '\\', $this->class_type);
         }
-        return $this->class_tipo;
+        return $this->class_type;
     }
 
     /**

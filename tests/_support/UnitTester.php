@@ -39,9 +39,9 @@ class UnitTester extends \Codeception\Actor
 
         $type->setRawAttributes($attributes + $classes + [
             'class' => 'Test_' . $attributes['nome'],
-            'class_tipo' => 'Test_' . $attributes['nome'] . 'Tipo',
+            'class_type' => 'Test_' . $attributes['nome'] . 'Tipo',
             'mostrar' => 'S',
-            'deleted_tipo' => '',
+            'deleted_type' => '',
             'campos' => $this->createFields($fields)
         ]);
         $type->save();
@@ -56,7 +56,7 @@ class UnitTester extends \Codeception\Actor
         foreach ($fields as $field) {
             $fieldsVector[] = $this->createField($field);
         }
-        return interadmin_tipos_campos_encode($fieldsVector);
+        return interadmin_types_fields_encode($fieldsVector);
     }
 
     public function createField(array $field): array

@@ -124,7 +124,7 @@ class DynamicLoader
         }
         if ($type_id = TypeClassMap::getInstance()->getClassIdTipo($class)) {
             $type = new Type($type_id);
-            $type->class_tipo = $class;
+            $type->class_type = $class;
 
             return self::generateTypeClass($type, $addPhpDoc);
         }
