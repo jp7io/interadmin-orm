@@ -41,7 +41,7 @@ class UnitTester extends \Codeception\Actor
             'class' => 'Test_' . $attributes['nome'],
             'class_type' => 'Test_' . $attributes['nome'] . 'Tipo',
             'mostrar' => 'S',
-            'deleted_type' => '',
+            'deleted_at' => '',
             'campos' => $this->createFields($fields)
         ]);
         $type->save();

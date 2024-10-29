@@ -1072,7 +1072,7 @@ abstract class RecordAbstract
      */
     public function delete()
     {
-        $this->deleted = 'S';
+        $this->deleted_at = date('Y-m-d H:i:s');
         return $this->save();
     }
     /**
@@ -1094,7 +1094,7 @@ abstract class RecordAbstract
 
     public function restore()
     {
-        $this->deleted = '';
+        $this->deleted_at = null;
         return $this->save();
     }
 
@@ -1145,19 +1145,19 @@ abstract class RecordAbstract
         $table = end($tableParts);
         // Tipos
         if ($table === 'types' && count($tableParts) === 3) {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted_type = '' AND ";
+            return $alias.".mostrar <> '' AND ".$alias.".deleted_at IS NULL AND ";
         // Tags
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // do nothing
         // Arquivos
         } elseif ($table === 'files') {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
+            return $alias.".mostrar <> '' AND ".$alias.".deleted_at IS NULL AND ";
         // Registros
         } else {
             $return = $alias.".date_publish <= '".date('Y-m-d H:i:59', Record::getTimestamp())."'".
                 ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', Record::getTimestamp())."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
                 ' AND '.$alias.".char_key <> ''".
-                ' AND '.$alias.".deleted = ''".
+                ' AND '.$alias.".deleted_at IS NULL".
                 ' AND ';
             if (config('interadmin.preview')) {
                 $return .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';

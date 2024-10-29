@@ -32,7 +32,7 @@ class BaseClassMap
             $types = DB::table('types')
                 ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
-                ->where('deleted_type', '=', '')
+                ->where('deleted_at', '=', '')
                 ->where('mostrar', '<>', '')
                 ->orderByRaw("inherited LIKE '%".$attr."%'")
                 ->get();

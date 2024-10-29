@@ -49,7 +49,7 @@ abstract class BaseQuery
         'tags_registros',
         'publish_tipo',
         'visualizar',
-        'deleted_type',
+        'deleted_at',
     ];
 
     protected $initialOptions = [
