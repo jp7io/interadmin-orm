@@ -1004,9 +1004,9 @@ class Type extends RecordAbstract
         $cache->forever('modified', $modified);
 
         // check inheritance of types
-        $unsyncedTypes = DB::table('tipos AS child')
+        $unsyncedTypes = DB::table('types AS child')
             ->select('child.*')
-            ->join('tipos AS model', function ($join) {
+            ->join('types AS model', function ($join) {
                 $join->on('model.type_id', '=', 'child.model_type_id')
                     ->on(function ($q) {
                         $q->on('model.campos', '<>', 'child.campos')
