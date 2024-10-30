@@ -200,7 +200,7 @@ class FileRecord extends RecordAbstract
 
     public function getAttributesNames()
     {
-        return ['id_file', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_file', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted_at'];
     }
     public function getTableName()
     {

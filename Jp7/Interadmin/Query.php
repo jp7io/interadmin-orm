@@ -212,7 +212,7 @@ class Query extends Query\BaseQuery
     public function delete()
     {
         return $this->provider->deprecated_updateInterAdmins([
-            'deleted' => 'S',
+            'deleted_at' => 'S',
         ], $this->options);
     }
 

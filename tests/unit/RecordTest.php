@@ -86,7 +86,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
@@ -94,7 +94,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01' // date_expire no futuro
@@ -102,7 +102,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => '', // sem publish
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 123, // com parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01'
@@ -116,7 +116,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => '', // sem mostrar
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
@@ -124,7 +124,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => 'S', // com deleted
+                'deleted_at'  => 'S', // com deleted
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
@@ -132,7 +132,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:00:00',
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
@@ -140,7 +140,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 02:00:01', // date_publish no futuro
                 'date_expire' => '2016-01-01 03:00:00'
@@ -148,7 +148,7 @@ class RecordTest extends \Codeception\Test\Unit
             [[
                 'char_key' => 'S',
                 'publish'  => '', // sem publish
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0, // sem parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01'

@@ -514,7 +514,7 @@ abstract class BaseQuery
             $type = $data['tipo'];
         } elseif ($this instanceof TypeQuery) {
             return in_array($field, $this->typeChars);
-        } elseif (in_array($field, ['deleted', 'publish'])) {
+        } elseif (in_array($field, ['deleted_at', 'publish'])) {
             return true;
         } else {
             $type = $this->provider;

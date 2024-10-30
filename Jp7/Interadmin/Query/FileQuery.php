@@ -11,7 +11,7 @@ class FileQuery extends BaseQuery
         $chars = [
             'mostrar',
             'destaque',
-            'deleted',
+            'deleted_at',
             'link_blank',
         ];
 

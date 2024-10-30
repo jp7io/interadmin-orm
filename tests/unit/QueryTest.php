@@ -245,7 +245,7 @@ class QueryTest extends \Codeception\Test\Unit
             'no date_expire' => [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
@@ -253,7 +253,7 @@ class QueryTest extends \Codeception\Test\Unit
             'not expired yet' => [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:01:00' // date_expire no futuro
@@ -261,7 +261,7 @@ class QueryTest extends \Codeception\Test\Unit
             'children without publish' => [[
                 'char_key' => 'S',
                 'publish'  => '', // sem publish
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 123, // com parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:01:00'
@@ -275,15 +275,15 @@ class QueryTest extends \Codeception\Test\Unit
             'not active' => [[
                 'char_key' => '', // sem mostrar
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
-            'deleted' => [[
+            'deleted_at' => [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => 'S', // com deleted
+                'deleted_at'  => 'S', // com deleted
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
@@ -291,7 +291,7 @@ class QueryTest extends \Codeception\Test\Unit
             'expired' => [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:00:00',
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
@@ -299,7 +299,7 @@ class QueryTest extends \Codeception\Test\Unit
             'not published yet' => [[
                 'char_key' => 'S',
                 'publish'  => 'S',
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 02:01:00', // date_publish no futuro
                 'date_expire' => '2016-01-01 03:00:00'
@@ -307,7 +307,7 @@ class QueryTest extends \Codeception\Test\Unit
             'no publish' => [[
                 'char_key' => 'S',
                 'publish'  => '', // sem publish
-                'deleted'  => '',
+                'deleted_at'  => null,
                 'parent_id'  => 0, // sem parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:01:00'
