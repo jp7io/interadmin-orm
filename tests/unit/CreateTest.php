@@ -96,7 +96,7 @@ class CreateTest extends \Codeception\Test\Unit
 
         $user->delete();
 
-        $this->tester->seeInDatabase('interadmin_teste_registros', ['id' => $user->id, 'deleted_at' => 'S']);
+        $this->tester->seeInDatabase('interadmin_teste_registros', ['id' => $user->id, 'deleted_at' => 1]);
     }
 
     public function testForceDelete()

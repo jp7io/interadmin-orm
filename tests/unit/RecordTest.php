@@ -84,23 +84,23 @@ class RecordTest extends \Codeception\Test\Unit
     {
         return [
             [[
-                'char_key' => 'S',
-                'publish'  => 'S',
+                'char_key' => 1,
+                'publish'  => 1,
                 'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
             ]],
             [[
-                'char_key' => 'S',
-                'publish'  => 'S',
+                'char_key' => 1,
+                'publish'  => 1,
                 'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01' // date_expire no futuro
             ]],
             [[
-                'char_key' => 'S',
+                'char_key' => 1,
                 'publish'  => '', // sem publish
                 'deleted_at'  => null,
                 'parent_id'  => 123, // com parent
@@ -115,38 +115,38 @@ class RecordTest extends \Codeception\Test\Unit
         return [
             [[
                 'char_key' => '', // sem mostrar
-                'publish'  => 'S',
+                'publish'  => 1,
                 'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
-                'char_key' => 'S',
-                'publish'  => 'S',
-                'deleted_at'  => 'S', // com deleted
+                'char_key' => 1,
+                'publish'  => 1,
+                'deleted_at'  => 1, // com deleted
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
-                'char_key' => 'S',
-                'publish'  => 'S',
+                'char_key' => 1,
+                'publish'  => 1,
                 'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:00:00',
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
             ]],
             [[
-                'char_key' => 'S',
-                'publish'  => 'S',
+                'char_key' => 1,
+                'publish'  => 1,
                 'deleted_at'  => null,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 02:00:01', // date_publish no futuro
                 'date_expire' => '2016-01-01 03:00:00'
             ]],
             [[
-                'char_key' => 'S',
+                'char_key' => 1,
                 'publish'  => '', // sem publish
                 'deleted_at'  => null,
                 'parent_id'  => 0, // sem parent

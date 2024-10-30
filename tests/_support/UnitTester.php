@@ -40,7 +40,7 @@ class UnitTester extends \Codeception\Actor
         $type->setRawAttributes($attributes + $classes + [
             'class' => 'Test_' . $attributes['nome'],
             'class_type' => 'Test_' . $attributes['nome'] . 'Tipo',
-            'mostrar' => 'S',
+            'mostrar' => 1,
             'deleted_at' => '',
             'campos' => $this->createFields($fields)
         ]);
@@ -88,8 +88,8 @@ class UnitTester extends \Codeception\Actor
             'varchar_key' => 'argentinopam',
             'password_key' => '123',
             'varchar_2' => 'pamela@jp7.com.br',
-            'char_key' => 'S',
-            'publish' => 'S',
+            'char_key' => 1,
+            'publish' => 1,
             'ordem' => 0,
         ];
         $user->setRawAttributes($attributes);

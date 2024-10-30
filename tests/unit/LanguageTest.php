@@ -20,7 +20,7 @@ class LanguageTest extends Unit
 
     public function testWithLanguageChecked()
     {
-        $this->tester->createI18nNewsType(['language' => 'S']);
+        $this->tester->createI18nNewsType(['language' => 1]);
 
         $news = Test_Noticia::build();
         $news->title = 'Doria eleito prefeito';
@@ -54,10 +54,10 @@ class LanguageTest extends Unit
 
         App::setLocale('pt-BR');
     }
-    
+
     public function testTypeName()
     {
-        $newsType = $this->tester->createI18nNewsType(['language' => 'S', 'nome_en' => 'News']);
+        $newsType = $this->tester->createI18nNewsType(['language' => 1, 'nome_en' => 'News']);
 
         $nomePtBr = $newsType->getName();
 

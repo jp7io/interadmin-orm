@@ -18,7 +18,7 @@ class RelationTest extends \Codeception\Test\Unit
         $this->cityType = $this->tester->createType(
             [
                 'nome' => 'City',
-                //'tags' => 'S',
+                //'tags' => 1,
             ],
             [
                 ['tipo' => 'varchar_key', 'nome' => 'Name'],
