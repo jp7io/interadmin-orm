@@ -492,7 +492,6 @@ abstract class RecordAbstract
                 $rs = $db->select($sql, $options['bindings']);
             }
         } catch (QueryException $e) {
-            dd($e->getMessage(), $sql, $options['bindings']);
             $sql = self::replaceBindings($options['bindings'], $sql);
             if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
                 $sql .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
