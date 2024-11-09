@@ -120,7 +120,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             return $value;
         }
         // Mutators
-        $mutator = 'get'.Str::studly($name).'Attribute';
+        $mutator = 'get' . Str::studly($name) . 'Attribute';
         if (method_exists($this, $mutator)) {
             $value = $this->$mutator($value);
             return $value;
@@ -137,7 +137,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
         // FIXME remove when old code is validated
         if (isset($aliases[$name]) && array_key_exists($aliases[$name], $this->attributes)) {
-            throw new UnexpectedValueException('$this->attributes must not use alias: '.$aliases[$name]);
+            throw new UnexpectedValueException('$this->attributes must not use alias: ' . $aliases[$name]);
         }
         // Relations / Lazy Loading
         $value = $this->_lazyLoadAttribute($name);
@@ -166,7 +166,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 $column = $this->_aliasToColumn($name, array_flip($aliases));
                 if ($column === $name) {
                     $data = $this->getType()->getRelationships()[$name];
-                    throw new Exception($name.' is a relation, use '.$name.($data['multi'] ? '_ids' : '_id')); // laravel code
+                    throw new Exception($name . ' is a relation, use ' . $name . ($data['multi'] ? '_ids' : '_id')); // laravel code
                 }
                 $name = $column;
             }
@@ -282,11 +282,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     private function _debugLazyLoading($msg, $name, $caller)
     {
-        $msg = $msg.' "'.$name.'".'.PHP_EOL.
-            '- Class: '.get_class($this).PHP_EOL.
-            '- ID: '.$this->id.PHP_EOL.
-            '- File: '.($caller['file'] ?? '').' - Line: '.($caller['line'] ?? '');
-        if (self::$lazy_loading_debug){
+        $msg = $msg . ' "' . $name . '".' . PHP_EOL .
+            '- Class: ' . get_class($this) . PHP_EOL .
+            '- ID: ' . $this->id . PHP_EOL .
+            '- File: ' . ($caller['file'] ?? '') . ' - Line: ' . ($caller['line'] ?? '');
+        if (self::$lazy_loading_debug) {
             throw new \Exception($msg);
         } else {
             \Log::notice($msg);
@@ -298,7 +298,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $data = $relationships[$name];
         // select_multi
         if ($data['multi']) {
-            $fks = $this->{$name.'_ids'};
+            $fks = $this->{$name . '_ids'};
             if (!$fks) {
                 return jp7_collect([]);
             }
@@ -332,7 +332,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             return $loaded->values;
         }
         // select
-        $fk = $this->{$name.'_id'};
+        $fk = $this->{$name . '_id'};
         if (!$fk) {
             return null;
         }
@@ -376,7 +376,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($query = static::query()) {
             return call_user_func_array([$query, $name], $arguments);
         }
-        throw new BadMethodCallException('Call to undefined method '.get_called_class().'::'.$name);
+        throw new BadMethodCallException('Call to undefined method ' . get_called_class() . '::' . $name);
     }
 
     public static function all()
@@ -469,7 +469,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         } else {
             $className = RecordClassMap::getInstance()->getClass($type->type_id);
             if (!$className) {
-                $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
+                $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE) . 'Record';
             }
         }
 
@@ -527,11 +527,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             return $relationships[$methodName]['query'];
         }
         // Default error when method doesn´t exist
-        $message = 'Call to undefined method '.get_class($this).'->'.$methodName.'(). Available magic methods: '."\n";
+        $message = 'Call to undefined method ' . get_class($this) . '->' . $methodName . '(). Available magic methods: ' . "\n";
         $children = $this->getType()->getInterAdminsChildren();
 
         foreach (array_keys($children) as $childName) {
-            $message .= "\t\t- ".lcfirst($childName)."()\n";
+            $message .= "\t\t- " . lcfirst($childName) . "()\n";
         }
         if ($this->hasArquivosTab()) {
             $message .= "\t\t- arquivos()\n";
@@ -575,7 +575,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             // Record::type() -> Classes that have name
             $type = static::type();
             if (!$type) {
-                throw new UnexpectedValueException('Could not find type_id for record. Class: '.get_class($this).' - ID: ' . $this->id);
+                throw new UnexpectedValueException('Could not find type_id for record. Class: ' . get_class($this) . ' - ID: ' . $this->id);
             }
         } else {
             $type = Type::getInstance($this->attributes['type_id'], [
@@ -617,7 +617,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
             if ($this->parent_id) {
                 if (!$this->parent_type_id) {
-                    throw new Exception('Field parent_type_id is required. Id: '.$this->id);
+                    throw new Exception('Field parent_type_id is required. Id: ' . $this->id);
                 }
                 $this->_parent = Type::getInstance($this->parent_type_id)
                     ->records()
@@ -715,7 +715,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function deprecated_createArquivo(array $attributes = [])
     {
-        $className = static::DEFAULT_NAMESPACE.'FileRecord';
+        $className = static::DEFAULT_NAMESPACE . 'FileRecord';
         if (!class_exists($className)) {
             $className = 'Jp7\\Interadmin\\FileRecord';
         }
@@ -741,7 +741,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if (isset($options['class'])) {
             $className = $options['class'];
         } else {
-            $className = static::DEFAULT_NAMESPACE.'FileRecord';
+            $className = static::DEFAULT_NAMESPACE . 'FileRecord';
         }
         if (!class_exists($className)) {
             $className = 'Jp7\\Interadmin\\FileRecord';
@@ -757,10 +757,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $this->_whereArrayFix($options['where']); // FIXME
 
         $options['fields'] = array_merge(['id_file'], (array) $options['fields']);
-        $options['from'] = $fileModel->getTableName().' AS main';
-        $options['where'][] = 'type_id = '.intval($this->type_id);
-        $options['where'][] = 'id = '.intval($this->id);
-        $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' ordem';
+        $options['from'] = $fileModel->getTableName() . ' AS main';
+        $options['where'][] = 'type_id = ' . intval($this->type_id);
+        $options['where'][] = 'id = ' . intval($this->id);
+        $options['order'] = (isset($options['order']) ? $options['order'] . ',' : '') . ' ordem';
         // Internal use
         $options['aliases'] = $fileModel->getAttributesAliases();
         $options['campos'] = $fileModel->getAttributesCampos();
@@ -815,12 +815,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function deprecated_setTags(array $tags)
     {
         $db = $this->getDb();
-        $sql = 'DELETE FROM '.$db->getTablePrefix().'tags WHERE parent_id = '.$this->id;
+        $sql = 'DELETE FROM ' . $db->getTablePrefix() . 'tags WHERE parent_id = ' . $this->id;
         foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, type_id) VALUES
-                ('.$this->id.','.
-                ($tag instanceof self ? $tag->id : 0).','.
-                ($tag instanceof self ? $tag->type_id : $tag->type_id).')';
+            $sql = 'INSERT INTO ' . $db->getTablePrefix() . 'tags (parent_id, id, type_id) VALUES
+                (' . $this->id . ',' .
+                ($tag instanceof self ? $tag->id : 0) . ',' .
+                ($tag instanceof self ? $tag->type_id : $tag->type_id) . ')';
             if (!$db->insert($sql)) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
@@ -838,11 +838,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $retorno = [];
         if (!$this->_tags || $options) {
             $db = $this->getDb();
-            $options['where'][] = 'parent_id = '.$this->id;
-            $sql = 'SELECT * FROM '.$db->getTablePrefix().'tags '.
-                'WHERE '.implode(' AND ', $options['where']).
-                (!empty($options['group']) ? ' GROUP BY '.$options['group'] : '').
-                (!empty($options['limit']) ? ' LIMIT '.$options['limit'] : '');
+            $options['where'][] = 'parent_id = ' . $this->id;
+            $sql = 'SELECT * FROM ' . $db->getTablePrefix() . 'tags ' .
+                'WHERE ' . implode(' AND ', $options['where']) .
+                (!empty($options['group']) ? ' GROUP BY ' . $options['group'] : '') .
+                (!empty($options['limit']) ? ' LIMIT ' . $options['limit'] : '');
             $rs = $db->select($sql);
             $this->_tags = [];
             foreach ($rs as $row) {
@@ -851,10 +851,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                     if ($row->id) {
                         $options = [
                             'fields' => ['varchar_key'],
-                            'where' => ['id = '.$row->id],
+                            'where' => ['id = ' . $row->id],
                         ];
                         if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
-                            $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
+                            $tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';
                             $tag_registro->interadmin = $this;
                             $retorno[] = $tag_registro;
                         }
@@ -882,12 +882,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return $this->char_key &&
             !$this->deleted_at &&
             ($this->parent_id || $this->publish || !config('interadmin.preview')) &&
-            $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
-            ($this->date_expire->getTimestamp() >= Record::getTimestamp() || $this->date_expire->format('Y') < 1);
+            $this->publish_at->getTimestamp() <= Record::getTimestamp() &&
+            ($this->expire_at->getTimestamp() >= Record::getTimestamp() || $this->expire_at->format('Y') < 1);
     }
 
     /**
-     * Saves this record and updates date_modify.
+     * Saves this record and updates updated_at.
      */
     public function save()
     {
@@ -899,15 +899,15 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
 
         // log
-        $this->log = date('d/m/Y H:i').' - '.
-            self::$log_user.' - '.
-            (self::$log_action ? self::$log_action.' - ' : '').
-            Request::ip().
-            chr(13).
+        $this->log = date('d/m/Y H:i') . ' - ' .
+            self::$log_user . ' - ' .
+            (self::$log_action ? self::$log_action . ' - ' : '') .
+            Request::ip() .
+            chr(13) .
             $this->log;
 
-        // date_modify
-        $this->date_modify = date('c');
+        // updated_at
+        $this->updated_at = date('c');
 
         return $this->saveRaw();
     }
@@ -920,14 +920,14 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
         $id_slug = to_slug($this->varchar_key);
         if (is_numeric($id_slug)) {
-            $id_slug = '--'.$id_slug;
+            $id_slug = '--' . $id_slug;
         }
 
         if ($this->siblings()->where('id_slug', $id_slug)->exists()) {
             // Add 1 if it already exists
             // REGEXP used to avoid multiple queries
             $max = $this->siblings()
-                ->where('id_slug', 'REGEXP', '^'.$id_slug.'[0-9]*$')
+                ->where('id_slug', 'REGEXP', '^' . $id_slug . '[0-9]*$')
                 ->orderByRaw('LENGTH(id_slug) DESC, id_slug DESC')
                 ->value('id_slug');
 
@@ -1034,11 +1034,13 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         return self::$publish_filters_enabled;
     }
-    public static function debugLazyLoading(bool $bool = true) {
+    public static function debugLazyLoading(bool $bool = true)
+    {
         self::$lazy_loading_debug = $bool;
     }
 
-    public static function setLazyLoadingOptimizerEnabled(bool $bool) {
+    public static function setLazyLoadingOptimizerEnabled(bool $bool)
+    {
         $oldValue = self::$lazy_loading_optimizer;
         self::$lazy_loading_optimizer = $bool;
 
@@ -1119,12 +1121,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
 
         if (!Str::startsWith($nomeCampo, 'select_')) {
-            throw new Exception('The field '.$attribute.' is not a select. It was expected a select field on setAttributeBySearch.');
+            throw new Exception('The field ' . $attribute . ' is not a select. It was expected a select field on setAttributeBySearch.');
         }
 
         $campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
         $record = $campoTipo->deprecatedFindFirst([
-            'where' => [$searchColumn." = '".$searchValue."'"],
+            'where' => [$searchColumn . " = '" . $searchValue . "'"],
         ]);
         if (Str::startsWith($nomeCampo, 'select_multi_')) {
             $this->$attribute = [$record];
@@ -1254,13 +1256,14 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             // idColumn
             'id',
             // WHERE:
-            'type_id', $this->type_id,
+            'type_id',
+            $this->type_id,
         ];
         foreach ($whereHash as $column => $value) {
             $params[] = $column;
             $params[] = $value;
         }
-        return 'unique:'.implode(',', $params);
+        return 'unique:' . implode(',', $params);
     }
 
     public function getFillable()

@@ -41,10 +41,28 @@ class Type extends RecordAbstract
     const CACHE_TAG = 'type';
 
     private static $inheritedFields = [
-        'class', 'class_type', 'icone', 'layout', 'layout_registros', 'tabela',
-        'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo',
-        'editpage', 'visualizar', 'template_inserir', 'tags_list', 'hits', 'texto',
-        'xtra_disabledfields', 'xtra_disabledchildren', 'files'
+        'class',
+        'class_type',
+        'icon',
+        'layout',
+        'layout_registros',
+        'table',
+        'template',
+        'children',
+        'campos',
+        'language',
+        'editar',
+        'unico',
+        'disparo',
+        'editpage',
+        'visualizar',
+        'template_inserir',
+        'tags_list',
+        'hits',
+        'texto',
+        'xtra_disabledfields',
+        'xtra_disabledchildren',
+        'files'
     ];
     private static $privateFields = ['children', 'campos'];
 
@@ -119,11 +137,11 @@ class Type extends RecordAbstract
             return $query;
         }
         // Default error when method doesn´t exist
-        $message = 'Call to undefined method '.get_class($this).'->'.
-            $methodName.'(). Available magic methods: '."\n";
+        $message = 'Call to undefined method ' . get_class($this) . '->' .
+            $methodName . '(). Available magic methods: ' . "\n";
 
         foreach ($this->_getChildrenKeyBySlug() as $slug => $child) {
-            $message .= "\t\t- ".lcfirst(Str::camel($slug))."()\n";
+            $message .= "\t\t- " . lcfirst(Str::camel($slug)) . "()\n";
         }
         throw new BadMethodCallException($message);
     }
@@ -162,7 +180,7 @@ class Type extends RecordAbstract
         if ($query = static::query()) {
             return call_user_func_array([$query, $name], $arguments);
         }
-        throw new BadMethodCallException('Call to undefined method '.get_called_class().'::'.$name);
+        throw new BadMethodCallException('Call to undefined method ' . get_called_class() . '::' . $name);
     }
 
     public static function all()
@@ -195,7 +213,7 @@ class Type extends RecordAbstract
             $classTipo = TypeClassMap::getInstance()->getClass($type_id);
             if (!$classTipo) {
                 if (isset($options['default_namespace'])) {
-                    $classTipo = $options['default_namespace'].'Type';
+                    $classTipo = $options['default_namespace'] . 'Type';
                 } else {
                     $classTipo = self::$_defaultClass;
                 }
@@ -211,7 +229,7 @@ class Type extends RecordAbstract
     /*
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
         if (!isset($this->attributes['model_type_id'])) {
-            $eagerload = array('nome', 'language', 'parent_type_id', 'campos', 'model_type_id', 'tabela', 'class', 'class_type', 'template', 'children');
+            $eagerload = array('nome', 'language', 'parent_type_id', 'campos', 'model_type_id', 'table', 'class', 'class_type', 'template', 'children');
             $neededFields = array_unique(array_merge((array) $fields, $eagerload));
             $values = parent::getFieldsValues($neededFields);
             if (is_array($fields)) {
@@ -280,7 +298,7 @@ class Type extends RecordAbstract
     public function deprecatedGetChildren($options = [])
     {
         $this->_whereArrayFix($options['where']); // FIXME
-        $cacheKey = __METHOD__.serialize($options);
+        $cacheKey = __METHOD__ . serialize($options);
 
         if (empty($options['order'])) {
             $options['order'] = 'ordem, nome';
@@ -294,7 +312,7 @@ class Type extends RecordAbstract
             $options['fields'] = array_merge(['type_id'], (array) $options['fields']);
         }
         // Internal use
-        $options['from'] = $this->getTableName().' AS main';
+        $options['from'] = $this->getTableName() . ' AS main';
         $options['aliases'] = $this->getAttributesAliases();
         $options['campos'] = $this->getAttributesCampos();
 
@@ -356,21 +374,21 @@ class Type extends RecordAbstract
 
         if ($options['eager_load']) {
             foreach ($options['eager_load'] as $relationshipData) {
-//                if ($relationshipData['type'] == 'select' && !$relationshipData['multi']) {
-//                    // Any eager load level missing?
-//                    if ($relationshipData['levels']) {
-//                        $selects = [];
-//                        $attribute = $relationshipData['name'];
-//                        foreach ($records as $item) {
-//                            if ($item->$attribute) {
-//                                $selects[] = $item->$attribute;
-//                            }
-//                        }
-//                        Relation::eagerLoad($selects, $relationshipData['levels']);
-//                    }
-//                } else {
-                    Relation::eagerLoad($records, $relationshipData['levels']);
-//                }
+                //                if ($relationshipData['type'] == 'select' && !$relationshipData['multi']) {
+                //                    // Any eager load level missing?
+                //                    if ($relationshipData['levels']) {
+                //                        $selects = [];
+                //                        $attribute = $relationshipData['name'];
+                //                        foreach ($records as $item) {
+                //                            if ($item->$attribute) {
+                //                                $selects[] = $item->$attribute;
+                //                            }
+                //                        }
+                //                        Relation::eagerLoad($selects, $relationshipData['levels']);
+                //                    }
+                //                } else {
+                Relation::eagerLoad($records, $relationshipData['levels']);
+                //                }
             }
         }
 
@@ -415,7 +433,7 @@ class Type extends RecordAbstract
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance, true);
 
-        $options['fields'] = $function.'('.$column.') AS values';
+        $options['fields'] = $function . '(' . $column . ') AS values';
 
         if (isset($options['group'])) {
             throw new Exception('This method cannot be used with GROUP BY.');
@@ -481,7 +499,7 @@ class Type extends RecordAbstract
     public function first()
     {
         if (func_num_args() > 0) {
-            throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');
+            throw new BadMethodCallException('Wrong number of arguments, received ' . func_num_args() . ', expected 0.');
         }
 
         return $this->limit(1)->get()->first();
@@ -500,7 +518,7 @@ class Type extends RecordAbstract
             if (is_numeric($this->model_type_id)) {
                 $model = Type::getInstance($this->model_type_id, ['default_namespace' => static::DEFAULT_NAMESPACE]);
             } else {
-                $className = 'Jp7_Model_'.$this->model_type_id.'Tipo';
+                $className = 'Jp7_Model_' . $this->model_type_id . 'Tipo';
                 $model = new $className();
             }
 
@@ -518,16 +536,29 @@ class Type extends RecordAbstract
     {
         return $this->getCache('campos', function () {
             $campos_parameters = [
-                'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
-                'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
-                'default', 'nome_id',
+                'tipo',
+                'nome',
+                'ajuda',
+                'tamanho',
+                'obrigatorio',
+                'separador',
+                'xtra',
+                'lista',
+                'orderby',
+                'combo',
+                'readonly',
+                'form',
+                'label',
+                'permissoes',
+                'default',
+                'nome_id',
             ];
             $campos    = explode('{;}', $this->campos);
             $A = [];
             for ($i = 0; $i < count($campos); $i++) {
                 $parameters = explode('{,}', $campos[$i]);
                 if ($parameters[0]) {
-                    $A[$parameters[0]]['ordem'] = ($i+1);
+                    $A[$parameters[0]]['ordem'] = ($i + 1);
                     $isSelect = strpos($parameters[0], 'select_') === 0;
                     for ($j = 0; $j < count($parameters); $j++) {
                         $A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
@@ -628,7 +659,7 @@ class Type extends RecordAbstract
     {
         if ($this->_interadminRelationships === null) {
             // getCampoTipo might be different for each class
-            $cacheKey = static::class.','.$this->getCacheKey('relationships');
+            $cacheKey = static::class . ',' . $this->getCacheKey('relationships');
             $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, 5, function () {
                 $relationships = [];
 
@@ -718,7 +749,7 @@ class Type extends RecordAbstract
     {
         $suffix = Lang::get('interadmin.suffix');
 
-        return $this->{'nome'.$suffix} ?: $this->nome;
+        return $this->{'nome' . $suffix} ?: $this->nome;
     }
 
     /**
@@ -730,9 +761,9 @@ class Type extends RecordAbstract
         $this->id_slug = to_slug($this->nome);
 
         // log
-        $this->log = date('d/m/Y H:i').' - '.Record::getLogUser().' - '.
-            Request::ip().chr(13).$this->log;
-        $this->date_modify = date('c');
+        $this->log = date('d/m/Y H:i') . ' - ' . Record::getLogUser() . ' - ' .
+            Request::ip() . chr(13) . $this->log;
+        $this->updated_at = date('c');
         // Inheritance
         $this->syncInheritance();
         $retorno = $this->saveRaw();
@@ -740,7 +771,7 @@ class Type extends RecordAbstract
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->type_id) {
             $inheritingTipos = $this->deprecatedGetChildren([
-                'where' => ["model_type_id = '".$this->type_id."'"],
+                'where' => ["model_type_id = '" . $this->type_id . "'"],
                 'class' => self::class,
             ]);
             foreach ($inheritingTipos as $type) {
@@ -771,7 +802,7 @@ class Type extends RecordAbstract
             if (is_numeric($this->model_type_id)) {
                 $modelo = new self($this->model_type_id);
             } else {
-                $className = 'Jp7_Model_'.$this->model_type_id.'Tipo';
+                $className = 'Jp7_Model_' . $this->model_type_id . 'Tipo';
                 $modelo = new $className();
             }
             foreach (self::$inheritedFields as $field) {
@@ -845,7 +876,7 @@ class Type extends RecordAbstract
         unset($options['order']);
 
         $valuesToSave = $this->_convertForDatabase(
-            $attributes + ['date_modify' => date('c')],
+            $attributes + ['updated_at' => date('c')],
             array_flip($options['aliases'])
         );
         return $this->_executeQuery($options, 'UPDATE', $valuesToSave);
@@ -866,7 +897,7 @@ class Type extends RecordAbstract
     }
     public function getTableName()
     {
-        return $this->getDb()->getTablePrefix().'types';
+        return $this->getDb()->getTablePrefix() . 'types';
     }
     public function getInterAdminsOrder()
     {
@@ -887,7 +918,7 @@ class Type extends RecordAbstract
                     ksort($order);
                 }
             }
-            $order[] = 'date_publish DESC';
+            $order[] = 'publish_at DESC';
             return implode(',', $order);
         });
     }
@@ -898,7 +929,7 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsTableName()
     {
-        return $this->_getTableLang().($this->tabela ?: 'records');
+        return $this->_getTableLang() . ($this->table ?: 'records');
     }
     /**
      * Returns the table name for the files.
@@ -907,7 +938,7 @@ class Type extends RecordAbstract
      */
     public function getArquivosTableName()
     {
-        return $this->_getTableLang().'files';
+        return $this->_getTableLang() . 'files';
     }
 
     public function getRecordClass()
@@ -936,7 +967,7 @@ class Type extends RecordAbstract
         $table = $this->getDb()->getTablePrefix();
         if ($this->language) {
             if (!Lang::has('interadmin.prefix')) {
-                throw new Exception('You need to add interadmin.prefix to app/lang/'.App::getLocale().'/interadmin.php');
+                throw new Exception('You need to add interadmin.prefix to app/lang/' . App::getLocale() . '/interadmin.php');
             }
             $table .= Lang::get('interadmin.prefix');
         }
@@ -957,7 +988,7 @@ class Type extends RecordAbstract
         $cache->forget($this->getCacheKey('tiposUsingThisModel'));
 
         // different values for getTipo() depending on class
-        $cache->forget(static::class.','.$this->getCacheKey('relationships'));
+        $cache->forget(static::class . ',' . $this->getCacheKey('relationships'));
     }
 
     protected function getCache($varname, $callback)
@@ -975,7 +1006,7 @@ class Type extends RecordAbstract
 
     protected function getCacheKey($varname)
     {
-        return $varname.','.$this->_db.','.$this->type_id;
+        return $varname . ',' . $this->_db . ',' . $this->type_id;
     }
 
     /**
@@ -994,7 +1025,7 @@ class Type extends RecordAbstract
 
         // check if types changed
         $modified = strtotime(DB::table('types')
-            ->select(DB::raw('MAX(date_modify) AS modified'))
+            ->select(DB::raw('MAX(updated_at) AS modified'))
             ->value('modified'));
         if ($modified === $cache->get('modified')) {
             return; // not changed
@@ -1017,7 +1048,7 @@ class Type extends RecordAbstract
         if (is_array($unsyncedTypes)) {
             $unsyncedTypes = collect($unsyncedTypes); // <= Laravel 5.2
         }
-        \Log::notice('Resyncing '.count($unsyncedTypes).' types: '.$unsyncedTypes->implode('type_id', ','));
+        \Log::notice('Resyncing ' . count($unsyncedTypes) . ' types: ' . $unsyncedTypes->implode('type_id', ','));
         foreach ($unsyncedTypes as $unsyncedType) {
             $type = new self($unsyncedType->type_id);
             $type->setRawAttributes(get_object_vars($unsyncedType));
@@ -1122,11 +1153,11 @@ class Type extends RecordAbstract
         if (method_exists($recordModel, $relationship)) {
             return $recordModel->$relationship()->getRelationshipData();
         }
-        throw new InvalidArgumentException('Unknown relationship: '.$relationship);
+        throw new InvalidArgumentException('Unknown relationship: ' . $relationship);
     }
 
     /**
-     * Creates a record with type_id, mostrar, date_insert and date_publish filled.
+     * Creates a record with type_id, mostrar, created_at and publish_at filled.
      *
      * @param array $attributes Attributes to be merged into the new record.
      *
@@ -1139,8 +1170,8 @@ class Type extends RecordAbstract
         if ($mostrar = $this->getFieldsAlias('char_key')) {
             $record->$mostrar = 'S';
         }
-        $record->date_publish = date('c');
-        $record->date_insert = date('c');
+        $record->publish_at = date('c');
+        $record->created_at = date('c');
         $record->publish = 'S';
         $record->log = '';
 
@@ -1165,9 +1196,9 @@ class Type extends RecordAbstract
         $typesUsingThisModel = $this->getCache('tiposUsingThisModel', function () {
             $options2 = [
                 'fields' => 'type_id',
-                'from' => $this->getTableName().' AS main',
+                'from' => $this->getTableName() . ' AS main',
                 'where' => [
-                    "model_type_id = '".$this->type_id."'",
+                    "model_type_id = '" . $this->type_id . "'",
                 ],
             ];
             $rs = $this->_executeQuery($options2);
@@ -1215,8 +1246,8 @@ class Type extends RecordAbstract
             $options['fields'] = array_merge($requiredFields, (array) $options['fields']);
         }
 
-        $options['from'] = $recordModel->getTableName().' AS main';
-        $options['order'] = (isset($options['order']) ? $options['order'].', ' : '').$this->getInterAdminsOrder();
+        $options['from'] = $recordModel->getTableName() . ' AS main';
+        $options['order'] = (isset($options['order']) ? $options['order'] . ', ' : '') . $this->getInterAdminsOrder();
 
         // Internal use
         $options['aliases'] = $recordModel->getAttributesAliases();
@@ -1225,7 +1256,7 @@ class Type extends RecordAbstract
         $options['eager_load'] = [];
 
         if (!$options['campos']) {
-            \Log::notice('Querying a type without "campos" - type_id: '.$this->type_id);
+            \Log::notice('Querying a type without "campos" - type_id: ' . $this->type_id);
         }
 
         if (isset($options['with'])) {
@@ -1235,29 +1266,29 @@ class Type extends RecordAbstract
                 $levels = explode('.', $withRelationship);
 
                 if ($relationshipData = $this->getRelationshipData($levels[0])) {
-//                    if ($relationshipData['type'] === 'select') {
-//                        // select.* - Esse carregamento é feito com join para aproveitar código existente
-//                        // E também porque join é mais rápido para hasOne() do que um novo select
-//                        if (!$relationshipData['multi']) {
-//                            $options['fields'][$levels[0]] = ['*'];
-//                            array_shift($levels);
-//                        }
-//                    }
+                    //                    if ($relationshipData['type'] === 'select') {
+                    //                        // select.* - Esse carregamento é feito com join para aproveitar código existente
+                    //                        // E também porque join é mais rápido para hasOne() do que um novo select
+                    //                        if (!$relationshipData['multi']) {
+                    //                            $options['fields'][$levels[0]] = ['*'];
+                    //                            array_shift($levels);
+                    //                        }
+                    //                    }
                     $options['eager_load'][] = $relationshipData + [
                         'levels' => $levels,
                     ];
                 } else {
-                    throw new Exception('Unknown relationship: '.$levels[0]);
+                    throw new Exception('Unknown relationship: ' . $levels[0]);
                 }
             }
         }
         if ($filterType) {
-            $options['where'][] = 'type_id = '.$this->type_id;
+            $options['where'][] = 'type_id = ' . $this->type_id;
             if ($this->_parent instanceof Record) {
                 // NULL to avoid finding children for invalid parents without ID
-                $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
+                $options['where'][] =  'parent_id = ' . ($this->_parent->id ?: 'NULL');
                 if ($this->_parent->type_id) {
-                    $options['where'][] = 'parent_type_id = '.$this->_parent->type_id;
+                    $options['where'][] = 'parent_type_id = ' . $this->_parent->type_id;
                 }
             }
         }
@@ -1265,7 +1296,7 @@ class Type extends RecordAbstract
 
     public function getInterAdminsAdminAttributes()
     {
-        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted_at', 'hits'];
+        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'publish_at', 'created_at', 'expire_at', 'updated_at', 'log', 'publish', 'deleted_at', 'hits'];
     }
 
     public function getFillable()
@@ -1388,7 +1419,7 @@ class Type extends RecordAbstract
     {
         $validActions = ['index', 'show', 'create', 'store', 'update', 'destroy', 'edit'];
         if (!in_array($action, $validActions)) {
-            throw new BadMethodCallException('Invalid action "'.$action.'", valid actions: '.implode(', ', $validActions));
+            throw new BadMethodCallException('Invalid action "' . $action . '", valid actions: ' . implode(', ', $validActions));
         }
 
         return r::getRouteByTypeId($this->type_id, $action);

@@ -28,9 +28,9 @@ class DynamicLoader
         $code = self::getCode($class);
         if ($code) {
             try {
-                eval('?>'.$code);
+                eval('?>' . $code);
             } catch (\Throwable $e) {
-                throw new \RuntimeException($e->getMessage().' - Code: '.$code, 0, $e);
+                throw new \RuntimeException($e->getMessage() . ' - Code: ' . $code, 0, $e);
             }
             return true;
         }
@@ -59,14 +59,14 @@ class DynamicLoader
     protected static function getPhpDocCampo($type, $campo)
     {
         if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
-//            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
-//            $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
-//            $retorno = self::_getCampoTypeClass($type->getCampoTipo($campo), $isTipo, $isMulti);
+            //            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
+            //            $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
+            //            $retorno = self::_getCampoTypeClass($type->getCampoTipo($campo), $isTipo, $isMulti);
             $type = 'int';
         } elseif (strpos($campo['tipo'], 'select_') === 0) {
-//            $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
-//            $isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
-//            $retorno = self::_getCampoTypeClass($campo['nome'], $isTipo, $isMulti);
+            //            $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
+            //            $isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
+            //            $retorno = self::_getCampoTypeClass($campo['nome'], $isTipo, $isMulti);
             $type = 'int';
         } elseif (strpos($campo['tipo'], 'int') === 0 || strpos($campo['tipo'], 'id') === 0) {
             $type = 'string';
@@ -77,26 +77,26 @@ class DynamicLoader
         } else {
             $type = 'string';
         }
-        return $type.' $'.$campo['nome_id'].' '.$campo['ajuda'];
+        return $type . ' $' . $campo['nome_id'] . ' ' . $campo['ajuda'];
     }
 
     public static function generateRecordClass(Type $type, $addPhpDoc = false)
     {
-        $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $prefixClass = constant(Type::getDefaultClass() . '::DEFAULT_NAMESPACE');
 
         $phpdoc = '';
         if ($addPhpDoc) {
-            $phpdoc = '/**'."\r\n";
+            $phpdoc = '/**' . "\r\n";
             foreach ($type->getFields() as $campo) {
-                $phpdoc .= ' * @property '.self::getPhpDocCampo($type, $campo)."\r\n";
+                $phpdoc .= ' * @property ' . self::getPhpDocCampo($type, $campo) . "\r\n";
             }
-            $phpdoc .= ' * @property \\Date $date_publish'."\r\n";
+            $phpdoc .= ' * @property \\Date $publish_at' . "\r\n";
             $phpdoc .= ' */';
         }
 
         return self::buildClass(
             $type->getRecordClass(),
-            $prefixClass.'Record',
+            $prefixClass . 'Record',
             '',
             $phpdoc
         );
@@ -104,11 +104,11 @@ class DynamicLoader
 
     public static function generateTypeClass(Type $type, $addPhpDoc = false)
     {
-        $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
+        $prefixClass = constant(Type::getDefaultClass() . '::DEFAULT_NAMESPACE');
         $phpdoc = $addPhpDoc ? '/** --- */' : '';
         return self::buildClass(
             $type->getTypeClass(),
-            $prefixClass.'Type',
+            $prefixClass . 'Type',
             "const ID_TIPO = {$type->type_id};",
             $phpdoc
         );
@@ -142,7 +142,7 @@ class DynamicLoader
     {
         list($namespace, $className) = self::getNamespaceAndClass($className);
         if ($namespace) {
-            $namespace = 'namespace '.$namespace.';';
+            $namespace = 'namespace ' . $namespace . ';';
         }
         return <<<STR
 <?php

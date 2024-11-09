@@ -137,11 +137,11 @@ class Log extends RecordAbstract
     }
     public function getAttributesNames()
     {
-        return ['id_log', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
+        return ['id_log', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'created_at'];
     }
     public function getTableName()
     {
-        return $this->getDb()->getTablePrefix().'logs';
+        return $this->getDb()->getTablePrefix() . 'logs';
     }
     /**
      * @see RecordAbstract::getCampoTipo()
@@ -168,7 +168,7 @@ class Log extends RecordAbstract
         //$log->lang = $lang->lang;
         $log->ip = Request::ip();
         //$log->select_user = $s_user['id'];
-        $log->date_insert = new Date;
+        $log->created_at = new Date;
         $log->fill($attributes);
 
         return $log;
@@ -191,13 +191,13 @@ class Log extends RecordAbstract
         } else {
             $options['fields'] = static::DEFAULT_FIELDS;
         }
-        $options['from'] = $instance->getTableName().' AS main';
+        $options['from'] = $instance->getTableName() . ' AS main';
 
         if (empty($options['where'])) {
             $options['where'][] = '1 = 1';
         }
         if (empty($options['order'])) {
-            $options['order'] = 'date_insert DESC';
+            $options['order'] = 'created_at DESC';
         }
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();

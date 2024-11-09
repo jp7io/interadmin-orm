@@ -24,8 +24,8 @@ class TypeTest extends \Codeception\Test\Unit
         unset($type->newProp);
         $this->assertFalse(isset($type->newProp));
 
-        $type->date_modify = date('c');
-        $this->assertInstanceOf('Date', $type->date_modify);
+        $type->updated_at = date('c');
+        $this->assertInstanceOf('Date', $type->updated_at);
     }
 
     public function testSave()

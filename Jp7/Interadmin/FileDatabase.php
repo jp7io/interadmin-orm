@@ -13,7 +13,7 @@ namespace Jp7\Interadmin;
  * @property string $zoom obsoleto
  * @property string $lang
  * @property int $versao  contagem de mudanças
- * @property Date $date_modify
+ * @property Date $updated_at
  * @property string $directory noticias, mediabox, can't be the type's name because it can change
  * @property int $width
  * @property int $height
@@ -25,7 +25,7 @@ class FileDatabase extends RecordAbstract
     use Downloadable;
 
     protected $_primary_key = 'id_file_banco';
-     /**
+    /**
      * Contains the Type, i.e. the record with an 'type_id' equal to this record�s 'type_id'.
      *
      * @var Type
@@ -52,25 +52,25 @@ class FileDatabase extends RecordAbstract
             // TODO: remove after migration
             $this->directory = toId($this->getType()->nome);
         }
-        return config('interadmin.storage.backend_path').'/upload/'.
-            ($this->directory ? $this->directory.'/' : '').
-            $this->getBasename().
-            ($this->versao ? '?v='.$this->versao : '');
+        return config('interadmin.storage.backend_path') . '/upload/' .
+            ($this->directory ? $this->directory . '/' : '') .
+            $this->getBasename() .
+            ($this->versao ? '?v=' . $this->versao : '');
     }
 
     public function setDateModifyAttribute($value)
     {
-        $this->attributes['date_modify'] = new \Date($value);
+        $this->attributes['updated_at'] = new \Date($value);
     }
 
     public function getBasename()
     {
-        return str_pad($this->id_file_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
+        return str_pad($this->id_file_banco, 8, '0', STR_PAD_LEFT) . '.' . $this->tipo;
     }
 
     public function save()
     {
-        $this->attributes['date_modify'] = new \Date;
+        $this->attributes['updated_at'] = new \Date;
         return parent::save();
     }
 
@@ -127,7 +127,7 @@ class FileDatabase extends RecordAbstract
 
     public function getTableName()
     {
-        return $this->getDb()->getTablePrefix().'files_banco';
+        return $this->getDb()->getTablePrefix() . 'files_banco';
     }
 
     public function getAttributesAliases()

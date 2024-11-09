@@ -63,7 +63,7 @@ abstract class RecordAbstract
             return $value;
         }
         // Mutators
-        $mutator = 'get'.Str::studly($name).'Attribute';
+        $mutator = 'get' . Str::studly($name) . 'Attribute';
         if (method_exists($this, $mutator)) {
             $value = $this->$mutator($value);
             return $value;
@@ -137,8 +137,8 @@ abstract class RecordAbstract
         $options = [
             'fields' => $attributes,
             'fields_alias' => $fieldsAlias,
-            'from' => $this->getTableName().' AS main',
-            'where' => [$this->_primary_key.' = '.intval($this->{$this->_primary_key})],
+            'from' => $this->getTableName() . ' AS main',
+            'where' => [$this->_primary_key . ' = ' . intval($this->{$this->_primary_key})],
             'use_published_filters' => false,
             // Internal use
             'aliases' => $this->getAttributesAliases(),
@@ -181,23 +181,23 @@ abstract class RecordAbstract
     protected function getMutatedAttribute($name, $value)
     {
         if (is_string($value)) {
-            if (strpos($name, 'date_') === 0) {
-               return new \Date($value);
+            if (str_ends_with($name, '_at')) {
+                return new \Date($value);
             }
             if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
                 static $fileClassName = [];
                 if (!isset($fileClassName[static::DEFAULT_NAMESPACE])) {
-                    if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
-                        $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'InterAdminFieldFile';
+                    if (class_exists(static::DEFAULT_NAMESPACE . 'InterAdminFieldFile')) {
+                        $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE . 'InterAdminFieldFile';
                     } else {
-                        $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'FileField';
+                        $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE . 'FileField';
                     }
                     if (!class_exists($fileClassName[static::DEFAULT_NAMESPACE])) {
                         $fileClassName[static::DEFAULT_NAMESPACE] = 'Jp7\\Interadmin\\FileField';
                     }
                 }
                 $className = $fileClassName[static::DEFAULT_NAMESPACE];
-                $file = new $className($value, $this->{$name.'_text'});
+                $file = new $className($value, $this->{$name . '_text'});
                 $file->setParent($this);
                 return $file;
             }
@@ -314,7 +314,7 @@ abstract class RecordAbstract
 
         if ($this->exists) {
             if (getenv('APP_DEBUG') && !$db->table($table)->where($pk, $this->$pk)->exists()) {
-                throw new UnexpectedValueException('No record found before update with PK ('.$pk.'): '.$this->$pk);
+                throw new UnexpectedValueException('No record found before update with PK (' . $pk . '): ' . $this->$pk);
             }
             $db->table($table)->where($pk, $this->$pk)->update($valuesToSave);
         } else {
@@ -338,7 +338,7 @@ abstract class RecordAbstract
                     } else {
                         $valuesToSave[$key] = (string) $value;
                         if ($value instanceof FileField) {
-                            $valuesToSave[$key.'_text'] = $value->text;
+                            $valuesToSave[$key . '_text'] = $value->text;
                         }
                     }
                     break;
@@ -414,7 +414,7 @@ abstract class RecordAbstract
                     $filters = static::getPublishedFilters($table, 'main');
                 } else {
                     $joinArr = explode(' ON', $alias);
-                    $options['from'][$key] = $table.' AS '.$joinArr[0].' ON '.static::getPublishedFilters($table, $joinArr[0]).$joinArr[1];
+                    $options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
                 }
             }
         }
@@ -429,10 +429,10 @@ abstract class RecordAbstract
                 } else {
                     $table = $type->getInterAdminsTableName();
                 }
-                $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
+                $joinSql = ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' .
                     ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
                 if (!$typeless) {
-                    $joinSql .= $alias.'.type_id = '.$type->type_id.' AND ';
+                    $joinSql .= $alias . '.type_id = ' . $type->type_id . ' AND ';
                 }
                 $preIndex = count($options['from']);
                 $joinSql .= $this->_resolveSql($on, $options, $use_published_filters);
@@ -449,12 +449,12 @@ abstract class RecordAbstract
         }
 
         if (isset($options['skip'])) {
-            $options['limit'] = $options['skip'].','.($options['limit'] ?? '18446744073709551615');
+            $options['limit'] = $options['skip'] . ',' . ($options['limit'] ?? '18446744073709551615');
         }
 
         // Sql
-        $sql = ' WHERE '.$filters.$clauses.
-            (!empty($options['limit']) ? ' LIMIT '.$options['limit'] : '');
+        $sql = ' WHERE ' . $filters . $clauses .
+            (!empty($options['limit']) ? ' LIMIT ' . $options['limit'] : '');
 
         if ($APP_DEBUG) {
             $startQuery = microtime(true);
@@ -464,37 +464,38 @@ abstract class RecordAbstract
             if ($_stmt === 'UPDATE') {
                 foreach ($_valuesToSave as $key => $value) {
                     if ($value instanceof Expression) {
-                        $_valuesToSave[$key] = $key.' = '.$this->_resolveSql($value, $options, $use_published_filters);
+                        $_valuesToSave[$key] = $key . ' = ' . $this->_resolveSql($value, $options, $use_published_filters);
                     } else {
-                        $binding = ':val'.count($options['bindings']);
+                        $binding = ':val' . count($options['bindings']);
                         $options['bindings'][$binding] = $value;
-                        $_valuesToSave[$key] = $key.' = '.$binding;
+                        $_valuesToSave[$key] = $key . ' = ' . $binding;
                     }
                 }
-                $sql = 'UPDATE '.$from.
-                    ($options['from'] ? implode('', $options['from']) : '').
-                    ' SET '.implode(', ', $_valuesToSave).
+                $sql = 'UPDATE ' . $from .
+                    ($options['from'] ? implode('', $options['from']) : '') .
+                    ' SET ' . implode(', ', $_valuesToSave) .
                     $sql;
                 $rs = $db->update($sql, $options['bindings']);
             } elseif ($_stmt === 'DELETE') {
                 // Temp table needed for LIMIT
-                $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.
-                    'SELECT main.id FROM '.$from.
-                    ($options['from'] ? implode('', $options['from']) : '').
-                    $sql.
+                $sql = 'DELETE main FROM ' . $from . ' INNER JOIN (' .
+                    'SELECT main.id FROM ' . $from .
+                    ($options['from'] ? implode('', $options['from']) : '') .
+                    $sql .
                     ') AS temp ON main.id = temp.id';
                 $rs = $db->delete($sql, $options['bindings']);
             } else {
-                $sql = 'SELECT '.implode(',', $options['fields']).
-                    ' FROM '.$from.
-                    ($options['from'] ? implode('', $options['from']) : '').
+                $sql = 'SELECT ' . implode(',', $options['fields']) .
+                    ' FROM ' . $from .
+                    ($options['from'] ? implode('', $options['from']) : '') .
                     $sql;
                 $rs = $db->select($sql, $options['bindings']);
             }
         } catch (QueryException $e) {
+            dd($e);
             $sql = self::replaceBindings($options['bindings'], $sql);
             if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
-                $sql .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
+                $sql .= ' /* Available fields: ' . implode(', ', array_keys($options['aliases'])) . '*/';
             }
             throw new QueryException($sql, $options['bindings'], $e->getPrevious());
         }
@@ -519,12 +520,12 @@ abstract class RecordAbstract
     {
         //$sql = explode('FROM ', str_replace(self::getPublishedFilters('records', 'main'), '/* ... */ ', $sql))[1];
         $ms = function ($start) {
-            return number_format((microtime(true)-$start)*1000).'ms';
+            return number_format((microtime(true) - $start) * 1000) . 'ms';
         };
         $caller = '';
         foreach ($trace as $item) {
             if (!empty($item['file']) && !str_contains($item['file'], '/vendor/')) {
-                $caller = str_replace(base_path(), '', $item['file']).':'.$item['line'];
+                $caller = str_replace(base_path(), '', $item['file']) . ':' . $item['line'];
                 break;
             }
         }
@@ -539,7 +540,7 @@ abstract class RecordAbstract
             $GLOBALS['__queries'] = 0;
         }
         $GLOBALS['__queries']++;
-        \Log::debug($sql.PHP_EOL.'/* '.$caller.' - '.$ms($startQuery).' - '.$callee.' */');
+        \Log::debug($sql . PHP_EOL . '/* ' . $caller . ' - ' . $ms($startQuery) . ' - ' . $callee . ' */');
     }
 
     /**
@@ -563,12 +564,12 @@ abstract class RecordAbstract
             }
         }
 
-        $clause = ((!empty($options['group'])) ? ' GROUP BY '.$options['group'] : '').
-            ((!empty($options['having'])) ? ' HAVING '.implode(' AND ', $options['having']) : '');
+        $clause = ((!empty($options['group'])) ? ' GROUP BY ' . $options['group'] : '') .
+            ((!empty($options['having'])) ? ' HAVING ' . implode(' AND ', $options['having']) : '');
 
-        return $resolvedWhere.
-            $this->_resolveSql($clause, $options, $use_published_filters).
-            ((isset($resolvedOrder)) ? ' ORDER BY '.$resolvedOrder : '');
+        return $resolvedWhere .
+            $this->_resolveSql($clause, $options, $use_published_filters) .
+            ((isset($resolvedOrder)) ? ' ORDER BY ' . $resolvedOrder : '');
     }
 
     protected function _resolveSql($clause, array &$options, $use_published_filters)
@@ -581,11 +582,38 @@ abstract class RecordAbstract
         // not followed by "(" or " (", so it won't match "CONCAT(" or "IN ("
         $not_function = '(?![ ]?\()';
         $reserved = [
-            'SELECT', 'WHERE',
-            'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
-            'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
-            'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END', 'BINARY',
-            'HOUR', 'MINUTE', 'SECOND',
+            'SELECT',
+            'WHERE',
+            'AND',
+            'OR',
+            'ORDER',
+            'BY',
+            'GROUP',
+            'NOT',
+            'LIKE',
+            'IS',
+            'NULL',
+            'DESC',
+            'ASC',
+            'BETWEEN',
+            'REGEXP',
+            'HAVING',
+            'DISTINCT',
+            'UNSIGNED',
+            'AS',
+            'INTERVAL',
+            'DAY',
+            'WEEK',
+            'MONTH',
+            'YEAR',
+            'CASE',
+            'WHEN',
+            'THEN',
+            'END',
+            'BINARY',
+            'HOUR',
+            'MINUTE',
+            'SECOND',
         ];
 
         $offset = 0;
@@ -597,7 +625,7 @@ abstract class RecordAbstract
             'joins' => [],
         ];
 
-        while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+        while (preg_match('/(' . $quoted . '|' . $keyword . $not_function . '|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
             list($termo, $pos) = $matches[1];
             // Resolvendo true e false para char
             if (strtolower($termo) == 'true' || strtolower($termo) == 'false') {
@@ -606,11 +634,11 @@ abstract class RecordAbstract
                     $negativas = array_reverse($negativas);
                 }
                 $inicio = substr($clause, 0, $pos + strlen($termo));
-                $inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)'.$termo.'$/i', '$1'.$negativas[0]."=$3''", $inicio, 1, $count);
+                $inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)' . $termo . '$/i', '$1' . $negativas[0] . "=$3''", $inicio, 1, $count);
                 if (!$count) {
-                    $inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)'.$termo.'/i', '$1'.$negativas[1]."=$2''", $inicio, 1);
+                    $inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)' . $termo . '/i', '$1' . $negativas[1] . "=$2''", $inicio, 1);
                 }
-                $clause = $inicioRep.substr($clause, $pos + strlen($termo));
+                $clause = $inicioRep . substr($clause, $pos + strlen($termo));
                 $offset = strlen($inicioRep);
                 continue;
             }
@@ -630,7 +658,7 @@ abstract class RecordAbstract
             if ($termo == 'EXISTS') {
                 $inicio = substr($clause, 0, $pos + strlen($termo));
                 $existsClause = substr($clause, $pos + strlen($termo));
-                if (preg_match('/^([\( ]+)('.$keyword.')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
+                if (preg_match('/^([\( ]+)(' . $keyword . ')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
                     $table = $existsMatches[2];
                     // TODO unificar logica
                     if (!isset($childrenArr)) {
@@ -646,13 +674,13 @@ abstract class RecordAbstract
                         ]);
 
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
-                        $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
-                        ' WHERE '.$joinFilter.$table.'.parent_id = main.id AND '.$table.'.type_id = '.$joinTipo->type_id.''.
-                        (($existsMatches[4]) ? ' AND ' : '');
+                        $existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . ' AS ' . $table .
+                            ' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.type_id = ' . $joinTipo->type_id . '' .
+                            (($existsMatches[4]) ? ' AND ' : '');
                     } elseif ($table == 'tags') {
                         // Tags
-                        $existsMatches[2] = 'SELECT id_tag FROM '.$this->getDb()->getTablePrefix().'tags AS '.$table.
-                        ' WHERE '.$table.'.parent_id = main.id'.(($existsMatches[4]) ? ' AND ' : '');
+                        $existsMatches[2] = 'SELECT id_tag FROM ' . $this->getDb()->getTablePrefix() . 'tags AS ' . $table .
+                            ' WHERE ' . $table . '.parent_id = main.id' . (($existsMatches[4]) ? ' AND ' : '');
                     } elseif (isset($options['joins'][$table])) {
                         // Joins custom
                         $joinTipo = $options['joins'][$table][1];
@@ -661,8 +689,8 @@ abstract class RecordAbstract
                             'where' => $options['joins'][$table][2],
                         ];
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
-                        $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
-                        ' WHERE '.$joinFilter.$this->_resolveSqlClausesAlias($onClause, $use_published_filters).(($existsMatches[4]) ? ' AND ' : '');
+                        $existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . ' AS ' . $table .
+                            ' WHERE ' . $joinFilter . $this->_resolveSqlClausesAlias($onClause, $use_published_filters) . (($existsMatches[4]) ? ' AND ' : '');
                     } elseif (method_exists($options['model'], $joinNome)) {
                         // Metodo estilo Eloquent
                         $relationshipData = $options['model']->$joinNome()->getRelationshipData();
@@ -672,17 +700,17 @@ abstract class RecordAbstract
                         $joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
 
                         $conditions = array_map(function ($x) use ($table) {
-                                return $table.'.'.$x;
-                            }, $relationshipData['conditions']);
+                            return $table . '.' . $x;
+                        }, $relationshipData['conditions']);
 
-                        $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
-                            ' WHERE '.$joinFilter.implode(' AND ', $conditions).
-                            ' AND '.$table.'.type_id = '.$joinTipo->type_id.''.
+                        $existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . ' AS ' . $table .
+                            ' WHERE ' . $joinFilter . implode(' AND ', $conditions) .
+                            ' AND ' . $table . '.type_id = ' . $joinTipo->type_id . '' .
                             (($existsMatches[4]) ? ' AND ' : '');
                     }
 
-                    $inicioRep = $inicio.$existsMatches[1].$existsMatches[2].$existsMatches[3];
-                    $clause = $inicioRep.substr($clause, strlen($inicio.$existsMatches[0]));
+                    $inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
+                    $clause = $inicioRep . substr($clause, strlen($inicio . $existsMatches[0]));
                     $offset = strlen($inicioRep);
 
                     $ignoreJoinsUntil = $offset;
@@ -715,20 +743,20 @@ abstract class RecordAbstract
 
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
-                            $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
-                                ' AS '.$table.' ON '.$table.'.parent_id = main.id'.
-                                ' AND '.$table.'.type_id = '.$joinTipo->type_id;
+                            $options['from'][] = ' LEFT JOIN ' . $joinTipo->getInterAdminsTableName() .
+                                ' AS ' . $table . ' ON ' . $table . '.parent_id = main.id' .
+                                ' AND ' . $table . '.type_id = ' . $joinTipo->type_id;
 
                             $options['auto_group_flag'] = true;
                         }
                         $joinAliases = array_flip($joinTipo->getFieldsAlias());
 
-                    // Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
+                        // Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
                     } elseif ($table == 'tags') {
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
-                            $options['from'][] = ' LEFT JOIN '.$this->getDb()->getTablePrefix().'tags AS '.$table.
-                                ' ON '.$table.'.parent_id = main.id';
+                            $options['from'][] = ' LEFT JOIN ' . $this->getDb()->getTablePrefix() . 'tags AS ' . $table .
+                                ' ON ' . $table . '.parent_id = main.id';
 
                             $options['auto_group_flag'] = true;
                         }
@@ -741,21 +769,21 @@ abstract class RecordAbstract
                                 $options['pre_joins'][$table] = true;
                             }
                             $joinTipo = $options['joins'][$table][1];
-                        // Joins de select
-                        } elseif (isset($aliases[$joinNome.'_id']) && isset($campos[$aliases[$joinNome.'_id']])) {
-                            $joinNome = $aliases[$joinNome.'_id'];
+                            // Joins de select
+                        } elseif (isset($aliases[$joinNome . '_id']) && isset($campos[$aliases[$joinNome . '_id']])) {
+                            $joinNome = $aliases[$joinNome . '_id'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->_addJoinAlias($options, $table, $campos[$joinNome]);
                             }
                             $joinTipo = $this->getCampoTipo($campos[$joinNome]);
-                        // Joins de select_multi
-                        } elseif (isset($aliases[$joinNome.'_ids']) && isset($campos[$aliases[$joinNome.'_ids']])) {
-                            $joinNome = $aliases[$joinNome.'_ids'];
+                            // Joins de select_multi
+                        } elseif (isset($aliases[$joinNome . '_ids']) && isset($campos[$aliases[$joinNome . '_ids']])) {
+                            $joinNome = $aliases[$joinNome . '_ids'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->_addJoinAlias($options, $table, $campos[$joinNome]);
                             }
                             $joinTipo = $this->getCampoTipo($campos[$joinNome]);
-                        // Joins de special
+                            // Joins de special
                         } elseif (isset($campos[$joinNome])) {
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->_addJoinAlias($options, $table, $campos[$joinNome]);
@@ -767,18 +795,18 @@ abstract class RecordAbstract
                             $joinTipo = $relationshipData['tipo'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $conditions = array_map(function ($x) use ($table) {
-                                    return $table.'.'.$x;
+                                    return $table . '.' . $x;
                                 }, $relationshipData['conditions']);
 
                                 $options['from_alias'][] = $table;
-                                $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
-                                    ' AS '.$table.' ON '.implode(' AND ', $conditions).
-                                    ' AND '.$table.'.type_id = '.$joinTipo->type_id;
+                                $options['from'][] = ' LEFT JOIN ' . $joinTipo->getInterAdminsTableName() .
+                                    ' AS ' . $table . ' ON ' . implode(' AND ', $conditions) .
+                                    ' AND ' . $table . '.type_id = ' . $joinTipo->type_id;
 
                                 $options['auto_group_flag'] = true;
                             }
                         } else {
-                            throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
+                            throw new Exception('The field "' . $joinNome . '" cannot be used as a join (' . get_class($this) . ' - PK: ' . $this->__toString() . ').');
                         }
                         if ($joinTipo instanceof Type) {
                             $joinAliases = array_flip($joinTipo->getFieldsAlias());
@@ -788,8 +816,8 @@ abstract class RecordAbstract
                     }
                     // TEMPORARIO FIXME, necessario melhor maneira
                     if ($subtermo) {
-                        $subtable = $table.'__'.$termo;
-                        $termo = $termo.'_id';
+                        $subtable = $table . '__' . $termo;
+                        $termo = $termo . '_id';
 
                         $subCampos = $joinTipo->getFields();
                         $subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
@@ -797,9 +825,9 @@ abstract class RecordAbstract
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (!in_array($subtable, $options['from_alias'])) {
                             $options['from_alias'][] = $subtable;
-                            $options['from'][] = ' LEFT JOIN '.$subJoinTipo->getInterAdminsTableName().
-                                ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$termo].
-                                ' AND '.$subtable.'.type_id = '.$subJoinTipo->type_id;
+                            $options['from'][] = ' LEFT JOIN ' . $subJoinTipo->getInterAdminsTableName() .
+                                ' AS ' . $subtable . ' ON ' . $subtable . '.id = ' . $table . '.' . $joinAliases[$termo] .
+                                ' AND ' . $subtable . '.type_id = ' . $subJoinTipo->type_id;
                         }
 
                         $table = $subtable;
@@ -808,7 +836,7 @@ abstract class RecordAbstract
                     }
                     $campo = $this->_aliasToColumn($termo, $joinAliases);
                 }
-                $termo = $table.'.'.$campo;
+                $termo = $table . '.' . $campo;
                 $clause = substr_replace($clause, $termo, $pos, $len);
             }
             $offset = $pos + strlen($termo);
@@ -861,16 +889,16 @@ abstract class RecordAbstract
                         'fields_alias' => $options['fields_alias'],
                     ];
                     */
-                } elseif (isset($aliases[$join.'_ids'])) {
-                    throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
+                } elseif (isset($aliases[$join . '_ids'])) {
+                    throw new Exception('The field "' . $join . '" cannot be used with select() (' . get_class($this) . ' - PK: ' . $this->__toString() . ').');
                 } else {
                     // Select
-                    $nome = isset($aliases[$join.'_id']) ? $aliases[$join.'_id'] : $join;
-                    $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
+                    $nome = isset($aliases[$join . '_id']) ? $aliases[$join . '_id'] : $join;
+                    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
                     // Join e Recursividade
                     if (empty($options['from_alias']) || !in_array($join, (array) $options['from_alias'])) {
                         if (!isset($campos[$nome])) {
-                            throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
+                            throw new Exception('The field "' . $join . '" cannot be used with select() (' . get_class($this) . ' - PK: ' . $this->__toString() . ').');
                         }
                         $joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
                         if ($joinClasse !== 'tipo') {
@@ -889,14 +917,14 @@ abstract class RecordAbstract
                         'campos' => $joinTipo->getFields(),
                         'aliases' => array_flip($joinTipo->getFieldsAlias()),
                     ];
-                    $this->_resolveFieldsAlias($joinOptions, $join.'.');
+                    $this->_resolveFieldsAlias($joinOptions, $join . '.');
                     foreach ($joinOptions['fields'] as $joinField) {
                         array_push($fields, $joinField);
                     }
                 }
                 unset($fields[$join]);
 
-            // Com função
+                // Com função
             } elseif (strpos($campo, '(') !== false || strpos($campo, ' ') !== false) {
                 if (strpos($campo, ' AS ') === false) {
                     $aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
@@ -905,15 +933,15 @@ abstract class RecordAbstract
                     $aggregateAlias = array_pop($parts);
                     $campo = implode(' AS ', $parts);
                 }
-                $fields[$join] = $this->_resolveSql($campo, $options, true).' AS `'.$table.$aggregateAlias.'`';
-            // Sem join
+                $fields[$join] = $this->_resolveSql($campo, $options, true) . ' AS `' . $table . $aggregateAlias . '`';
+                // Sem join
             } else {
                 $nome = $this->_aliasToColumn($campo, $aliases);
                 if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-                    $fields[] = $table.$nome.'_text';
+                    $fields[] = $table . $nome . '_text';
                 }
 
-                $fields[$join] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
+                $fields[$join] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
             }
         }
         $options['fields'] = $fields;
@@ -933,8 +961,8 @@ abstract class RecordAbstract
     protected function _addJoinAlias(array &$options, $alias, $campo, $table = 'main')
     {
         $joinTipo = $this->getCampoTipo($campo);
-        if (!$joinTipo ) { //  || strpos($campo['tipo'], 'select_multi_') === 0
-            throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this).' - PK: '.$this->__toString().').');
+        if (!$joinTipo) { //  || strpos($campo['tipo'], 'select_multi_') === 0
+            throw new Exception('The field "' . $alias . '" cannot be used as a join (' . get_class($this) . ' - PK: ' . $this->__toString() . ').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
 
@@ -942,22 +970,22 @@ abstract class RecordAbstract
         $xtra = $campo['xtra'];
         $isMulti = strpos($column, 'select_multi_') === 0 || in_array($xtra, FieldUtil::getSpecialMultiXtras());
         if (in_array($xtra, FieldUtil::getSelectTipoXtras()) || in_array($xtra, FieldUtil::getSpecialTipoXtras())) {
-            $options['from'][] = ' LEFT JOIN '.$joinTipo->getTableName().
-                ' AS '.$alias.' ON '.
+            $options['from'][] = ' LEFT JOIN ' . $joinTipo->getTableName() .
+                ' AS ' . $alias . ' ON ' .
                 ($isMulti ?
-                    'FIND_IN_SET('.$alias.'.type_id, '.$table.'.'.$column.')' :
-                    $table.'.'.$column.' = '.$alias.'.type_id'
+                    'FIND_IN_SET(' . $alias . '.type_id, ' . $table . '.' . $column . ')' :
+                    $table . '.' . $column . ' = ' . $alias . '.type_id'
                 );
 
             return 'tipo';
         } else {
-            $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
-                ' AS '.$alias.' ON '.
+            $options['from'][] = ' LEFT JOIN ' . $joinTipo->getInterAdminsTableName() .
+                ' AS ' . $alias . ' ON ' .
                 ($isMulti ?
-                    'FIND_IN_SET('.$alias.'.id, '.$table.'.'.$column.')' :
-                    $table.'.'.$column.' = '.$alias.'.id'
-                ).
-                ' AND '.$alias.'.type_id = '.$joinTipo->type_id;
+                    'FIND_IN_SET(' . $alias . '.id, ' . $table . '.' . $column . ')' :
+                    $table . '.' . $column . ' = ' . $alias . '.id'
+                ) .
+                ' AND ' . $alias . '.type_id = ' . $joinTipo->type_id;
 
             return 'interadmin';
         }
@@ -1001,7 +1029,7 @@ abstract class RecordAbstract
                 $object->attributes[$table]->$field = $value;
             } else {
                 // select_* relationship
-                $column = array_search($table.'_id', $options['aliases']);
+                $column = array_search($table . '_id', $options['aliases']);
                 if ($column === false && isset($options['aliases'][$table])) {
                     // sem alias (select_key)
                     $column = $table;
@@ -1130,7 +1158,7 @@ abstract class RecordAbstract
     public function getColumns()
     {
         $table = $this->getTableName();
-        $cacheKey = 'columns,'.$this->_db.','.$table;
+        $cacheKey = 'columns,' . $this->_db . ',' . $table;
         return \Cache::remember($cacheKey, 5, function () use ($table) {
             $db = $this->getDb();
             $table = str_replace($db->getTablePrefix(), '', $table); // FIXME
@@ -1144,22 +1172,22 @@ abstract class RecordAbstract
         $table = end($tableParts);
         // Tipos
         if ($table === 'types' && count($tableParts) === 3) {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted_at IS NULL AND ";
-        // Tags
+            return $alias . ".mostrar <> '' AND " . $alias . ".deleted_at IS NULL AND ";
+            // Tags
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // do nothing
-        // Arquivos
+            // Arquivos
         } elseif ($table === 'files') {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted_at IS NULL AND ";
-        // Registros
+            return $alias . ".mostrar <> '' AND " . $alias . ".deleted_at IS NULL AND ";
+            // Registros
         } else {
-            $return = $alias.".date_publish <= '".date('Y-m-d H:i:59', Record::getTimestamp())."'".
-                ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', Record::getTimestamp())."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
-                ' AND '.$alias.".char_key <> ''".
-                ' AND '.$alias.".deleted_at IS NULL".
+            $return = $alias . ".publish_at <= '" . date('Y-m-d H:i:59', Record::getTimestamp()) . "'" .
+                ' AND (' . $alias . ".expire_at > '" . date('Y-m-d H:i:00', Record::getTimestamp()) . "' OR " . $alias . ".expire_at = '0000-00-00 00:00:00')" .
+                ' AND ' . $alias . ".char_key <> ''" .
+                ' AND ' . $alias . ".deleted_at IS NULL" .
                 ' AND ';
             if (config('interadmin.preview')) {
-                $return .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';
+                $return .= '(' . $alias . ".publish <> '' OR " . $alias . '.parent_id > 0) AND ';
             }
 
             return $return;
@@ -1194,7 +1222,7 @@ abstract class RecordAbstract
         } elseif ($db instanceof ConnectionInterface) {
             $this->_db = $db->getName();
         } else {
-            throw new UnexpectedValueException('Expected instance of ConnectionInterface or connection name, received '.gettype($db));
+            throw new UnexpectedValueException('Expected instance of ConnectionInterface or connection name, received ' . gettype($db));
         }
     }
 
@@ -1238,13 +1266,13 @@ abstract class RecordAbstract
         foreach ($bindinds as $key => $value) {
             $found = false;
             $sql = preg_replace_callback(
-                '~'.$quoted.'|(?<before>\W)'.$key.'\b~', // pattern
+                '~' . $quoted . '|(?<before>\W)' . $key . '\b~', // pattern
                 function ($matches) use ($pdo, $value, &$found) { // callback
                     if ($found || $matches['quoted']) {
                         return $matches[0]; // quoted, unchanged
                     }
                     $found = true; // replace only first occurrence
-                    return $matches['before'].$pdo->quote($value);
+                    return $matches['before'] . $pdo->quote($value);
                 },
                 $sql // subject
             );
