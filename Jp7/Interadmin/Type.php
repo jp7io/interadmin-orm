@@ -115,7 +115,7 @@ class Type extends RecordAbstract
             $methodName.'(). Available magic methods: '."\n";
 
         foreach ($this->_getChildrenKeyBySlug() as $slug => $child) {
-            $message .= "\t\t- ".lcfirst(Str::case($slug))."()\n";
+            $message .= "\t\t- ".lcfirst(Str::camel($slug))."()\n";
         }
         throw new BadMethodCallException($message);
     }
