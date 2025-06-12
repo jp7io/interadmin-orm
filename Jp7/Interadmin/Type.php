@@ -2,6 +2,7 @@
 
 namespace Jp7\Interadmin;
 
+use Illuminate\Support\Str;
 use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use InvalidArgumentException;
@@ -114,7 +115,7 @@ class Type extends RecordAbstract
             $methodName.'(). Available magic methods: '."\n";
 
         foreach ($this->_getChildrenKeyBySlug() as $slug => $child) {
-            $message .= "\t\t- ".lcfirst(camel_case($slug))."()\n";
+            $message .= "\t\t- ".lcfirst(Str::case($slug))."()\n";
         }
         throw new BadMethodCallException($message);
     }
@@ -122,7 +123,7 @@ class Type extends RecordAbstract
     protected function _getManyRelationship($name)
     {
         $childrenBySlug = $this->_getChildrenKeyBySlug();
-        $childSlug = snake_case($name, '-');
+        $childSlug = Str::snake($name, '-');
         if (array_key_exists($childSlug, $childrenBySlug)) {
             $childrenBySlug[$childSlug]->setParent($this);
             return $childrenBySlug[$childSlug]->records();
@@ -1034,7 +1035,7 @@ class Type extends RecordAbstract
                     $childrenArrParts = array_pad($childrenArrParts, 4, '');
                 }
                 $child = array_combine(['id_tipo', 'nome', 'ajuda', 'netos'], $childrenArrParts);
-                $nome_id = studly_case(to_slug($child['nome']));
+                $nome_id = Str::studly(to_slug($child['nome']));
                 $children[$nome_id] = $child;
             }
             return $children;
