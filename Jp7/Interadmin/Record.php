@@ -822,7 +822,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 ($tag instanceof self ? $tag->id : 0).','.
                 ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
             if (!$db->insert($sql)) {
-                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                throw new Exception($db->ErrorMsg());
             }
         }
     }
