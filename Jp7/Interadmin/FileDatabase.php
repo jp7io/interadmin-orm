@@ -65,7 +65,7 @@ class FileDatabase extends RecordAbstract
 
     public function getBasename()
     {
-        return str_pad($this->id_arquivo_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
+        return str_pad((int) $this->id_arquivo_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
     }
 
     public function save()
