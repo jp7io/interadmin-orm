@@ -13,7 +13,7 @@ class TypeQuery extends BaseQuery
      */
     protected $provider;
 
-    public function __construct(Type $provider = null)
+    public function __construct(?Type $provider = null)
     {
         if (is_null($provider)) {
             $provider = new Type;

@@ -256,7 +256,7 @@ class Type extends RecordAbstract
      *
      * @param RecordAbstract $parent
      */
-    public function setParent(RecordAbstract $parent = null)
+    public function setParent(?RecordAbstract $parent = null)
     {
         $this->_parent = $parent;
     }

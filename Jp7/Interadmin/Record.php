@@ -592,7 +592,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @param Type $tipo
      */
-    public function setType(Type $tipo = null)
+    public function setType(?Type $tipo = null)
     {
         $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
@@ -639,7 +639,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @param Record $parent
      */
-    public function setParent(Record $parent = null)
+    public function setParent(?Record $parent = null)
     {
         $this->_parent = $parent; // Record or null
         $parent = $parent ?? new \stdClass;
