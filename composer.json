@@ -26,7 +26,10 @@
     "autoload": {
         "psr-4": {
             "Jp7\\Interadmin\\": "Jp7/Interadmin/"
-        }
+        },
+        "classmap": [
+            "legacy"
+        ]
     },
     "scripts": {
 
