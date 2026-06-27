@@ -594,7 +594,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function setType(?Type $tipo = null)
     {
-        $this->attributes['id_tipo'] = $tipo->id_tipo;
+        $this->attributes['id_tipo'] = $tipo ? $tipo->id_tipo : 0;
         $this->_tipo = $tipo;
         $this->_aliases = $tipo ? $this->getAttributesAliases() : [];
     }

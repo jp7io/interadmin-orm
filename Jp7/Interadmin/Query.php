@@ -23,6 +23,17 @@ class Query extends Query\BaseQuery
         return $this;
     }
 
+    /**
+     * Toggle field aliasing (campos alias) for the returned records. Pass false to
+     * get raw column names as properties (e.g. for export/serialization round-trips),
+     * the fluent equivalent of the array-options `'fields_alias' => false`.
+     */
+    public function fieldsAlias($fieldsAlias)
+    {
+        $this->options['fields_alias'] = $fieldsAlias;
+        return $this;
+    }
+
     protected function providerFind($options)
     {
         if (empty($options['class'])) {
