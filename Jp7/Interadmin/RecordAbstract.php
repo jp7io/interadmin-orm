@@ -496,7 +496,25 @@ abstract class RecordAbstract
             if (str_contains($e->getMessage(), 'Unknown column') && $options['aliases']) {
                 $sql .= ' /* Available fields: '.implode(', ', array_keys($options['aliases'])) . '*/';
             }
-            throw new QueryException($sql, $options['bindings'], $e->getPrevious());
+
+            // Re-throw with the interpolated SQL (and the available-fields hint), which is
+            // the whole point of this catch.
+            //
+            // This used to call the Laravel 5 three-arg constructor,
+            // QueryException($sql, $bindings, $previous). Since Laravel 8 the signature is
+            // ($connectionName, $sql, array $bindings, Throwable $previous) -- so $bindings
+            // received the PDOException and it blew up with:
+            //
+            //   TypeError: Argument #3 ($bindings) must be of type array, PDOException given
+            //
+            // i.e. EVERY database error anywhere in the app was reported as that TypeError
+            // instead of the actual SQL error. The real cause was never visible.
+            throw new QueryException(
+                $e->getConnectionName(),
+                $sql,
+                $options['bindings'],
+                $e->getPrevious() ?: $e
+            );
         }
 
         if ($APP_DEBUG) {
