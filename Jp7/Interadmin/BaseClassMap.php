@@ -92,7 +92,17 @@ class BaseClassMap
      */
     public function getClassIdTipo($class)
     {
-        return array_search($class, $this->getClasses());
+        $id_tipo = array_search($class, $this->getClasses());
+        if ($id_tipo === false && strpos($class, '\\') !== false) {
+            // Tenants with interadmin.psr-4=false bind types to underscore class
+            // names, but a legacy underscore->namespace bridge (class_alias) makes
+            // get_called_class() report the namespaced form (e.g. Ci\Loja instead
+            // of Ci_Loja). Fall back to the underscore key so static finders
+            // (::where/::find/::query/::orderBy) resolve for those aliased classes.
+            // Purely additive: only runs when the direct lookup already missed.
+            $id_tipo = array_search(str_replace('\\', '_', $class), $this->getClasses());
+        }
+        return $id_tipo;
     }
 
     /**
