@@ -11,28 +11,6 @@ class Collection extends BaseCollection
     public $_refs;
     
     /**
-     * Converts from $item->subitems to $subitem->items.
-     * @deprecated Don't extend Collection
-     */
-    public function flips($property, $keepItemsAs = 'items')
-    {
-        $subitems = [];
-        foreach ($this->items as $item) {
-            $subitem = $item->$property;
-            if (is_object($subitem)) {
-                $key = $subitem->__toString();
-                if (!array_key_exists($key, $subitems)) {
-                    $subitem->$keepItemsAs = [];
-                    $subitems[$key] = $subitem;
-                }
-                $subitems[$key]->{$keepItemsAs}[] = $item;
-            }
-        }
-
-        return new self($subitems);
-    }
-
-    /**
      * @deprecated Don't extend Collection
      */
     public function jsonList($column, $key)
@@ -80,14 +58,6 @@ class Collection extends BaseCollection
         }
 
         return $items->implode($glue);
-    }
-
-    /**
-     * @deprecated Don't extend Collection
-     */
-    public function keySort(\Closure $callback)
-    {
-        uksort($this->items, $callback);
     }
 
     public function onDestruct($closure)
