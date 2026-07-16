@@ -618,18 +618,8 @@ abstract class RecordAbstract
         while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
             list($termo, $pos) = $matches[1];
             // Resolvendo true e false para char
-            if (strtolower($termo) == 'true' || strtolower($termo) == 'false') {
-                $negativas = ['', '!'];
-                if (strtolower($termo) == 'false') {
-                    $negativas = array_reverse($negativas);
-                }
-                $inicio = substr($clause, 0, $pos + strlen($termo));
-                $inicioRep = preg_replace('/(\.char_[[:alnum:] ]*)(<>|!=)([ ]*)'.$termo.'$/i', '$1'.$negativas[0]."=$3''", $inicio, 1, $count);
-                if (!$count) {
-                    $inicioRep = preg_replace('/(\.char_[^=]*)=([ ]*)'.$termo.'/i', '$1'.$negativas[1]."=$2''", $inicio, 1);
-                }
-                $clause = $inicioRep.substr($clause, $pos + strlen($termo));
-                $offset = strlen($inicioRep);
+            if (CharBooleanRewriter::handles($termo)) {
+                list($clause, $offset) = CharBooleanRewriter::rewrite($clause, $termo, $pos);
                 continue;
             }
 
@@ -1156,32 +1146,20 @@ abstract class RecordAbstract
         });
     }
 
+    /**
+     * The publishing/visibility predicates for a table, qualified with $alias.
+     *
+     * Stays here, and stays the entry point, because it is a POLYMORPHIC SEAM: subclasses
+     * override it to opt out (Log returns nothing -- log rows have no publishing
+     * calendar), and the compiler reaches it through late static binding. The predicate
+     * building itself now lives in PublishedFilter.
+     *
+     * @see PublishedFilter
+     * @see Log::getPublishedFilters()
+     */
     public static function getPublishedFilters($table, $alias)
     {
-        $tableParts = explode('_', $table);
-        $table = end($tableParts);
-        // Tipos
-        if ($table === 'tipos' && count($tableParts) === 3) {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
-        // Tags
-        } elseif ($table === 'tags' && count($tableParts) === 3) {
-            // do nothing
-        // Arquivos
-        } elseif ($table === 'arquivos') {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
-        // Registros
-        } else {
-            $return = $alias.".date_publish <= '".date('Y-m-d H:i:59', Record::getTimestamp())."'".
-                ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', Record::getTimestamp())."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
-                ' AND '.$alias.".char_key <> ''".
-                ' AND '.$alias.".deleted = ''".
-                ' AND ';
-            if (config('interadmin.preview')) {
-                $return .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';
-            }
-
-            return $return;
-        }
+        return PublishedFilter::sql($table, $alias);
     }
 
     /**
