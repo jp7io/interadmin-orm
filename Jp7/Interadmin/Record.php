@@ -808,71 +808,6 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
 
     /**
-     * Sets the tags for this record. It DELETES the previous records.
-     *
-     * @param array $tags Array of object to be saved as tags.
-     */
-    public function deprecated_setTags(array $tags)
-    {
-        $db = $this->getDb();
-        $sql = 'DELETE FROM '.$db->getTablePrefix().'tags WHERE parent_id = '.$this->id;
-        foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
-                ('.$this->id.','.
-                ($tag instanceof self ? $tag->id : 0).','.
-                ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
-            if (!$db->insert($sql)) {
-                throw new Exception($db->ErrorMsg());
-            }
-        }
-    }
-    /**
-     * Returns the tags.
-     *
-     * @param array $options Available keys: where, group, limit.
-     *
-     * @return array
-     */
-    public function deprecated_getTags($options = [])
-    {
-        $retorno = [];
-        if (!$this->_tags || $options) {
-            $db = $this->getDb();
-            $options['where'][] = 'parent_id = '.$this->id;
-            $sql = 'SELECT * FROM '.$db->getTablePrefix().'tags '.
-                'WHERE '.implode(' AND ', $options['where']).
-                (!empty($options['group']) ? ' GROUP BY '.$options['group'] : '').
-                (!empty($options['limit']) ? ' LIMIT '.$options['limit'] : '');
-            $rs = $db->select($sql);
-            $this->_tags = [];
-            foreach ($rs as $row) {
-                if ($tag_tipo = Type::getInstance($row->id_tipo)) {
-                    $tag_text = $tag_tipo->nome;
-                    if ($row->id) {
-                        $options = [
-                            'fields' => ['varchar_key'],
-                            'where' => ['id = '.$row->id],
-                        ];
-                        if ($tag_registro = $tag_tipo->deprecatedFindFirst($options)) {
-                            $tag_text = $tag_registro->varchar_key.' ('.$tag_tipo->nome.')';
-                            $tag_registro->interadmin = $this;
-                            $retorno[] = $tag_registro;
-                        }
-                    } else {
-                        $tag_tipo->interadmin = $this;
-                        $retorno[] = $tag_tipo;
-                    }
-                }
-            }
-        } else {
-            $retorno = $this->_tags;
-        }
-        if (!$options) {
-            $this->_tags = $retorno; // cache somente para getTags sem $options
-        }
-        return (array) $retorno;
-    }
-    /**
      * Checks if this object is published using the same rules used on interadmin_query().
      *
      * @return bool
@@ -1101,36 +1036,6 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function getAdminAttributes()
     {
         return $this->getType()->getInterAdminsAdminAttributes();
-    }
-
-    /**
-     * Searches $value on the relationship and sets the $attribute.
-     *
-     * @param string $attribute
-     * @param string $searchValue
-     * @param string $searchColumn
-     *
-     * @throws Exception
-     */
-    public function setAttributeBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')
-    {
-        $campos = $this->getType()->getCampos();
-        $aliases = array_flip($this->_aliases);
-        $nomeCampo = $aliases[$attribute] ? $aliases[$attribute] : $attribute;
-
-        if (!starts_with($nomeCampo, 'select_')) {
-            throw new Exception('The field '.$attribute.' is not a select. It was expected a select field on setAttributeBySearch.');
-        }
-
-        $campoTipo = $this->getCampoTipo($campos[$nomeCampo]);
-        $record = $campoTipo->deprecatedFindFirst([
-            'where' => [$searchColumn." = '".$searchValue."'"],
-        ]);
-        if (starts_with($nomeCampo, 'select_multi_')) {
-            $this->$attribute = [$record];
-        } else {
-            $this->$attribute = $record;
-        }
     }
 
     /**
