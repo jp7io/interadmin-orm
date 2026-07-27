@@ -466,6 +466,26 @@ class Type extends RecordAbstract
     }
 
     /**
+     * Retrieves the record with this id, scoped to this Type's id_tipo.
+     *
+     * Lives here rather than only on the legacy InterAdminTipo shim: tenant Type
+     * subclasses extend this class directly, so without it every one of their
+     * ~80 findById() call sites hits __call() and fatals with BadMethodCallException.
+     * Same body the shim had, so behaviour is unchanged for callers that had it.
+     *
+     * @param int   $id      Search value.
+     * @param array $options Available keys: fields, where, order, group, class.
+     *
+     * @return Record|null First Record object found.
+     */
+    public function findById($id, $options = [])
+    {
+        $options['where'][] = 'id = '.intval((string) $id);
+
+        return $this->deprecatedFindFirst($options);
+    }
+
+    /**
      * Retrieves the first records which have this Type's id_tipo.
      *
      * @return Record First Record object found.
