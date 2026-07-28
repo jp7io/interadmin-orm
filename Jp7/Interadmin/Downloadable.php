@@ -111,7 +111,7 @@ trait Downloadable
             Storage::disk($disk)->put($filename, $this->getContents());
         }
         if ($disk === 'local') {
-            return Storage::disk($disk)->getDriver()->getAdapter()->getPathPrefix().$filename;
+            return Storage::disk($disk)->path($filename);
         } else {
             return Storage::disk($disk)->url($filename);
         }
