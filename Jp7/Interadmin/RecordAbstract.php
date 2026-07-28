@@ -1111,7 +1111,10 @@ abstract class RecordAbstract
     protected function _whereArrayFix(&$where)
     {
         if (is_string($where)) {
-            $where = jp7_explode(' AND ', $where);
+            // Inlined from jp7io/inc's jp7_explode(), which this package called without
+            // declaring the dependency. array_filter() preserves keys and drops '0' as
+            // well as '' -- both are the legacy behaviour and are kept deliberately.
+            $where = array_filter(explode(' AND ', $where), 'trim');
         } elseif (!$where) {
             $where = [];
         }
