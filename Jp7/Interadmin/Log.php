@@ -215,9 +215,18 @@ class Log extends RecordAbstract
         return $logs;
     }
 
+    /**
+     * The newest log matching $options, or null when nothing matches.
+     *
+     * Subscripting [0] unguarded raised "Undefined array key 0" for every caller whose
+     * filter had no rows -- e.g. the dashboard's last-login lookup for a user with no
+     * `login` entry, which 500'd the whole page. Both of its consumers (the warnings
+     * check and pages/welcome/last-login.blade.php) already treat a falsy result as
+     * "no previous login", so null is the contract they were written against.
+     */
     public static function findFirstLog($options = [])
     {
-        return static::findLogs($options + ['limit' => 1])[0];
+        return static::findLogs($options + ['limit' => 1])[0] ?? null;
     }
 
     public static function getPublishedFilters($table, $alias)
