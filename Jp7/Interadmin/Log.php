@@ -81,7 +81,7 @@ class Log extends RecordAbstract
             $this->_tipo = Type::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
-                'class' => $options['class'],
+                'class' => empty($options['class']) ? null : $options['class'],
                 'default_namespace' => static::DEFAULT_NAMESPACE
             ]);
         }
