@@ -430,7 +430,18 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             }
             if (count(self::$_collections) > 50) {
                 // don't increase memory too much
-                array_splice(self::$_collections, 0, 10);
+                //
+                // Unset the ten oldest by key rather than array_splice()ing them
+                // out. Splice frees its elements while it is still walking the
+                // array, and freeing a Collection re-enters THIS array through
+                // Collection::__destruct() -> onDestruct() -> unset(), which PHP 8
+                // refuses outright: "Array was modified during array_splice
+                // operation". It is a fatal on any process that keeps more than 50
+                // collections alive at once -- a page that builds that many, or a
+                // worker rendering for one user after another.
+                foreach (array_slice(array_keys(self::$_collections), 0, 10) as $antiga) {
+                    unset(self::$_collections[$antiga]);
+                }
             }
             $collection->onDestruct(function () use ($collection_id) {
                 unset(self::$_collections[$collection_id]);
