@@ -753,7 +753,15 @@ abstract class BaseQuery
             ->take($perPage)
             ->get();
 
-        return new LengthAwarePaginator($items->all(), $totalItems, $perPage, $page, [
+        // The Collection itself, not $items->all(): Record::newCollection() registers
+        // collections of more than two records in Record::$_collections so that touching
+        // a relation eager-loads it across the whole page, and attaches an onDestruct
+        // that unregisters them again. Unwrapping to an array here left that Collection
+        // with no reference, so it was destroyed on return -- taking the registry entry
+        // with it, while the records kept a _collection_id pointing at nothing. Every
+        // relation on a paginated listing then fell back to one query per row.
+        // LengthAwarePaginator keeps a Collection as-is, so passing it is enough.
+        return new LengthAwarePaginator($items, $totalItems, $perPage, $page, [
             'path' => LengthAwarePaginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
