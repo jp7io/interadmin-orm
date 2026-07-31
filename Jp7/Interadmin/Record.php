@@ -245,7 +245,17 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // children most likely
         if ($query = $this->_getManyRelationship($name)) {
             if (!array_key_exists($name, $this->relations)) {
-                if ($this->_collection_id && array_key_exists($this->_collection_id, self::$_collections)) {
+                // The optimizer cannot take 'arquivos': Relation::eagerLoad() resolves a
+                // name through Type::getRelationshipData(), which knows _parent, select,
+                // select_multi and children, and throws InvalidArgumentException for
+                // anything else. Files are not a declared relationship -- they live in
+                // their own interadmin_*_arquivos table and _getManyRelationship() hands
+                // them back as a FileQuery -- so routing them there throws
+                // "Unknown relationship: arquivos" instead of loading them.
+                if (!$query instanceof Query\FileQuery
+                    && $this->_collection_id
+                    && array_key_exists($this->_collection_id, self::$_collections)
+                ) {
                     // Lazy loading optimizer // It fills $this->relations[$name]
                     Relation::eagerLoad(self::$_collections[$this->_collection_id], $name);
                 } else {
