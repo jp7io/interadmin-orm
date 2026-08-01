@@ -371,9 +371,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function relationFromColumn($column)
     {
         $alias = $this->_aliases[$column];
-        if (starts_with($column, 'select_multi_')) {
+        if (str_starts_with($column, 'select_multi_')) {
             $relation = substr($alias, 0, -4); // _ids = 4 chars
-        } elseif (starts_with($column, 'select_')) {
+        } elseif (str_starts_with($column, 'select_')) {
             $relation = substr($alias, 0, -3); // _id = 3 chars
         } else {
             throw new InvalidArgumentException('$column must start with select_ or select_multi_.');
@@ -1105,10 +1105,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
         $stringValue = [];
         foreach ($camposCombo as $campoCombo) {
-            if (starts_with($campoCombo, 'file_')) {
+            if (str_starts_with($campoCombo, 'file_')) {
                 continue;
             }
-            if (starts_with($campoCombo, 'select_')) {
+            if (str_starts_with($campoCombo, 'select_')) {
                 if ($relation = $this->relationFromColumn($campoCombo)) {
                     $stringValue[] = $relation->getName();
                 }
@@ -1155,10 +1155,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 if ($campo['xtra'] === 'email' || $campo['xtra'] === 'id_email') {
                     $rules[$alias][] = 'email';
                 }
-                if (starts_with($campo['tipo'], 'int_')) {
+                if (str_starts_with($campo['tipo'], 'int_')) {
                     $rules[$alias][] = 'integer';
                 }
-                if (starts_with($campo['tipo'], 'date_')) {
+                if (str_starts_with($campo['tipo'], 'date_')) {
                     $rules[$alias][] = 'date_format:Y-m-d';
                 }
             }
