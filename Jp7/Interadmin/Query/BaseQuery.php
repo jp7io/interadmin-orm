@@ -4,6 +4,7 @@ namespace Jp7\Interadmin\Query;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Jp7\Interadmin\Type;
@@ -209,7 +210,7 @@ abstract class BaseQuery
                 'fields' => array_filter([$column, $key]),
             ] + $this->options);
 
-        return jp7_collect(array_pluck($array, $column, $key));
+        return jp7_collect(Arr::pluck($array, $column, $key));
     }
 
     /**

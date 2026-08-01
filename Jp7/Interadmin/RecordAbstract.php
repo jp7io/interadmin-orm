@@ -645,7 +645,7 @@ abstract class RecordAbstract
                         $childrenArr = $this->getInterAdminsChildren();
                     }
 
-                    $joinNome = studly_case($table);
+                    $joinNome = Str::studly($table);
                     if (isset($childrenArr[$joinNome])) {
                         // Children
                         $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
@@ -712,7 +712,7 @@ abstract class RecordAbstract
                     }
 
                     // Joins com children
-                    $joinNome = studly_case($table);
+                    $joinNome = Str::studly($table);
                     // Support for old join alias: ChildrenLojas => Lojas
                     $joinNome = replace_prefix('Children', '', $joinNome);
                     if (isset($childrenArr[$joinNome]) || isset($childrenArr[$joinNome])) {
