@@ -1,24 +1,31 @@
 <?php
 
-use Codeception\Configuration;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
-// Laravel facades
+/*
+ * Minimal stand-ins for the Laravel services the ORM reaches for through global class names.
+ *
+ * The package always runs inside a real Laravel app in production; its own suite boots no
+ * framework, so anything the ORM calls statically has to exist here or the tests cannot load.
+ * Keep this list as small as the ORM's actual surface -- every entry added here is a Laravel
+ * API the ORM depends on without declaring it, and therefore worth removing rather than
+ * polyfilling.
+ */
+
 class Cache extends Illuminate\Support\Facades\Cache
 {
     protected static function resolveFacadeInstance($name)
     {
         static $cache;
         if (!$cache) {
-            $arraystore = new ArrayStore();
-            $cache = new Repository($arraystore);
+            $cache = new Repository(new ArrayStore());
         }
         return $cache;
     }
 
-    public static function store()
+    public static function store($name = null)
     {
         return self::resolveFacadeInstance('');
     }
@@ -36,21 +43,14 @@ class DB extends Illuminate\Support\Facades\DB
         static $db;
         if (!$db) {
             $db = new Capsule;
-
-            $config = (object) Configuration::config()['modules']['config']['Db'];
-            $db->addConnection([
-                'driver'    => 'mysql',
-                'host'      => $config->host,
-                'database'  => $config->database,
-                'username'  => $config->user,
-                'password'  => $config->password,
-                'charset'   => 'utf8',
+            $db->addConnection(testDatabaseConfig() + [
+                'driver' => 'mysql',
+                'charset' => 'utf8',
                 'collation' => 'utf8_unicode_ci',
-                'prefix'    => 'interadmin_teste_',
+                'prefix' => 'interadmin_teste_',
                 'strict' => false,
-                'timezone'  => '-03:00'
+                'timezone' => '-03:00',
             ]);
-
             $db->setAsGlobal();
         }
         return $db;
@@ -134,12 +134,29 @@ class Log
     }
 }
 
+/**
+ * Connection settings shared by the Capsule above and by TestCase's own PDO handle.
+ *
+ * @return array{host: string, port: string, database: string, username: string, password: string}
+ */
+function testDatabaseConfig(): array
+{
+    return [
+        'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
+        'port' => $_ENV['DB_PORT'] ?? '3306',
+        'database' => $_ENV['DB_DATABASE'] ?? 'interadmin_orm_test',
+        'username' => $_ENV['DB_USERNAME'] ?? 'root',
+        'password' => $_ENV['DB_PASSWORD'] ?? '',
+    ];
+}
+
 function base_path($path = '')
 {
     return BASE_PATH.($path ? DIRECTORY_SEPARATOR.$path : $path);
 }
 
-function config($key) {
+function config($key)
+{
     $repository = new Illuminate\Config\Repository([
         'interadmin' => [
             'psr-4' => false,

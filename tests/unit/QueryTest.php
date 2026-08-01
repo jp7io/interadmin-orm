@@ -1,26 +1,26 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\RecordClassMap;
 
-class QueryTest extends \Codeception\Test\Unit
+class QueryTest extends TestCase
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
+    private $oldTimestamp;
 
-    protected function _before()
+    protected function setUp(): void
     {
-        $this->tester->seeNumRecords(0, 'interadmin_teste_tipos');
-        $this->tester->createUserType();
+        parent::setUp();
+
+        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->createUserType();
 
         RecordClassMap::getInstance()->clearCache();
     }
 
     public function testWhere()
     {
-        $newUser = $this->tester->createUser();
+        $newUser = $this->createUser();
 
         $userQuery = Test_User::where('varchar_key', '=', $newUser->varchar_key)->first();
         $this->assertEquals($newUser->username, $userQuery->username);
@@ -44,7 +44,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereRaw()
     {
-        $newUser = $this->tester->createUser();
+        $newUser = $this->createUser();
 
         $userRawQuery = Test_User::whereRaw('DATE(date_insert) = CURDATE()')->first();
         $this->assertEquals(date('Y-m-d'), date('Y-m-d', $userRawQuery->date_insert->timestamp));
@@ -55,7 +55,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereYear()
     {
-        $tblee = $this->tester->createUser([
+        $tblee = $this->createUser([
             'varchar_key' => 'tblee',
             'varchar_2' => 'timbernerslee@cern.org',
             'date_insert'=> new Date('1955-01-01')
@@ -67,7 +67,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereMonth()
     {
-        $lpage = $this->tester->createUser([
+        $lpage = $this->createUser([
             'varchar_key' => 'lpage',
             'varchar_2' => 'larrypage@gmail.com',
             'date_insert'=> new Date('2016-10-03')
@@ -79,7 +79,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereDay()
     {
-        $sbrin = $this->tester->createUser([
+        $sbrin = $this->createUser([
             'varchar_key' => 'sbrin',
             'varchar_2' => 'sergeybrin@gmail.com',
             'date_insert'=> new Date('2016-10-03')
@@ -91,7 +91,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereIn()
     {
-        $this->tester->createUsersBulk(4);
+        $this->createUsersBulk(4);
 
         $users = Test_User::whereIn('varchar_key', ['User #0', 'User #1'])->get();
         $this->assertTrue($users->contains('username', 'User #0'));
@@ -102,7 +102,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testWhereNotIn()
     {
-        $this->tester->createUsersBulk(4);
+        $this->createUsersBulk(4);
 
         $users = Test_User::whereNotIn('varchar_key', ['User #0', 'User #1'])->get();
         $this->assertFalse($users->contains('varchar_key', 'User #0'));
@@ -149,7 +149,7 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testDelete()
     {
-        $this->tester->createUsersBulk(10);
+        $this->createUsersBulk(10);
 
         Test_User::where('username', 'User #0')->orderBy('username')->delete();
         $this->assertEquals(9, Test_User::count());
@@ -159,26 +159,26 @@ class QueryTest extends \Codeception\Test\Unit
 
         Test_User::query()->delete();
         $this->assertEquals(0, Test_User::count());
-        $this->tester->seeNumRecords(10, 'interadmin_teste_registros');
+        $this->seeNumRecords(10, 'interadmin_teste_registros');
     }
 
     public function testForceDelete()
     {
-        $this->tester->createUsersBulk(10);
+        $this->createUsersBulk(10);
 
         Test_User::where('username', 'User #0')->orderBy('username')->forceDelete();
-        $this->tester->seeNumRecords(9, 'interadmin_teste_registros');
+        $this->seeNumRecords(9, 'interadmin_teste_registros');
 
         Test_User::limit(2)->forceDelete();
-        $this->tester->seeNumRecords(7, 'interadmin_teste_registros');
+        $this->seeNumRecords(7, 'interadmin_teste_registros');
 
         Test_User::query()->forceDelete();
-        $this->tester->seeNumRecords(0, 'interadmin_teste_registros');
+        $this->seeNumRecords(0, 'interadmin_teste_registros');
     }
 
     public function testUpdate()
     {
-        $this->tester->createUsersBulk(10);
+        $this->createUsersBulk(10);
 
         Test_User::where('ordem', '<', 5)->update([
             'e_mail' => 'updated@jp7.com.br',
@@ -194,15 +194,13 @@ class QueryTest extends \Codeception\Test\Unit
 
     public function testIncrement()
     {
-        $this->tester->createUsersBulk(10);
+        $this->createUsersBulk(10);
 
         Test_User::where('ordem', '>=', 5)->increment('ordem', 10);
         $this->assertEquals('0,1,2,3,4,15,16,17,18,19', Test_User::pluck('ordem')->implode(','));
     }
 
-    /**
-     * @dataProvider publishedProvider
-     */
+    #[DataProvider('publishedProvider')]
     public function testPublished(array $attributes)
     {
         $this->oldTimestamp = Record::hasTimestamp() ? Record::getTimestamp() : null;
@@ -218,9 +216,7 @@ class QueryTest extends \Codeception\Test\Unit
         Record::setTimestamp($this->oldTimestamp);
     }
 
-    /**
-     * @dataProvider unpublishedProvider
-     */
+    #[DataProvider('unpublishedProvider')]
     public function testUnpublished(array $attributes)
     {
         $this->oldTimestamp = Record::hasTimestamp() ? Record::getTimestamp() : null;
@@ -239,7 +235,7 @@ class QueryTest extends \Codeception\Test\Unit
         Record::setTimestamp($this->oldTimestamp);
     }
 
-    public function publishedProvider()
+    public static function publishedProvider()
     {
         return [
             'no date_expire' => [[
@@ -269,7 +265,7 @@ class QueryTest extends \Codeception\Test\Unit
         ];
     }
 
-    public function unpublishedProvider()
+    public static function unpublishedProvider()
     {
         return [
             'not active' => [[

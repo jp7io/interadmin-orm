@@ -5,25 +5,24 @@ use Jp7\Interadmin\DynamicLoader;
 use Jp7\Interadmin\RecordClassMap;
 use Jp7\Interadmin\TypeClassMap;
 
-class CreateTest extends \Codeception\Test\Unit
+class CreateTest extends TestCase
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
+    private $userType;
 
-    protected function _before()
+    protected function setUp(): void
     {
-        $this->tester->seeNumRecords(0, 'interadmin_teste_tipos');
+        parent::setUp();
 
-        $this->userType = $this->tester->createUserType();
+        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+
+        $this->userType = $this->createUserType();
     }
 
     // tests
 
     public function testTypeWasSaved()
     {
-        $this->tester->seeInDatabase('interadmin_teste_tipos', [
+        $this->seeInDatabase('interadmin_teste_tipos', [
             'id_tipo' => $this->userType->id_tipo,
             'nome' => $this->userType->nome,
             'id_slug' => $this->userType->id_slug
@@ -32,7 +31,7 @@ class CreateTest extends \Codeception\Test\Unit
 
     public function testDynamicLoader()
     {
-        $type = $this->tester->createType(['nome' => 'ClassName'], [
+        $type = $this->createType(['nome' => 'ClassName'], [
             ['tipo' => 'varchar_key', 'nome' => 'Name'],
         ]);
 
@@ -56,8 +55,8 @@ class CreateTest extends \Codeception\Test\Unit
 
     public function testSave()
     {
-        $user = $this->tester->createUser();
-        $this->tester->seeInDatabase('interadmin_teste_registros', ['id_tipo' => $user->id_tipo]);
+        $user = $this->createUser();
+        $this->seeInDatabase('interadmin_teste_registros', ['id_tipo' => $user->id_tipo]);
     }
 
     public function testCreate()
@@ -69,7 +68,7 @@ class CreateTest extends \Codeception\Test\Unit
             'password_key' => '123',
         ]);
 
-        $this->tester->seeInDatabase('interadmin_teste_registros', [
+        $this->seeInDatabase('interadmin_teste_registros', [
             'id_tipo' => $user->id_tipo,
             'varchar_key' => $user->username,
             'password_key' => $user->password,
@@ -79,7 +78,7 @@ class CreateTest extends \Codeception\Test\Unit
 
     public function testMassAssignmentValidation()
     {
-        $this->tester->expectException(MassAssignmentException::class, function () {
+        $this->assertThrows(MassAssignmentException::class, function () {
             Test_User::create([
                 'varchar_key' => 'argentinopam',
                 'password_key' => '123',
@@ -89,26 +88,26 @@ class CreateTest extends \Codeception\Test\Unit
 
     public function testDelete()
     {
-        $user = $this->tester->createUser([
+        $user = $this->createUser([
             'varchar_key' => 'isommerville',
             'password_key' => '123'
         ]);
 
         $user->delete();
 
-        $this->tester->seeInDatabase('interadmin_teste_registros', ['id' => $user->id, 'deleted' => 'S']);
+        $this->seeInDatabase('interadmin_teste_registros', ['id' => $user->id, 'deleted' => 'S']);
     }
 
     public function testForceDelete()
     {
-        $user = $this->tester->createUser([
+        $user = $this->createUser([
             'varchar_key' => 'isommerville',
             'password_key' => '123'
         ]);
 
         $user->forceDelete();
 
-        $this->tester->dontSeeInDatabase('interadmin_teste_registros', ['id' => $user->id]);
+        $this->dontSeeInDatabase('interadmin_teste_registros', ['id' => $user->id]);
     }
 
 }

@@ -774,7 +774,8 @@ class Type extends RecordAbstract
     public function syncInheritance()
     {
         // Retornando ao valor real
-        foreach (array_filter(explode(',', $this->inherited)) as $inherited_var) {
+        // A type that inherits nothing has `inherited` NULL, not ''.
+        foreach (array_filter(explode(',', (string) $this->inherited)) as $inherited_var) {
             $this->attributes[$inherited_var] = '';
         }
         $this->inherited = [];

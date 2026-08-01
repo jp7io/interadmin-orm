@@ -3,19 +3,21 @@
 use Jp7\Interadmin\Field\SelectField;
 use Jp7\Interadmin\RecordClassMap;
 
-class RelationTest extends \Codeception\Test\Unit
+class RelationTest extends TestCase
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
+    private $userType;
+    private $cityType;
+    private $storeType;
+    private $testimonialType;
 
-    public function _before()
+    protected function setUp(): void
     {
-        $this->tester->seeNumRecords(0, 'interadmin_teste_tipos');
-        $this->userType = $this->tester->createUserType();
+        parent::setUp();
 
-        $this->cityType = $this->tester->createType(
+        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->userType = $this->createUserType();
+
+        $this->cityType = $this->createType(
             [
                 'nome' => 'City',
                 //'tags' => 'S',
@@ -27,7 +29,7 @@ class RelationTest extends \Codeception\Test\Unit
             ]
         );
 
-        $this->storeType = $this->tester->createType(
+        $this->storeType = $this->createType(
             [
                 'nome' => 'Store',
                 'children' => $this->userType->id_tipo.'{,}Employees{,}{,}{;}'
@@ -39,7 +41,7 @@ class RelationTest extends \Codeception\Test\Unit
             ]
         );
 
-        $this->testimonialType = $this->tester->createType(
+        $this->testimonialType = $this->createType(
             [
                 'nome' => 'Testimonial'
             ],
@@ -150,7 +152,7 @@ class RelationTest extends \Codeception\Test\Unit
         $store->save();
 
         $storeWith = Test_Store::with('city')->first();
-        $relations = $this->tester->readPrivate($storeWith, 'relations');
+        $relations = $this->readPrivate($storeWith, 'relations');
         $this->assertEquals($store->city->id, $relations['city']->id);
     }
 

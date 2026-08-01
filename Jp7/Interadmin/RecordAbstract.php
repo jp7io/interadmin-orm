@@ -464,7 +464,11 @@ abstract class RecordAbstract
             if ($_stmt === 'UPDATE') {
                 foreach ($_valuesToSave as $key => $value) {
                     if ($value instanceof Expression) {
-                        $_valuesToSave[$key] = $key.' = '.$this->_resolveSql($value, $options, $use_published_filters);
+                        $_valuesToSave[$key] = $key.' = '.$this->_resolveSql(
+                            RawSql::toSql($value),
+                            $options,
+                            $use_published_filters
+                        );
                     } else {
                         $binding = ':val'.count($options['bindings']);
                         $options['bindings'][$binding] = $value;

@@ -1,19 +1,15 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Jp7\Interadmin\Record;
 use Jp7\Interadmin\RecordClassMap;
 
-class RecordTest extends \Codeception\Test\Unit
+class RecordTest extends TestCase
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
-
     private $oldTimestamp;
     private $oldConfig;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +23,7 @@ class RecordTest extends \Codeception\Test\Unit
         Record::setTimestamp(strtotime('2016-01-01 02:00:00'));
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         global $config;
         $config = $this->oldConfig;
@@ -38,7 +34,7 @@ class RecordTest extends \Codeception\Test\Unit
 
     public function testSetAndGet()
     {
-        $this->tester->createUserType();
+        $this->createUserType();
         RecordClassMap::getInstance()->clearCache();
 
         $user = Test_User::build();
@@ -62,25 +58,21 @@ class RecordTest extends \Codeception\Test\Unit
         $this->assertInstanceOf('Date', $user->date_publish);
     }
 
-    /**
-     * @dataProvider publishedProvider
-     */
+    #[DataProvider('publishedProvider')]
     public function testPublished(array $attributes)
     {
         $record = new Record($attributes);
         $this->assertTrue($record->isPublished());
     }
 
-    /**
-     * @dataProvider unpublishedProvider
-     */
+    #[DataProvider('unpublishedProvider')]
     public function testUnpublished(array $attributes)
     {
         $record = new Record($attributes);
         $this->assertFalse($record->isPublished());
     }
 
-    public function publishedProvider()
+    public static function publishedProvider()
     {
         return [
             [[
@@ -110,7 +102,7 @@ class RecordTest extends \Codeception\Test\Unit
         ];
     }
 
-    public function unpublishedProvider()
+    public static function unpublishedProvider()
     {
         return [
             [[

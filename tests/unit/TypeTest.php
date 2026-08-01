@@ -3,13 +3,8 @@
 use Jp7\Interadmin\Type;
 use Jp7\Interadmin\TypeClassMap;
 
-class TypeTest extends \Codeception\Test\Unit
+class TypeTest extends TestCase
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
-
     public function testSetAndGet()
     {
         $type = new Type;
@@ -30,22 +25,22 @@ class TypeTest extends \Codeception\Test\Unit
 
     public function testSave()
     {
-        $this->tester->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->seeNumRecords(0, 'interadmin_teste_tipos');
 
-        $userType = $this->tester->createUserType();
+        $userType = $this->createUserType();
 
-        $this->tester->seeNumRecords(1, 'interadmin_teste_tipos');
+        $this->seeNumRecords(1, 'interadmin_teste_tipos');
 
         $type = new Type($userType->id_tipo);
         $this->assertTrue($type->exists);
         $type->save();
 
-        $this->tester->seeNumRecords(1, 'interadmin_teste_tipos');
+        $this->seeNumRecords(1, 'interadmin_teste_tipos');
 
         $type = new Type;
         $this->assertFalse($type->exists);
         $type->save();
 
-        $this->tester->seeNumRecords(2, 'interadmin_teste_tipos');
+        $this->seeNumRecords(2, 'interadmin_teste_tipos');
     }
 }

@@ -554,7 +554,8 @@ abstract class BaseQuery
     {
         if (is_object($value)) {
             if ($value instanceof Expression) {
-                return $value;
+                // Raw SQL, so it goes into the clause verbatim rather than through a binding.
+                return RawSql::toSql($value);
             }
             $value = $value->__toString();
         }

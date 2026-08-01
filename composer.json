@@ -3,25 +3,25 @@
     "description": "JP7 InterAdmin ORM",
     "keywords": [],
     "license": "proprietary",
-    "repositories" : [
+    "repositories": [
         {
-            "type": "composer",
-            "url": "https://satis.jp7.io"
+            "type": "vcs",
+            "url": "git@github.com:jp7io/classes"
         }
     ],
     "require": {
+        "php": "^8.4",
         "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
         "jp7io/classes": "dev-main",
-        "illuminate/support": "~5.2",
-        "illuminate/database": "~5.2",
-        "illuminate/cache": "~5.2",
-        "illuminate/config": "~5.2",
-        "symfony/var-dumper": "~3.0",
-        "codeception/codeception": "^2.2",
-        "codeclimate/php-test-reporter": "^0.3.2",
-        "vlucas/phpdotenv": "^2.4"
+        "illuminate/support": "^12.0",
+        "illuminate/database": "^12.0",
+        "illuminate/cache": "^12.0",
+        "illuminate/config": "^12.0",
+        "symfony/var-dumper": "^7.0",
+        "phpunit/phpunit": "^12.5",
+        "vlucas/phpdotenv": "^5.6"
     },
     "autoload": {
         "psr-4": {
@@ -31,8 +31,16 @@
             "legacy"
         ]
     },
+    "autoload-dev": {
+        "classmap": [
+            "tests/TestCase.php"
+        ]
+    },
     "scripts": {
-
+        "test": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpunit"
+        ]
     },
     "config": {
         "preferred-install": "dist",

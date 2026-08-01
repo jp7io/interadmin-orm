@@ -1,26 +1,22 @@
 <?php
 
-use Codeception\Test\Unit;
 use Jp7\Interadmin\RecordClassMap;
 
-class LanguageTest extends Unit
+class LanguageTest extends TestCase
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
-
-    public function _before()
+    protected function setUp(): void
     {
-        $this->tester->seeNumRecords(0, 'interadmin_teste_registros');
-        $this->tester->seeNumRecords(0, 'interadmin_teste_en_registros');
+        parent::setUp();
+
+        $this->seeNumRecords(0, 'interadmin_teste_registros');
+        $this->seeNumRecords(0, 'interadmin_teste_en_registros');
 
         RecordClassMap::getInstance()->clearCache();
     }
 
     public function testWithLanguageChecked()
     {
-        $this->tester->createI18nNewsType(['language' => 'S']);
+        $this->createI18nNewsType(['language' => 'S']);
 
         $news = Test_Noticia::build();
         $news->title = 'Doria eleito prefeito';
@@ -39,7 +35,7 @@ class LanguageTest extends Unit
 
     public function testWithoutLanguageChecked()
     {
-        $this->tester->createI18nNewsType();
+        $this->createI18nNewsType();
 
         $news = Test_Noticia::build();
         $news->title = 'Lula preso';
@@ -57,7 +53,7 @@ class LanguageTest extends Unit
     
     public function testTypeName()
     {
-        $newsType = $this->tester->createI18nNewsType(['language' => 'S', 'nome_en' => 'News']);
+        $newsType = $this->createI18nNewsType(['language' => 'S', 'nome_en' => 'News']);
 
         $nomePtBr = $newsType->getName();
 
