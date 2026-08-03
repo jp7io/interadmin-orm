@@ -979,11 +979,30 @@ class Type extends RecordAbstract
         return self::getCacheRepository()->remember($cacheKey, 5, $callback);
     }
 
+    /**
+     * No static memo here, and the reason is that a repository is not always interchangeable
+     * with a later one for the same tag.
+     *
+     * Cache::tag() hands back a FileStore rooted at a per-tag directory, and one of those is as
+     * good as the next -- the state lives on disk, so anyone's flush() is everyone's. But on a
+     * store whose state lives in the OBJECT (the `array` store the test suites ask for) the
+     * repository belongs to the application instance that built it, and Laravel builds a new
+     * application between tests. A memo taken in one test then reads a store that nobody else
+     * writes to: an explicit Cache::tag(self::CACHE_TAG)->flush() resolves the CURRENT store,
+     * empties that, and leaves this one holding the values it cached before. Types then answer
+     * from a cache no flush can reach, for the rest of the process.
+     *
+     * That is not hypothetical -- it is why DashboardRecentItemsTest saw a type's `icone` as the
+     * empty string an earlier test had cached, after updating it and flushing. It stayed hidden
+     * because the container exports CACHE_DRIVER=file, which beats phpunit.xml's <env>, so local
+     * runs never used the store the config asks for. CI has no such variable and does.
+     *
+     * Cache::tag() already memoizes the FileStore case, so the cost of dropping this is nil
+     * where it was actually buying anything.
+     */
     protected static function getCacheRepository()
     {
-        static $cacheRepository;
-        $cacheRepository = $cacheRepository ?: Cache::tag(self::CACHE_TAG);
-        return $cacheRepository;
+        return Cache::tag(self::CACHE_TAG);
     }
 
     protected function getCacheKey($varname)
