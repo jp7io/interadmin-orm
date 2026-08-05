@@ -1142,15 +1142,50 @@ abstract class RecordAbstract
         return $this->attributes;
     }
 
+    /**
+     * Column names of this record's table, as reported by the schema.
+     *
+     * An empty listing is never cached, and a cached one is never trusted. A table with no
+     * columns does not exist, so [] is always the answer to a read that FAILED -- a connection
+     * still pointed at another database, a tenant whose tables are not imported yet, a table
+     * name this class got wrong -- and it is not a fact worth keeping for even a second.
+     *
+     * Keeping it wedges the whole tenant instead of the one call that failed. Type's attribute
+     * names ARE this listing, so an empty one stops Type::__get() recognising `campos` as a
+     * column; the tipos row then never lazy-loads, getCampos() parses '' into an empty field
+     * map, and every relation field throws out of _resolveFieldsAlias(). It reads as a schema
+     * problem while the schema is perfectly fine. Nor does the TTL bound it: remember() rewrote
+     * the empty value on every miss, so a condition that recurs kept the poison topped up.
+     *
+     * Reading THROUGH the guard is also what heals a cache poisoned by an earlier version of
+     * this method, with nobody having to flush anything.
+     *
+     * @see BaseClassMap::getClasses() same rule ("only cache if it has classes"), same reason.
+     */
     public function getColumns()
     {
         $table = $this->getTableName();
         $cacheKey = 'columns,'.$this->_db.','.$table;
-        return \Cache::remember($cacheKey, 5, function () use ($table) {
-            $db = $this->getDb();
-            $table = str_replace($db->getTablePrefix(), '', $table); // FIXME
-            return $db->getSchemaBuilder()->getColumnListing($table);
-        });
+
+        if ($columns = \Cache::get($cacheKey)) {
+            return $columns;
+        }
+
+        $db = $this->getDb();
+        // getColumnListing() puts the prefix back on, so it has to come off first. Anchored,
+        // and once: a table whose own name repeats the prefix (a type whose `tabela` holds the
+        // fully qualified name, say) was rewritten by the old unanchored str_replace() into a
+        // DIFFERENT table, which answers with the wrong columns when it happens to exist.
+        $prefix = $db->getTablePrefix();
+        if ($prefix && str_starts_with($table, $prefix)) {
+            $table = substr($table, strlen($prefix));
+        }
+        $columns = $db->getSchemaBuilder()->getColumnListing($table);
+
+        if ($columns) {
+            \Cache::put($cacheKey, $columns, 5);
+        }
+        return $columns;
     }
 
     /**

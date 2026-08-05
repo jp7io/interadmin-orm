@@ -528,7 +528,7 @@ class Type extends RecordAbstract
      */
     public function getCampos()
     {
-        return $this->getCache('campos', function () {
+        return $this->getCacheUnlessEmpty('campos', function () {
             $campos_parameters = [
                 'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
                 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
@@ -977,6 +977,33 @@ class Type extends RecordAbstract
     {
         $cacheKey = $this->getCacheKey($varname);
         return self::getCacheRepository()->remember($cacheKey, 5, $callback);
+    }
+
+    /**
+     * getCache(), minus the part where an empty result gets persisted.
+     *
+     * Only for values whose emptiness always means the read failed, rather than that the
+     * answer is nothing. getCampos() is that: `campos` is parsed out of an attribute, so an
+     * empty field map is what you get whenever the tipos row did not load -- and a type with
+     * no field map cannot be selected from at all, every relation field throwing out of
+     * _resolveFieldsAlias(). Keeping one buys an explode() on '' and costs a wedged type.
+     *
+     * Do NOT widen this to getCache() itself. An empty children list or an empty __call map is
+     * an ordinary answer for an ordinary type, and re-deriving those hits the database.
+     */
+    protected function getCacheUnlessEmpty($varname, $callback)
+    {
+        $cacheKey = $this->getCacheKey($varname);
+        $cache = self::getCacheRepository();
+
+        if ($value = $cache->get($cacheKey)) {
+            return $value;
+        }
+        $value = $callback();
+        if ($value) {
+            $cache->put($cacheKey, $value, 5);
+        }
+        return $value;
     }
 
     /**
