@@ -1183,7 +1183,7 @@ abstract class RecordAbstract
         $columns = $db->getSchemaBuilder()->getColumnListing($table);
 
         if ($columns) {
-            \Cache::put($cacheKey, $columns, 5);
+            \Cache::put($cacheKey, $columns, Type::CACHE_TTL);
         }
         return $columns;
     }

@@ -40,6 +40,12 @@ class Type extends RecordAbstract
     const ID_TIPO = 0;
     const CACHE_TAG = 'type';
 
+    /**
+     * Seconds. Cache::remember() has taken seconds since Laravel 5.8, and the 5 written here
+     * meant five minutes; as five seconds it expired between two views of the same page.
+     */
+    const CACHE_TTL = 300;
+
     private static $inheritedFields = [
         'class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela',
         'template', 'children', 'campos', 'language', 'editar', 'unico', 'disparo',
@@ -290,7 +296,7 @@ class Type extends RecordAbstract
         $options['aliases'] = $this->getAttributesAliases();
         $options['campos'] = $this->getAttributesCampos();
 
-        $rs = self::getCacheRepository()->remember($cacheKey, 5, function () use ($options) {
+        $rs = self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, function () use ($options) {
             return $this->_executeQuery($options);
         });
 
@@ -641,7 +647,7 @@ class Type extends RecordAbstract
         if ($this->_interadminRelationships === null) {
             // getCampoTipo might be different for each class
             $cacheKey = static::class.','.$this->getCacheKey('relationships');
-            $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, 5, function () {
+            $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, function () {
                 $relationships = [];
 
                 foreach ($this->getCampos() as $campo => $array) {
@@ -976,7 +982,7 @@ class Type extends RecordAbstract
     protected function getCache($varname, $callback)
     {
         $cacheKey = $this->getCacheKey($varname);
-        return self::getCacheRepository()->remember($cacheKey, 5, $callback);
+        return self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, $callback);
     }
 
     /**
@@ -1001,7 +1007,7 @@ class Type extends RecordAbstract
         }
         $value = $callback();
         if ($value) {
-            $cache->put($cacheKey, $value, 5);
+            $cache->put($cacheKey, $value, self::CACHE_TTL);
         }
         return $value;
     }

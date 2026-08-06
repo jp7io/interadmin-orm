@@ -79,7 +79,7 @@ class BaseClassMap
                 $this->classes = static::prepareMap(static::CLASS_ATTRIBUTE);
                 if ($this->classes) {
                     // only cache if it has classes
-                    $cache->put(static::CACHE_KEY, $this->classes, 5);
+                    $cache->put(static::CACHE_KEY, $this->classes, Type::CACHE_TTL);
                 }
             }
         }
