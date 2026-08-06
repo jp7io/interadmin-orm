@@ -246,10 +246,14 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     {
         return [];
     }
+    // Inlined from jp7io/inc's jp7_human_size(), which this package called without declaring
+    // the dependency. Not classes' human_size(): that formats 2048 as "2.00 KB", not "2KB".
     public function getSize()
     {
         try {
-            return jp7_human_size(\Illuminate\Support\Facades\Storage::size(substr($this->url, strlen('../../'))));
+            $kb = ceil(\Illuminate\Support\Facades\Storage::size(substr($this->url, strlen('../../'))) / 1024);
+
+            return ($kb < 1024) ? $kb.'KB' : round($kb / 1024, 1).'MB';
         } catch (\Throwable $e) {
             return '0KB';
         }
