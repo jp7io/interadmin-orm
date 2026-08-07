@@ -376,81 +376,14 @@ abstract class RecordAbstract
         $db = $this->getDb();
         $APP_DEBUG = getenv('APP_DEBUG');
 
-        // Type casting
-        if (!is_array($options['from'])) {
-            $options['from'] = (array) $options['from'];
-        }
-        if (!is_array($options['where'])) {
-            $options['where'] = (array) $options['where'];
-        }
-        if (!array_key_exists('bindings', $options)) {
-            $options['bindings'] = [];
-        }
-        $options['where'] = implode(' AND ', $options['where']);
-        if (!is_array($options['fields'])) {
-            $options['fields'] = (array) $options['fields'];
-        }
-        if (empty($options['fields_alias'])) {
-            $options['aliases'] = [];
-        } else {
-            $options['aliases'] = array_flip($options['aliases']);
-        }
-        if (array_key_exists('use_published_filters', $options)) {
-            $use_published_filters = $options['use_published_filters'];
-        } else {
-            $use_published_filters = Record::isPublishedFiltersEnabled();
-        }
+        $use_published_filters = $this->_normalizeQueryOptions($options);
 
         // Resolve Alias and Joins for 'fields' and 'from'
         $this->_resolveFieldsAlias($options);
         // Resolve Alias and Joins for 'where', 'group' and 'order';
         $clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
 
-        $filters = '';
-        if ($use_published_filters) {
-            foreach ($options['from'] as $key => $from) {
-                list($table, $alias) = explode(' AS ', $from);
-                if ($alias == 'main') {
-                    $filters = static::getPublishedFilters($table, 'main');
-                } else {
-                    $joinArr = explode(' ON', $alias);
-                    $options['from'][$key] = $table.' AS '.$joinArr[0].' ON '.static::getPublishedFilters($table, $joinArr[0]).$joinArr[1];
-                }
-            }
-        }
-
-        $from = array_shift($options['from']); // main table
-        if (isset($options['joins']) && $options['joins']) {
-            $pre_joins = $options['pre_joins'] ?? [];
-            foreach ($options['joins'] as $alias => $join) {
-                @list($joinType, $tipo, $on, $typeless) = $join;
-                if ($tipo === Type::class) {
-                    $table = (new Type)->getTableName();
-                } else {
-                    $table = $tipo->getInterAdminsTableName();
-                }
-                $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
-                    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '');
-                if (!$typeless) {
-                    $joinSql .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
-                }
-                $preIndex = count($options['from']);
-                $joinSql .= $this->_resolveSql($on, $options, $use_published_filters);
-                if (isset($pre_joins[$alias])) {
-                    $after = array_splice($options['from'], $preIndex);
-                    // it's on pre_join so it's a dependency for some FROM join
-                    array_unshift($options['from'], $joinSql);
-                    // it was inserted after, so it's a dependency
-                    $options['from'] = array_merge($after, $options['from']);
-                } else {
-                    $options['from'][] = $joinSql;
-                }
-            }
-        }
-
-        if (isset($options['skip'])) {
-            $options['limit'] = $options['skip'].','.($options['limit'] ?? '18446744073709551615');
-        }
+        list($from, $filters) = $this->sqlCompiler()->from($options, $use_published_filters);
 
         // Sql
         $sql = ' WHERE '.$filters.$clauses.
@@ -462,36 +395,22 @@ abstract class RecordAbstract
 
         try {
             if ($_stmt === 'UPDATE') {
-                foreach ($_valuesToSave as $key => $value) {
-                    if ($value instanceof Expression) {
-                        $_valuesToSave[$key] = $key.' = '.$this->_resolveSql(
-                            RawSql::toSql($value),
-                            $options,
-                            $use_published_filters
-                        );
-                    } else {
-                        $binding = ':val'.count($options['bindings']);
-                        $options['bindings'][$binding] = $value;
-                        $_valuesToSave[$key] = $key.' = '.$binding;
-                    }
-                }
-                $sql = 'UPDATE '.$from.
-                    ($options['from'] ? implode('', $options['from']) : '').
-                    ' SET '.implode(', ', $_valuesToSave).
+                // The SET list is compiled first because a raw expression in it can append
+                // a join of its own, which the FROM read below has to pick up.
+                $set = $this->_compileSetValues($_valuesToSave, $options, $use_published_filters);
+                $sql = 'UPDATE '.$from.$this->_joinSql($options).
+                    ' SET '.$set.
                     $sql;
                 $rs = $db->update($sql, $options['bindings']);
             } elseif ($_stmt === 'DELETE') {
                 // Temp table needed for LIMIT
                 $sql = 'DELETE main FROM '.$from.' INNER JOIN ('.
-                    'SELECT main.id FROM '.$from.
-                    ($options['from'] ? implode('', $options['from']) : '').
-                    $sql.
+                    'SELECT main.id FROM '.$from.$this->_joinSql($options).$sql.
                     ') AS temp ON main.id = temp.id';
                 $rs = $db->delete($sql, $options['bindings']);
             } else {
                 $sql = 'SELECT '.implode(',', $options['fields']).
-                    ' FROM '.$from.
-                    ($options['from'] ? implode('', $options['from']) : '').
+                    ' FROM '.$from.$this->_joinSql($options).
                     $sql;
                 $rs = $db->select($sql, $options['bindings']);
             }
@@ -535,6 +454,71 @@ abstract class RecordAbstract
         }
         // $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
         return $rs;
+    }
+
+    /**
+     * Fills in the option shapes the rest of the query path assumes -- list-typed from,
+     * where and fields, a bindings array, aliases flipped to column => alias -- and folds
+     * skip into limit, which MySQL spells as an offset pair.
+     *
+     * @return bool whether the publishing predicates apply: the option when set, the global
+     *              default otherwise.
+     */
+    private function _normalizeQueryOptions(array &$options)
+    {
+        foreach (['from', 'where', 'fields'] as $key) {
+            if (!is_array($options[$key])) {
+                $options[$key] = (array) $options[$key];
+            }
+        }
+        if (!array_key_exists('bindings', $options)) {
+            $options['bindings'] = [];
+        }
+        $options['where'] = implode(' AND ', $options['where']);
+        $options['aliases'] = empty($options['fields_alias']) ? [] : array_flip($options['aliases']);
+
+        if (isset($options['skip'])) {
+            // MySQL has no offset without a limit, hence the largest BIGINT
+            $options['limit'] = $options['skip'].','.($options['limit'] ?? '18446744073709551615');
+        }
+
+        if (array_key_exists('use_published_filters', $options)) {
+            return $options['use_published_filters'];
+        }
+
+        return Record::isPublishedFiltersEnabled();
+    }
+
+    /**
+     * The JOINs, as one string. Read late and never cached: the SET list of an UPDATE can
+     * still add one.
+     */
+    private function _joinSql(array $options)
+    {
+        return $options['from'] ? implode('', $options['from']) : '';
+    }
+
+    /**
+     * Compiles an UPDATE's SET list. A raw expression goes through the alias walk so it can
+     * name this type's fields; anything else becomes a binding.
+     */
+    private function _compileSetValues(array $values, array &$options, $use_published_filters)
+    {
+        foreach ($values as $key => $value) {
+            if ($value instanceof Expression) {
+                $values[$key] = $key.' = '.$this->_resolveSql(
+                    RawSql::toSql($value),
+                    $options,
+                    $use_published_filters
+                );
+            } else {
+                $binding = ':val'.count($options['bindings']);
+                $options['bindings'][$binding] = $value;
+                $values[$key] = $key.' = '.$binding;
+            }
+        }
+
+        return implode(', ', $values);
     }
 
     private function _debugQuery($sql, $trace, $startQuery)

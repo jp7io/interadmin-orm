@@ -78,6 +78,63 @@ class SqlCompiler
     }
 
     /**
+     * Finishes the FROM clause once the alias walk has appended whatever joins it needed:
+     * splices the publishing predicates into each join's ON, then materializes the joins
+     * declared explicitly through Query::join().
+     *
+     * Returns the main table and the main alias's predicates, which belong in the WHERE
+     * rather than in an ON -- separately, because a DELETE names the main table twice.
+     *
+     * @return array{0: string, 1: string} [$from, $filters]
+     */
+    public function from(array &$options, $use_published_filters)
+    {
+        $filters = '';
+        if ($use_published_filters) {
+            foreach ($options['from'] as $key => $from) {
+                list($table, $alias) = explode(' AS ', $from);
+                if ($alias == 'main') {
+                    $filters = $this->record::getPublishedFilters($table, 'main');
+                } else {
+                    $joinArr = explode(' ON', $alias);
+                    $options['from'][$key] = $table.' AS '.$joinArr[0].' ON '.$this->record::getPublishedFilters($table, $joinArr[0]).$joinArr[1];
+                }
+            }
+        }
+
+        $from = array_shift($options['from']); // main table
+        if (isset($options['joins']) && $options['joins']) {
+            $pre_joins = $options['pre_joins'] ?? [];
+            foreach ($options['joins'] as $alias => $join) {
+                @list($joinType, $tipo, $on, $typeless) = $join;
+                if ($tipo === Type::class) {
+                    $table = (new Type)->getTableName();
+                } else {
+                    $table = $tipo->getInterAdminsTableName();
+                }
+                $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
+                    ($use_published_filters ? $this->record::getPublishedFilters($table, $alias) : '');
+                if (!$typeless) {
+                    $joinSql .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
+                }
+                $preIndex = count($options['from']);
+                $joinSql .= $this->resolve($on, $options, $use_published_filters);
+                if (isset($pre_joins[$alias])) {
+                    $after = array_splice($options['from'], $preIndex);
+                    // it's on pre_join so it's a dependency for some FROM join
+                    array_unshift($options['from'], $joinSql);
+                    // it was inserted after, so it's a dependency
+                    $options['from'] = array_merge($after, $options['from']);
+                } else {
+                    $options['from'][] = $joinSql;
+                }
+            }
+        }
+
+        return [$from, $filters];
+    }
+
+    /**
      * Rewrites every alias in $clause to `table.column`, appending to $options['from'] any
      * join that rewriting turned out to need.
      */
