@@ -198,7 +198,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         return $records;
     }
 
-    protected function _aliasToColumn($alias, $aliases)
+    public function _aliasToColumn($alias, $aliases)
     {
         if (isset($aliases[$alias])) {
             return $aliases[$alias];

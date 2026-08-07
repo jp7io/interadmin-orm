@@ -129,7 +129,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         return $result;
     }
 
-    protected function _aliasToColumn($alias, $aliases)
+    public function _aliasToColumn($alias, $aliases)
     {
         if (isset($aliases[$alias])) {
             return $aliases[$alias];
