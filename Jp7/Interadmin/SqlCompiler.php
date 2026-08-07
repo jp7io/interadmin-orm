@@ -61,7 +61,8 @@ class SqlCompiler
             $resolvedOrder = $this->resolve($options['order'], $options, $use_published_filters);
         }
         // Group by para wheres com children, DISTINCT é usado para corrigir COUNT() com children
-        $firstField = reset($options['fields']);
+        $fields = $options['fields'] ?? [];
+        $firstField = $fields ? reset($fields) : '';
         if (empty($options['group']) && strpos($firstField, 'DISTINCT') === false) {
             if (!empty($options['auto_group_flag'])) {
                 $options['group'] = 'main.id';
@@ -155,7 +156,7 @@ class SqlCompiler
                         $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
                         $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
                         ' WHERE '.$joinFilter.$this->clauses($onClause, $use_published_filters).(($existsMatches[4]) ? ' AND ' : '');
-                    } elseif (method_exists($options['model'], $joinNome)) {
+                    } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
                         // Metodo estilo Eloquent
                         $relationshipData = $options['model']->$joinNome()->getRelationshipData();
 
@@ -199,7 +200,7 @@ class SqlCompiler
                     $joinNome = Str::studly($table);
                     // Support for old join alias: ChildrenLojas => Lojas
                     $joinNome = replace_prefix('Children', '', $joinNome);
-                    if (isset($childrenArr[$joinNome]) || isset($childrenArr[$joinNome])) {
+                    if (isset($childrenArr[$joinNome])) {
                         $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
