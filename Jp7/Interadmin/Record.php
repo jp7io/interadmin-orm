@@ -489,7 +489,10 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $className = $options['class'];
         } else {
             $className = RecordClassMap::getInstance()->getClass($tipo->id_tipo);
-            if (!$className) {
+            // A binding PHP cannot declare is treated as no binding. DynamicLoader generates
+            // every OTHER mapped name on demand, so this is the one way `new $className` below
+            // can meet a class that does not exist — see DynamicLoader::isDeclarable().
+            if (!$className || !DynamicLoader::isDeclarable($className)) {
                 $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
         }

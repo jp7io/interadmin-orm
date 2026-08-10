@@ -191,7 +191,8 @@ class Type extends RecordAbstract
         } else {
             // Classe não foi forçada, verificar classMap
             $classTipo = TypeClassMap::getInstance()->getClass($id_tipo);
-            if (!$classTipo) {
+            // As in Record::getInstance(): a `class_tipo` PHP cannot declare is no binding.
+            if (!$classTipo || !DynamicLoader::isDeclarable($classTipo)) {
                 if (isset($options['default_namespace'])) {
                     $classTipo = $options['default_namespace'].'Type';
                 } else {

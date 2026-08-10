@@ -6,7 +6,44 @@ use App;
 
 class DynamicLoader
 {
+    /**
+     * The names PHP refuses with an E_COMPILE_ERROR — which `try`/`catch` never sees, so for
+     * these the check in isDeclarable() is not a nicety, it is the only thing that can prevent
+     * the fatal. Every OTHER reserved word is a ParseError, which the probe there catches.
+     * Re-derive on a PHP upgrade: eval("class X {}") per candidate in a process of its own and
+     * keep the ones that exit 255.
+     */
+    private const RESERVED_CLASS_NAMES = [
+        'bool', 'false', 'float', 'int', 'iterable', 'mixed', 'never', 'null', 'object',
+        'parent', 'self', 'string', 'true', 'void',
+    ];
+
+    /** @var array<string, bool> memoized, because the misses are asked about per record. */
+    private static $declarable = [];
+
     private static $registered = false;
+
+    /**
+     * Whether PHP can declare a class by this name at all.
+     *
+     * `tipos.class` becomes a class name by a literal `_` → `\` swap, so a content type named
+     * "Include" asks for `class Include {}` and a type named "String" asks for something worse.
+     * Callers treat such a binding as NO binding: nothing can make the name exist, so the only
+     * question is whether they degrade to the default class or take the request down with them.
+     */
+    public static function isDeclarable($class)
+    {
+        if (!isset(self::$declarable[$class])) {
+            $short = last(explode('\\', $class));
+            try {
+                token_get_all('<?php class '.$short.' {}', TOKEN_PARSE);
+                self::$declarable[$class] = !in_array(strtolower($short), self::RESERVED_CLASS_NAMES, true);
+            } catch (\ParseError $e) {
+                self::$declarable[$class] = false;
+            }
+        }
+        return self::$declarable[$class];
+    }
 
     public static function register()
     {
@@ -24,6 +61,12 @@ class DynamicLoader
     {
         if (!App::bound('config')) {
             return false; // there was a problem with codeception after running all tests
+        }
+        // An autoloader that cannot provide a name has to return quietly. This one used to
+        // generate the class anyway and let the eval below blow up — as a RuntimeException for a
+        // keyword, and as an uncatchable fatal for `self`/`int`/`string` and the eleven like them.
+        if (!self::isDeclarable($class)) {
+            return false;
         }
         $code = self::getCode($class);
         if ($code) {
