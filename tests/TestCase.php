@@ -127,9 +127,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function readPrivate(object $object, string $property): mixed
     {
-        $reflectionProperty = (new ReflectionObject($object))->getProperty($property);
-        $reflectionProperty->setAccessible(true);
-        return $reflectionProperty->getValue($object);
+        return (new ReflectionObject($object))->getProperty($property)->getValue($object);
     }
 
     // ------------------------------------------------------------------------- factories

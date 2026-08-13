@@ -10,16 +10,16 @@
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.5",
         "jdorn/sql-formatter": "~1.2"
     },
     "require-dev": {
         "jp7io/classes": "dev-main",
-        "illuminate/support": "^12.0",
-        "illuminate/database": "^12.0",
-        "illuminate/cache": "^12.0",
-        "illuminate/config": "^12.0",
-        "symfony/var-dumper": "^7.0",
+        "illuminate/support": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/cache": "^13.0",
+        "illuminate/config": "^13.0",
+        "symfony/var-dumper": "^8.0",
         "phpunit/phpunit": "^12.5",
         "vlucas/phpdotenv": "^5.6"
     },
@@ -44,7 +44,10 @@
     },
     "config": {
         "preferred-install": "dist",
-        "component-dir": "vendor/components-installed"
+        "component-dir": "vendor/components-installed",
+        "platform": {
+            "php": "8.5"
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true
