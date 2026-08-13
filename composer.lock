@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a0e686ac26013d018753206fd246db7",
+    "content-hash": "b23f829d1b42566ec8f68c37e6bcb7b2",
     "packages": [
         {
             "name": "doctrine/sql-formatter",
