@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "^8.5",
-        "jdorn/sql-formatter": "~1.2"
+        "doctrine/sql-formatter": "^1.5"
     },
     "require-dev": {
         "jp7io/classes": "dev-main",

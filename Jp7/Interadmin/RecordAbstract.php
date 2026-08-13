@@ -11,7 +11,7 @@ use Jp7\TryMethod;
 use Exception;
 use UnexpectedValueException;
 use DB;
-use SqlFormatter;
+use Doctrine\SqlFormatter\SqlFormatter;
 
 /**
  * Class which represents records on the table interadmin_{client name}.
@@ -450,7 +450,7 @@ abstract class RecordAbstract
 
         if (!empty($options['debug'])) {
             // $time = $debugger->getTime($options['debug']);
-            echo SqlFormatter::format(self::replaceBindings($options['bindings'], $sql));
+            echo (new SqlFormatter())->format(self::replaceBindings($options['bindings'], $sql));
         }
         // $select_multi_fields = isset($options['select_multi_fields']) ? $options['select_multi_fields'] : null;
         return $rs;
