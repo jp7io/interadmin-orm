@@ -2,6 +2,8 @@
 
 namespace Jp7\Interadmin;
 
+use BadMethodCallException;
+
 class TypelessQuery extends Query
 {
     protected function providerFind($options)

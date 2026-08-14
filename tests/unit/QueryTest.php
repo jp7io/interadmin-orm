@@ -53,6 +53,21 @@ class QueryTest extends TestCase
         $this->assertNull($userRawQuery);
     }
 
+    /**
+     * A raw expression as the VALUE of a where(), which reaches SQL verbatim rather than
+     * as a binding. testUpdate() covers the same unwrapping on the write path; only that
+     * one had it, which is how the read path went missing.
+     */
+    public function testWhereWithRawValue()
+    {
+        $newUser = $this->createUser();
+
+        $found = Test_User::where('date_insert', '<=', \DB::raw('NOW()'))->first();
+        $this->assertEquals($newUser->username, $found->username);
+
+        $this->assertNull(Test_User::where('date_insert', '>', \DB::raw('NOW()'))->first());
+    }
+
     public function testWhereYear()
     {
         $tblee = $this->createUser([

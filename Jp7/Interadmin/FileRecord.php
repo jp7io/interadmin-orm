@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin;
 
 use Exception;
+use UnexpectedValueException;
 
 /**
  * Class which represents records on the table interadmin_{client name}_arquivos.
@@ -52,12 +53,15 @@ class FileRecord extends RecordAbstract
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
-                kd('no id_tipo, not implemented');
-                $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
+                throw new UnexpectedValueException(
+                    'Cannot resolve the Type of file record '.$this->id_arquivo.': it has no id_tipo. '.
+                    'Call setType() before getType() -- looking the column up from the table was never '.
+                    'implemented, it only called jp7io/inc, which this package no longer depends on.'
+                );
             }
             $this->_tipo = Type::getInstance($this->id_tipo, [
                 'db' => $this->_db,
-                'class' => $options['class'],
+                'class' => $options['class'] ?? null,
             ]);
         }
 

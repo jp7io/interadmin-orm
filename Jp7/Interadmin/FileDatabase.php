@@ -149,6 +149,13 @@ class FileDatabase extends RecordAbstract
         return '';
     }
     /**
+     * @see RecordAbstract::getCampoTipo()
+     */
+    public function getCampoTipo($campo)
+    {
+        return;
+    }
+    /**
      * @see RecordAbstract::getAdminAttributes()
      */
     public function getAdminAttributes()

@@ -69,6 +69,11 @@ class App
         Lang::setLocale($locale);
     }
 
+    public static function getLocale()
+    {
+        return Lang::getLocale();
+    }
+
     public static function runningInConsole()
     {
         return true;
@@ -131,6 +136,15 @@ class Log
     public static function error($e)
     {
         echo 'Log@error: '.$e->getMessage().PHP_EOL;
+    }
+
+    // Discarded rather than echoed: the ORM writes these per query and per lazy load.
+    public static function debug($message)
+    {
+    }
+
+    public static function notice($message)
+    {
     }
 }
 

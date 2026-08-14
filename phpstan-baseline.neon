@@ -1,0 +1,97 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined static property static\(Jp7\\Interadmin\\BaseClassMap\)\:\:\$instance\.$#'
+			identifier: staticProperty.notFound
+			count: 2
+			path: Jp7/Interadmin/BaseClassMap.php
+
+		-
+			message: '#^Access to undefined constant static\(Jp7\\Interadmin\\BaseClassMap\)\:\:CACHE_KEY\.$#'
+			identifier: classConstant.notFound
+			count: 3
+			path: Jp7/Interadmin/BaseClassMap.php
+
+		-
+			message: '#^Access to undefined constant static\(Jp7\\Interadmin\\BaseClassMap\)\:\:CLASS_ATTRIBUTE\.$#'
+			identifier: classConstant.notFound
+			count: 1
+			path: Jp7/Interadmin/BaseClassMap.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: Jp7/Interadmin/BaseClassMap.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\FieldUtil\:\:getCampoHeader\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 2
+			path: Jp7/Interadmin/FieldUtil.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: Jp7/Interadmin/Log.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: Jp7/Interadmin/Query/BaseQuery.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\Record\:\:_findChild\(\) should return array but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\Record\:\:_getManyRelationship\(\) should return Jp7\\Interadmin\\Query\|Jp7\\Interadmin\\Query\\FileQuery but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\Record\:\:type\(\) should return Jp7\\Interadmin\\Type but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Call to an undefined method Jp7\\Interadmin\\RecordAbstract\:\:getCampoTipo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: Jp7/Interadmin/RecordAbstract.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\RecordAbstract\:\:_resolveFieldsAlias\(\) should return array but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/RecordAbstract.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\Type\:\:getCampoTipo\(\) should return Jp7\\Interadmin\\Type but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\Type\:\:getInterAdminsChildrenTipo\(\) should return Jp7\\Interadmin\\Type but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Method Jp7\\Interadmin\\Type\:\:getParent\(\) should return Jp7\\Interadmin\\RecordAbstract but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Method InterAdmin\:\:deleteChildrenForever\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: legacy/InterAdmin.php

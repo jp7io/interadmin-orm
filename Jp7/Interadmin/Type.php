@@ -541,7 +541,7 @@ class Type extends RecordAbstract
                 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
                 'default', 'nome_id',
             ];
-            $campos    = explode('{;}', $this->campos);
+            $campos    = explode('{;}', (string) $this->campos);
             $A = [];
             for ($i = 0; $i < count($campos); $i++) {
                 $parameters = explode('{,}', $campos[$i]);

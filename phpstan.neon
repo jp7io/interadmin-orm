@@ -1,0 +1,21 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 0
+    paths:
+        - Jp7
+        - legacy
+    # Scanned, not executed: the ORM reaches Laravel through root-aliased facade names
+    # that only exist inside a booted app, and polyfill.php is where the suite declares them.
+    scanFiles:
+        - tests/polyfill.php
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # Provided by the host Laravel app at runtime, not by this package: root-aliased
+        # facades and the \Date alias tests/bootstrap.php sets up for Carbon.
+        -
+            identifier: class.notFound
+            message: '#\b(Storage|ImgResize|RecordUrl|Date)\b#'
+    excludePaths:
+        - vendor

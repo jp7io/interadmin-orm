@@ -2,23 +2,24 @@
 
 class InterAdminArquivoBanco
 {
+    public $db_prefix;
+
     public function __construct($options = [])
     {
-        $this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+        $this->db_prefix = ($options['db_prefix'] ?? '') ?: $GLOBALS['db_prefix'];
     }
 
     /**
-     * Adiciona arquivo ao banco e retorna ID.
-     *
      * @param array $fieldsValues
      *
-     * @return string id_arquivo_banco
+     * @throws LogicException always
      */
     public function addFile($fieldsValues)
     {
-        $id_arquivo_banco = jp7_db_insert($this->getTableName(), 'id_arquivo_banco', '', $fieldsValues);
-
-        return str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+        throw new LogicException(
+            'InterAdminArquivoBanco::addFile() is not supported: its only implementation was '.
+            "jp7io/inc's jp7_db_insert(), and that package is gone. Use Jp7\\Interadmin\\FileDatabase."
+        );
     }
 
     public function getTableName()

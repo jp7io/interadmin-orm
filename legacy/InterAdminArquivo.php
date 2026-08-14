@@ -60,12 +60,16 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
-                $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
+                throw new UnexpectedValueException(
+                    'Cannot resolve the Tipo of file record '.$this->id_arquivo.': it has no id_tipo. '.
+                    'Call setTipo() before getTipo() -- looking the column up from the table was never '.
+                    'implemented, it only called jp7io/inc, which this package no longer depends on.'
+                );
             }
             $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
-                'class' => $options['class'],
+                'class' => $options['class'] ?? null,
             ]);
         }
 

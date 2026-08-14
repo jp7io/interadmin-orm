@@ -9,6 +9,7 @@ class FieldUtil
 {
     public $id;
     public $id_tipo;
+    public $field;
 
     /**
      * Construtor p￺úblico.

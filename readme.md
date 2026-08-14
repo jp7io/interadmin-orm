@@ -47,5 +47,14 @@ $usedCeltas = Carro::where('modelo', 'Celta')
 
 ```
 cp .env.example .env.testing
-php vendor/bin/codecept run --coverage
+composer test
 ```
+
+## Static analysis
+
+```
+composer analyse
+```
+
+PHPStan runs at level 0 over `Jp7/` and `legacy/`, with the debt that predates it recorded in
+`phpstan-baseline.neon`. New code is expected to add nothing to that file.

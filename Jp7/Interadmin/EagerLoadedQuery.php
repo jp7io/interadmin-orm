@@ -10,7 +10,6 @@ use BadMethodCallException;
 class EagerLoadedQuery extends Query
 {
     protected $data;
-    protected $type;
     protected $debug;
 
     public function __construct(RecordAbstract $type, $data)
@@ -70,15 +69,5 @@ class EagerLoadedQuery extends Query
         $this->debug = $debug;
 
         return $this;
-    }
-
-    public function __call($method_name, $params)
-    {
-        $target = $this->type;
-        if ($this->debug) {
-            $target = $this->type->debug();
-        }
-
-        return call_user_func_array([$target, $method_name], $params);
     }
 }

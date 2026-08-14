@@ -3,6 +3,7 @@
 namespace Jp7\Interadmin\Query;
 
 use Jp7\Interadmin\FileRecord;
+use BadMethodCallException;
 
 class FileQuery extends BaseQuery
 {

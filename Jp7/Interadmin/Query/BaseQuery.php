@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Jp7\Interadmin\Type;
 use Jp7\Interadmin\RecordAbstract;
+use Jp7\Interadmin\RawSql;
 use BadMethodCallException;
 use Jp7\Interadmin\Collection;
 
