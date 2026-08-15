@@ -78,24 +78,6 @@ class DynamicLoader
             return true;
         }
 
-        // Support legacy ORM class names
-        if (str_contains($class, '_')) {
-            $last = last(explode('_', $class));
-            $replacements = [
-                'Record' => 'InterAdmin',
-                'Type' => 'InterAdminTipo',
-                'FileField' => 'InterAdminFieldFile',
-                'FileRecord' => 'InterAdminArquivo',
-            ];
-            if (array_key_exists($last, $replacements)) {
-                $replacedClass = str_replace($last, $replacements[$last], $class);
-                if (class_exists($replacedClass)) {
-                    class_alias($replacedClass, $class);
-                }
-            }
-            return true;
-        }
-
         return false;
     }
 

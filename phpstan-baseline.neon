@@ -90,8 +90,3 @@ parameters:
 			count: 1
 			path: Jp7/Interadmin/Type.php
 
-		-
-			message: '#^Method InterAdmin\:\:deleteChildrenForever\(\) should return int but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: legacy/InterAdmin.php

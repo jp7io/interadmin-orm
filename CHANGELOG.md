@@ -1,3 +1,13 @@
+## 4.0
+* Removed the pre-namespace shim: `InterAdmin`, `InterAdminTipo`, `InterAdminArquivo`, `InterAdminArquivoBanco` and `InterAdminAbstract`, with the `legacy` classmap entry and DynamicLoader's `X_Record -> X_InterAdmin` name bridge.
+* Breaking changes:
+  * `new InterAdminTipo($id)` -> `Jp7\Interadmin\Type::getInstance($id)`, or `new Tenant\Type($id)` where the tenant subclass matters.
+  * `new InterAdmin($id, $options)` -> `Jp7\Interadmin\Record::__construct(array $attributes = [], $type = null)`. The 2.x signature has been a TypeError since 3.0, so any surviving call was already fatal.
+  * `$tipo->getInterAdmins($options)` -> `$tipo->records()`; `$record->setFieldsValues($attrs)` -> `updateAttributes($attrs)`. Both were removed in 3.0 and have thrown BadMethodCallException ever since — the shim kept the class name alive, never these methods.
+  * **A class name held as a STRING is a dependency.** `->class('InterAdmin')`, `'class' => 'InterAdmin'` and `unserialize(..., ['allowed_classes' => ['InterAdmin']])` all reach `new $className`, and no grep for `new`/`extends` finds them. Sweep for quoted names too.
+  * Hydrating as `Record` rather than `InterAdmin` changes `DEFAULT_NAMESPACE` from `''`, so relations resolve to objects: `relationFromColumn()` returns a `Collection` where the shim returned a plain array.
+  * Anything serialized by the 2.x classes is unreadable regardless of this release — it uses the `C:`/`Serializable` format, which `unserialize()` rejects on PHP 8.5.
+
 ## 3.3
 * Several improvements for eager loading and performance
 * Breaking changes:

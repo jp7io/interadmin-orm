@@ -5,7 +5,6 @@ parameters:
     level: 0
     paths:
         - Jp7
-        - legacy
     # Scanned, not executed: the ORM reaches Laravel through root-aliased facade names
     # that only exist inside a booted app, and polyfill.php is where the suite declares them.
     scanFiles:
