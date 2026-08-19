@@ -29,9 +29,69 @@ use DB;
 /**
  * Class which represents records on the table interadmin_{client name}_tipos.
  *
+ * The @method block is what __callStatic() forwards to Query\TypeQuery -- it declares nothing and
+ * adds nothing. first(), delete(), forceDelete() and restore() are absent on purpose: each is a
+ * public INSTANCE method here, which PHP refuses to call statically rather than routing to
+ * __callStatic(). build() and create() return Type rather than static, because TypeQuery
+ * instantiates Type::getDefaultClass() and not the called class. MagicSurfaceTest holds both ends.
+ *
  * @property string $interadminsOrderby SQL Order By for the records of this Type.
  * @property string $class Class to be instantiated for the records of this Type.
  * @property string $tabela Table of this Type, or of its Model, if it has no table.
+ * @property int|string $id_tipo This Type's primary key.
+ * @property string $children The child Types, as the '{,}'/'{;}' delimited blob the column stores.
+ *
+ * @method static Type build(array $attributes = [])
+ * @method static bool chunk(int $count, callable $callback)
+ * @method static int count()
+ * @method static Type create(array $attributes = [])
+ * @method static Query\TypeQuery debug(bool $debug = true)
+ * @method static Query\TypeQuery doesntHave(string $relationship)
+ * @method static bool exists()
+ * @method static static|null find(int|string $id)
+ * @method static static findOrFail(int|string $id)
+ * @method static static findOrNew(int|string $id)
+ * @method static static firstOrCreate(array $attributes, array $values = [])
+ * @method static static firstOrFail()
+ * @method static static firstOrNew(array $attributes, array $values = [])
+ * @method static Query\TypeQuery forPage(int $page, int $perPage = 15)
+ * @method static Collection get()
+ * @method static array getOptionsArray(bool $replaceBinding = true)
+ * @method static Query\TypeQuery groupBy(string $column)
+ * @method static Query\TypeQuery groupByRaw(string $group)
+ * @method static Query\TypeQuery has(string $relationship)
+ * @method static Query\TypeQuery havingRaw(string $sql)
+ * @method static Query\TypeQuery join(string $alias, string|Type $className, array|string $conditions, string $_joinType = 'INNER', bool $_typeless = false)
+ * @method static array jsonList(string $column, string $key)
+ * @method static Query\TypeQuery leftJoin(string $alias, string|Type $className, array|string $conditions)
+ * @method static Query\TypeQuery limit(int $limit)
+ * @method static Collection lists(string $column, ?string $key = null)
+ * @method static Query\TypeQuery orWhere(string|callable $column, mixed $operator = null, mixed $value = null)
+ * @method static Query\TypeQuery orderBy(string $column, string $direction = 'asc')
+ * @method static Query\TypeQuery orderByRaw(string $order)
+ * @method static \Illuminate\Pagination\LengthAwarePaginator paginate(?int $perPage = null, array $columns = ['*'], string $pageName = 'page')
+ * @method static Collection pluck(string $column, ?string $key = null)
+ * @method static Query\TypeQuery published(bool|array $filters = true)
+ * @method static Query\TypeQuery rightJoin(string $alias, string|Type $className, array|string $conditions)
+ * @method static Query\TypeQuery select(string|array ...$columns)
+ * @method static Query\TypeQuery skip(int $offset)
+ * @method static Query\TypeQuery take(int $limit)
+ * @method static Query\TypeQuery typelessJoin(string $alias, string|Type $className, array|string $conditions)
+ * @method static Query\TypeQuery typelessLeftJoin(string $alias, string|Type $className, array|string $conditions)
+ * @method static Query\TypeQuery typelessRightJoin(string $alias, string|Type $className, array|string $conditions)
+ * @method static mixed value(string $column)
+ * @method static Query\TypeQuery where(string|callable $column, mixed $operator = null, mixed $value = null)
+ * @method static Query\TypeQuery whereDate(string $column, mixed $operator, mixed $value = null)
+ * @method static Query\TypeQuery whereDay(string $column, mixed $operator, mixed $value = null)
+ * @method static Query\TypeQuery whereDoesntHave(string $relationship, mixed $conditions = null)
+ * @method static Query\TypeQuery whereFindInSet(string $column, mixed $value)
+ * @method static Query\TypeQuery whereHas(string $relationship, mixed $conditions = null, bool $_not = false)
+ * @method static Query\TypeQuery whereIn(string $column, array $values, bool $_not = false)
+ * @method static Query\TypeQuery whereMonth(string $column, mixed $operator, mixed $value = null)
+ * @method static Query\TypeQuery whereNotIn(string $column, array $values)
+ * @method static Query\TypeQuery whereRaw(string $where)
+ * @method static Query\TypeQuery whereYear(string $column, mixed $operator, mixed $value = null)
+ * @method static Query\TypeQuery with(string ...$relationships)
  */
 class Type extends RecordAbstract
 {

@@ -13,6 +13,22 @@ use Jp7\Interadmin\RawSql;
 use BadMethodCallException;
 use Jp7\Interadmin\Collection;
 
+/**
+ * __call() answers `orFoo()` with `foo()` for anything this class declares, and only inside a
+ * where() grouping closure -- ungrouped it throws rather than building an OR. The where family
+ * is the half that has callers; orWhere() is a real method and so is not listed.
+ *
+ * @method $this orWhereRaw(string $where)
+ * @method $this orWhereIn(string $column, array $values, bool $_not = false)
+ * @method $this orWhereNotIn(string $column, array $values)
+ * @method $this orWhereFindInSet(string $column, mixed $value)
+ * @method $this orWhereHas(string $relationship, mixed $conditions = null, bool $_not = false)
+ * @method $this orWhereDoesntHave(string $relationship, mixed $conditions = null)
+ * @method $this orWhereYear(string $column, mixed $operator, mixed $value = null)
+ * @method $this orWhereMonth(string $column, mixed $operator, mixed $value = null)
+ * @method $this orWhereDay(string $column, mixed $operator, mixed $value = null)
+ * @method $this orWhereDate(string $column, mixed $operator, mixed $value = null)
+ */
 abstract class BaseQuery
 {
     /**
