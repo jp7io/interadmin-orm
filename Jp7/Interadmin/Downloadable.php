@@ -8,9 +8,9 @@ use Storage;
 
 trait Downloadable
 {
-    public function isImage()
+    public function isImage(): bool
     {
-        return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $this->url);
+        return (bool) preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $this->url);
     }
 
     /**
@@ -55,12 +55,12 @@ trait Downloadable
         return replace_prefix($backendPath.'/', '', $url);
     }
 
-    private function removeQueryString()
+    private function removeQueryString(): string|false|null
     {
         return parse_url($this->url, PHP_URL_PATH);
     }
 
-    public function isExternal()
+    public function isExternal(): bool
     {
         return !empty(parse_url($this->url)['host']);
     }
@@ -70,7 +70,7 @@ trait Downloadable
      *
      * @return string Extension, such as 'jpg' or 'gif'.
      */
-    public function getExtension()
+    public function getExtension(): string
     {
         return pathinfo($this->removeQueryString(), PATHINFO_EXTENSION);
     }
