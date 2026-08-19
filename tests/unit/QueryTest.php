@@ -204,7 +204,9 @@ class QueryTest extends TestCase
         $this->assertEquals('User #0 suffix', Test_User::orderBy('username')->first()->username);
         $this->assertEquals(5, Test_User::where('e_mail', 'updated@jp7.com.br')->count());
         $this->assertEquals(5, Test_User::where('username', 'LIKE', '%suffix')->count());
-        $this->assertEquals('0,0,0,0,0,5,6,7,8,9', Test_User::pluck('ordem')->implode(','));
+        // Ordered by id: the update leaves five rows sharing ordem 0, so no order the
+        // column itself could give is total and an unordered SELECT rotates them.
+        $this->assertEquals('0,0,0,0,0,5,6,7,8,9', Test_User::orderBy('id')->pluck('ordem')->implode(','));
     }
 
     public function testIncrement()

@@ -5,8 +5,15 @@ namespace Jp7\Interadmin;
 use Cache;
 use DB;
 
-class BaseClassMap
+/**
+ * @phpstan-consistent-constructor
+ */
+abstract class BaseClassMap
 {
+    // $instance, CACHE_KEY and CLASS_ATTRIBUTE are deliberately NOT declared here: undefined
+    // on the base is what makes a subclass that forgets one a fatal rather than a map cached
+    // under '' and a singleton shared with its sibling. PHPStan reports all six; baselined.
+
     protected $classes;
 
     protected function __construct()

@@ -243,6 +243,10 @@ class SqlCompiler
             if (!in_array($termo[0], ["'", '"', ":"]) && !is_numeric($termo) && !in_array(strtoupper($termo), static::RESERVED)) {
                 $len = strlen($termo);
                 $table = 'main';
+                // Reset per term: both survive an iteration otherwise, so a term that skips
+                // the branch assigning them would compile a join off the PREVIOUS term's type.
+                $subtermo = null;
+                $joinTipo = null;
                 if (strpos($termo, '.') !== false) {
                     list($table, $termo, $subtermo) = explode('.', $termo) + [2 => null];
                 }
@@ -338,6 +342,9 @@ class SqlCompiler
                     }
                     // TEMPORARIO FIXME, necessario melhor maneira
                     if ($subtermo) {
+                        if (!$joinTipo instanceof Type) {
+                            throw new Exception('The field "'.$table.'.'.$termo.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
+                        }
                         $subtable = $table.'__'.$termo;
                         $termo = $termo.'_id';
 

@@ -2,7 +2,7 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
-    level: 0
+    level: 1
     paths:
         - Jp7
     # Scanned, not executed: the ORM reaches Laravel through root-aliased facade names
@@ -16,5 +16,11 @@ parameters:
         -
             identifier: class.notFound
             message: '#\b(Storage|ImgResize|RecordUrl|Date)\b#'
+        # Also runtime-only: Cache::tag() is a MACRO jp7io/classes registers (Cache::tags(),
+        # the spelling that looks right, throws on every tenant), and RouterFacade proxies
+        # Jp7\Laravel\Router::getRouteByTypeId() through the facade's __callStatic.
+        -
+            identifier: staticMethod.notFound
+            message: '#\b(Cache::tag|RouterFacade::getRouteByTypeId)\(\)#'
     excludePaths:
         - vendor

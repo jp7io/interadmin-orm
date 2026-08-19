@@ -65,21 +65,18 @@ class FieldUtil
     {
         $key = $campo['tipo'];
         if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
-            if (is_callable($campo['nome'])) {
-                return call_user_func($campo['nome'], $campo, '', 'header');
-            } else {
-                echo 'Função '.$campo['nome'].' não encontrada.';
+            if (!is_callable($campo['nome'])) {
+                return 'Função '.$campo['nome'].' não encontrada.';
             }
-        } elseif (strpos($key, 'select_') === 0) {
+            return call_user_func($campo['nome'], $campo, '', 'header');
+        }
+        if (strpos($key, 'select_') === 0) {
             if ($campo['label']) {
                 return $campo['label'];
-            } elseif ($campo['nome'] instanceof Type) {
-                return $campo['nome']->nome;
-            } elseif ($campo['nome'] == 'all') {
-                return 'Tipos';
             }
-        } else {
-            return $campo['nome'];
+            // Type::getCampos() resolves a select_'s `nome` to a Type; only 'all' stays a string.
+            return $campo['nome'] instanceof Type ? $campo['nome']->nome : 'Tipos';
         }
+        return $campo['nome'];
     }
 }

@@ -287,7 +287,7 @@ class Type extends RecordAbstract
      *
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return Type|RecordAbstract
+     * @return Type|RecordAbstract|null Null for a root type, which has no parent_id_tipo.
      */
     public function getParent($options = [])
     {
@@ -759,7 +759,7 @@ class Type extends RecordAbstract
      *
      * @param object $campo
      *
-     * @return Type
+     * @return Type|null Null when the field stores no type, which callers test for.
      */
     public function getCampoTipo($campo)
     {
@@ -1181,7 +1181,7 @@ class Type extends RecordAbstract
      *
      * @param string $nome_id Camel Case name, e.g.: DadosPessoais
      *
-     * @return Type
+     * @return Type|null Null when $nome_id is not among getInterAdminsChildren().
      */
     public function getInterAdminsChildrenTipo($nome_id)
     {

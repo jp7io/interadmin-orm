@@ -579,12 +579,12 @@ abstract class RecordAbstract
     /**
      * Resolves Aliases on $options fields.
      *
+     * The resolved fields go back through $options by reference; nothing is returned.
+     *
      * @param array  $options Same syntax as $options
-     * @param array  $campos
-     * @param array  $aliases 'alias' => 'field'
      * @param string $table   Table alias for the fields.
      *
-     * @return array Revolved $fields.
+     * @return void
      */
     protected function _resolveFieldsAlias(&$options = [], $table = 'main.')
     {
@@ -677,6 +677,16 @@ abstract class RecordAbstract
         }
         $options['fields'] = $fields;
     }
+
+    /**
+     * The Type a relation field points at, or null when the field stores no type.
+     *
+     * Every subclass answers it -- Type and Record with a lookup, the three file-backed
+     * ones with `void` -- and SqlCompiler reaches it from outside the hierarchy.
+     *
+     * @see SqlCompiler
+     */
+    abstract public function getCampoTipo($campo);
 
     /**
      * Maps one of this record's field aliases to its physical column.

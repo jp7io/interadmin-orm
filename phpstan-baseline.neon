@@ -19,16 +19,64 @@ parameters:
 			path: Jp7/Interadmin/BaseClassMap.php
 
 		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: Jp7/Interadmin/BaseClassMap.php
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: Jp7/Interadmin/FileRecord.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\FieldUtil\:\:getCampoHeader\(\) should return string but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$id_arquivo\.$#'
+			identifier: property.notFound
 			count: 2
-			path: Jp7/Interadmin/FieldUtil.php
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$id_tipo\.$#'
+			identifier: property.notFound
+			count: 4
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$legenda\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$nome\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$parte\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 14
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\FileRecord\:\:\$url_thumb\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/FileRecord.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Log\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Log.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Log\:\:\$id_tipo\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Log.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -43,50 +91,157 @@ parameters:
 			path: Jp7/Interadmin/Query/BaseQuery.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\Record\:\:_findChild\(\) should return array but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$char_key\.$#'
+			identifier: property.notFound
 			count: 1
 			path: Jp7/Interadmin/Record.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\Record\:\:_getManyRelationship\(\) should return Jp7\\Interadmin\\Query\|Jp7\\Interadmin\\Query\\FileQuery but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$date_expire\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$date_modify\.$#'
+			identifier: property.notFound
 			count: 1
 			path: Jp7/Interadmin/Record.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\Record\:\:type\(\) should return Jp7\\Interadmin\\Type but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$date_publish\.$#'
+			identifier: property.notFound
 			count: 1
 			path: Jp7/Interadmin/Record.php
 
 		-
-			message: '#^Call to an undefined method Jp7\\Interadmin\\RecordAbstract\:\:getCampoTipo\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$deleted\.$#'
+			identifier: property.notFound
 			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 8
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$id_slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$id_tipo\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$log\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$parent_id_tipo\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$publish\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Record\:\:\$varchar_key\.$#'
+			identifier: property.notFound
+			count: 3
+			path: Jp7/Interadmin/Record.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\RecordAbstract\:\:\$deleted\.$#'
+			identifier: property.notFound
+			count: 2
 			path: Jp7/Interadmin/RecordAbstract.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\RecordAbstract\:\:_resolveFieldsAlias\(\) should return array but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: Jp7/Interadmin/RecordAbstract.php
-
-		-
-			message: '#^Method Jp7\\Interadmin\\Type\:\:getCampoTipo\(\) should return Jp7\\Interadmin\\Type but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$campos\.$#'
+			identifier: property.notFound
 			count: 1
 			path: Jp7/Interadmin/Type.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\Type\:\:getInterAdminsChildrenTipo\(\) should return Jp7\\Interadmin\\Type but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$class_tipo\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$date_modify\.$#'
+			identifier: property.notFound
 			count: 1
 			path: Jp7/Interadmin/Type.php
 
 		-
-			message: '#^Method Jp7\\Interadmin\\Type\:\:getParent\(\) should return Jp7\\Interadmin\\RecordAbstract but return statement is missing\.$#'
-			identifier: return.missing
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$deleted_tipo\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$id_slug\.$#'
+			identifier: property.notFound
 			count: 1
 			path: Jp7/Interadmin/Type.php
 
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$id_tipo_string\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$inherited\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$language\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$log\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$model_id_tipo\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$nome\.$#'
+			identifier: property.notFound
+			count: 4
+			path: Jp7/Interadmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\Interadmin\\Type\:\:\$parent_id_tipo\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/Interadmin/Type.php

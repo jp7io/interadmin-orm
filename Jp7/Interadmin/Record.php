@@ -522,7 +522,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
 
     /**
-     * @return Type
+     * The Type this class is bound to in the RecordClassMap, or null when it is bound to none.
+     *
+     * @return Type|null
      */
     public static function type()
     {
@@ -572,7 +574,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @param string $nome_id CamelCase
      *
-     * @return array
+     * @return array|null Null when the Type declares no child under that name.
      */
     protected function _findChild($nome_id)
     {
@@ -631,7 +633,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     /**
      * @param $name
-     * @return EagerLoadedQuery|Query|Query\FileQuery
+     * @return EagerLoadedQuery|Query|Query\FileQuery|null Null when $name names no child and no arquivos tab.
      */
     protected function _getManyRelationship($name)
     {

@@ -42,12 +42,13 @@ class FileField
     public function getText()
     {
         if ($this->text) {
-            $retorno = $this->text;
-        } elseif ($parent = $this->getParent()) {
-            $retorno = $parent->getName();
+            return $this->text;
+        }
+        if ($parent = $this->getParent()) {
+            return $parent->getName();
         }
 
-        return $retorno;
+        return '';
     }
     /**
      * Returns $parent.
