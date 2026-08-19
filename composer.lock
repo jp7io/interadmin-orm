@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fdb82525847c0749c9cca73689533da",
+    "content-hash": "e4522f14e552c8501b2aa1e64f2e52dd",
     "packages": [
         {
             "name": "doctrine/sql-formatter",
@@ -975,12 +975,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jp7io/classes.git",
-                "reference": "bf8a693b7c0d3abf0d33eec85def8847369ab646"
+                "reference": "bbd74593102579fd93b27b153a497632703adef6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7io/classes/zipball/bf8a693b7c0d3abf0d33eec85def8847369ab646",
-                "reference": "bf8a693b7c0d3abf0d33eec85def8847369ab646",
+                "url": "https://api.github.com/repos/jp7io/classes/zipball/bbd74593102579fd93b27b153a497632703adef6",
+                "reference": "bbd74593102579fd93b27b153a497632703adef6",
                 "shasum": ""
             },
             "require": {
@@ -1008,7 +1008,7 @@
                 "source": "https://github.com/jp7io/classes/tree/main",
                 "issues": "https://github.com/jp7io/classes/issues"
             },
-            "time": "2026-08-13T15:05:21+00:00"
+            "time": "2026-08-19T18:04:55+00:00"
         },
         {
             "name": "laravel/serializable-closure",
