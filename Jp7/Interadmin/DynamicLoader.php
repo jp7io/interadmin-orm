@@ -19,9 +19,9 @@ class DynamicLoader
     ];
 
     /** @var array<string, bool> memoized, because the misses are asked about per record. */
-    private static $declarable = [];
+    private static array $declarable = [];
 
-    private static $registered = false;
+    private static bool $registered = false;
 
     /**
      * Whether PHP can declare a class by this name at all.
@@ -45,19 +45,19 @@ class DynamicLoader
         return self::$declarable[$class];
     }
 
-    public static function register()
+    public static function register(): void
     {
         spl_autoload_register([self::class, 'load']);
         self::$registered = true;
     }
 
-    public static function isRegistered()
+    public static function isRegistered(): bool
     {
         return self::$registered;
     }
 
     // Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
-    public static function load($class)
+    public static function load($class): bool
     {
         if (!App::bound('config')) {
             return false; // there was a problem with codeception after running all tests
@@ -81,7 +81,7 @@ class DynamicLoader
         return false;
     }
 
-    protected static function getPhpDocCampo($tipo, $campo)
+    protected static function getPhpDocCampo($tipo, array $campo): string
     {
         if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
 //            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
@@ -105,7 +105,7 @@ class DynamicLoader
         return $type.' $'.$campo['nome_id'].' '.$campo['ajuda'];
     }
 
-    public static function generateRecordClass(Type $type, $addPhpDoc = false)
+    public static function generateRecordClass(Type $type, $addPhpDoc = false): string
     {
         $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
 
@@ -127,7 +127,7 @@ class DynamicLoader
         );
     }
 
-    public static function generateTypeClass(Type $type, $addPhpDoc = false)
+    public static function generateTypeClass(Type $type, $addPhpDoc = false): string
     {
         $prefixClass = constant(Type::getDefaultClass().'::DEFAULT_NAMESPACE');
         $phpdoc = $addPhpDoc ? '/** --- */' : '';
@@ -155,7 +155,7 @@ class DynamicLoader
         }
     }
 
-    protected static function getNamespaceAndClass($className)
+    protected static function getNamespaceAndClass($className): array
     {
         $namespace = explode('\\', $className);
         $className = array_pop($namespace);
@@ -163,7 +163,7 @@ class DynamicLoader
         return [$namespace, $className];
     }
 
-    protected static function buildClass($className, $parentClass, $classBody, $phpdoc)
+    protected static function buildClass($className, $parentClass, $classBody, $phpdoc): string
     {
         list($namespace, $className) = self::getNamespaceAndClass($className);
         if ($namespace) {

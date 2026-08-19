@@ -32,7 +32,7 @@ class PublishedFilter
      *
      * @return string|null Null when the table has nothing to filter (see the tags branch)
      */
-    public static function sql($table, $alias)
+    public static function sql($table, $alias): ?string
     {
         $tableParts = explode('_', $table);
         $table = end($tableParts);
@@ -60,7 +60,7 @@ class PublishedFilter
      * The records calendar: published already, not yet expired (or never expiring),
      * flagged visible, not soft-deleted.
      */
-    private static function registrosSql($alias)
+    private static function registrosSql($alias): string
     {
         $now = Record::getTimestamp();
 

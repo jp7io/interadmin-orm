@@ -26,7 +26,7 @@ class TypeQuery extends BaseQuery
         return $this->provider->deprecatedGetChildren($options);
     }
 
-    public function count()
+    public function count(): int
     {
         if (func_num_args() > 0) {
             throw new BadMethodCallException('Wrong number of arguments, received '.func_num_args().', expected 0.');

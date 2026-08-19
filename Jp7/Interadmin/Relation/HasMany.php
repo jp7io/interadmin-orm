@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 class HasMany
 {
-    private $record;
+    private \Jp7\Interadmin\Record $record;
     private $className;
     private $foreign_key;
     private $local_key;
@@ -22,7 +22,7 @@ class HasMany
         $this->local_key = $local_key;
     }
 
-    public function getRelationshipData()
+    public function getRelationshipData(): array
     {
         $type = call_user_func([$this->className, 'type']);
         $aliases = $type->getCamposAlias();
@@ -59,7 +59,7 @@ class HasMany
         return $this->query;
     }
 
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         $response = call_user_func_array([$this->query(), $method], $arguments);
         if ($response instanceof Query) {

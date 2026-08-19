@@ -46,7 +46,7 @@ class FileDatabase extends RecordAbstract
     /**
      * @return string
      */
-    public function getUrlAttribute()
+    public function getUrlAttribute(): string
     {
         if ($this->directory === '' && $this->getType()) {
             // TODO: remove after migration
@@ -58,12 +58,12 @@ class FileDatabase extends RecordAbstract
             ($this->versao ? '?v='.$this->versao : '');
     }
 
-    public function setDateModifyAttribute($value)
+    public function setDateModifyAttribute($value): void
     {
         $this->attributes['date_modify'] = new \Date($value);
     }
 
-    public function getBasename()
+    public function getBasename(): string
     {
         return str_pad((int) $this->id_arquivo_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
     }
@@ -95,7 +95,7 @@ class FileDatabase extends RecordAbstract
      *
      * @param Type $tipo
      */
-    public function setType($tipo)
+    public function setType($tipo): void
     {
         $this->attributes['id_tipo'] = $tipo->id_tipo;
         $this->_tipo = $tipo;
@@ -119,46 +119,46 @@ class FileDatabase extends RecordAbstract
      *
      * @param Record $parent
      */
-    public function setParent($parent)
+    public function setParent($parent): void
     {
         $this->attributes['id'] = $parent->id;
         $this->_parent = $parent;
     }
 
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->getDb()->getTablePrefix().'arquivos_banco';
     }
 
-    public function getAttributesAliases()
+    public function getAttributesAliases(): array
     {
         return [];
     }
-    public function getAttributesCampos()
+    public function getAttributesCampos(): array
     {
         return [];
     }
 
-    public function getAttributesNames()
+    public function getAttributesNames(): array
     {
         return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
 
-    public function getTagFilters()
+    public function getTagFilters(): string
     {
         return '';
     }
     /**
      * @see RecordAbstract::getCampoTipo()
      */
-    public function getCampoTipo($campo)
+    public function getCampoTipo($campo): void
     {
         return;
     }
     /**
      * @see RecordAbstract::getAdminAttributes()
      */
-    public function getAdminAttributes()
+    public function getAdminAttributes(): array
     {
         return [];
     }

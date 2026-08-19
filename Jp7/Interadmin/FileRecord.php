@@ -49,7 +49,7 @@ class FileRecord extends RecordAbstract
      *
      * @return Type
      */
-    public function getType($options = [])
+    public function getType(array $options = [])
     {
         if (!$this->_tipo) {
             if (!$this->id_tipo) {
@@ -72,7 +72,7 @@ class FileRecord extends RecordAbstract
      *
      * @param Type $tipo
      */
-    public function setType($tipo)
+    public function setType($tipo): void
     {
         $this->id_tipo = $tipo->id_tipo;
         $this->_tipo = $tipo;
@@ -100,7 +100,7 @@ class FileRecord extends RecordAbstract
      *
      * @param Record $parent
      */
-    public function setParent($parent)
+    public function setParent($parent): void
     {
         $this->id = $parent->id;
         $this->_parent = $parent;
@@ -128,7 +128,7 @@ class FileRecord extends RecordAbstract
      *
      * @todo Create a class for _arquivos_banco
      */
-    public function addToArquivosBanco($upload_root = '../../upload/')
+    public function addToArquivosBanco($upload_root = '../../upload/'): string
     {
         global $lang;
         // Inserindo no banco de arquivos
@@ -188,21 +188,21 @@ class FileRecord extends RecordAbstract
         return $this->url;
     }
 
-    public function getAttributesAliases()
+    public function getAttributesAliases(): array
     {
         return [];
     }
-    public function getAttributesCampos()
+    public function getAttributesCampos(): array
     {
         return [];
     }
 
-    public function getFillable()
+    public function getFillable(): array
     {
         return ['parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem'];
     }
 
-    public function getAttributesNames()
+    public function getAttributesNames(): array
     {
         return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
@@ -218,19 +218,19 @@ class FileRecord extends RecordAbstract
     /**
      * @see RecordAbstract::getCampoTipo()
      */
-    public function getCampoTipo($campo)
+    public function getCampoTipo($campo): void
     {
         return;
     }
 
-    public function getTagFilters()
+    public function getTagFilters(): string
     {
         return '';
     }
     /**
      * @see RecordAbstract::getAdminAttributes()
      */
-    public function getAdminAttributes()
+    public function getAdminAttributes(): array
     {
         return [];
     }

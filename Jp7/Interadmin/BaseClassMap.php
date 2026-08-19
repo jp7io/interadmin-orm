@@ -24,7 +24,7 @@ class BaseClassMap
         return static::$instance;
     }
 
-    protected static function prepareMap($attr)
+    protected static function prepareMap($attr): array
     {
         $arr = [];
         $roots = []; // keep track of duplicated classes
@@ -62,7 +62,7 @@ class BaseClassMap
         return $arr;
     }
 
-    public function clearCache()
+    public function clearCache(): void
     {
         Cache::tag(Type::CACHE_TAG)->forget(static::CACHE_KEY);
         static::getInstance()->classes = null;
@@ -90,7 +90,7 @@ class BaseClassMap
      * @param  string $class
      * @return int   id_tipo
      */
-    public function getClassIdTipo($class)
+    public function getClassIdTipo($class): int|string|false
     {
         $id_tipo = array_search($class, $this->getClasses());
         if ($id_tipo === false && strpos($class, '\\') !== false) {

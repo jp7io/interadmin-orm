@@ -28,7 +28,7 @@ class FileField
         $this->url = $url;
         $this->text = $text;
     }
-    public function __toString()
+    public function __toString(): string
     {
         return $this->url;
     }
@@ -67,7 +67,7 @@ class FileField
      *
      * @see FileField::$parent
      */
-    public function setParent($parent)
+    public function setParent($parent): void
     {
         $this->_parent = $parent;
     }

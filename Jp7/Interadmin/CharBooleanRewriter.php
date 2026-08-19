@@ -24,7 +24,7 @@ namespace Jp7\Interadmin;
 class CharBooleanRewriter
 {
     /** Is this token one this rewriter handles? */
-    public static function handles($term)
+    public static function handles($term): bool
     {
         return strtolower($term) === 'true' || strtolower($term) === 'false';
     }
@@ -42,7 +42,7 @@ class CharBooleanRewriter
      *
      * @return array [$clause, $offset] rewritten clause + where to resume scanning
      */
-    public static function rewrite($clause, $term, $pos)
+    public static function rewrite($clause, $term, $pos): array
     {
         // ['', '!'] for true, reversed for false: index 0 negates a <>/!= comparison,
         // index 1 negates an = comparison.

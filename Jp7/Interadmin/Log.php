@@ -75,7 +75,7 @@ class Log extends RecordAbstract
      *
      * @return Type
      */
-    public function getType($options = [])
+    public function getType(array $options = [])
     {
         if (!$this->_tipo) {
             $this->_tipo = Type::getInstance($this->id_tipo, [
@@ -93,7 +93,7 @@ class Log extends RecordAbstract
      *
      * @param Type $tipo
      */
-    public function setType($tipo)
+    public function setType($tipo): void
     {
         $this->id_tipo = $tipo->id_tipo;
         $this->_tipo = $tipo;
@@ -121,47 +121,47 @@ class Log extends RecordAbstract
      *
      * @param Record $parent
      */
-    public function setParent($parent)
+    public function setParent($parent): void
     {
         $this->id = $parent->id;
         $this->_parent = $parent;
     }
 
-    public function getAttributesAliases()
+    public function getAttributesAliases(): array
     {
         return [];
     }
-    public function getAttributesCampos()
+    public function getAttributesCampos(): array
     {
         return [];
     }
-    public function getAttributesNames()
+    public function getAttributesNames(): array
     {
         return ['id_log', 'id', 'id_tipo', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
     }
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->getDb()->getTablePrefix().'logs';
     }
     /**
      * @see RecordAbstract::getCampoTipo()
      */
-    public function getCampoTipo($campo)
+    public function getCampoTipo($campo): void
     {
         return;
     }
-    public function getTagFilters()
+    public function getTagFilters(): string
     {
         return '';
     }
     /**
      * @see RecordAbstract::getAdminAttributes()
      */
-    public function getAdminAttributes()
+    public function getAdminAttributes(): array
     {
         return [];
     }
-    public static function create($attributes = [])
+    public static function create(array $attributes = []): self
     {
         $log = new self;
 
@@ -183,7 +183,10 @@ class Log extends RecordAbstract
         return $logs[0]->count_id;
     }
 
-    public static function findLogs($options = [])
+    /**
+     * @return static[]
+     */
+    public static function findLogs(array $options = []): array
     {
         $instance = new self;
         if (isset($options['fields'])) {
@@ -229,7 +232,7 @@ class Log extends RecordAbstract
         return static::findLogs($options + ['limit' => 1])[0] ?? null;
     }
 
-    public static function getPublishedFilters($table, $alias)
+    public static function getPublishedFilters($table, $alias): void
     {
         // N￣o precisa
     }

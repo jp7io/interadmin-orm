@@ -24,7 +24,7 @@ class RawSql
      * @param Expression|string $value
      * @return string
      */
-    public static function toSql($value)
+    public static function toSql($value): string
     {
         if ($value instanceof Expression) {
             return (string) $value->getValue(DB::connection()->getQueryGrammar());

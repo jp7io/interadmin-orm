@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EloquentProxy extends Model
 {
-    private $record;
+    private ?\Jp7\Interadmin\RecordAbstract $record = null;
 
-    public function setRecord(RecordAbstract $record)
+    public function setRecord(RecordAbstract $record): void
     {
         $this->record = $record;
     }
@@ -21,17 +21,17 @@ class EloquentProxy extends Model
         return $this->record->$key;
     }
 
-    public function setAttribute($key, $value)
+    public function setAttribute($key, $value): never
     {
         throw new \LogicException('This proxy should be readonly');
     }
 
-    public function save(array $options = [])
+    public function save(array $options = []): never
     {
         throw new \LogicException('This proxy should be readonly');
     }
 
-    public static function query()
+    public static function query(): never
     {
         throw new \LogicException('This proxy should be readonly');
     }

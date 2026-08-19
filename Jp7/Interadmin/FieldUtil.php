@@ -22,7 +22,7 @@ class FieldUtil
     {
         $this->field = $field;
     }
-    public function __toString()
+    public function __toString(): string
     {
         return $this->field['tipo'];
     }
@@ -32,7 +32,7 @@ class FieldUtil
      *
      * @return array
      */
-    public static function getSelectTipoXtras()
+    public static function getSelectTipoXtras(): array
     {
         return ['S', 'X_tipos', 'ajax_tipos', 'radio_tipos'];
     }
@@ -41,7 +41,7 @@ class FieldUtil
      *
      * @return array
      */
-    public static function getSpecialTipoXtras()
+    public static function getSpecialTipoXtras(): array
     {
         return ['tipos_multi', 'tipos'];
     }
@@ -50,7 +50,7 @@ class FieldUtil
      *
      * @return array
      */
-    public static function getSpecialMultiXtras()
+    public static function getSpecialMultiXtras(): array
     {
         return ['registros_multi', 'tipos_multi'];
     }

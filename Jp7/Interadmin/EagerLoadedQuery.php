@@ -64,7 +64,7 @@ class EagerLoadedQuery extends Query
             return $first;
     }
 
-    public function debug($debug = true)
+    public function debug($debug = true): static
     {
         $this->debug = $debug;
 

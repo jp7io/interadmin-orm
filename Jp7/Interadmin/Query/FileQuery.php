@@ -7,7 +7,7 @@ use BadMethodCallException;
 
 class FileQuery extends BaseQuery
 {
-    protected function _isChar($field)
+    protected function _isChar($field): bool
     {
         $chars = [
             'mostrar',
@@ -43,7 +43,7 @@ class FileQuery extends BaseQuery
         return $this->build($attributes)->save();
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->provider->deprecated_getArquivos(['fields' => 'id_arquivo'] + $this->options));
     }

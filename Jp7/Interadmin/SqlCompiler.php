@@ -44,7 +44,7 @@ class SqlCompiler
         'HOUR', 'MINUTE', 'SECOND',
     ];
 
-    protected $record;
+    protected \Jp7\Interadmin\RecordAbstract $record;
 
     public function __construct(RecordAbstract $record)
     {
@@ -54,7 +54,7 @@ class SqlCompiler
     /**
      * Compiles WHERE, GROUP BY, HAVING and ORDER BY into one trailing SQL fragment.
      */
-    public function clauses(array &$options, $use_published_filters)
+    public function clauses(array &$options, $use_published_filters): string
     {
         $resolvedWhere = $this->resolve($options['where'], $options, $use_published_filters);
         if (isset($options['order'])) {
@@ -87,7 +87,7 @@ class SqlCompiler
      *
      * @return array{0: string, 1: string} [$from, $filters]
      */
-    public function from(array &$options, $use_published_filters)
+    public function from(array &$options, $use_published_filters): array
     {
         $filters = '';
         if ($use_published_filters) {
@@ -221,7 +221,7 @@ class SqlCompiler
 
                         $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
 
-                        $conditions = array_map(function ($x) use ($table) {
+                        $conditions = array_map(function ($x) use ($table): string {
                                 return $table.'.'.$x;
                             }, $relationshipData['conditions']);
 
@@ -316,7 +316,7 @@ class SqlCompiler
 
                             $joinTipo = $relationshipData['tipo'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $conditions = array_map(function ($x) use ($table) {
+                                $conditions = array_map(function ($x) use ($table): string {
                                     return $table.'.'.$x;
                                 }, $relationshipData['conditions']);
 
@@ -371,7 +371,7 @@ class SqlCompiler
      * Appends the LEFT JOIN a relation field needs, and reports which table it landed on:
      * 'tipo' for a join to tipos, 'interadmin' for one to a records table.
      */
-    public function addJoin(array &$options, $alias, $campo, $table = 'main')
+    public function addJoin(array &$options, $alias, array $campo, $table = 'main'): string
     {
         $joinTipo = $this->record->getCampoTipo($campo);
         if (!$joinTipo ) { //  || strpos($campo['tipo'], 'select_multi_') === 0
