@@ -7,26 +7,18 @@ use Jp7\Interadmin\RecordClassMap;
 class RecordTest extends TestCase
 {
     private $oldTimestamp;
-    private $oldConfig;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        global $config;
-        $this->oldConfig = $config;
         $this->oldTimestamp = Record::hasTimestamp() ? Record::getTimestamp() : null;
-
-        $config = $config ? clone $config : new stdClass;
-        $config->interadmin_preview = true;
 
         Record::setTimestamp(strtotime('2016-01-01 02:00:00'));
     }
 
     protected function tearDown(): void
     {
-        global $config;
-        $config = $this->oldConfig;
         Record::setTimestamp($this->oldTimestamp);
 
         parent::tearDown();
