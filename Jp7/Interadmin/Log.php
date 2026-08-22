@@ -18,6 +18,21 @@ use Request;
 
 /**
  * Class representing records on the table interadmin_{client name}_logs.
+ *
+ * The nine below are getAttributesNames(), which is a FIXED list here: unlike Record, a log has no
+ * campos and getAttributesAliases() is empty, so naming them is reading this class rather than
+ * guessing at a tenant's field layout. A `date_` value arrives as a Date, getMutatedAttribute()
+ * casting every string on that prefix.
+ *
+ * @property int $id_log  PK
+ * @property int $id  Parent record ID
+ * @property int $id_tipo
+ * @property string $lang
+ * @property string $action  One of the ACTION_* constants
+ * @property string $ip
+ * @property string $data  Free text: the user agent on a login, the view's start time
+ * @property int $select_user  The InterAdmin user this log belongs to
+ * @property Date $date_insert
  */
 class Log extends RecordAbstract
 {
