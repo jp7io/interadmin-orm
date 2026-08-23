@@ -17,6 +17,7 @@ namespace Jp7\Interadmin;
  * @property string $directory noticias, mediabox, can't be the type's name because it can change
  * @property int $width
  * @property int $height
+ * @property int $pages   PDF page count, 0 where nothing counted it
  * @property string $deleted   'S' or ''
  * @property string $url    getUrlAttribute() mutator
  */
