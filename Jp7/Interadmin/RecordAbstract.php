@@ -142,7 +142,7 @@ abstract class RecordAbstract
             'use_published_filters' => false,
             // Internal use
             'aliases' => $this->getAttributesAliases(),
-            'campos' => $this->getAttributesCampos(),
+            'campos' => $this->getAttributesFields(),
         ];
         $rs = $this->_executeQuery($options);
         if ($row = array_shift($rs)) {
@@ -636,7 +636,7 @@ abstract class RecordAbstract
                             $fields[$join][] = 'id';
                         }
                     }
-                    $joinTipo = $this->getCampoTipo($campos[$nome]);
+                    $joinTipo = $this->getFieldType($campos[$nome]);
                 }
                 if ($joinTipo) {
                     $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinTipo);
@@ -686,7 +686,7 @@ abstract class RecordAbstract
      *
      * @see SqlCompiler
      */
-    abstract public function getCampoTipo($campo);
+    abstract public function getFieldType($campo);
 
     /**
      * Maps one of this record's field aliases to its physical column.
@@ -863,14 +863,7 @@ abstract class RecordAbstract
         }
     }
 
-    /**
-     * Returns the Type for a field.
-     *
-     * @param object $campo
-     *
-     * @return Type
-     */
-    abstract public function getAttributesCampos();
+    abstract public function getAttributesFields();
     abstract public function getAttributesNames();
     abstract public function getAttributesAliases();
     abstract public function getAdminAttributes();

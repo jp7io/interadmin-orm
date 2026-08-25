@@ -86,7 +86,7 @@ class DynamicLoader
         if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
 //            $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
 //            $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
-//            $retorno = self::_getCampoTypeClass($tipo->getCampoTipo($campo), $isTipo, $isMulti);
+//            $retorno = self::_getCampoTypeClass($tipo->getFieldType($campo), $isTipo, $isMulti);
             $type = 'int';
         } elseif (strpos($campo['tipo'], 'select_') === 0) {
 //            $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);

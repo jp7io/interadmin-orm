@@ -192,7 +192,7 @@ class FileRecord extends RecordAbstract
     {
         return [];
     }
-    public function getAttributesCampos(): array
+    public function getAttributesFields(): array
     {
         return [];
     }
@@ -216,9 +216,9 @@ class FileRecord extends RecordAbstract
     }
 
     /**
-     * @see RecordAbstract::getCampoTipo()
+     * @see RecordAbstract::getFieldType()
      */
-    public function getCampoTipo($campo): void
+    public function getFieldType($campo): void
     {
         return;
     }

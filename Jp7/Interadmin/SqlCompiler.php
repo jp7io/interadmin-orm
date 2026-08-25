@@ -301,20 +301,20 @@ class SqlCompiler
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->addJoin($options, $table, $campos[$joinNome]);
                             }
-                            $joinTipo = $this->record->getCampoTipo($campos[$joinNome]);
+                            $joinTipo = $this->record->getFieldType($campos[$joinNome]);
                         // Joins de select_multi
                         } elseif (isset($aliases[$joinNome.'_ids']) && isset($campos[$aliases[$joinNome.'_ids']])) {
                             $joinNome = $aliases[$joinNome.'_ids'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->addJoin($options, $table, $campos[$joinNome]);
                             }
-                            $joinTipo = $this->record->getCampoTipo($campos[$joinNome]);
+                            $joinTipo = $this->record->getFieldType($campos[$joinNome]);
                         // Joins de special
                         } elseif (isset($campos[$joinNome])) {
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->addJoin($options, $table, $campos[$joinNome]);
                             }
-                            $joinTipo = $this->record->getCampoTipo($campos[$joinNome]);
+                            $joinTipo = $this->record->getFieldType($campos[$joinNome]);
                         } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
                             $relationshipData = $options['model']->$joinNome()->getRelationshipData();
 
@@ -349,7 +349,7 @@ class SqlCompiler
                         $termo = $termo.'_id';
 
                         $subCampos = $joinTipo->getFields();
-                        $subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
+                        $subJoinTipo = $joinTipo->getFieldType($subCampos[$joinAliases[$termo]]);
 
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (!in_array($subtable, $options['from_alias'])) {
@@ -380,7 +380,7 @@ class SqlCompiler
      */
     public function addJoin(array &$options, $alias, array $campo, $table = 'main'): string
     {
-        $joinTipo = $this->record->getCampoTipo($campo);
+        $joinTipo = $this->record->getFieldType($campo);
         if (!$joinTipo ) { //  || strpos($campo['tipo'], 'select_multi_') === 0
             throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
         }

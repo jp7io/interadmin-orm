@@ -854,7 +854,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' ordem';
         // Internal use
         $options['aliases'] = $arquivoModel->getAttributesAliases();
-        $options['campos'] = $arquivoModel->getAttributesCampos();
+        $options['campos'] = $arquivoModel->getAttributesFields();
 
         $rs = $this->_executeQuery($options);
 
@@ -968,13 +968,13 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         return $this->getType()->getFieldNames();
     }
-    public function getAttributesCampos()
+    public function getAttributesFields()
     {
         return $this->getType()->getFields();
     }
-    final public function getCampoTipo($campo)
+    final public function getFieldType($campo)
     {
-        return $this->getType()->getCampoTipo($campo);
+        return $this->getType()->getFieldType($campo);
     }
     public function getAttributesAliases()
     {

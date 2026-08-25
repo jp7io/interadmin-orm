@@ -146,7 +146,7 @@ class Log extends RecordAbstract
     {
         return [];
     }
-    public function getAttributesCampos(): array
+    public function getAttributesFields(): array
     {
         return [];
     }
@@ -159,9 +159,9 @@ class Log extends RecordAbstract
         return $this->getDb()->getTablePrefix().'logs';
     }
     /**
-     * @see RecordAbstract::getCampoTipo()
+     * @see RecordAbstract::getFieldType()
      */
-    public function getCampoTipo($campo): void
+    public function getFieldType($campo): void
     {
         return;
     }
@@ -219,7 +219,7 @@ class Log extends RecordAbstract
         }
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();
-        $options['campos'] = $instance->getAttributesCampos();
+        $options['campos'] = $instance->getAttributesFields();
 
         $rs = $instance->_executeQuery($options);
         $logs = [];

@@ -355,7 +355,7 @@ class Type extends RecordAbstract
         // Internal use
         $options['from'] = $this->getTableName().' AS main';
         $options['aliases'] = $this->getAttributesAliases();
-        $options['campos'] = $this->getAttributesCampos();
+        $options['campos'] = $this->getAttributesFields();
 
         $rs = self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, function () use ($options) {
             return $this->_executeQuery($options);
@@ -706,7 +706,7 @@ class Type extends RecordAbstract
     public function getRelationships()
     {
         if ($this->_interadminRelationships === null) {
-            // getCampoTipo might be different for each class
+            // getFieldType might be different for each class
             $cacheKey = static::class.','.$this->getCacheKey('relationships');
             $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, function () {
                 $relationships = [];
@@ -736,7 +736,7 @@ class Type extends RecordAbstract
                         } else {
                             $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
                         }
-                        if ($specialTipo = $this->getCampoTipo($array)) {
+                        if ($specialTipo = $this->getFieldType($array)) {
                             $query = $specialTipo->records();
                         } else {
                             $query = new TypelessQuery(static::getInstance(0));
@@ -761,7 +761,7 @@ class Type extends RecordAbstract
      *
      * @return Type|null Null when the field stores no type, which callers test for.
      */
-    public function getCampoTipo($campo)
+    public function getFieldType($campo)
     {
         if (is_object($campo['nome'])) {
             return $campo['nome'];
@@ -770,14 +770,14 @@ class Type extends RecordAbstract
         }
     }
 
-    public function getCampoTipoByAlias($alias)
+    public function getFieldTypeByAlias($alias)
     {
         $campos = $this->getFields();
         $aliases = array_flip($this->getFieldAliases());
 
         $nomeCampo = $aliases[$alias] ? $aliases[$alias] : $alias;
 
-        return $this->getCampoTipo($campos[$nomeCampo]);
+        return $this->getFieldType($campos[$nomeCampo]);
     }
     /**
      * Returns this object´s nome.
@@ -936,7 +936,7 @@ class Type extends RecordAbstract
         return $this->getColumns();
     }
 
-    public function getAttributesCampos()
+    public function getAttributesFields()
     {
         return [];
     }
@@ -1346,7 +1346,7 @@ class Type extends RecordAbstract
 
         // Internal use
         $options['aliases'] = $recordModel->getAttributesAliases();
-        $options['campos'] = $recordModel->getAttributesCampos();
+        $options['campos'] = $recordModel->getAttributesFields();
         $options['model'] = $recordModel;
         $options['eager_load'] = [];
 

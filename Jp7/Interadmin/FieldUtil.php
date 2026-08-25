@@ -61,7 +61,7 @@ class FieldUtil
      *
      * @return string
      */
-    public static function getCampoHeader($campo)
+    public static function getFieldHeader($campo)
     {
         $key = $campo['tipo'];
         if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
