@@ -275,7 +275,7 @@ class SqlCompiler
 
                             $options['auto_group_flag'] = true;
                         }
-                        $joinAliases = array_flip($joinTipo->getCamposAlias());
+                        $joinAliases = array_flip($joinTipo->getFieldAliases());
 
                     // Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
                     } elseif ($table == 'tags') {
@@ -335,7 +335,7 @@ class SqlCompiler
                             throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
                         }
                         if ($joinTipo instanceof Type) {
-                            $joinAliases = array_flip($joinTipo->getCamposAlias());
+                            $joinAliases = array_flip($joinTipo->getFieldAliases());
                         } else {
                             $joinAliases = [];
                         }
@@ -348,7 +348,7 @@ class SqlCompiler
                         $subtable = $table.'__'.$termo;
                         $termo = $termo.'_id';
 
-                        $subCampos = $joinTipo->getCampos();
+                        $subCampos = $joinTipo->getFields();
                         $subJoinTipo = $joinTipo->getCampoTipo($subCampos[$joinAliases[$termo]]);
 
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
@@ -361,7 +361,7 @@ class SqlCompiler
 
                         $table = $subtable;
                         $termo = $subtermo;
-                        $joinAliases = array_flip($subJoinTipo->getCamposAlias());
+                        $joinAliases = array_flip($subJoinTipo->getFieldAliases());
                     }
                     $campo = $this->record->_aliasToColumn($termo, $joinAliases);
                 }

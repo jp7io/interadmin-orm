@@ -966,11 +966,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
     public function getAttributesNames()
     {
-        return $this->getType()->getCamposNames();
+        return $this->getType()->getFieldNames();
     }
     public function getAttributesCampos()
     {
-        return $this->getType()->getCampos();
+        return $this->getType()->getFields();
     }
     final public function getCampoTipo($campo)
     {
@@ -978,7 +978,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
     public function getAttributesAliases()
     {
-        return $this->getType()->getCamposAlias();
+        return $this->getType()->getFieldAliases();
     }
     public function getTableName()
     {
@@ -1169,7 +1169,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function getStringValue()
     {
-        $camposCombo = $this->getType()->getCamposCombo();
+        $camposCombo = $this->getType()->getComboFieldNames();
         if (!$camposCombo) {
             return $this->id;
         }
@@ -1215,7 +1215,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function getRules()
     {
         $rules = [];
-        foreach ($this->getType()->getCampos() as $campo) {
+        foreach ($this->getType()->getFields() as $campo) {
             if ($campo['form']) {
                 $alias = $campo['nome_id'];
 
@@ -1263,7 +1263,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         $fillable = [];
 
-        foreach ($this->getType()->getCampos() as $campo) {
+        foreach ($this->getType()->getFields() as $campo) {
             if ($campo['form']) {
                 $fillable[] = $campo['nome_id'];
             }

@@ -645,8 +645,8 @@ abstract class RecordAbstract
                     $joinOptions = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
-                        'campos' => $joinTipo->getCampos(),
-                        'aliases' => array_flip($joinTipo->getCamposAlias()),
+                        'campos' => $joinTipo->getFields(),
+                        'aliases' => array_flip($joinTipo->getFieldAliases()),
                     ];
                     $this->_resolveFieldsAlias($joinOptions, $join.'.');
                     foreach ($joinOptions['fields'] as $joinField) {
@@ -891,7 +891,7 @@ abstract class RecordAbstract
      *
      * Keeping it wedges the whole tenant instead of the one call that failed. Type's attribute
      * names ARE this listing, so an empty one stops Type::__get() recognising `campos` as a
-     * column; the tipos row then never lazy-loads, getCampos() parses '' into an empty field
+     * column; the tipos row then never lazy-loads, getFields() parses '' into an empty field
      * map, and every relation field throws out of _resolveFieldsAlias(). It reads as a schema
      * problem while the schema is perfectly fine. Nor does the TTL bound it: remember() rewrote
      * the empty value on every miss, so a condition that recurs kept the poison topped up.
