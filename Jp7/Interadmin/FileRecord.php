@@ -218,7 +218,7 @@ class FileRecord extends RecordAbstract
     /**
      * @see RecordAbstract::getFieldType()
      */
-    public function getFieldType($campo): void
+    public function getFieldType($field): void
     {
         return;
     }

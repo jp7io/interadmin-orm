@@ -592,18 +592,18 @@ abstract class RecordAbstract
         $aliases = &$options['aliases'];
         $fields = $options['fields'];
 
-        foreach ($fields as $key => $campo) {
+        foreach ($fields as $key => $field) {
             // Traduzindo 'join.campo' para 'join' => array('campo')
-            if (is_string($campo) && strpos($campo, '.') !== false && strpos($campo, '(') === false) {
-                list($join, $nome) = explode('.', $campo);
+            if (is_string($field) && strpos($field, '.') !== false && strpos($field, '(') === false) {
+                list($join, $nome) = explode('.', $field);
                 $fields[$join][] = $nome;
                 unset($fields[$key]);
             }
         }
 
-        foreach ($fields as $join => $campo) {
+        foreach ($fields as $join => $field) {
             // Com join
-            if (is_array($campo)) {
+            if (is_array($field)) {
                 //$nome = isset($aliases[$join]) ? $aliases[$join] : $join;
 
                 // Join e Recursividade
@@ -656,18 +656,18 @@ abstract class RecordAbstract
                 unset($fields[$join]);
 
             // Com função
-            } elseif (strpos($campo, '(') !== false || strpos($campo, ' ') !== false) {
-                if (strpos($campo, ' AS ') === false) {
-                    $aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
+            } elseif (strpos($field, '(') !== false || strpos($field, ' ') !== false) {
+                if (strpos($field, ' AS ') === false) {
+                    $aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $field)), '_');
                 } else {
-                    $parts = explode(' AS ', $campo);
+                    $parts = explode(' AS ', $field);
                     $aggregateAlias = array_pop($parts);
-                    $campo = implode(' AS ', $parts);
+                    $field = implode(' AS ', $parts);
                 }
-                $fields[$join] = $this->_resolveSql($campo, $options, true).' AS `'.$table.$aggregateAlias.'`';
+                $fields[$join] = $this->_resolveSql($field, $options, true).' AS `'.$table.$aggregateAlias.'`';
             // Sem join
             } else {
-                $nome = $this->_aliasToColumn($campo, $aliases);
+                $nome = $this->_aliasToColumn($field, $aliases);
                 if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
                     $fields[] = $table.$nome.'_text';
                 }
@@ -686,7 +686,7 @@ abstract class RecordAbstract
      *
      * @see SqlCompiler
      */
-    abstract public function getFieldType($campo);
+    abstract public function getFieldType($field);
 
     /**
      * Maps one of this record's field aliases to its physical column.
@@ -709,9 +709,9 @@ abstract class RecordAbstract
     /**
      * @see SqlCompiler::addJoin()
      */
-    protected function _addJoinAlias(array &$options, $alias, $campo, $table = 'main')
+    protected function _addJoinAlias(array &$options, $alias, $field, $table = 'main')
     {
-        return $this->sqlCompiler()->addJoin($options, $alias, $campo, $table);
+        return $this->sqlCompiler()->addJoin($options, $alias, $field, $table);
     }
     /**
      * Associates the values on a SQL RecordSet with the fields and insert them on the attributes array.

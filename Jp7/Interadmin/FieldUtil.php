@@ -57,26 +57,26 @@ class FieldUtil
     /**
      * Retorna o valor do campo no header (cabeçalho da listagem).
      *
-     * @param array $campo
+     * @param array $field
      *
      * @return string
      */
-    public static function getFieldHeader($campo)
+    public static function getFieldHeader($field)
     {
-        $key = $campo['tipo'];
+        $key = $field['tipo'];
         if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
-            if (!is_callable($campo['nome'])) {
-                return 'Função '.$campo['nome'].' não encontrada.';
+            if (!is_callable($field['nome'])) {
+                return 'Função '.$field['nome'].' não encontrada.';
             }
-            return call_user_func($campo['nome'], $campo, '', 'header');
+            return call_user_func($field['nome'], $field, '', 'header');
         }
         if (strpos($key, 'select_') === 0) {
-            if ($campo['label']) {
-                return $campo['label'];
+            if ($field['label']) {
+                return $field['label'];
             }
             // Type::getFields() resolves a select_'s `nome` to a Type; only 'all' stays a string.
-            return $campo['nome'] instanceof Type ? $campo['nome']->nome : 'Tipos';
+            return $field['nome'] instanceof Type ? $field['nome']->nome : 'Tipos';
         }
-        return $campo['nome'];
+        return $field['nome'];
     }
 }

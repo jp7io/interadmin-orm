@@ -444,30 +444,30 @@ class Type extends RecordAbstract
 
     public function deprecated_max($column, $options = [])
     {
-        $retorno = $this->deprecated_aggregate('MAX', $column, $options);
+        $result = $this->deprecated_aggregate('MAX', $column, $options);
 
-        return $retorno[0];
+        return $result[0];
     }
 
     public function deprecated_min($column, $options = [])
     {
-        $retorno = $this->deprecated_aggregate('MIN', $column, $options);
+        $result = $this->deprecated_aggregate('MIN', $column, $options);
 
-        return $retorno[0];
+        return $result[0];
     }
 
     public function deprecated_sum($column, $options = [])
     {
-        $retorno = $this->deprecated_aggregate('SUM', $column, $options);
+        $result = $this->deprecated_aggregate('SUM', $column, $options);
 
-        return $retorno[0];
+        return $result[0];
     }
 
     public function deprecated_avg($column, $options = [])
     {
-        $retorno = $this->deprecated_aggregate('AVG', $column, $options);
+        $result = $this->deprecated_aggregate('AVG', $column, $options);
 
-        return $retorno[0];
+        return $result[0];
     }
 
     public function deprecated_aggregate($function, $column, $options)
@@ -621,7 +621,7 @@ class Type extends RecordAbstract
                 }
             }
             // Alias
-            foreach ($A as $campo => $array) {
+            foreach ($A as $column => $array) {
                 if (empty($array['nome_id'])) {
                     // Gerar nome_id
                     $alias = $array['nome'];
@@ -630,21 +630,21 @@ class Type extends RecordAbstract
                     }
                     if (!$alias) {
                         throw new UnexpectedValueException('An alias was expected.');
-                        //$alias = $campo;
+                        //$alias = $column;
                     }
-                    $A[$campo]['nome_id'] = to_slug($alias, '_');
+                    $A[$column]['nome_id'] = to_slug($alias, '_');
                 }
-                if (strpos($campo, 'select_') === 0) {
-                    if (strpos($campo, 'select_multi_') === 0) {
-                        $A[$campo]['nome_id'] .= '_ids';
+                if (strpos($column, 'select_') === 0) {
+                    if (strpos($column, 'select_multi_') === 0) {
+                        $A[$column]['nome_id'] .= '_ids';
                     } else {
-                        $A[$campo]['nome_id'] .= '_id';
+                        $A[$column]['nome_id'] .= '_id';
                     }
-                } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
+                } elseif (strpos($column, 'special_') === 0 && $array['xtra']) {
                     if (in_array($array['xtra'], FieldUtil::getSpecialMultiXtras())) {
-                        $A[$campo]['nome_id'] .= '_ids';
+                        $A[$column]['nome_id'] .= '_ids';
                     } else {
-                        $A[$campo]['nome_id'] .= '_id';
+                        $A[$column]['nome_id'] .= '_id';
                     }
                 }
             }
@@ -679,11 +679,11 @@ class Type extends RecordAbstract
         if (!$this->_interadminAliases) {
             $this->_interadminAliases = $this->getCache('campos_alias', function () {
                 $aliases = [];
-                foreach ($this->getFields() as $campo => $array) {
-                    if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
+                foreach ($this->getFields() as $column => $array) {
+                    if (strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0) {
                         continue;
                     }
-                    $aliases[$campo] = $array['nome_id'];
+                    $aliases[$column] = $array['nome_id'];
                 }
                 return $aliases;
             });
@@ -698,8 +698,8 @@ class Type extends RecordAbstract
 
     public function getComboFieldNames()
     {
-        return array_keys(array_filter($this->getFields(), function ($campo) {
-            return (bool) $campo['combo'] || $campo['tipo'] === 'varchar_key';
+        return array_keys(array_filter($this->getFields(), function ($field) {
+            return (bool) $field['combo'] || $field['tipo'] === 'varchar_key';
         }));
     }
 
@@ -711,12 +711,12 @@ class Type extends RecordAbstract
             $this->_interadminRelationships = self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, function () {
                 $relationships = [];
 
-                foreach ($this->getFields() as $campo => $array) {
-                    if (strpos($campo, 'tit_') === 0 || strpos($campo, 'func_') === 0) {
+                foreach ($this->getFields() as $column => $array) {
+                    if (strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0) {
                         continue;
                     }
-                    if (strpos($campo, 'select_') === 0) {
-                        $multi = strpos($campo, 'select_multi_') === 0;
+                    if (strpos($column, 'select_') === 0) {
+                        $multi = strpos($column, 'select_multi_') === 0;
                         $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
                         if ($multi) {
                             $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
@@ -728,7 +728,7 @@ class Type extends RecordAbstract
                             'type' => $hasType,
                             'multi' => $multi,
                         ];
-                    } elseif (strpos($campo, 'special_') === 0 && $array['xtra']) {
+                    } elseif (strpos($column, 'special_') === 0 && $array['xtra']) {
                         $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
                         $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
                         if ($multi) {
@@ -757,15 +757,15 @@ class Type extends RecordAbstract
     /**
      * Returns the Type for a field.
      *
-     * @param object $campo
+     * @param object $field
      *
      * @return Type|null Null when the field stores no type, which callers test for.
      */
-    public function getFieldType($campo)
+    public function getFieldType($field)
     {
-        if (is_object($campo['nome'])) {
-            return $campo['nome'];
-        } elseif ($campo['nome'] == 'all') {
+        if (is_object($field['nome'])) {
+            return $field['nome'];
+        } elseif ($field['nome'] == 'all') {
             return new self;
         }
     }
@@ -775,9 +775,9 @@ class Type extends RecordAbstract
         $campos = $this->getFields();
         $aliases = array_flip($this->getFieldAliases());
 
-        $nomeCampo = $aliases[$alias] ? $aliases[$alias] : $alias;
+        $columnName = $aliases[$alias] ? $aliases[$alias] : $alias;
 
-        return $this->getFieldType($campos[$nomeCampo]);
+        return $this->getFieldType($campos[$columnName]);
     }
     /**
      * Returns this object´s nome.
@@ -814,7 +814,7 @@ class Type extends RecordAbstract
         $this->date_modify = date('c');
         // Inheritance
         $this->syncInheritance();
-        $retorno = $this->saveRaw();
+        $result = $this->saveRaw();
 
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->id_tipo) {
@@ -828,7 +828,7 @@ class Type extends RecordAbstract
             }
         }
 
-        return $retorno;
+        return $result;
     }
 
     protected function _update($attributes)
@@ -849,15 +849,15 @@ class Type extends RecordAbstract
         // Atualizando cache com dados do modelo
         if ($this->model_id_tipo) {
             if (is_numeric($this->model_id_tipo)) {
-                $modelo = new self($this->model_id_tipo);
+                $model = new self($this->model_id_tipo);
             } else {
                 $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
-                $modelo = new $className();
+                $model = new $className();
             }
             foreach (self::$inheritedFields as $field) {
-                if (($modelo->$field && !$this->$field) || in_array($field, self::$privateFields)) {
+                if (($model->$field && !$this->$field) || in_array($field, self::$privateFields)) {
                     $this->inherited[] = $field;
-                    $this->$field = $modelo->$field;
+                    $this->$field = $model->$field;
                 }
             }
         }

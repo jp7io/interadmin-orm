@@ -504,8 +504,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 // operation". It is a fatal on any process that keeps more than 50
                 // collections alive at once -- a page that builds that many, or a
                 // worker rendering for one user after another.
-                foreach (array_slice(array_keys(self::$_collections), 0, 10) as $antiga) {
-                    unset(self::$_collections[$antiga]);
+                foreach (array_slice(array_keys(self::$_collections), 0, 10) as $oldest) {
+                    unset(self::$_collections[$oldest]);
                 }
             }
             $collection->onDestruct(function () use ($collection_id) {
@@ -972,9 +972,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         return $this->getType()->getFields();
     }
-    final public function getFieldType($campo)
+    final public function getFieldType($field)
     {
-        return $this->getType()->getFieldType($campo);
+        return $this->getType()->getFieldType($field);
     }
     public function getAttributesAliases()
     {
@@ -1169,22 +1169,22 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function getStringValue()
     {
-        $camposCombo = $this->getType()->getComboFieldNames();
-        if (!$camposCombo) {
+        $comboColumns = $this->getType()->getComboFieldNames();
+        if (!$comboColumns) {
             return $this->id;
         }
         $stringValue = [];
-        foreach ($camposCombo as $campoCombo) {
-            if (str_starts_with($campoCombo, 'file_')) {
+        foreach ($comboColumns as $comboColumn) {
+            if (str_starts_with($comboColumn, 'file_')) {
                 continue;
             }
-            if (str_starts_with($campoCombo, 'select_')) {
-                if ($relation = $this->relationFromColumn($campoCombo)) {
+            if (str_starts_with($comboColumn, 'select_')) {
+                if ($relation = $this->relationFromColumn($comboColumn)) {
                     $stringValue[] = $relation->getName();
                 }
                 continue;
             }
-            $stringValue[] = $this->$campoCombo;
+            $stringValue[] = $this->$comboColumn;
         }
 
         return implode(' - ', array_filter($stringValue));
@@ -1215,20 +1215,20 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function getRules()
     {
         $rules = [];
-        foreach ($this->getType()->getFields() as $campo) {
-            if ($campo['form']) {
-                $alias = $campo['nome_id'];
+        foreach ($this->getType()->getFields() as $field) {
+            if ($field['form']) {
+                $alias = $field['nome_id'];
 
-                if ($campo['obrigatorio']) {
+                if ($field['obrigatorio']) {
                     $rules[$alias][] = 'required';
                 }
-                if ($campo['xtra'] === 'email' || $campo['xtra'] === 'id_email') {
+                if ($field['xtra'] === 'email' || $field['xtra'] === 'id_email') {
                     $rules[$alias][] = 'email';
                 }
-                if (str_starts_with($campo['tipo'], 'int_')) {
+                if (str_starts_with($field['tipo'], 'int_')) {
                     $rules[$alias][] = 'integer';
                 }
-                if (str_starts_with($campo['tipo'], 'date_')) {
+                if (str_starts_with($field['tipo'], 'date_')) {
                     $rules[$alias][] = 'date_format:Y-m-d';
                 }
             }
@@ -1263,9 +1263,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         $fillable = [];
 
-        foreach ($this->getType()->getFields() as $campo) {
-            if ($campo['form']) {
-                $fillable[] = $campo['nome_id'];
+        foreach ($this->getType()->getFields() as $field) {
+            if ($field['form']) {
+                $fillable[] = $field['nome_id'];
             }
         }
 

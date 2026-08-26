@@ -158,28 +158,28 @@ class SqlCompiler
         ];
 
         while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
-            list($termo, $pos) = $matches[1];
+            list($term, $pos) = $matches[1];
             // Resolvendo true e false para char
-            if (CharBooleanRewriter::handles($termo)) {
-                list($clause, $offset) = CharBooleanRewriter::rewrite($clause, $termo, $pos);
+            if (CharBooleanRewriter::handles($term)) {
+                list($clause, $offset) = CharBooleanRewriter::rewrite($clause, $term, $pos);
                 continue;
             }
 
-            if ($termo === 'FROM') {
+            if ($term === 'FROM') {
                 $insideFrom = true;
             }
             if ($insideFrom) {
-                if ($termo === 'WHERE') { // join ainda nao suportado
+                if ($term === 'WHERE') { // joins are not supported here yet
                     $insideFrom = false;
                 }
-                $offset = $pos + strlen($termo);
+                $offset = $pos + strlen($term);
                 continue;
             }
 
             // Joins com EXISTS
-            if ($termo == 'EXISTS') {
-                $inicio = substr($clause, 0, $pos + strlen($termo));
-                $existsClause = substr($clause, $pos + strlen($termo));
+            if ($term == 'EXISTS') {
+                $start = substr($clause, 0, $pos + strlen($term));
+                $existsClause = substr($clause, $pos + strlen($term));
                 if (preg_match('/^([\( ]+)('.$keyword.')([ ]+)(WHERE)?/', $existsClause, $existsMatches)) {
                     $table = $existsMatches[2];
                     // TODO unificar logica
@@ -231,27 +231,27 @@ class SqlCompiler
                             (($existsMatches[4]) ? ' AND ' : '');
                     }
 
-                    $inicioRep = $inicio.$existsMatches[1].$existsMatches[2].$existsMatches[3];
-                    $clause = $inicioRep.substr($clause, strlen($inicio.$existsMatches[0]));
-                    $offset = strlen($inicioRep);
+                    $startRep = $start.$existsMatches[1].$existsMatches[2].$existsMatches[3];
+                    $clause = $startRep.substr($clause, strlen($start.$existsMatches[0]));
+                    $offset = strlen($startRep);
 
                     $ignoreJoinsUntil = $offset;
                     continue;
                 }
             }
 
-            if (!in_array($termo[0], ["'", '"', ":"]) && !is_numeric($termo) && !in_array(strtoupper($termo), static::RESERVED)) {
-                $len = strlen($termo);
+            if (!in_array($term[0], ["'", '"', ":"]) && !is_numeric($term) && !in_array(strtoupper($term), static::RESERVED)) {
+                $len = strlen($term);
                 $table = 'main';
                 // Reset per term: both survive an iteration otherwise, so a term that skips
                 // the branch assigning them would compile a join off the PREVIOUS term's type.
-                $subtermo = null;
+                $subTerm = null;
                 $joinTipo = null;
-                if (strpos($termo, '.') !== false) {
-                    list($table, $termo, $subtermo) = explode('.', $termo) + [2 => null];
+                if (strpos($term, '.') !== false) {
+                    list($table, $term, $subTerm) = explode('.', $term) + [2 => null];
                 }
                 if ($table === 'main') {
-                    $campo = $this->record->_aliasToColumn($termo, $aliases);
+                    $column = $this->record->_aliasToColumn($term, $aliases);
                 } else {
                     if (!isset($childrenArr)) {
                         $childrenArr = $this->record->getInterAdminsChildren();
@@ -291,7 +291,7 @@ class SqlCompiler
                         $joinNome = isset($aliases[$table]) ? $aliases[$table] : $table;
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (isset($options['joins'][$table])) {
-                            if ($subtermo) {
+                            if ($subTerm) {
                                 $options['pre_joins'][$table] = true;
                             }
                             $joinTipo = $options['joins'][$table][1];
@@ -341,34 +341,34 @@ class SqlCompiler
                         }
                     }
                     // TEMPORARIO FIXME, necessario melhor maneira
-                    if ($subtermo) {
+                    if ($subTerm) {
                         if (!$joinTipo instanceof Type) {
-                            throw new Exception('The field "'.$table.'.'.$termo.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
+                            throw new Exception('The field "'.$table.'.'.$term.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
                         }
-                        $subtable = $table.'__'.$termo;
-                        $termo = $termo.'_id';
+                        $subtable = $table.'__'.$term;
+                        $term = $term.'_id';
 
                         $subCampos = $joinTipo->getFields();
-                        $subJoinTipo = $joinTipo->getFieldType($subCampos[$joinAliases[$termo]]);
+                        $subJoinTipo = $joinTipo->getFieldType($subCampos[$joinAliases[$term]]);
 
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (!in_array($subtable, $options['from_alias'])) {
                             $options['from_alias'][] = $subtable;
                             $options['from'][] = ' LEFT JOIN '.$subJoinTipo->getInterAdminsTableName().
-                                ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$termo].
+                                ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$term].
                                 ' AND '.$subtable.'.id_tipo = '.$subJoinTipo->id_tipo;
                         }
 
                         $table = $subtable;
-                        $termo = $subtermo;
+                        $term = $subTerm;
                         $joinAliases = array_flip($subJoinTipo->getFieldAliases());
                     }
-                    $campo = $this->record->_aliasToColumn($termo, $joinAliases);
+                    $column = $this->record->_aliasToColumn($term, $joinAliases);
                 }
-                $termo = $table.'.'.$campo;
-                $clause = substr_replace($clause, $termo, $pos, $len);
+                $term = $table.'.'.$column;
+                $clause = substr_replace($clause, $term, $pos, $len);
             }
-            $offset = $pos + strlen($termo);
+            $offset = $pos + strlen($term);
         }
 
         return $clause;
@@ -378,16 +378,16 @@ class SqlCompiler
      * Appends the LEFT JOIN a relation field needs, and reports which table it landed on:
      * 'tipo' for a join to tipos, 'interadmin' for one to a records table.
      */
-    public function addJoin(array &$options, $alias, array $campo, $table = 'main'): string
+    public function addJoin(array &$options, $alias, array $field, $table = 'main'): string
     {
-        $joinTipo = $this->record->getFieldType($campo);
-        if (!$joinTipo ) { //  || strpos($campo['tipo'], 'select_multi_') === 0
+        $joinTipo = $this->record->getFieldType($field);
+        if (!$joinTipo ) { //  || strpos($field['tipo'], 'select_multi_') === 0
             throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
 
-        $column = $campo['tipo'];
-        $xtra = $campo['xtra'];
+        $column = $field['tipo'];
+        $xtra = $field['xtra'];
         $isMulti = strpos($column, 'select_multi_') === 0 || in_array($xtra, FieldUtil::getSpecialMultiXtras());
         if (in_array($xtra, FieldUtil::getSelectTipoXtras()) || in_array($xtra, FieldUtil::getSpecialTipoXtras())) {
             $options['from'][] = ' LEFT JOIN '.$joinTipo->getTableName().
