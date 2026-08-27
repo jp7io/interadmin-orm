@@ -372,7 +372,6 @@ abstract class RecordAbstract
      */
     protected function _executeQuery($options, $_stmt = false, $_valuesToSave = []) // , &$select_multi_fields = []
     {
-        //global $debugger;
         $db = $this->getDb();
         $APP_DEBUG = getenv('APP_DEBUG');
 
@@ -541,10 +540,6 @@ abstract class RecordAbstract
         //        break;
         //    }
         //}
-        if (!isset($GLOBALS['__queries'])) {
-            $GLOBALS['__queries'] = 0;
-        }
-        $GLOBALS['__queries']++;
         \Log::debug($sql.PHP_EOL.'/* '.$caller.' - '.$ms($startQuery).' - '.$callee.' */');
     }
 
