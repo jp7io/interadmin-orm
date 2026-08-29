@@ -1,8 +1,8 @@
 <?php
 
-namespace Jp7\Interadmin\Query;
+namespace Jp7\InterAdmin\Query;
 
-use Jp7\Interadmin\FileRecord;
+use Jp7\InterAdmin\FileRecord;
 use BadMethodCallException;
 
 class FileQuery extends BaseQuery

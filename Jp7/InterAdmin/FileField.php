@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 /**
  * Handles the url of uploaded files retrieved from the database.

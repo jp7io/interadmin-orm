@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 use Illuminate\Support\Str;
 use Jp7\Laravel\RouterFacade as r;

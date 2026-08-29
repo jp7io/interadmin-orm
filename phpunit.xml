@@ -14,7 +14,7 @@
     </testsuites>
     <source>
         <include>
-            <directory>Jp7/Interadmin</directory>
+            <directory>Jp7/InterAdmin</directory>
         </include>
     </source>
 </phpunit>

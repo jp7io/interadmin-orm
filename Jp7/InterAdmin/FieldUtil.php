@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 /**
  * Generates the HTML output for a field based on its type, such as varchar, int or text.

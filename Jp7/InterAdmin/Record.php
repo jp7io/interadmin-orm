@@ -1,8 +1,8 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
-use Jp7\Interadmin\Relation\HasMany;
+use Jp7\InterAdmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Str;
@@ -808,7 +808,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         $className = static::DEFAULT_NAMESPACE.'FileRecord';
         if (!class_exists($className)) {
-            $className = 'Jp7\\Interadmin\\FileRecord';
+            $className = 'Jp7\\InterAdmin\\FileRecord';
         }
         $arquivo = new $className();
         $arquivo->setParent($this);
@@ -835,7 +835,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             $className = static::DEFAULT_NAMESPACE.'FileRecord';
         }
         if (!class_exists($className)) {
-            $className = 'Jp7\\Interadmin\\FileRecord';
+            $className = 'Jp7\\InterAdmin\\FileRecord';
         }
         $arquivoModel = new $className(0);
         $arquivoModel->setType($this->getType());

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Jp7\Interadmin\RecordClassMap;
+use Jp7\InterAdmin\RecordClassMap;
 
 class ResultTest extends TestCase
 {

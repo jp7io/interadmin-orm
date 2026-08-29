@@ -1,10 +1,10 @@
 <?php
 
-use Jp7\Interadmin\Query;
-use Jp7\Interadmin\Query\BaseQuery;
-use Jp7\Interadmin\Query\TypeQuery;
-use Jp7\Interadmin\Record;
-use Jp7\Interadmin\Type;
+use Jp7\InterAdmin\Query;
+use Jp7\InterAdmin\Query\BaseQuery;
+use Jp7\InterAdmin\Query\TypeQuery;
+use Jp7\InterAdmin\Record;
+use Jp7\InterAdmin\Type;
 
 /**
  * The `@method static` tags on Type and Record are the only written form of an API PHP resolves

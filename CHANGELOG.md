@@ -1,8 +1,8 @@
 ## 4.0
 * Removed the pre-namespace shim: `InterAdmin`, `InterAdminTipo`, `InterAdminArquivo`, `InterAdminArquivoBanco` and `InterAdminAbstract`, with the `legacy` classmap entry and DynamicLoader's `X_Record -> X_InterAdmin` name bridge.
 * Breaking changes:
-  * `new InterAdminTipo($id)` -> `Jp7\Interadmin\Type::getInstance($id)`, or `new Tenant\Type($id)` where the tenant subclass matters.
-  * `new InterAdmin($id, $options)` -> `Jp7\Interadmin\Record::__construct(array $attributes = [], $type = null)`. The 2.x signature has been a TypeError since 3.0, so any surviving call was already fatal.
+  * `new InterAdminTipo($id)` -> `Jp7\InterAdmin\Type::getInstance($id)`, or `new Tenant\Type($id)` where the tenant subclass matters.
+  * `new InterAdmin($id, $options)` -> `Jp7\InterAdmin\Record::__construct(array $attributes = [], $type = null)`. The 2.x signature has been a TypeError since 3.0, so any surviving call was already fatal.
   * `$tipo->getInterAdmins($options)` -> `$tipo->records()`; `$record->setFieldsValues($attrs)` -> `updateAttributes($attrs)`. Both were removed in 3.0 and have thrown BadMethodCallException ever since — the shim kept the class name alive, never these methods.
   * **A class name held as a STRING is a dependency.** `->class('InterAdmin')`, `'class' => 'InterAdmin'` and `unserialize(..., ['allowed_classes' => ['InterAdmin']])` all reach `new $className`, and no grep for `new`/`extends` finds them. Sweep for quoted names too.
   * Hydrating as `Record` rather than `InterAdmin` changes `DEFAULT_NAMESPACE` from `''`, so relations resolve to objects: `relationFromColumn()` returns a `Collection` where the shim returned a plain array.
@@ -36,7 +36,7 @@
 * Move getUrl() out of the ORM
 
 ## 3.0
-* Merged both ORMs: InterAdmin and Jp7/Interadmin/Record
+* Merged both ORMs: InterAdmin and Jp7/InterAdmin/Record
 
 ### Changes to projects which used InterAdmin/InterAdminTipo:
  * Removed methods deprecated on 2.1.1 (like getInterAdmins)
@@ -49,7 +49,7 @@
  * Default aliases are generated in snake_case now (if empty). To use old aliases you must manually define them.
  * ORM depends on new configuration: /config/interadmin.php and /resources/lang/pt-BR/interadmin.php
 
-### Changes to projects which used Jp7/Interadmin/Record
+### Changes to projects which used Jp7/InterAdmin/Record
  * Attributes are stored internally without alias / use getAliasedAttributes() if needed
 
 ## 2.7
@@ -68,14 +68,14 @@
 
 ### Changes to projects which used branch laravel:
  * InterSite -> Jp7\Intersite
- * InterAdmin -> Jp7\Interadmin\Record
- * InterAdminAbstract -> Jp7\Interadmin\RecordAbstract
- * InterAdminTipo -> Jp7\Interadmin\Type
- * InterAdminArquivo -> Jp7\Interadmin\FileRecord
- * InterAdminArquivoBanco -> Jp7\Interadmin\FileDatabase
- * InterAdminLog -> Jp7\Interadmin\Log
- * InterAdminField -> Jp7\Interadmin\FieldUtil
- * InterAdminFieldFile -> Jp7\Interadmin\FileField
+ * InterAdmin -> Jp7\InterAdmin\Record
+ * InterAdminAbstract -> Jp7\InterAdmin\RecordAbstract
+ * InterAdminTipo -> Jp7\InterAdmin\Type
+ * InterAdminArquivo -> Jp7\InterAdmin\FileRecord
+ * InterAdminArquivoBanco -> Jp7\InterAdmin\FileDatabase
+ * InterAdminLog -> Jp7\InterAdmin\Log
+ * InterAdminField -> Jp7\InterAdmin\FieldUtil
+ * InterAdminFieldFile -> Jp7\InterAdmin\FileField
  * Change config suffix in resources/lang/en/interadmin.php from \_en to en\_
 
 ## 2.6

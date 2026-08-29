@@ -1,8 +1,8 @@
 <?php
 
-namespace Jp7\Interadmin\Query;
+namespace Jp7\InterAdmin\Query;
 
-use Jp7\Interadmin\Type;
+use Jp7\InterAdmin\Type;
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 

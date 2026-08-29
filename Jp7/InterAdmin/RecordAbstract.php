@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\ConnectionInterface;
@@ -21,7 +21,7 @@ abstract class RecordAbstract
     use TryMethod;
 
     const DEFAULT_FIELDS_ALIAS = true;
-    const DEFAULT_NAMESPACE = 'Jp7\Interadmin\\';
+    const DEFAULT_NAMESPACE = 'Jp7\InterAdmin\\';
     const DEFAULT_FIELDS = '*';
 
     protected static $unguarded = false;
@@ -193,7 +193,7 @@ abstract class RecordAbstract
                         $fileClassName[static::DEFAULT_NAMESPACE] = static::DEFAULT_NAMESPACE.'FileField';
                     }
                     if (!class_exists($fileClassName[static::DEFAULT_NAMESPACE])) {
-                        $fileClassName[static::DEFAULT_NAMESPACE] = 'Jp7\\Interadmin\\FileField';
+                        $fileClassName[static::DEFAULT_NAMESPACE] = 'Jp7\\InterAdmin\\FileField';
                     }
                 }
                 $className = $fileClassName[static::DEFAULT_NAMESPACE];
@@ -535,8 +535,8 @@ abstract class RecordAbstract
         }
         $callee = '';
         //foreach (array_reverse($trace) as $item) {
-        //    if (!empty($item['class']) && str_starts_with($item['class'], 'Jp7\Interadmin\Query') && $item['function'] !== '__call') {
-        //        $callee = str_replace('Jp7\\Interadmin\\', '', $item['class']).'@'.$item['function'];
+        //    if (!empty($item['class']) && str_starts_with($item['class'], 'Jp7\InterAdmin\Query') && $item['function'] !== '__call') {
+        //        $callee = str_replace('Jp7\\InterAdmin\\', '', $item['class']).'@'.$item['function'];
         //        break;
         //    }
         //}

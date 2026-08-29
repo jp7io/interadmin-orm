@@ -1,14 +1,14 @@
 <?php
 
-namespace Jp7\Interadmin\Relation;
+namespace Jp7\InterAdmin\Relation;
 
-use Jp7\Interadmin\Query;
-use Jp7\Interadmin\Record;
+use Jp7\InterAdmin\Query;
+use Jp7\InterAdmin\Record;
 use InvalidArgumentException;
 
 class HasMany
 {
-    private \Jp7\Interadmin\Record $record;
+    private \Jp7\InterAdmin\Record $record;
     private $className;
     private $foreign_key;
     private $local_key;

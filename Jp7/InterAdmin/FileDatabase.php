@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 /**
  * @property int $id_arquivo_banco  PK

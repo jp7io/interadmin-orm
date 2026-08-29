@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 /**
  * Rewrites a boolean literal compared against a char_ column into the emptiness test that

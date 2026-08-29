@@ -25,6 +25,6 @@ Jp7\Laravel\CacheExtension::apply();
 
 // Registers the autoloader that evals a class body for every row in `tipos`, which is how
 // the tests' Test_User / Test_Store come into existence at all.
-Jp7\Interadmin\DynamicLoader::register();
+Jp7\InterAdmin\DynamicLoader::register();
 
 TestCase::createSchema();

@@ -1,7 +1,7 @@
 <?php
 
-use Jp7\Interadmin\Field\SelectField;
-use Jp7\Interadmin\RecordClassMap;
+use Jp7\InterAdmin\Field\SelectField;
+use Jp7\InterAdmin\RecordClassMap;
 
 class RelationTest extends TestCase
 {

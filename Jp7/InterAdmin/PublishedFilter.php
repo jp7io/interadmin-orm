@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 /**
  * Builds the "is this row currently visible?" SQL predicates that the query compiler

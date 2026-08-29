@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Jp7\\Interadmin\\": "Jp7/Interadmin/"
+            "Jp7\\InterAdmin\\": "Jp7/InterAdmin/"
         }
     },
     "autoload-dev": {

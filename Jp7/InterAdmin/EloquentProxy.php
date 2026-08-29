@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EloquentProxy extends Model
 {
-    private ?\Jp7\Interadmin\RecordAbstract $record = null;
+    private ?\Jp7\InterAdmin\RecordAbstract $record = null;
 
     public function setRecord(RecordAbstract $record): void
     {

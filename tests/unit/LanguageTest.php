@@ -1,6 +1,6 @@
 <?php
 
-use Jp7\Interadmin\RecordClassMap;
+use Jp7\InterAdmin\RecordClassMap;
 
 class LanguageTest extends TestCase
 {

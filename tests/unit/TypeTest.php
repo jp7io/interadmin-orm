@@ -1,7 +1,7 @@
 <?php
 
-use Jp7\Interadmin\Type;
-use Jp7\Interadmin\TypeClassMap;
+use Jp7\InterAdmin\Type;
+use Jp7\InterAdmin\TypeClassMap;
 
 class TypeTest extends TestCase
 {

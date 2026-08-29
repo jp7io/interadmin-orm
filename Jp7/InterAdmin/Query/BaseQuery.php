@@ -1,17 +1,17 @@
 <?php
 
-namespace Jp7\Interadmin\Query;
+namespace Jp7\InterAdmin\Query;
 
 use Illuminate\Database\Query\Expression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Jp7\Interadmin\Type;
-use Jp7\Interadmin\RecordAbstract;
-use Jp7\Interadmin\RawSql;
+use Jp7\InterAdmin\Type;
+use Jp7\InterAdmin\RecordAbstract;
+use Jp7\InterAdmin\RawSql;
 use BadMethodCallException;
-use Jp7\Interadmin\Collection;
+use Jp7\InterAdmin\Collection;
 
 /**
  * __call() answers `orFoo()` with `foo()` for anything this class declares, and only inside a

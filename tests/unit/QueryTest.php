@@ -1,8 +1,8 @@
 <?php
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Jp7\Interadmin\Record;
-use Jp7\Interadmin\RecordClassMap;
+use Jp7\InterAdmin\Record;
+use Jp7\InterAdmin\RecordClassMap;
 
 class QueryTest extends TestCase
 {

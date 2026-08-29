@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 use Illuminate\Support\Str;
 use Exception;
@@ -44,7 +44,7 @@ class SqlCompiler
         'HOUR', 'MINUTE', 'SECOND',
     ];
 
-    protected \Jp7\Interadmin\RecordAbstract $record;
+    protected \Jp7\InterAdmin\RecordAbstract $record;
 
     public function __construct(RecordAbstract $record)
     {

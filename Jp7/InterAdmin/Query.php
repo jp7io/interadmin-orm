@@ -1,6 +1,6 @@
 <?php
 
-namespace Jp7\Interadmin;
+namespace Jp7\InterAdmin;
 
 use BadMethodCallException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -93,7 +93,7 @@ class Query extends Query\BaseQuery
      *
      * @throws BadMethodCallException
      *
-     * @return \Jp7\Interadmin\Query
+     * @return \Jp7\InterAdmin\Query
      */
     public function joinThrough($className, $relationshipPath)
     {

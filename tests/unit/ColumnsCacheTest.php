@@ -1,6 +1,6 @@
 <?php
 
-use Jp7\Interadmin\Type;
+use Jp7\InterAdmin\Type;
 
 /**
  * The failure these cover: an empty column listing, once cached, wedges a whole tenant.

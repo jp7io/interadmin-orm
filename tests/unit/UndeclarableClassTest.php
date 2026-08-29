@@ -1,11 +1,11 @@
 <?php
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Jp7\Interadmin\DynamicLoader;
-use Jp7\Interadmin\Record;
-use Jp7\Interadmin\RecordClassMap;
-use Jp7\Interadmin\Type;
-use Jp7\Interadmin\TypeClassMap;
+use Jp7\InterAdmin\DynamicLoader;
+use Jp7\InterAdmin\Record;
+use Jp7\InterAdmin\RecordClassMap;
+use Jp7\InterAdmin\Type;
+use Jp7\InterAdmin\TypeClassMap;
 
 /**
  * A content type bound to a class name PHP cannot declare.

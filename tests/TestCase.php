@@ -1,6 +1,6 @@
 <?php
 
-use Jp7\Interadmin\Type;
+use Jp7\InterAdmin\Type;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
