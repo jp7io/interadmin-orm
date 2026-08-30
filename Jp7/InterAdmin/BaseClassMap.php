@@ -97,7 +97,7 @@ abstract class BaseClassMap
      * @param  string $class
      * @return int   type_id
      */
-    public function getClassIdTipo($class): int|string|false
+    public function getClassTypeId($class): int|string|false
     {
         $type_id = array_search($class, $this->getClasses());
         if ($type_id === false && strpos($class, '\\') !== false) {

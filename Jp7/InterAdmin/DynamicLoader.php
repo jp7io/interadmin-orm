@@ -141,13 +141,13 @@ class DynamicLoader
 
     public static function getCode($class, $addPhpDoc = false)
     {
-        if ($type_id = RecordClassMap::getInstance()->getClassIdTipo($class)) {
+        if ($type_id = RecordClassMap::getInstance()->getClassTypeId($class)) {
             $tipo = new Type($type_id);
             $tipo->class = $class;
 
             return self::generateRecordClass($tipo, $addPhpDoc);
         }
-        if ($type_id = TypeClassMap::getInstance()->getClassIdTipo($class)) {
+        if ($type_id = TypeClassMap::getInstance()->getClassTypeId($class)) {
             $tipo = new Type($type_id);
             $tipo->class_tipo = $class;
 

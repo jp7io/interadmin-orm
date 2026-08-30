@@ -160,7 +160,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($type) {
             $this->setType($type);
         } elseif (isset($attributes['type_id'])) {
-            $this->setIdTipoAttribute($attributes['type_id']);
+            $this->setTypeIdAttribute($attributes['type_id']);
             unset($attributes['type_id']);
         } elseif ($type = static::type()) {
             $this->setType($type);
@@ -255,7 +255,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $this->exists = (bool) $value;
     }
 
-    public function setIdTipoAttribute($value)
+    public function setTypeIdAttribute($value)
     {
         $this->attributes['type_id'] = $value;
         if (!$this->_tipo) {
@@ -528,7 +528,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public static function type()
     {
-        if ($type_id = RecordClassMap::getInstance()->getClassIdTipo(get_called_class())) {
+        if ($type_id = RecordClassMap::getInstance()->getClassTypeId(get_called_class())) {
             return Type::getInstance($type_id, ['default_namespace' => static::DEFAULT_NAMESPACE]);
         }
     }
