@@ -764,9 +764,9 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     /**
      * @return Type[]
      */
-    public function getChildrenTipos()
+    public function getChildrenTypes()
     {
-        $childrenTypes = $this->getType()->getInterAdminsChildrenTipos();
+        $childrenTypes = $this->getType()->getInterAdminsChildrenTypes();
         foreach ($childrenTypes as $childType) {
             $childType->setParent($this);
         }

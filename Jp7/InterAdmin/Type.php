@@ -822,13 +822,13 @@ class Type extends RecordAbstract
         $this->syncInheritance();
         $result = $this->saveRaw();
 
-        // Inheritance - Tipos inheriting from this Tipo
+        // Inheritance - Types inheriting from this Type
         if ($this->type_id) {
-            $inheritingTipos = $this->deprecatedGetChildren([
+            $inheritingTypes = $this->deprecatedGetChildren([
                 'where' => ["model_type_id = '".$this->type_id."'"],
                 'class' => self::class,
             ]);
-            foreach ($inheritingTipos as $type) {
+            foreach ($inheritingTypes as $type) {
                 $type->syncInheritance();
                 $type->saveRaw();
             }
@@ -1191,9 +1191,9 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsChildrenTipo($nome_id)
     {
-        $childrenTipos = $this->getInterAdminsChildren();
-        if (isset($childrenTipos[$nome_id])) {
-            $type_id = $childrenTipos[$nome_id]['type_id'];
+        $childrenTypes = $this->getInterAdminsChildren();
+        if (isset($childrenTypes[$nome_id])) {
+            $type_id = $childrenTypes[$nome_id]['type_id'];
 
             return self::getInstance($type_id, [
                 'db' => $this->_db,
@@ -1211,7 +1211,7 @@ class Type extends RecordAbstract
         }
     }
 
-    public function getInterAdminsChildrenTipos()
+    public function getInterAdminsChildrenTypes()
     {
         $types = [];
         foreach ($this->getInterAdminsChildren() as $nome_id => $metadata) {
