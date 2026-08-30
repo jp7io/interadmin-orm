@@ -34,12 +34,12 @@ class TypeQuery extends BaseQuery
         $options = $this->options;
 
         if (empty($options['group'])) {
-            $options['fields'] = ['COUNT(type_id) AS count_id_tipo'];
+            $options['fields'] = ['COUNT(type_id) AS count_type_id'];
         } elseif ($options['group'] == 'type_id') {
             // O COUNT() precisa trazer a contagem total em 1 linha
             // Caso exista GROUP BY type_id, ele traria em várias linhas
             // Esse é um tratamento especial apenas para o type_id
-            $options['fields'] = ['COUNT(DISTINCT type_id) AS count_id_tipo'];
+            $options['fields'] = ['COUNT(DISTINCT type_id) AS count_type_id'];
             unset($options['group']);
         } else {
             // Se houver GROUP BY com outro campo, retornará a contagem errada
@@ -51,7 +51,7 @@ class TypeQuery extends BaseQuery
             throw new \Exception('Could not resolve groupBy() before count().');
         }
 
-        return isset($rows[0]->count_id_tipo) ? intval($rows[0]->count_id_tipo) : 0;
+        return isset($rows[0]->count_type_id) ? intval($rows[0]->count_type_id) : 0;
     }
 
     public function find($id)
