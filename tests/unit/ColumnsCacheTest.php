@@ -108,7 +108,7 @@ class ColumnsCacheTest extends TestCase
         $this->assertSame([], $type->getFields());
         $this->assertNull($cache->get($cacheKey), 'An empty field map must not be persisted.');
 
-        $type->fields = $this->createFields([['tipo' => 'varchar_key', 'nome' => 'Title']]);
+        $type->fields = $this->createFields([['type' => 'varchar_key', 'name' => 'Title']]);
 
         $this->assertArrayHasKey('varchar_key', $type->getFields());
         $this->assertNotEmpty($cache->get($cacheKey));

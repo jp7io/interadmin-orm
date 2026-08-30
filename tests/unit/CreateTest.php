@@ -32,7 +32,7 @@ class CreateTest extends TestCase
     public function testDynamicLoader()
     {
         $type = $this->createType(['name' => 'ClassName'], [
-            ['tipo' => 'varchar_key', 'nome' => 'Name'],
+            ['type' => 'varchar_key', 'name' => 'Name'],
         ]);
 
         TypeClassMap::getInstance()->clearCache();

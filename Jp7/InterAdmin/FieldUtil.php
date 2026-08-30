@@ -24,7 +24,7 @@ class FieldUtil
     }
     public function __toString(): string
     {
-        return $this->field['tipo'];
+        return $this->field['type'];
     }
 
     /**
@@ -63,20 +63,20 @@ class FieldUtil
      */
     public static function getFieldHeader($field)
     {
-        $key = $field['tipo'];
+        $key = $field['type'];
         if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
-            if (!is_callable($field['nome'])) {
-                return 'Função '.$field['nome'].' não encontrada.';
+            if (!is_callable($field['name'])) {
+                return 'Função '.$field['name'].' não encontrada.';
             }
-            return call_user_func($field['nome'], $field, '', 'header');
+            return call_user_func($field['name'], $field, '', 'header');
         }
         if (strpos($key, 'select_') === 0) {
             if ($field['label']) {
                 return $field['label'];
             }
             // Type::getFields() resolves a select_'s `nome` to a Type; only 'all' stays a string.
-            return $field['nome'] instanceof Type ? $field['nome']->name : 'Tipos';
+            return $field['name'] instanceof Type ? $field['name']->name : 'Tipos';
         }
-        return $field['nome'];
+        return $field['name'];
     }
 }

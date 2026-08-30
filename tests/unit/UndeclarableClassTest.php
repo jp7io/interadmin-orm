@@ -87,7 +87,7 @@ class UndeclarableClassTest extends TestCase
             'class' => $name,
             'class_tipo' => $name,
         ], [
-            ['tipo' => 'varchar_key', 'nome' => 'Nome'],
+            ['type' => 'varchar_key', 'name' => 'Nome'],
         ]);
 
         TypeClassMap::getInstance()->clearCache();

@@ -596,24 +596,27 @@ class Type extends RecordAbstract
     public function getFields()
     {
         return $this->getCacheUnlessEmpty('campos', function () {
+            // The blob is POSITIONAL, so these names are this decoder's invention, not stored
+            // data. They must stay identical to InterAdmin's Field::FIELDS_ATTRIBUTES, which
+            // encodes the same 16 slots back.
             $campos_parameters = [
-                'tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra',
-                'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
-                'default', 'nome_id',
+                'type', 'name', 'help', 'size', 'required', 'separator', 'xtra',
+                'list', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissions',
+                'default', 'name_id',
             ];
             $campos    = explode('{;}', (string) $this->fields);
             $A = [];
             for ($i = 0; $i < count($campos); $i++) {
                 $parameters = explode('{,}', $campos[$i]);
                 if ($parameters[0]) {
-                    $A[$parameters[0]]['ordem'] = ($i+1);
+                    $A[$parameters[0]]['order'] = ($i+1);
                     $isSelect = strpos($parameters[0], 'select_') === 0;
                     for ($j = 0; $j < count($parameters); $j++) {
                         $A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
                     }
-                    if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
-                        $type_id = $A[$parameters[0]]['nome'];
-                        $A[$parameters[0]]['nome'] = self::getInstance($type_id, [
+                    if ($isSelect && $A[$parameters[0]]['name'] != 'all') {
+                        $type_id = $A[$parameters[0]]['name'];
+                        $A[$parameters[0]]['name'] = self::getInstance($type_id, [
                             'db' => $this->_db,
                             'default_namespace' => static::DEFAULT_NAMESPACE,
                         ]);
@@ -622,9 +625,9 @@ class Type extends RecordAbstract
             }
             // Alias
             foreach ($A as $column => $array) {
-                if (empty($array['nome_id'])) {
+                if (empty($array['name_id'])) {
                     // Gerar nome_id
-                    $alias = $array['nome'];
+                    $alias = $array['name'];
                     if (is_object($alias)) {
                         $alias = empty($array['label']) ? $alias->name : $array['label'];
                     }
@@ -632,19 +635,19 @@ class Type extends RecordAbstract
                         throw new UnexpectedValueException('An alias was expected.');
                         //$alias = $column;
                     }
-                    $A[$column]['nome_id'] = to_slug($alias, '_');
+                    $A[$column]['name_id'] = to_slug($alias, '_');
                 }
                 if (strpos($column, 'select_') === 0) {
                     if (strpos($column, 'select_multi_') === 0) {
-                        $A[$column]['nome_id'] .= '_ids';
+                        $A[$column]['name_id'] .= '_ids';
                     } else {
-                        $A[$column]['nome_id'] .= '_id';
+                        $A[$column]['name_id'] .= '_id';
                     }
                 } elseif (strpos($column, 'special_') === 0 && $array['xtra']) {
                     if (in_array($array['xtra'], FieldUtil::getSpecialMultiXtras())) {
-                        $A[$column]['nome_id'] .= '_ids';
+                        $A[$column]['name_id'] .= '_ids';
                     } else {
-                        $A[$column]['nome_id'] .= '_id';
+                        $A[$column]['name_id'] .= '_id';
                     }
                 }
             }
@@ -683,7 +686,7 @@ class Type extends RecordAbstract
                     if (strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0) {
                         continue;
                     }
-                    $aliases[$column] = $array['nome_id'];
+                    $aliases[$column] = $array['name_id'];
                 }
                 return $aliases;
             });
@@ -699,7 +702,7 @@ class Type extends RecordAbstract
     public function getComboFieldNames()
     {
         return array_keys(array_filter($this->getFields(), function ($field) {
-            return (bool) $field['combo'] || $field['tipo'] === 'varchar_key';
+            return (bool) $field['combo'] || $field['type'] === 'varchar_key';
         }));
     }
 
@@ -719,12 +722,12 @@ class Type extends RecordAbstract
                         $multi = strpos($column, 'select_multi_') === 0;
                         $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
                         if ($multi) {
-                            $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
+                            $relation = substr($array['name_id'], 0, -4); // _ids = 4 chars
                         } else {
-                            $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                            $relation = substr($array['name_id'], 0, -3); // _id = 3 chars
                         }
                         $relationships[$relation] = [
-                            'query' => $hasType ? $array['nome'] : $array['nome']->records(),
+                            'query' => $hasType ? $array['name'] : $array['name']->records(),
                             'type' => $hasType,
                             'multi' => $multi,
                         ];
@@ -732,9 +735,9 @@ class Type extends RecordAbstract
                         $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
                         $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
                         if ($multi) {
-                            $relation = substr($array['nome_id'], 0, -4); // _ids = 4 chars
+                            $relation = substr($array['name_id'], 0, -4); // _ids = 4 chars
                         } else {
-                            $relation = substr($array['nome_id'], 0, -3); // _id = 3 chars
+                            $relation = substr($array['name_id'], 0, -3); // _id = 3 chars
                         }
                         if ($specialTipo = $this->getFieldType($array)) {
                             $query = $specialTipo->records();
@@ -763,9 +766,9 @@ class Type extends RecordAbstract
      */
     public function getFieldType($field)
     {
-        if (is_object($field['nome'])) {
-            return $field['nome'];
-        } elseif ($field['nome'] == 'all') {
+        if (is_object($field['name'])) {
+            return $field['name'];
+        } elseif ($field['name'] == 'all') {
             return new self;
         }
     }

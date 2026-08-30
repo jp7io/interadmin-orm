@@ -1217,18 +1217,18 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $rules = [];
         foreach ($this->getType()->getFields() as $field) {
             if ($field['form']) {
-                $alias = $field['nome_id'];
+                $alias = $field['name_id'];
 
-                if ($field['obrigatorio']) {
+                if ($field['required']) {
                     $rules[$alias][] = 'required';
                 }
                 if ($field['xtra'] === 'email' || $field['xtra'] === 'id_email') {
                     $rules[$alias][] = 'email';
                 }
-                if (str_starts_with($field['tipo'], 'int_')) {
+                if (str_starts_with($field['type'], 'int_')) {
                     $rules[$alias][] = 'integer';
                 }
-                if (str_starts_with($field['tipo'], 'date_')) {
+                if (str_starts_with($field['type'], 'date_')) {
                     $rules[$alias][] = 'date_format:Y-m-d';
                 }
             }
@@ -1265,7 +1265,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
         foreach ($this->getType()->getFields() as $field) {
             if ($field['form']) {
-                $fillable[] = $field['nome_id'];
+                $fillable[] = $field['name_id'];
             }
         }
 

@@ -381,12 +381,12 @@ class SqlCompiler
     public function addJoin(array &$options, $alias, array $field, $table = 'main'): string
     {
         $joinTipo = $this->record->getFieldType($field);
-        if (!$joinTipo ) { //  || strpos($field['tipo'], 'select_multi_') === 0
+        if (!$joinTipo ) { //  || strpos($field['type'], 'select_multi_') === 0
             throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
 
-        $column = $field['tipo'];
+        $column = $field['type'];
         $xtra = $field['xtra'];
         $isMulti = strpos($column, 'select_multi_') === 0 || in_array($xtra, FieldUtil::getSpecialMultiXtras());
         if (in_array($xtra, FieldUtil::getSelectTipoXtras()) || in_array($xtra, FieldUtil::getSpecialTipoXtras())) {

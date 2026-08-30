@@ -166,23 +166,23 @@ abstract class TestCase extends BaseTestCase
     protected function createField(array $field): array
     {
         return [
-            'ordem' => 1,
-            'tipo' => $field['tipo'],
-            'nome' => $field['nome'],
-            'ajuda' => $field['ajuda'] ?? '',
-            'tamanho' => $field['tamanho'] ?? '',
-            'obrigatorio' => $field['obrigatorio'] ?? '',
-            'separador' => $field['separator'] ?? '',
+            'order' => 1,
+            'type' => $field['type'],
+            'name' => $field['name'],
+            'help' => $field['help'] ?? '',
+            'size' => $field['size'] ?? '',
+            'required' => $field['required'] ?? '',
+            'separator' => $field['separator'] ?? '',
             'xtra' => $field['xtra'] ?? '',
-            'lista' => $field['lista'] ?? '',
+            'list' => $field['list'] ?? '',
             'orderby' => $field['orderby'] ?? '',
             'combo' => $field['combo'] ?? '',
             'readonly' => $field['readonly'] ?? '',
             'form' => $field['form'] ?? '',
             'label' => $field['label'] ?? '',
-            'permissoes' => $field['permissoes'] ?? '',
+            'permissions' => $field['permissions'] ?? '',
             'default' => $field['default'] ?? '',
-            'nome_id' => $field['nome_id'] ?? to_slug($field['nome'], '_'),
+            'name_id' => $field['name_id'] ?? to_slug($field['name'], '_'),
         ];
     }
 
@@ -195,7 +195,7 @@ abstract class TestCase extends BaseTestCase
             'varchar_2' => 'pamela@jp7.com.br',
             'char_key' => 'S',
             'publish' => 'S',
-            'ordem' => 0,
+            'order' => 0,
         ];
         $user->setRawAttributes($attributes);
         $user->save();
@@ -206,11 +206,11 @@ abstract class TestCase extends BaseTestCase
     protected function createUserType(): Type
     {
         return $this->createType(['name' => 'User'], [
-            ['tipo' => 'varchar_key', 'nome' => 'Username'],
-            ['tipo' => 'password_key', 'nome' => 'Password'],
-            ['tipo' => 'varchar_2', 'nome' => 'E-mail'],
-            ['tipo' => 'char_key', 'nome' => 'Mostrar'],
-            ['tipo' => 'int_key', 'nome' => 'Ordem']
+            ['type' => 'varchar_key', 'name' => 'Username'],
+            ['type' => 'password_key', 'name' => 'Password'],
+            ['type' => 'varchar_2', 'name' => 'E-mail'],
+            ['type' => 'char_key', 'name' => 'Mostrar'],
+            ['type' => 'int_key', 'name' => 'Ordem']
         ]);
     }
 
@@ -219,8 +219,8 @@ abstract class TestCase extends BaseTestCase
         return $this->createType(
             $attributes + ['name' => 'Noticia'],
             [
-                ['tipo' => 'varchar_key', 'nome' => 'Title'],
-                ['tipo' => 'char_key', 'nome' => 'Mostrar']
+                ['type' => 'varchar_key', 'name' => 'Title'],
+                ['type' => 'char_key', 'name' => 'Mostrar']
             ]
         );
     }
@@ -231,7 +231,7 @@ abstract class TestCase extends BaseTestCase
         for ($i = 0; $i < $count; $i++) {
             $list[] = $this->createUser([
                 'varchar_key' => 'User #'.$i,
-                'ordem' => $i
+                'order' => $i
             ]);
         }
 

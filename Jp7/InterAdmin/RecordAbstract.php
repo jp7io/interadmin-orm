@@ -731,7 +731,7 @@ abstract class RecordAbstract
                 $attributes[$field] = $value;
                 /*
                 if (!empty($options['select_multi_fields'])) {
-                    if (strpos($campos[$field]['tipo'], 'select_multi_') === 0) {
+                    if (strpos($campos[$field]['type'], 'select_multi_') === 0) {
                         $multi_options = $options['select_multi_fields'][$alias];
                         if ($multi_options) {
                             Relation::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);

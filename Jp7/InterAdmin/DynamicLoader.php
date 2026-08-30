@@ -83,26 +83,26 @@ class DynamicLoader
 
     protected static function getPhpDocField($tipo, array $field): string
     {
-        if (strpos($field['tipo'], 'special_') === 0 && $field['xtra']) {
+        if (strpos($field['type'], 'special_') === 0 && $field['xtra']) {
 //            $isMulti = in_array($field['xtra'], InterAdminField::getSpecialMultiXtras());
 //            $isTipo = in_array($field['xtra'], InterAdminField::getSpecialTipoXtras());
 //            $retorno = self::_getCampoTypeClass($tipo->getFieldType($field), $isTipo, $isMulti);
             $type = 'int';
-        } elseif (strpos($field['tipo'], 'select_') === 0) {
-//            $isMulti = (strpos($field['tipo'], 'select_multi') === 0);
+        } elseif (strpos($field['type'], 'select_') === 0) {
+//            $isMulti = (strpos($field['type'], 'select_multi') === 0);
 //            $isTipo = in_array($field['xtra'], InterAdminField::getSelectTipoXtras());
-//            $retorno = self::_getCampoTypeClass($field['nome'], $isTipo, $isMulti);
+//            $retorno = self::_getCampoTypeClass($field['name'], $isTipo, $isMulti);
             $type = 'int';
-        } elseif (strpos($field['tipo'], 'int') === 0 || strpos($field['tipo'], 'id') === 0) {
+        } elseif (strpos($field['type'], 'int') === 0 || strpos($field['type'], 'id') === 0) {
             $type = 'string';
-        } elseif (strpos($field['tipo'], 'char') === 0) {
+        } elseif (strpos($field['type'], 'char') === 0) {
             $type = 'string';
-        } elseif (strpos($field['tipo'], 'date') === 0) {
+        } elseif (strpos($field['type'], 'date') === 0) {
             $type = '\\Date';
         } else {
             $type = 'string';
         }
-        return $type.' $'.$field['nome_id'].' '.$field['ajuda'];
+        return $type.' $'.$field['name_id'].' '.$field['help'];
     }
 
     public static function generateRecordClass(Type $type, $addPhpDoc = false): string

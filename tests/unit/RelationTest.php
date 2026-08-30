@@ -23,9 +23,9 @@ class RelationTest extends TestCase
                 //'tags' => 'S',
             ],
             [
-                ['tipo' => 'varchar_key', 'nome' => 'Name'],
-                ['tipo' => 'varchar_1', 'nome' => 'UF'],
-                ['tipo' => 'char_key', 'nome' => 'Mostrar']
+                ['type' => 'varchar_key', 'name' => 'Name'],
+                ['type' => 'varchar_1', 'name' => 'UF'],
+                ['type' => 'char_key', 'name' => 'Mostrar']
             ]
         );
 
@@ -35,9 +35,9 @@ class RelationTest extends TestCase
                 'children' => $this->userType->type_id.'{,}Employees{,}{,}{;}'
             ],
             [
-                ['tipo' => 'varchar_key', 'nome' => 'Name'],
-                ['tipo' => 'select_1', 'nome' => $this->cityType->type_id, 'xtra' => SelectField::XTRA_RECORD, 'nome_id' => 'city'],
-                ['tipo' => 'char_key', 'nome' => 'Mostrar']
+                ['type' => 'varchar_key', 'name' => 'Name'],
+                ['type' => 'select_1', 'name' => $this->cityType->type_id, 'xtra' => SelectField::XTRA_RECORD, 'name_id' => 'city'],
+                ['type' => 'char_key', 'name' => 'Mostrar']
             ]
         );
 
@@ -46,8 +46,8 @@ class RelationTest extends TestCase
                 'name' => 'Testimonial'
             ],
             [
-                ['tipo' => 'varchar_key', 'nome' => 'Title'],
-                ['tipo' => 'char_key', 'nome' => 'Mostrar']
+                ['type' => 'varchar_key', 'name' => 'Title'],
+                ['type' => 'char_key', 'name' => 'Mostrar']
             ]
         );
 
