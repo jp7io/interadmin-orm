@@ -94,12 +94,12 @@ class FileDatabase extends RecordAbstract
     /**
      * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param Type $tipo
+     * @param Type $type
      */
-    public function setType($tipo): void
+    public function setType($type): void
     {
-        $this->attributes['type_id'] = $tipo->type_id;
-        $this->_tipo = $tipo;
+        $this->attributes['type_id'] = $type->type_id;
+        $this->_tipo = $type;
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.

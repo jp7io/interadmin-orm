@@ -106,12 +106,12 @@ class Log extends RecordAbstract
     /**
      * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param Type $tipo
+     * @param Type $type
      */
-    public function setType($tipo): void
+    public function setType($type): void
     {
-        $this->type_id = $tipo->type_id;
-        $this->_tipo = $tipo;
+        $this->type_id = $type->type_id;
+        $this->_tipo = $type;
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.
@@ -123,9 +123,9 @@ class Log extends RecordAbstract
     public function getParent($options = [])
     {
         if (!$this->_parent) {
-            $tipo = $this->getType();
+            $type = $this->getType();
             if ($this->id) {
-                $this->_parent = Record::getInstance($this->id, $options, $tipo);
+                $this->_parent = Record::getInstance($this->id, $options, $type);
             }
         }
 

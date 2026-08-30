@@ -81,28 +81,28 @@ class DynamicLoader
         return false;
     }
 
-    protected static function getPhpDocField($tipo, array $field): string
+    protected static function getPhpDocField($type, array $field): string
     {
         if (strpos($field['type'], 'special_') === 0 && $field['xtra']) {
 //            $isMulti = in_array($field['xtra'], InterAdminField::getSpecialMultiXtras());
 //            $isTipo = in_array($field['xtra'], InterAdminField::getSpecialTipoXtras());
-//            $retorno = self::_getCampoTypeClass($tipo->getFieldType($field), $isTipo, $isMulti);
-            $type = 'int';
+//            $retorno = self::_getCampoTypeClass($type->getFieldType($field), $isTipo, $isMulti);
+            $phpDocType = 'int';
         } elseif (strpos($field['type'], 'select_') === 0) {
 //            $isMulti = (strpos($field['type'], 'select_multi') === 0);
 //            $isTipo = in_array($field['xtra'], InterAdminField::getSelectTipoXtras());
 //            $retorno = self::_getCampoTypeClass($field['name'], $isTipo, $isMulti);
-            $type = 'int';
+            $phpDocType = 'int';
         } elseif (strpos($field['type'], 'int') === 0 || strpos($field['type'], 'id') === 0) {
-            $type = 'string';
+            $phpDocType = 'string';
         } elseif (strpos($field['type'], 'char') === 0) {
-            $type = 'string';
+            $phpDocType = 'string';
         } elseif (strpos($field['type'], 'date') === 0) {
-            $type = '\\Date';
+            $phpDocType = '\\Date';
         } else {
-            $type = 'string';
+            $phpDocType = 'string';
         }
-        return $type.' $'.$field['name_id'].' '.$field['help'];
+        return $phpDocType.' $'.$field['name_id'].' '.$field['help'];
     }
 
     public static function generateRecordClass(Type $type, $addPhpDoc = false): string
@@ -142,16 +142,16 @@ class DynamicLoader
     public static function getCode($class, $addPhpDoc = false)
     {
         if ($type_id = RecordClassMap::getInstance()->getClassTypeId($class)) {
-            $tipo = new Type($type_id);
-            $tipo->class = $class;
+            $type = new Type($type_id);
+            $type->class = $class;
 
-            return self::generateRecordClass($tipo, $addPhpDoc);
+            return self::generateRecordClass($type, $addPhpDoc);
         }
         if ($type_id = TypeClassMap::getInstance()->getClassTypeId($class)) {
-            $tipo = new Type($type_id);
-            $tipo->class_tipo = $class;
+            $type = new Type($type_id);
+            $type->class_tipo = $class;
 
-            return self::generateTypeClass($tipo, $addPhpDoc);
+            return self::generateTypeClass($type, $addPhpDoc);
         }
     }
 
