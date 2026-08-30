@@ -873,13 +873,13 @@ class Type extends RecordAbstract
      */
     public function delete()
     {
-        $this->deleted_tipo = 'S';
+        $this->deleted_at = date('c');
         $this->save();
     }
 
     public function restore()
     {
-        $this->deleted_tipo = '';
+        $this->deleted_at = null;
         $this->save();
     }
 

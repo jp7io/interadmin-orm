@@ -326,6 +326,12 @@ abstract class RecordAbstract
         return $this;
     }
 
+    /**
+     * Columns whose empty value is a real NULL. Everywhere else this schema spells "empty" as '',
+     * so the blanket null -> '' below is right; a nullable datetime would land on 0000-00-00.
+     */
+    protected static $nullableAttributes = ['deleted_at'];
+
     protected function _convertForDatabase($attributes, $aliases)
     {
         $valuesToSave = [];
@@ -346,7 +352,7 @@ abstract class RecordAbstract
                     $valuesToSave[$key] = implode(',', $value);
                     break;
                 case 'NULL':
-                    $valuesToSave[$key] = '';
+                    $valuesToSave[$key] = in_array($key, static::$nullableAttributes, true) ? null : '';
                     break;
                 case 'boolean':
                     if (str_starts_with($key, 'char_')) {

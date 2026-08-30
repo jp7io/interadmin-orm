@@ -44,7 +44,7 @@ class PublishedFilter
         // name, so this is latent rather than live. Preserved exactly; changing it is a
         // behavior change, not part of the extraction.
         if ($table === 'types' && count($tableParts) === 3) {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
+            return $alias.".mostrar <> '' AND ".$alias.'.deleted_at IS NULL AND ';
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // Tags carry no publishing state of their own -- returns null, and callers
             // concatenate that as ''.

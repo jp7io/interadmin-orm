@@ -67,7 +67,6 @@ abstract class BaseQuery
         'tags_registros',
         'publish_tipo',
         'visualizar',
-        'deleted_tipo',
     ];
 
     protected $initialOptions = [
@@ -338,6 +337,26 @@ abstract class BaseQuery
     public function whereRaw($where)
     {
         return $this->_addWhere($where);
+    }
+
+    /**
+     * `IS NULL` / `IS NOT NULL`. `where($column, null)` already compiles to these; this is the
+     * Laravel spelling, so a call site reads the same whether it runs through this builder or
+     * Eloquent's. __call gives orWhereNull/orWhereNotNull from these.
+     *
+     * @return static
+     */
+    public function whereNull($column)
+    {
+        return $this->where($column, null);
+    }
+
+    /**
+     * @return static
+     */
+    public function whereNotNull($column)
+    {
+        return $this->where($column, '<>', null);
     }
 
     /**
