@@ -40,6 +40,7 @@ use DB;
  * @property string $tabela Table of this Type, or of its Model, if it has no table.
  * @property int|string $type_id This Type's primary key.
  * @property string $children The child Types, as the '{,}'/'{;}' delimited blob the column stores.
+ * @property ?string $deleted_at When this Type was soft-deleted, NULL while it is live.
  *
  * @method static Type build(array $attributes = [])
  * @method static bool chunk(int $count, callable $callback)
@@ -90,6 +91,8 @@ use DB;
  * @method static Query\TypeQuery whereMonth(string $column, mixed $operator, mixed $value = null)
  * @method static Query\TypeQuery whereNotIn(string $column, array $values)
  * @method static Query\TypeQuery whereRaw(string $where)
+ * @method static Query\TypeQuery whereNull(string $column)
+ * @method static Query\TypeQuery whereNotNull(string $column)
  * @method static Query\TypeQuery whereYear(string $column, mixed $operator, mixed $value = null)
  * @method static Query\TypeQuery with(string ...$relationships)
  */

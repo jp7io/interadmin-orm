@@ -262,7 +262,7 @@ CREATE TABLE `interadmin_teste_types` (
   `layout_registros` tinyint(1) UNSIGNED NOT NULL,
   `ordem` tinyint(4) NOT NULL DEFAULT '0',
   `log` text NOT NULL,
-  `deleted_tipo` char(1) NOT NULL DEFAULT '',
+  `deleted_at` datetime DEFAULT NULL,
   `inherited` varchar(255) NOT NULL,
   `xtra_disabledfields` text NOT NULL,
   `xtra_disabledchildren` varchar(255) NOT NULL

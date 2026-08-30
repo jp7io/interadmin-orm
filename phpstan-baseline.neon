@@ -163,12 +163,6 @@ parameters:
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$deleted_tipo\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Jp7/InterAdmin/Type.php
-
-		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$fields\.$#'
 			identifier: property.notFound
 			count: 1

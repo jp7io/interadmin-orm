@@ -146,7 +146,7 @@ abstract class TestCase extends BaseTestCase
             'class' => 'Test_'.$attributes['name'],
             'class_tipo' => 'Test_'.$attributes['name'].'Tipo',
             'mostrar' => 'S',
-            'deleted_tipo' => '',
+            'deleted_at' => null,
             'fields' => $this->createFields($fields)
         ]);
         $type->save();

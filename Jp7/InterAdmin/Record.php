@@ -85,6 +85,8 @@ use RecordUrl;
  * @method static Query whereMonth(string $column, mixed $operator, mixed $value = null)
  * @method static Query whereNotIn(string $column, array $values)
  * @method static Query whereRaw(string $where)
+ * @method static Query whereNull(string $column)
+ * @method static Query whereNotNull(string $column)
  * @method static Query whereYear(string $column, mixed $operator, mixed $value = null)
  * @method static Query with(string ...$relationships)
  */
