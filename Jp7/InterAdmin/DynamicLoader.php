@@ -134,7 +134,7 @@ class DynamicLoader
         return self::buildClass(
             $type->getTypeClass(),
             $prefixClass.'Type',
-            "const ID_TIPO = {$type->type_id};",
+            "const TYPE_ID = {$type->type_id};",
             $phpdoc
         );
     }

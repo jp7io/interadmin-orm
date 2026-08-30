@@ -97,7 +97,7 @@ class Type extends RecordAbstract
 {
     use \Jp7\Laravel\Routable;
 
-    const ID_TIPO = 0;
+    const TYPE_ID = 0;
     const CACHE_TAG = 'type';
 
     /**
@@ -146,7 +146,7 @@ class Type extends RecordAbstract
      */
     public function __construct($type_id = null)
     {
-        $this->type_id = $type_id ?? static::ID_TIPO;
+        $this->type_id = $type_id ?? static::TYPE_ID;
     }
 
     public function &__get($name)
