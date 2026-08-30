@@ -21,19 +21,13 @@ parameters:
 		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 2
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$id_arquivo\.$#'
 			identifier: property.notFound
 			count: 2
-			path: Jp7/InterAdmin/FileRecord.php
-
-		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$type_id\.$#'
-			identifier: property.notFound
-			count: 4
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
@@ -45,38 +39,20 @@ parameters:
 		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$nome\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 1
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$parte\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$type_id\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 3
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$url\.$#'
 			identifier: property.notFound
-			count: 14
+			count: 7
 			path: Jp7/InterAdmin/FileRecord.php
-
-		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$url_thumb\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Jp7/InterAdmin/FileRecord.php
-
-		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Log\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Jp7/InterAdmin/Log.php
-
-		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Log\:\:\$type_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Jp7/InterAdmin/Log.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -133,12 +109,6 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$type_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Jp7/InterAdmin/Record.php
-
-		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$log\.$#'
 			identifier: property.notFound
 			count: 2
@@ -163,6 +133,12 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$type_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: Jp7/InterAdmin/Record.php
+
+		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$varchar_key\.$#'
 			identifier: property.notFound
 			count: 3
@@ -173,12 +149,6 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/RecordAbstract.php
-
-		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$fields\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Jp7/InterAdmin/Type.php
 
 		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$class_tipo\.$#'
@@ -199,13 +169,13 @@ parameters:
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$id_slug\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$fields\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$type_id_string\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$id_slug\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php
@@ -242,6 +212,12 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$parent_type_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Jp7/InterAdmin/Type.php
+
+		-
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$type_id_string\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php
