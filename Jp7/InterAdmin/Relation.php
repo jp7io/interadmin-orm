@@ -66,7 +66,7 @@ class Relation
                 $records->_refs[] = $parentRecords; // avoid $rows be removed from memory too soon
             }
             foreach ($parentRecords as $parent) {
-                $rows[$parent->id_tipo.','.$parent->id] = $parent;
+                $rows[$parent->type_id.','.$parent->id] = $parent;
             }
         }
 

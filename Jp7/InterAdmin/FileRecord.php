@@ -21,7 +21,7 @@ class FileRecord extends RecordAbstract
      */
     public $db_prefix;
     /**
-     * Contains the Type, i.e. the record with an 'id_tipo' equal to this record�s 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'type_id' equal to this record�s 'type_id'.
      *
      * @var Type
      */
@@ -52,14 +52,14 @@ class FileRecord extends RecordAbstract
     public function getType(array $options = [])
     {
         if (!$this->_tipo) {
-            if (!$this->id_tipo) {
+            if (!$this->type_id) {
                 throw new UnexpectedValueException(
-                    'Cannot resolve the Type of file record '.$this->id_arquivo.': it has no id_tipo. '.
+                    'Cannot resolve the Type of file record '.$this->id_arquivo.': it has no type_id. '.
                     'Call setType() before getType() -- looking the column up from the table was never '.
                     'implemented, it only called jp7io/inc, which this package no longer depends on.'
                 );
             }
-            $this->_tipo = Type::getInstance($this->id_tipo, [
+            $this->_tipo = Type::getInstance($this->type_id, [
                 'db' => $this->_db,
                 'class' => $options['class'] ?? null,
             ]);
@@ -74,7 +74,7 @@ class FileRecord extends RecordAbstract
      */
     public function setType($tipo): void
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->type_id = $tipo->type_id;
         $this->_tipo = $tipo;
     }
     /**
@@ -136,11 +136,11 @@ class FileRecord extends RecordAbstract
 
     public function getAttributesNames(): array
     {
-        return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_arquivo', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
     public function getTableName()
     {
-        if ($this->id_tipo) {
+        if ($this->type_id) {
             return $this->getType()->getArquivosTableName();
         } else {
             return $this->db_prefix.'_arquivos';

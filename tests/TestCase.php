@@ -15,10 +15,10 @@ abstract class TestCase extends BaseTestCase
 {
     /** The tables in tests/_data/dump.sql, emptied before each test. */
     private const TABLES = [
-        'interadmin_teste_registros',
-        'interadmin_teste_en_registros',
+        'interadmin_teste_records',
+        'interadmin_teste_en_records',
         'interadmin_teste_tags',
-        'interadmin_teste_tipos',
+        'interadmin_teste_types',
     ];
 
     private static ?PDO $pdo = null;
@@ -143,11 +143,11 @@ abstract class TestCase extends BaseTestCase
         $type = new Type;
 
         $type->setRawAttributes($attributes + [
-            'class' => 'Test_'.$attributes['nome'],
-            'class_tipo' => 'Test_'.$attributes['nome'].'Tipo',
+            'class' => 'Test_'.$attributes['name'],
+            'class_tipo' => 'Test_'.$attributes['name'].'Tipo',
             'mostrar' => 'S',
             'deleted_tipo' => '',
-            'campos' => $this->createFields($fields)
+            'fields' => $this->createFields($fields)
         ]);
         $type->save();
 
@@ -205,7 +205,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function createUserType(): Type
     {
-        return $this->createType(['nome' => 'User'], [
+        return $this->createType(['name' => 'User'], [
             ['tipo' => 'varchar_key', 'nome' => 'Username'],
             ['tipo' => 'password_key', 'nome' => 'Password'],
             ['tipo' => 'varchar_2', 'nome' => 'E-mail'],
@@ -217,7 +217,7 @@ abstract class TestCase extends BaseTestCase
     protected function createI18nNewsType(array $attributes = []): Type
     {
         return $this->createType(
-            $attributes + ['nome' => 'Noticia'],
+            $attributes + ['name' => 'Noticia'],
             [
                 ['tipo' => 'varchar_key', 'nome' => 'Title'],
                 ['tipo' => 'char_key', 'nome' => 'Mostrar']

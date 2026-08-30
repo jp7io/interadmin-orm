@@ -13,7 +13,7 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->seeNumRecords(0, 'interadmin_teste_types');
 
         $this->userType = $this->createUserType();
     }
@@ -22,16 +22,16 @@ class CreateTest extends TestCase
 
     public function testTypeWasSaved()
     {
-        $this->seeInDatabase('interadmin_teste_tipos', [
-            'id_tipo' => $this->userType->id_tipo,
-            'nome' => $this->userType->nome,
+        $this->seeInDatabase('interadmin_teste_types', [
+            'type_id' => $this->userType->type_id,
+            'name' => $this->userType->name,
             'id_slug' => $this->userType->id_slug
         ]);
     }
 
     public function testDynamicLoader()
     {
-        $type = $this->createType(['nome' => 'ClassName'], [
+        $type = $this->createType(['name' => 'ClassName'], [
             ['tipo' => 'varchar_key', 'nome' => 'Name'],
         ]);
 
@@ -50,13 +50,13 @@ class CreateTest extends TestCase
     public function testBuildEntity()
     {
         $user = Test_User::build();
-        $this->assertNotNull($user->id_tipo);
+        $this->assertNotNull($user->type_id);
     }
 
     public function testSave()
     {
         $user = $this->createUser();
-        $this->seeInDatabase('interadmin_teste_registros', ['id_tipo' => $user->id_tipo]);
+        $this->seeInDatabase('interadmin_teste_records', ['type_id' => $user->type_id]);
     }
 
     public function testCreate()
@@ -68,8 +68,8 @@ class CreateTest extends TestCase
             'password_key' => '123',
         ]);
 
-        $this->seeInDatabase('interadmin_teste_registros', [
-            'id_tipo' => $user->id_tipo,
+        $this->seeInDatabase('interadmin_teste_records', [
+            'type_id' => $user->type_id,
             'varchar_key' => $user->username,
             'password_key' => $user->password,
         ]);
@@ -95,7 +95,7 @@ class CreateTest extends TestCase
 
         $user->delete();
 
-        $this->seeInDatabase('interadmin_teste_registros', ['id' => $user->id, 'deleted' => 'S']);
+        $this->seeInDatabase('interadmin_teste_records', ['id' => $user->id, 'deleted' => 'S']);
     }
 
     public function testForceDelete()
@@ -107,7 +107,7 @@ class CreateTest extends TestCase
 
         $user->forceDelete();
 
-        $this->dontSeeInDatabase('interadmin_teste_registros', ['id' => $user->id]);
+        $this->dontSeeInDatabase('interadmin_teste_records', ['id' => $user->id]);
     }
 
 }

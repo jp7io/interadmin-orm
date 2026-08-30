@@ -27,7 +27,7 @@ class PublishedFilter
      * front of its own clause, so the filter always ends in a joiner rather than the
      * caller having to know whether it is empty.
      *
-     * @param string $table Table name, prefixed (e.g. 'interadmin_ci_registros')
+     * @param string $table Table name, prefixed (e.g. 'interadmin_ci_records')
      * @param string $alias Alias the predicates are qualified with (e.g. 'main')
      *
      * @return string|null Null when the table has nothing to filter (see the tags branch)
@@ -38,29 +38,29 @@ class PublishedFilter
         $table = end($tableParts);
 
         // NOTE (characterized, not designed): the `count($tableParts) === 3` guards mean
-        // only a PREFIXED name is recognized -- 'interadmin_ci_tipos' takes the tipos
-        // branch, but a bare 'tipos' falls through to the registros branch below and is
+        // only a PREFIXED name is recognized -- 'interadmin_ci_types' takes the types
+        // branch, but a bare 'types' falls through to the records branch below and is
         // filtered on columns it does not have. Every in-ORM caller passes a prefixed
         // name, so this is latent rather than live. Preserved exactly; changing it is a
         // behavior change, not part of the extraction.
-        if ($table === 'tipos' && count($tableParts) === 3) {
+        if ($table === 'types' && count($tableParts) === 3) {
             return $alias.".mostrar <> '' AND ".$alias.".deleted_tipo = '' AND ";
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // Tags carry no publishing state of their own -- returns null, and callers
             // concatenate that as ''.
             return null;
-        } elseif ($table === 'arquivos') {
+        } elseif ($table === 'files') {
             return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
         }
 
-        return self::registrosSql($alias);
+        return self::recordsSql($alias);
     }
 
     /**
      * The records calendar: published already, not yet expired (or never expiring),
      * flagged visible, not soft-deleted.
      */
-    private static function registrosSql($alias): string
+    private static function recordsSql($alias): string
     {
         $now = Record::getTimestamp();
 

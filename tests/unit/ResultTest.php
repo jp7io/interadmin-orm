@@ -9,7 +9,7 @@ class ResultTest extends TestCase
     {
         parent::setUp();
 
-        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->seeNumRecords(0, 'interadmin_teste_types');
         $this->createUserType();
 
         RecordClassMap::getInstance()->clearCache();

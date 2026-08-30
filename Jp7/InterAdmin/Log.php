@@ -26,7 +26,7 @@ use Request;
  *
  * @property int $id_log  PK
  * @property int $id  Parent record ID
- * @property int $id_tipo
+ * @property int $type_id
  * @property string $lang
  * @property string $action  One of the ACTION_* constants
  * @property string $ip
@@ -50,7 +50,7 @@ class Log extends RecordAbstract
      */
     public $db_prefix;
     /**
-     * Contains the Type, i.e. the record with an 'id_tipo' equal to this recordﾴs 'id_tipo'.
+     * Contains the Type, i.e. the record with an 'type_id' equal to this recordﾴs 'type_id'.
      *
      * @var Type
      */
@@ -93,7 +93,7 @@ class Log extends RecordAbstract
     public function getType(array $options = [])
     {
         if (!$this->_tipo) {
-            $this->_tipo = Type::getInstance($this->id_tipo, [
+            $this->_tipo = Type::getInstance($this->type_id, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => empty($options['class']) ? null : $options['class'],
@@ -110,7 +110,7 @@ class Log extends RecordAbstract
      */
     public function setType($tipo): void
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->type_id = $tipo->type_id;
         $this->_tipo = $tipo;
     }
     /**
@@ -152,7 +152,7 @@ class Log extends RecordAbstract
     }
     public function getAttributesNames(): array
     {
-        return ['id_log', 'id', 'id_tipo', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
+        return ['id_log', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
     }
     public function getTableName(): string
     {

@@ -8,7 +8,7 @@ namespace Jp7\InterAdmin;
 class FieldUtil
 {
     public $id;
-    public $id_tipo;
+    public $type_id;
     public $field;
 
     /**
@@ -75,7 +75,7 @@ class FieldUtil
                 return $field['label'];
             }
             // Type::getFields() resolves a select_'s `nome` to a Type; only 'all' stays a string.
-            return $field['nome'] instanceof Type ? $field['nome']->nome : 'Tipos';
+            return $field['nome'] instanceof Type ? $field['nome']->name : 'Tipos';
         }
         return $field['nome'];
     }

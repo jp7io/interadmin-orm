@@ -8,8 +8,8 @@ class LanguageTest extends TestCase
     {
         parent::setUp();
 
-        $this->seeNumRecords(0, 'interadmin_teste_registros');
-        $this->seeNumRecords(0, 'interadmin_teste_en_registros');
+        $this->seeNumRecords(0, 'interadmin_teste_records');
+        $this->seeNumRecords(0, 'interadmin_teste_en_records');
 
         RecordClassMap::getInstance()->clearCache();
     }
@@ -53,17 +53,17 @@ class LanguageTest extends TestCase
     
     public function testTypeName()
     {
-        $newsType = $this->createI18nNewsType(['language' => 'S', 'nome_en' => 'News']);
+        $newsType = $this->createI18nNewsType(['language' => 'S', 'name_en' => 'News']);
 
         $nomePtBr = $newsType->getName();
 
-        $this->assertEquals($newsType->nome, $nomePtBr);
+        $this->assertEquals($newsType->name, $nomePtBr);
 
         App::setLocale('en');
 
         $nomeEnUs = $newsType->getName();
 
-        $this->assertEquals($newsType->nome_en, $nomeEnUs);
+        $this->assertEquals($newsType->name_en, $nomeEnUs);
 
         App::setLocale('pt-BR');
     }

@@ -25,22 +25,22 @@ class TypeTest extends TestCase
 
     public function testSave()
     {
-        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->seeNumRecords(0, 'interadmin_teste_types');
 
         $userType = $this->createUserType();
 
-        $this->seeNumRecords(1, 'interadmin_teste_tipos');
+        $this->seeNumRecords(1, 'interadmin_teste_types');
 
-        $type = new Type($userType->id_tipo);
+        $type = new Type($userType->type_id);
         $this->assertTrue($type->exists);
         $type->save();
 
-        $this->seeNumRecords(1, 'interadmin_teste_tipos');
+        $this->seeNumRecords(1, 'interadmin_teste_types');
 
         $type = new Type;
         $this->assertFalse($type->exists);
         $type->save();
 
-        $this->seeNumRecords(2, 'interadmin_teste_tipos');
+        $this->seeNumRecords(2, 'interadmin_teste_types');
     }
 }

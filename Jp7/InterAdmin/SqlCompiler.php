@@ -115,7 +115,7 @@ class SqlCompiler
                 $joinSql = ' '.$joinType.' JOIN '.$table.' AS '.$alias.' ON '.
                     ($use_published_filters ? $this->record::getPublishedFilters($table, $alias) : '');
                 if (!$typeless) {
-                    $joinSql .= $alias.'.id_tipo = '.$tipo->id_tipo.' AND ';
+                    $joinSql .= $alias.'.type_id = '.$tipo->type_id.' AND ';
                 }
                 $preIndex = count($options['from']);
                 $joinSql .= $this->resolve($on, $options, $use_published_filters);
@@ -190,14 +190,14 @@ class SqlCompiler
                     $joinNome = Str::studly($table);
                     if (isset($childrenArr[$joinNome])) {
                         // Children
-                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
+                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['type_id'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
                         ]);
 
                         $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
                         $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
-                        ' WHERE '.$joinFilter.$table.'.parent_id = main.id AND '.$table.'.id_tipo = '.$joinTipo->id_tipo.''.
+                        ' WHERE '.$joinFilter.$table.'.parent_id = main.id AND '.$table.'.type_id = '.$joinTipo->type_id.''.
                         (($existsMatches[4]) ? ' AND ' : '');
                     } elseif ($table == 'tags') {
                         // Tags
@@ -227,7 +227,7 @@ class SqlCompiler
 
                         $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
                             ' WHERE '.$joinFilter.implode(' AND ', $conditions).
-                            ' AND '.$table.'.id_tipo = '.$joinTipo->id_tipo.''.
+                            ' AND '.$table.'.type_id = '.$joinTipo->type_id.''.
                             (($existsMatches[4]) ? ' AND ' : '');
                     }
 
@@ -262,7 +262,7 @@ class SqlCompiler
                     // Support for old join alias: ChildrenLojas => Lojas
                     $joinNome = replace_prefix('Children', '', $joinNome);
                     if (isset($childrenArr[$joinNome])) {
-                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['id_tipo'], [
+                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['type_id'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
                         ]);
@@ -271,7 +271,7 @@ class SqlCompiler
                             $options['from_alias'][] = $table;
                             $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
                                 ' AS '.$table.' ON '.$table.'.parent_id = main.id'.
-                                ' AND '.$table.'.id_tipo = '.$joinTipo->id_tipo;
+                                ' AND '.$table.'.type_id = '.$joinTipo->type_id;
 
                             $options['auto_group_flag'] = true;
                         }
@@ -327,7 +327,7 @@ class SqlCompiler
                                 $options['from_alias'][] = $table;
                                 $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
                                     ' AS '.$table.' ON '.implode(' AND ', $conditions).
-                                    ' AND '.$table.'.id_tipo = '.$joinTipo->id_tipo;
+                                    ' AND '.$table.'.type_id = '.$joinTipo->type_id;
 
                                 $options['auto_group_flag'] = true;
                             }
@@ -356,7 +356,7 @@ class SqlCompiler
                             $options['from_alias'][] = $subtable;
                             $options['from'][] = ' LEFT JOIN '.$subJoinTipo->getInterAdminsTableName().
                                 ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$term].
-                                ' AND '.$subtable.'.id_tipo = '.$subJoinTipo->id_tipo;
+                                ' AND '.$subtable.'.type_id = '.$subJoinTipo->type_id;
                         }
 
                         $table = $subtable;
@@ -393,8 +393,8 @@ class SqlCompiler
             $options['from'][] = ' LEFT JOIN '.$joinTipo->getTableName().
                 ' AS '.$alias.' ON '.
                 ($isMulti ?
-                    'FIND_IN_SET('.$alias.'.id_tipo, '.$table.'.'.$column.')' :
-                    $table.'.'.$column.' = '.$alias.'.id_tipo'
+                    'FIND_IN_SET('.$alias.'.type_id, '.$table.'.'.$column.')' :
+                    $table.'.'.$column.' = '.$alias.'.type_id'
                 );
 
             return 'tipo';
@@ -405,7 +405,7 @@ class SqlCompiler
                     'FIND_IN_SET('.$alias.'.id, '.$table.'.'.$column.')' :
                     $table.'.'.$column.' = '.$alias.'.id'
                 ).
-                ' AND '.$alias.'.id_tipo = '.$joinTipo->id_tipo;
+                ' AND '.$alias.'.type_id = '.$joinTipo->type_id;
 
             return 'interadmin';
         }

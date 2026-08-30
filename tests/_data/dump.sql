@@ -18,14 +18,14 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `interadmin_teste_registros`
+-- Table structure for table `interadmin_teste_records`
 --
 
-CREATE TABLE `interadmin_teste_registros` (
+CREATE TABLE `interadmin_teste_records` (
   `id` mediumint(8) UNSIGNED NOT NULL,
   `id_string` varchar(255) NOT NULL,
   `id_slug` varchar(255) NOT NULL,
-  `id_tipo` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
+  `type_id` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
   `parent_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
   `parent_id_tipo` smallint(5) UNSIGNED NOT NULL,
   `date_key` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -108,14 +108,14 @@ CREATE TABLE `interadmin_teste_registros` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `interadmin_teste_en_registros`
+-- Table structure for table `interadmin_teste_en_records`
 --
 
-CREATE TABLE `interadmin_teste_en_registros` (
+CREATE TABLE `interadmin_teste_en_records` (
   `id` mediumint(8) UNSIGNED NOT NULL,
   `id_string` varchar(255) NOT NULL,
   `id_slug` varchar(255) NOT NULL,
-  `id_tipo` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
+  `type_id` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
   `parent_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
   `parent_id_tipo` smallint(5) UNSIGNED NOT NULL,
   `date_key` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -203,36 +203,36 @@ CREATE TABLE `interadmin_teste_en_registros` (
 CREATE TABLE `interadmin_teste_tags` (
   `id_tag` mediumint(8) UNSIGNED NOT NULL,
   `parent_id` mediumint(8) UNSIGNED NOT NULL,
-  `id_tipo` smallint(5) UNSIGNED NOT NULL,
+  `type_id` smallint(5) UNSIGNED NOT NULL,
   `id` mediumint(8) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `interadmin_teste_tipos`
+-- Table structure for table `interadmin_teste_types`
 --
 
-CREATE TABLE `interadmin_teste_tipos` (
-  `id_tipo` smallint(5) UNSIGNED NOT NULL,
+CREATE TABLE `interadmin_teste_types` (
+  `type_id` smallint(5) UNSIGNED NOT NULL,
   `id_tipo_string` varchar(255) NOT NULL,
   `id_slug` varchar(255) NOT NULL,
   `date_modify` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `model_id_tipo` varchar(100) NOT NULL DEFAULT '0',
   `parent_id_tipo` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
   `redirect_id_tipo` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
-  `nome` varchar(100) NOT NULL DEFAULT '',
-  `nome_en` varchar(100) NOT NULL DEFAULT '',
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `name_en` varchar(100) NOT NULL DEFAULT '',
   `texto` text NOT NULL,
   `class` varchar(255) NOT NULL DEFAULT '',
   `class_tipo` varchar(255) NOT NULL DEFAULT '',
-  `icone` varchar(255) NOT NULL,
+  `icon` varchar(255) NOT NULL,
   `template` varchar(255) NOT NULL DEFAULT '',
   `editpage` varchar(255) NOT NULL DEFAULT '',
   `template_inserir` varchar(255) NOT NULL DEFAULT '',
   `tabela` varchar(255) NOT NULL DEFAULT '',
   `disparo` varchar(255) NOT NULL DEFAULT '',
-  `campos` text NOT NULL,
+  `fields` text NOT NULL,
   `arquivos` varchar(50) NOT NULL DEFAULT '',
   `arquivos_ajuda` varchar(255) NOT NULL DEFAULT '',
   `arquivos_2` varchar(50) NOT NULL DEFAULT '',
@@ -245,7 +245,7 @@ CREATE TABLE `interadmin_teste_tipos` (
   `mostrar` char(1) NOT NULL DEFAULT '',
   `language` char(1) NOT NULL DEFAULT '',
   `menu` char(1) NOT NULL DEFAULT '',
-  `busca` char(1) NOT NULL DEFAULT '',
+  `search` char(1) NOT NULL DEFAULT '',
   `restrito` char(1) NOT NULL DEFAULT '',
   `admin` char(1) NOT NULL DEFAULT '',
   `editar` char(1) NOT NULL DEFAULT '',
@@ -275,19 +275,19 @@ CREATE TABLE `interadmin_teste_tipos` (
 --
 -- Indexes for table `interadmin_teste`
 --
-ALTER TABLE `interadmin_teste_registros`
+ALTER TABLE `interadmin_teste_records`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `id_tipo` (`id_tipo`),
+  ADD KEY `type_id` (`type_id`),
   ADD KEY `parent_id` (`parent_id`),
   ADD KEY `select_key` (`select_key`);
-ALTER TABLE `interadmin_teste_registros` ADD FULLTEXT KEY `interadmin_search` (`varchar_key`,`varchar_1`,`varchar_2`,`varchar_3`,`text_1`,`text_2`,`text_3`);
+ALTER TABLE `interadmin_teste_records` ADD FULLTEXT KEY `interadmin_search` (`varchar_key`,`varchar_1`,`varchar_2`,`varchar_3`,`text_1`,`text_2`,`text_3`);
 
 --
--- Indexes for table `interadmin_teste_en_registros`
+-- Indexes for table `interadmin_teste_en_records`
 --
-ALTER TABLE `interadmin_teste_en_registros`
+ALTER TABLE `interadmin_teste_en_records`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `id_tipo` (`id_tipo`),
+  ADD KEY `type_id` (`type_id`),
   ADD KEY `parent_id` (`parent_id`),
   ADD KEY `select_key` (`select_key`);
 
@@ -298,25 +298,25 @@ ALTER TABLE `interadmin_teste_tags`
   ADD PRIMARY KEY (`id_tag`);
 
 --
--- Indexes for table `interadmin_teste_tipos`
+-- Indexes for table `interadmin_teste_types`
 --
-ALTER TABLE `interadmin_teste_tipos`
-  ADD PRIMARY KEY (`id_tipo`);
-ALTER TABLE `interadmin_teste_tipos` ADD FULLTEXT KEY `interadmin_search` (`nome`,`nome_en`,`texto`);
+ALTER TABLE `interadmin_teste_types`
+  ADD PRIMARY KEY (`type_id`);
+ALTER TABLE `interadmin_teste_types` ADD FULLTEXT KEY `interadmin_search` (`name`,`name_en`,`texto`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `interadmin_teste_registros`
+-- AUTO_INCREMENT for table `interadmin_teste_records`
 --
-ALTER TABLE `interadmin_teste_registros`
+ALTER TABLE `interadmin_teste_records`
   MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134911;
 --
--- AUTO_INCREMENT for table `interadmin_teste_en_registros`
+-- AUTO_INCREMENT for table `interadmin_teste_en_records`
 --
-ALTER TABLE `interadmin_teste_en_registros`
+ALTER TABLE `interadmin_teste_en_records`
   MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5983;
 --
 -- AUTO_INCREMENT for table `interadmin_teste_tags`
@@ -324,7 +324,7 @@ ALTER TABLE `interadmin_teste_en_registros`
 ALTER TABLE `interadmin_teste_tags`
   MODIFY `id_tag` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table `interadmin_teste_tipos`
+-- AUTO_INCREMENT for table `interadmin_teste_types`
 --
-ALTER TABLE `interadmin_teste_tipos`
-  MODIFY `id_tipo` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=528;
+ALTER TABLE `interadmin_teste_types`
+  MODIFY `type_id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=528;

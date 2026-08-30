@@ -14,12 +14,12 @@ class RelationTest extends TestCase
     {
         parent::setUp();
 
-        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->seeNumRecords(0, 'interadmin_teste_types');
         $this->userType = $this->createUserType();
 
         $this->cityType = $this->createType(
             [
-                'nome' => 'City',
+                'name' => 'City',
                 //'tags' => 'S',
             ],
             [
@@ -31,19 +31,19 @@ class RelationTest extends TestCase
 
         $this->storeType = $this->createType(
             [
-                'nome' => 'Store',
-                'children' => $this->userType->id_tipo.'{,}Employees{,}{,}{;}'
+                'name' => 'Store',
+                'children' => $this->userType->type_id.'{,}Employees{,}{,}{;}'
             ],
             [
                 ['tipo' => 'varchar_key', 'nome' => 'Name'],
-                ['tipo' => 'select_1', 'nome' => $this->cityType->id_tipo, 'xtra' => SelectField::XTRA_RECORD, 'nome_id' => 'city'],
+                ['tipo' => 'select_1', 'nome' => $this->cityType->type_id, 'xtra' => SelectField::XTRA_RECORD, 'nome_id' => 'city'],
                 ['tipo' => 'char_key', 'nome' => 'Mostrar']
             ]
         );
 
         $this->testimonialType = $this->createType(
             [
-                'nome' => 'Testimonial'
+                'name' => 'Testimonial'
             ],
             [
                 ['tipo' => 'varchar_key', 'nome' => 'Title'],
@@ -253,8 +253,8 @@ class RelationTest extends TestCase
         $city3->save();
 
         DB::table('tags')->insert([
-            ['parent_id' => $testimonial2->id, 'id_tipo' => $city1->id_tipo, 'id' => $city1->id],
-            ['parent_id' => $testimonial2->id, 'id_tipo' => $city2->id_tipo, 'id' => $city2->id],
+            ['parent_id' => $testimonial2->id, 'type_id' => $city1->type_id, 'id' => $city1->id],
+            ['parent_id' => $testimonial2->id, 'type_id' => $city2->type_id, 'id' => $city2->id],
         ]);
 
         $result = Test_Testimonial::orderBy('id')->first();

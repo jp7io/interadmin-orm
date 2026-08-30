@@ -36,8 +36,8 @@ abstract class BaseClassMap
         $arr = [];
         $roots = []; // keep track of duplicated classes
         try {
-            $tipos = DB::table('tipos')
-                ->select($attr, 'id_tipo', 'inherited')
+            $tipos = DB::table('types')
+                ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
                 ->where('deleted_tipo', '=', '')
                 ->where('mostrar', '<>', '')
@@ -51,11 +51,11 @@ abstract class BaseClassMap
                 }
                 if (!$tipo->inherited || !in_array($attr, explode(',', $tipo->inherited))) {
                     if (array_key_exists($class, $roots) && config('interadmin.namespace')) {
-                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in id_tipo: '.$tipo->id_tipo);
+                        throw new \UnexpectedValueException('Duplicate entry for class: '.$class.' in type_id: '.$tipo->type_id);
                     }
                     $roots[$class] = true;
                 }
-                $arr[$tipo->id_tipo] = $class;
+                $arr[$tipo->type_id] = $class;
             }
         } catch (\PDOException $e) {
             $message = "InterAdmin database not connected";
@@ -95,30 +95,30 @@ abstract class BaseClassMap
 
     /**
      * @param  string $class
-     * @return int   id_tipo
+     * @return int   type_id
      */
     public function getClassIdTipo($class): int|string|false
     {
-        $id_tipo = array_search($class, $this->getClasses());
-        if ($id_tipo === false && strpos($class, '\\') !== false) {
+        $type_id = array_search($class, $this->getClasses());
+        if ($type_id === false && strpos($class, '\\') !== false) {
             // Tenants with interadmin.psr-4=false bind types to underscore class
             // names, but a legacy underscore->namespace bridge (class_alias) makes
             // get_called_class() report the namespaced form (e.g. Ci\Loja instead
             // of Ci_Loja). Fall back to the underscore key so static finders
             // (::where/::find/::query/::orderBy) resolve for those aliased classes.
             // Purely additive: only runs when the direct lookup already missed.
-            $id_tipo = array_search(str_replace('\\', '_', $class), $this->getClasses());
+            $type_id = array_search(str_replace('\\', '_', $class), $this->getClasses());
         }
-        return $id_tipo;
+        return $type_id;
     }
 
     /**
-     * @param  int $id_tipo
+     * @param  int $type_id
      * @return string Class
      */
-    public function getClass($id_tipo)
+    public function getClass($type_id)
     {
         $classes = $this->getClasses();
-        return isset($classes[$id_tipo]) ? $classes[$id_tipo] : null;
+        return isset($classes[$type_id]) ? $classes[$type_id] : null;
     }
 }

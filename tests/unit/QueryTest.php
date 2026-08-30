@@ -12,7 +12,7 @@ class QueryTest extends TestCase
     {
         parent::setUp();
 
-        $this->seeNumRecords(0, 'interadmin_teste_tipos');
+        $this->seeNumRecords(0, 'interadmin_teste_types');
         $this->createUserType();
 
         RecordClassMap::getInstance()->clearCache();
@@ -174,7 +174,7 @@ class QueryTest extends TestCase
 
         Test_User::query()->delete();
         $this->assertEquals(0, Test_User::count());
-        $this->seeNumRecords(10, 'interadmin_teste_registros');
+        $this->seeNumRecords(10, 'interadmin_teste_records');
     }
 
     public function testForceDelete()
@@ -182,13 +182,13 @@ class QueryTest extends TestCase
         $this->createUsersBulk(10);
 
         Test_User::where('username', 'User #0')->orderBy('username')->forceDelete();
-        $this->seeNumRecords(9, 'interadmin_teste_registros');
+        $this->seeNumRecords(9, 'interadmin_teste_records');
 
         Test_User::limit(2)->forceDelete();
-        $this->seeNumRecords(7, 'interadmin_teste_registros');
+        $this->seeNumRecords(7, 'interadmin_teste_records');
 
         Test_User::query()->forceDelete();
-        $this->seeNumRecords(0, 'interadmin_teste_registros');
+        $this->seeNumRecords(0, 'interadmin_teste_records');
     }
 
     public function testUpdate()

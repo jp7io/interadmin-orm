@@ -18,7 +18,7 @@ use Jp7\InterAdmin\Type;
  */
 class ColumnsCacheTest extends TestCase
 {
-    private const TIPOS_KEY = 'columns,,interadmin_teste_tipos';
+    private const TIPOS_KEY = 'columns,,interadmin_teste_types';
 
     protected function setUp(): void
     {
@@ -37,7 +37,7 @@ class ColumnsCacheTest extends TestCase
     {
         $columns = (new Type)->getColumns();
 
-        $this->assertContains('campos', $columns);
+        $this->assertContains('fields', $columns);
         $this->assertSame($columns, Cache::get(self::TIPOS_KEY));
     }
 
@@ -61,8 +61,8 @@ class ColumnsCacheTest extends TestCase
 
         $columns = (new Type)->getColumns();
 
-        $this->assertContains('campos', $columns);
-        $this->assertContains('campos', Cache::get(self::TIPOS_KEY));
+        $this->assertContains('fields', $columns);
+        $this->assertContains('fields', Cache::get(self::TIPOS_KEY));
     }
 
     /**
@@ -77,8 +77,8 @@ class ColumnsCacheTest extends TestCase
         $this->assertSame(
             [],
             $type->getColumns(),
-            'interadmin_teste_interadmin_teste_registros does not exist; '.
-            'it must not be answered with interadmin_teste_registros'
+            'interadmin_teste_interadmin_teste_records does not exist; '.
+            'it must not be answered with interadmin_teste_records'
         );
     }
 
@@ -91,7 +91,7 @@ class ColumnsCacheTest extends TestCase
         Cache::put(self::TIPOS_KEY, [], 5);
         Cache::tag(Type::CACHE_TAG)->flush(); // force campos to be re-derived from the row
 
-        $campos = (new Type($userType->id_tipo))->getFields();
+        $campos = (new Type($userType->type_id))->getFields();
 
         $this->assertArrayHasKey('varchar_key', $campos);
     }
@@ -101,14 +101,14 @@ class ColumnsCacheTest extends TestCase
      */
     public function testDoesNotCacheAnEmptyFieldMap()
     {
-        $type = $this->createType(['nome' => 'Fieldless'], []);
+        $type = $this->createType(['name' => 'Fieldless'], []);
         $cache = Cache::tag(Type::CACHE_TAG);
-        $cacheKey = 'campos,,'.$type->id_tipo;
+        $cacheKey = 'campos,,'.$type->type_id;
 
         $this->assertSame([], $type->getFields());
         $this->assertNull($cache->get($cacheKey), 'An empty field map must not be persisted.');
 
-        $type->campos = $this->createFields([['tipo' => 'varchar_key', 'nome' => 'Title']]);
+        $type->fields = $this->createFields([['tipo' => 'varchar_key', 'nome' => 'Title']]);
 
         $this->assertArrayHasKey('varchar_key', $type->getFields());
         $this->assertNotEmpty($cache->get($cacheKey));
@@ -127,6 +127,6 @@ class DoublePrefixTableType extends Type
 {
     public function getTableName()
     {
-        return 'interadmin_teste_interadmin_teste_registros';
+        return 'interadmin_teste_interadmin_teste_records';
     }
 }
