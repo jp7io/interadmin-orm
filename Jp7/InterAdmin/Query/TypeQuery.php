@@ -90,7 +90,7 @@ class TypeQuery extends BaseQuery
         $className = Type::getDefaultClass();
 
         $child = new $className();
-        $child->parent_id_tipo = $this->provider->type_id;
+        $child->parent_type_id = $this->provider->type_id;
         $child->mostrar = 'S';
 
         return $child->fill($attributes);

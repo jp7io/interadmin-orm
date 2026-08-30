@@ -119,7 +119,7 @@ class Type extends RecordAbstract
     protected $_primary_key = 'type_id';
 
     /**
-     * Contains the parent Type object, i.e. the record with an 'type_id' equal to this record's 'parent_id_tipo'.
+     * Contains the parent Type object, i.e. the record with an 'type_id' equal to this record's 'parent_type_id'.
      *
      * @var self
      */
@@ -269,8 +269,8 @@ class Type extends RecordAbstract
     }
     /*
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
-        if (!isset($this->attributes['model_id_tipo'])) {
-            $eagerload = array('name', 'language', 'parent_id_tipo', 'fields', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
+        if (!isset($this->attributes['model_type_id'])) {
+            $eagerload = array('name', 'language', 'parent_type_id', 'fields', 'model_type_id', 'tabela', 'class', 'class_tipo', 'template', 'children');
             $neededFields = array_unique(array_merge((array) $fields, $eagerload));
             $values = parent::getFieldsValues($neededFields);
             if (is_array($fields)) {
@@ -287,17 +287,17 @@ class Type extends RecordAbstract
      *
      * @param array $options Default array of options. Available keys: class.
      *
-     * @return Type|RecordAbstract|null Null for a root type, which has no parent_id_tipo.
+     * @return Type|RecordAbstract|null Null for a root type, which has no parent_type_id.
      */
     public function getParent($options = [])
     {
         if ($this->_parent) {
             return $this->_parent;
         }
-        if ($this->parent_id_tipo) {
+        if ($this->parent_type_id) {
             $options['default_namespace'] = static::DEFAULT_NAMESPACE;
 
-            return $this->_parent = self::getInstance($this->parent_id_tipo, $options);
+            return $this->_parent = self::getInstance($this->parent_type_id, $options);
         }
     }
 
@@ -381,12 +381,12 @@ class Type extends RecordAbstract
     public function children()
     {
         $query = new Query\TypeQuery($this);
-        return $query->where('parent_id_tipo', $this->type_id);
+        return $query->where('parent_type_id', $this->type_id);
     }
 
-    public function childrenByModel($model_id_tipo)
+    public function childrenByModel($model_type_id)
     {
-        return $this->children()->where('model_id_tipo', $model_id_tipo);
+        return $this->children()->where('model_type_id', $model_type_id);
     }
 
     /**
@@ -567,7 +567,7 @@ class Type extends RecordAbstract
     }
 
     /**
-     * Returns the model identified by model_id_tipo, or the object itself if it has no model.
+     * Returns the model identified by model_type_id, or the object itself if it has no model.
      *
      * @param array $options Default array of options.
      *
@@ -575,11 +575,11 @@ class Type extends RecordAbstract
      */
     public function getModel()
     {
-        if ($this->model_id_tipo) {
-            if (is_numeric($this->model_id_tipo)) {
-                $model = Type::getInstance($this->model_id_tipo, ['default_namespace' => static::DEFAULT_NAMESPACE]);
+        if ($this->model_type_id) {
+            if (is_numeric($this->model_type_id)) {
+                $model = Type::getInstance($this->model_type_id, ['default_namespace' => static::DEFAULT_NAMESPACE]);
             } else {
-                $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
+                $className = 'Jp7_Model_'.$this->model_type_id.'Tipo';
                 $model = new $className();
             }
 
@@ -805,7 +805,7 @@ class Type extends RecordAbstract
      */
     public function save()
     {
-        $this->id_tipo_string = toId($this->name);
+        $this->type_id_string = toId($this->name);
         $this->id_slug = to_slug($this->name);
 
         // log
@@ -819,7 +819,7 @@ class Type extends RecordAbstract
         // Inheritance - Tipos inheriting from this Tipo
         if ($this->type_id) {
             $inheritingTipos = $this->deprecatedGetChildren([
-                'where' => ["model_id_tipo = '".$this->type_id."'"],
+                'where' => ["model_type_id = '".$this->type_id."'"],
                 'class' => self::class,
             ]);
             foreach ($inheritingTipos as $tipo) {
@@ -847,11 +847,11 @@ class Type extends RecordAbstract
         }
         $this->inherited = [];
         // Atualizando cache com dados do modelo
-        if ($this->model_id_tipo) {
-            if (is_numeric($this->model_id_tipo)) {
-                $model = new self($this->model_id_tipo);
+        if ($this->model_type_id) {
+            if (is_numeric($this->model_type_id)) {
+                $model = new self($this->model_type_id);
             } else {
-                $className = 'Jp7_Model_'.$this->model_id_tipo.'Tipo';
+                $className = 'Jp7_Model_'.$this->model_type_id.'Tipo';
                 $model = new $className();
             }
             foreach (self::$inheritedFields as $field) {
@@ -1133,7 +1133,7 @@ class Type extends RecordAbstract
         $unsyncedTypes = DB::table('types AS child')
             ->select('child.*')
             ->join('types AS model', function ($join) {
-                $join->on('model.type_id', '=', 'child.model_id_tipo')
+                $join->on('model.type_id', '=', 'child.model_type_id')
                     ->on(function ($q) {
                         $q->on('model.campos', '<>', 'child.campos')
                             ->orOn('model.children', '<>', 'child.children');
@@ -1280,7 +1280,7 @@ class Type extends RecordAbstract
     }
 
     /**
-     * Returns all Type's using this Type as a model (model_id_tipo).
+     * Returns all Type's using this Type as a model (model_type_id).
      *
      * @param array $options [optional]
      *
@@ -1293,7 +1293,7 @@ class Type extends RecordAbstract
                 'fields' => 'type_id',
                 'from' => $this->getTableName().' AS main',
                 'where' => [
-                    "model_id_tipo = '".$this->type_id."'",
+                    "model_type_id = '".$this->type_id."'",
                 ],
             ];
             $rs = $this->_executeQuery($options2);
@@ -1383,7 +1383,7 @@ class Type extends RecordAbstract
                 // NULL to avoid finding children for invalid parents without ID
                 $options['where'][] =  'parent_id = '.($this->_parent->id ?: 'NULL');
                 if ($this->_parent->type_id) {
-                    $options['where'][] = 'parent_id_tipo = '.$this->_parent->type_id;
+                    $options['where'][] = 'parent_type_id = '.$this->_parent->type_id;
                 }
             }
         }
@@ -1391,7 +1391,7 @@ class Type extends RecordAbstract
 
     public function getInterAdminsAdminAttributes()
     {
-        return ['id_slug', 'id_string', 'parent_id', 'parent_id_tipo', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted', 'hits'];
+        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted', 'hits'];
     }
 
     public function getFillable()
@@ -1400,7 +1400,7 @@ class Type extends RecordAbstract
     }
 
     /**
-     * Returns all records having an Type that uses this as a model (model_id_tipo).
+     * Returns all records having an Type that uses this as a model (model_type_id).
      *
      * @param array $options [optional]
      *

@@ -31,7 +31,7 @@ parameters:
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$id_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$type_id\.$#'
 			identifier: property.notFound
 			count: 4
 			path: Jp7/InterAdmin/FileRecord.php
@@ -73,7 +73,7 @@ parameters:
 			path: Jp7/InterAdmin/Log.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Log\:\:\$id_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Log\:\:\$type_id\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/Log.php
@@ -133,7 +133,7 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$id_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$type_id\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/Record.php
@@ -151,7 +151,7 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$parent_id_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$parent_type_id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Record.php
@@ -175,7 +175,7 @@ parameters:
 			path: Jp7/InterAdmin/RecordAbstract.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$campos\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$fields\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php
@@ -205,7 +205,7 @@ parameters:
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$id_tipo_string\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$type_id_string\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php
@@ -229,19 +229,19 @@ parameters:
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$model_id_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$model_type_id\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$nome\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 4
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$parent_id_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$parent_type_id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php

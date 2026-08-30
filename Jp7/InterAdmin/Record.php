@@ -704,13 +704,13 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 Relation::eagerLoad(self::$_collections[$this->_collection_id], '_parent');
                 return $this->_parent;
             }
-            $this->loadAttributes(['parent_id', 'parent_id_tipo'], false);
+            $this->loadAttributes(['parent_id', 'parent_type_id'], false);
 
             if ($this->parent_id) {
-                if (!$this->parent_id_tipo) {
-                    throw new Exception('Field parent_id_tipo is required. Id: '.$this->id);
+                if (!$this->parent_type_id) {
+                    throw new Exception('Field parent_type_id is required. Id: '.$this->id);
                 }
-                $this->_parent = Type::getInstance($this->parent_id_tipo)
+                $this->_parent = Type::getInstance($this->parent_type_id)
                     ->records()
                     ->find($this->parent_id);
                 if ($this->_parent) {
@@ -738,7 +738,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $parent->type_id = $parent->type_id ?? 0; // needed for reference
         // by reference, allows parent to be saved after child is created
         $this->attributes['parent_id'] = &$parent->id;
-        $this->attributes['parent_id_tipo'] = &$parent->type_id;
+        $this->attributes['parent_type_id'] = &$parent->type_id;
     }
 
     /**
