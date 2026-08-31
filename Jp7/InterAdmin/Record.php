@@ -857,6 +857,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         // Internal use
         $options['aliases'] = $arquivoModel->getAttributesAliases();
         $options['field_definitions'] = $arquivoModel->getAttributesFields();
+        $options['has_file_fields'] = false;
 
         $rs = $this->_executeQuery($options);
 

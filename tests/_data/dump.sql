@@ -210,6 +210,31 @@ CREATE TABLE `interadmin_teste_tags` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `interadmin_teste_files`
+--
+
+CREATE TABLE `interadmin_teste_files` (
+  `file_id` int(10) UNSIGNED NOT NULL,
+  `type_id` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
+  `id` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `part` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+  `url` varchar(255) NOT NULL DEFAULT '',
+  `url_thumb` varchar(255) NOT NULL DEFAULT '',
+  `url_zoom` varchar(255) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `caption` varchar(255) NOT NULL DEFAULT '',
+  `credits` varchar(255) NOT NULL DEFAULT '',
+  `link` varchar(255) NOT NULL DEFAULT '',
+  `link_blank` char(1) NOT NULL DEFAULT '',
+  `visible` char(1) NOT NULL DEFAULT '',
+  `featured` char(1) NOT NULL DEFAULT '',
+  `position` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
+  `deleted` char(1) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `interadmin_teste_types`
 --
 
@@ -298,6 +323,13 @@ ALTER TABLE `interadmin_teste_tags`
   ADD PRIMARY KEY (`id_tag`);
 
 --
+-- Indexes for table `interadmin_teste_files`
+--
+ALTER TABLE `interadmin_teste_files`
+  ADD PRIMARY KEY (`file_id`),
+  ADD KEY `type_id` (`type_id`);
+
+--
 -- Indexes for table `interadmin_teste_types`
 --
 ALTER TABLE `interadmin_teste_types`
@@ -323,6 +355,11 @@ ALTER TABLE `interadmin_teste_en_records`
 --
 ALTER TABLE `interadmin_teste_tags`
   MODIFY `id_tag` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `interadmin_teste_files`
+--
+ALTER TABLE `interadmin_teste_files`
+  MODIFY `file_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `interadmin_teste_types`
 --

@@ -382,7 +382,7 @@ abstract class RecordAbstract
     /**
      * Executes a SQL Query based on the values passed by $options.
      *
-     * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, field_definitions and aliases.
+     * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, field_definitions, aliases and has_file_fields.
      * @param string $_stmt Performs DELETE or UPDATE instead of a SELECT
      * @param array $_valuesToSave On UPDATE calls SET these values
      * @return ADORecordSet
@@ -602,6 +602,9 @@ abstract class RecordAbstract
     {
         $fieldDefinitions = &$options['field_definitions'];
         $aliases = &$options['aliases'];
+        // The gate belongs to the table being SELECTed, which is not always $this: a record
+        // asks for its own files, whose `file_id` is a primary key rather than a field.
+        $hasFileFields = $options['has_file_fields'] ?? $this->hasFileFields;
         $fields = $options['fields'];
 
         foreach ($fields as $key => $field) {
@@ -680,7 +683,7 @@ abstract class RecordAbstract
             // Sem join
             } else {
                 $name = $this->_aliasToColumn($field, $aliases);
-                if ($this->hasFileFields && strpos($name, 'file_') === 0 && strpos($name, '_text') === false) {
+                if ($hasFileFields && strpos($name, 'file_') === 0 && strpos($name, '_text') === false) {
                     $fields[] = $table.$name.'_text';
                 }
 

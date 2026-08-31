@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  * UnitTester actor and its Db module.
  *
  * The Db module was configured `populate: true, cleanup: true`, i.e. reload the dump before
- * every test. The dump is pure DDL -- four tables, zero rows -- so the same isolation comes
+ * every test. The dump is pure DDL -- five tables, zero rows -- so the same isolation comes
  * from loading it once in bootstrap and truncating between tests, which is far cheaper.
  */
 abstract class TestCase extends BaseTestCase
@@ -17,6 +17,7 @@ abstract class TestCase extends BaseTestCase
     private const TABLES = [
         'interadmin_teste_records',
         'interadmin_teste_en_records',
+        'interadmin_teste_files',
         'interadmin_teste_tags',
         'interadmin_teste_types',
     ];
