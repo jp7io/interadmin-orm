@@ -1141,7 +1141,7 @@ class Type extends RecordAbstract
             ->join('types AS model', function ($join) {
                 $join->on('model.type_id', '=', 'child.model_type_id')
                     ->on(function ($q) {
-                        $q->on('model.campos', '<>', 'child.campos')
+                        $q->on('model.fields', '<>', 'child.fields')
                             ->orOn('model.children', '<>', 'child.children');
                     });
             })
