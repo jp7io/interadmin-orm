@@ -6,13 +6,13 @@ use Exception;
 use UnexpectedValueException;
 
 /**
- * Class which represents records on the table interadmin_{client name}_arquivos.
+ * Class which represents records on the table interadmin_{client name}_files.
  */
 class FileRecord extends RecordAbstract
 {
     use Downloadable;
 
-    protected $_primary_key = 'id_arquivo';
+    protected $_primary_key = 'file_id';
     /** A fixed column list, so `file_` is an ordinary prefix here and `file_id` is an int. */
     protected $hasFileFields = false;
 
@@ -37,12 +37,12 @@ class FileRecord extends RecordAbstract
     /**
      * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
      *
-     * @param int   $id_arquivo This record's 'id_arquivo'.
+     * @param int   $file_id This record's 'file_id'.
      * @param array $options    Default array of options. Available keys: db_prefix, fields.
      */
-    public function __construct($id_arquivo = 0)
+    public function __construct($file_id = 0)
     {
-        $this->id_arquivo = $id_arquivo;
+        $this->file_id = $file_id;
     }
     /**
      * Gets the Type object for this record, which is then cached on the $_type property.
@@ -56,7 +56,7 @@ class FileRecord extends RecordAbstract
         if (!$this->_type) {
             if (!$this->type_id) {
                 throw new UnexpectedValueException(
-                    'Cannot resolve the Type of file record '.$this->id_arquivo.': it has no type_id. '.
+                    'Cannot resolve the Type of file record '.$this->file_id.': it has no type_id. '.
                     'Call setType() before getType() -- looking the column up from the table was never '.
                     'implemented, it only called jp7io/inc, which this package no longer depends on.'
                 );
@@ -114,12 +114,12 @@ class FileRecord extends RecordAbstract
      */
     public function getText()
     {
-        return $this->legenda;
+        return $this->caption;
     }
 
     public function getName()
     {
-        return $this->nome;
+        return $this->name;
     }
 
     public function getAttributesAliases(): array
@@ -133,19 +133,19 @@ class FileRecord extends RecordAbstract
 
     public function getFillable(): array
     {
-        return ['part', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem'];
+        return ['part', 'url', 'url_thumb', 'url_zoom', 'name', 'caption', 'credits', 'link', 'link_blank', 'visible', 'featured', 'position'];
     }
 
     public function getAttributesNames(): array
     {
-        return ['id_arquivo', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['file_id', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'name', 'caption', 'credits', 'link', 'link_blank', 'visible', 'featured', 'position', 'deleted'];
     }
     public function getTableName()
     {
         if ($this->type_id) {
             return $this->getType()->getArquivosTableName();
         } else {
-            return $this->db_prefix.'_arquivos';
+            return $this->db_prefix.'_files';
         }
     }
 

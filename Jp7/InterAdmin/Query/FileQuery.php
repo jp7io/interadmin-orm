@@ -10,8 +10,8 @@ class FileQuery extends BaseQuery
     protected function _isChar($field): bool
     {
         $chars = [
-            'mostrar',
-            'destaque',
+            'visible',
+            'featured',
             'deleted',
             'link_blank',
         ];
@@ -45,7 +45,7 @@ class FileQuery extends BaseQuery
 
     public function count(): int
     {
-        return count($this->provider->deprecated_getArquivos(['fields' => 'id_arquivo'] + $this->options));
+        return count($this->provider->deprecated_getArquivos(['fields' => 'file_id'] + $this->options));
     }
 
     /**
@@ -64,7 +64,7 @@ class FileQuery extends BaseQuery
             return null; // save a query
         }
 
-        $this->options['where'][] = $this->_parseComparison('id_arquivo', '=', $id);
+        $this->options['where'][] = $this->_parseComparison('file_id', '=', $id);
 
         return $this->first();
     }

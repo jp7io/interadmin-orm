@@ -50,7 +50,9 @@ class PublishedFilter
             // concatenate that as ''.
             return null;
         } elseif ($table === 'files') {
-            return $alias.".mostrar <> '' AND ".$alias.".deleted = '' AND ";
+            // Same `visible` as the types branch since increment 7, and still a branch of its own:
+            // a type is soft-deleted through `deleted_at`, a file through `deleted`.
+            return $alias.".visible <> '' AND ".$alias.".deleted = '' AND ";
         }
 
         return self::recordsSql($alias);

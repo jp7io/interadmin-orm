@@ -25,19 +25,19 @@ parameters:
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$id_arquivo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$file_id\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$legenda\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$caption\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/FileRecord.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$nome\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/FileRecord.php
@@ -151,7 +151,7 @@ parameters:
 			path: Jp7/InterAdmin/RecordAbstract.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$class_tipo\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$class_type\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/Type.php

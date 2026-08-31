@@ -143,9 +143,11 @@ class FileDatabase extends RecordAbstract
         return [];
     }
 
+    /** ⚠ The FILES table's shape, not this one's. Inert -- _resolveWildcard() intersects it with
+     * getColumns() -- but a name here is not evidence of a column on files_database. */
     public function getAttributesNames(): array
     {
-        return ['id_arquivo', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['file_id', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'name', 'caption', 'credits', 'link', 'link_blank', 'visible', 'featured', 'position', 'deleted'];
     }
 
     public function getTagFilters(): string

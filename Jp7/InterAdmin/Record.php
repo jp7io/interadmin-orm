@@ -800,7 +800,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     }
 
     /**
-     * Creates a new FileRecord with type_id, id and mostrar set.
+     * Creates a new FileRecord with type_id, id and visible set.
      *
      * @param array $attributes [optional]
      *
@@ -815,7 +815,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $arquivo = new $className();
         $arquivo->setParent($this);
         $arquivo->setType($this->getType());
-        $arquivo->mostrar = 'S';
+        $arquivo->visible = 'S';
 
         return $arquivo->fill($attributes);
     }
@@ -849,11 +849,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $this->_resolveWildcard($options['fields'], $arquivoModel);
         $this->_whereArrayFix($options['where']); // FIXME
 
-        $options['fields'] = array_merge(['id_arquivo'], (array) $options['fields']);
+        $options['fields'] = array_merge(['file_id'], (array) $options['fields']);
         $options['from'] = $arquivoModel->getTableName().' AS main';
         $options['where'][] = 'type_id = '.intval($this->type_id);
         $options['where'][] = 'id = '.intval($this->id);
-        $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' ordem';
+        $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' position';
         // Internal use
         $options['aliases'] = $arquivoModel->getAttributesAliases();
         $options['campos'] = $arquivoModel->getAttributesFields();
@@ -862,7 +862,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
 
         $records = [];
         foreach ($rs as $row) {
-            $arquivo = new $className($row->id_arquivo, [
+            $arquivo = new $className($row->file_id, [
                 'db' => $this->_db,
             ]);
             $arquivo->setType($this->getType());
