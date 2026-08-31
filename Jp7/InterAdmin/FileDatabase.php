@@ -6,7 +6,7 @@ namespace Jp7\InterAdmin;
  * @property int $file_database_id  PK
  * @property int $type_id
  * @property int $id    Parent record ID
- * @property int $part  0, 2, 3 - the arquivos tabs
+ * @property int $part  0, 2, 3 - the file slots
  * @property string $kind gif, bmp - the extension
  * @property string $keywords
  * @property string $thumb obsoleto

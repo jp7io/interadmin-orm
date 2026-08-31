@@ -39,13 +39,13 @@ class FileFieldPrefixTest extends TestCase
     }
 
     /**
-     * The SELECT side of the same gate. `arquivos()` runs its query through the PARENT record,
+     * The SELECT side of the same gate. `files()` runs its query through the PARENT record,
      * whose `file_` columns really are fields, so an ungated field list asks the files table
      * for a `file_id_text` twin of its own primary key and 42S22s on every record with files.
      */
     public function testAFilesQueryAsksForNoTextTwinOfThePrimaryKey(): void
     {
-        $this->createType(['name' => 'Gallery', 'arquivos' => 'S'], [
+        $this->createType(['name' => 'Gallery', 'files_1' => 'S'], [
             ['type' => 'varchar_key', 'name' => 'Title'],
         ]);
         RecordClassMap::getInstance()->clearCache();
@@ -54,9 +54,9 @@ class FileFieldPrefixTest extends TestCase
         $gallery->title = 'Dia das Crianças';
         $gallery->save();
 
-        $gallery->arquivos()->create(['url' => 'gallery/a.jpg', 'caption' => 'Legenda']);
+        $gallery->files()->create(['url' => 'gallery/a.jpg', 'caption' => 'Legenda']);
 
-        $files = $gallery->arquivos()->get();
+        $files = $gallery->files()->get();
 
         $this->assertCount(1, $files);
         $this->assertSame('gallery/a.jpg', $files->first()->url);

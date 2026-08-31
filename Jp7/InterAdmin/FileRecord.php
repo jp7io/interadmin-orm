@@ -143,7 +143,7 @@ class FileRecord extends RecordAbstract
     public function getTableName()
     {
         if ($this->type_id) {
-            return $this->getType()->getArquivosTableName();
+            return $this->getType()->getFilesTableName();
         } else {
             return $this->db_prefix.'_files';
         }

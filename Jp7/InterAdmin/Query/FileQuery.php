@@ -24,7 +24,7 @@ class FileQuery extends BaseQuery
      */
     protected function providerFind($options)
     {
-        return $this->provider->deprecated_getArquivos($options);
+        return $this->provider->deprecated_getFiles($options);
     }
 
     /**
@@ -32,7 +32,7 @@ class FileQuery extends BaseQuery
      */
     public function build(array $attributes = [])
     {
-        return $this->provider->deprecated_createArquivo($attributes);
+        return $this->provider->deprecated_createFile($attributes);
     }
 
     /**
@@ -45,7 +45,7 @@ class FileQuery extends BaseQuery
 
     public function count(): int
     {
-        return count($this->provider->deprecated_getArquivos(['fields' => 'file_id'] + $this->options));
+        return count($this->provider->deprecated_getFiles(['fields' => 'file_id'] + $this->options));
     }
 
     /**

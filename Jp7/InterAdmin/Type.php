@@ -113,7 +113,7 @@ class Type extends RecordAbstract
         'class', 'class_type', 'icon', 'layout', 'layout_records', 'table_name',
         'template', 'children', 'fields', 'language', 'edit', 'single', 'trigger_function',
         'editpage', 'template_view', 'template_insert', 'tags_list', 'hits', 'description',
-        'xtra_disabledfields', 'xtra_disabledchildren', 'arquivos'
+        'xtra_disabledfields', 'xtra_disabledchildren', 'files_1'
     ];
     private static $privateFields = ['children', 'fields'];
 
@@ -991,7 +991,7 @@ class Type extends RecordAbstract
      *
      * @return string
      */
-    public function getArquivosTableName()
+    public function getFilesTableName()
     {
         return $this->_getTableLang().'files';
     }
