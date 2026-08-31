@@ -140,7 +140,7 @@ class SqlCompiler
      */
     public function resolve($clause, array &$options, $use_published_filters)
     {
-        $campos = &$options['campos'];
+        $fieldDefinitions = &$options['field_definitions'];
         $aliases = &$options['aliases'];
 
         $quoted = '(\'((?<=\\\\)\'|[^\'])*\'|"((?<=\\\\)"|[^"])*")';
@@ -289,32 +289,32 @@ class SqlCompiler
                         $joinAliases = [];
                     } else {
                         $joinName = isset($aliases[$table]) ? $aliases[$table] : $table;
-                        // Permite utilizar relacionamentos no where sem ter usado o campo no fields
+                        // Lets a where clause use a relation that the field list never selected.
                         if (isset($options['joins'][$table])) {
                             if ($subTerm) {
                                 $options['pre_joins'][$table] = true;
                             }
                             $joinType = $options['joins'][$table][1];
                         // Joins de select
-                        } elseif (isset($aliases[$joinName.'_id']) && isset($campos[$aliases[$joinName.'_id']])) {
+                        } elseif (isset($aliases[$joinName.'_id']) && isset($fieldDefinitions[$aliases[$joinName.'_id']])) {
                             $joinName = $aliases[$joinName.'_id'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $this->addJoin($options, $table, $campos[$joinName]);
+                                $this->addJoin($options, $table, $fieldDefinitions[$joinName]);
                             }
-                            $joinType = $this->record->getFieldType($campos[$joinName]);
+                            $joinType = $this->record->getFieldType($fieldDefinitions[$joinName]);
                         // Joins de select_multi
-                        } elseif (isset($aliases[$joinName.'_ids']) && isset($campos[$aliases[$joinName.'_ids']])) {
+                        } elseif (isset($aliases[$joinName.'_ids']) && isset($fieldDefinitions[$aliases[$joinName.'_ids']])) {
                             $joinName = $aliases[$joinName.'_ids'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $this->addJoin($options, $table, $campos[$joinName]);
+                                $this->addJoin($options, $table, $fieldDefinitions[$joinName]);
                             }
-                            $joinType = $this->record->getFieldType($campos[$joinName]);
+                            $joinType = $this->record->getFieldType($fieldDefinitions[$joinName]);
                         // Joins de special
-                        } elseif (isset($campos[$joinName])) {
+                        } elseif (isset($fieldDefinitions[$joinName])) {
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $this->addJoin($options, $table, $campos[$joinName]);
+                                $this->addJoin($options, $table, $fieldDefinitions[$joinName]);
                             }
-                            $joinType = $this->record->getFieldType($campos[$joinName]);
+                            $joinType = $this->record->getFieldType($fieldDefinitions[$joinName]);
                         } elseif (isset($options['model']) && method_exists($options['model'], $joinName)) {
                             $relationshipData = $options['model']->$joinName()->getRelationshipData();
 
@@ -348,10 +348,10 @@ class SqlCompiler
                         $subtable = $table.'__'.$term;
                         $term = $term.'_id';
 
-                        $subCampos = $joinType->getFields();
-                        $subJoinType = $joinType->getFieldType($subCampos[$joinAliases[$term]]);
+                        $subFieldDefinitions = $joinType->getFields();
+                        $subJoinType = $joinType->getFieldType($subFieldDefinitions[$joinAliases[$term]]);
 
-                        // Permite utilizar relacionamentos no where sem ter usado o campo no fields
+                        // Lets a where clause use a relation that the field list never selected.
                         if (!in_array($subtable, $options['from_alias'])) {
                             $options['from_alias'][] = $subtable;
                             $options['from'][] = ' LEFT JOIN '.$subJoinType->getInterAdminsTableName().

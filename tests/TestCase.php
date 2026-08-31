@@ -160,12 +160,12 @@ abstract class TestCase extends BaseTestCase
         foreach ($fields as $field) {
             $fieldsVector[] = $this->createField($field);
         }
-        return interadmin_tipos_campos_encode($fieldsVector);
+        return interadmin_type_fields_encode($fieldsVector);
     }
 
     /**
      * The 16 positional slots of Type::getFields(), in order. No display-order key belongs
-     * here: interadmin_tipos_campos_encode() implode()s whatever it is given, dropping only a
+     * here: interadmin_type_fields_encode() implode()s whatever it is given, dropping only a
      * key literally spelled `ordem`, so any other name shifts every field one slot right.
      */
     protected function createField(array $field): array

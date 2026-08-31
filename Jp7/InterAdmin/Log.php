@@ -20,7 +20,7 @@ use Request;
  * Class representing records on the table interadmin_{client name}_logs.
  *
  * The nine below are getAttributesNames(), which is a FIXED list here: unlike Record, a log has no
- * campos and getAttributesAliases() is empty, so naming them is reading this class rather than
+ * field definitions and getAttributesAliases() is empty, so naming them is reading this class rather than
  * guessing at a tenant's field layout. A `date_` value arrives as a Date, getMutatedAttribute()
  * casting every string on that prefix.
  *
@@ -219,7 +219,7 @@ class Log extends RecordAbstract
         }
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();
-        $options['campos'] = $instance->getAttributesFields();
+        $options['field_definitions'] = $instance->getAttributesFields();
 
         $rs = $instance->_executeQuery($options);
         $logs = [];

@@ -153,7 +153,7 @@ abstract class RecordAbstract
             'use_published_filters' => false,
             // Internal use
             'aliases' => $this->getAttributesAliases(),
-            'campos' => $this->getAttributesFields(),
+            'field_definitions' => $this->getAttributesFields(),
         ];
         $rs = $this->_executeQuery($options);
         if ($row = array_shift($rs)) {
@@ -382,7 +382,7 @@ abstract class RecordAbstract
     /**
      * Executes a SQL Query based on the values passed by $options.
      *
-     * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
+     * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, field_definitions and aliases.
      * @param string $_stmt Performs DELETE or UPDATE instead of a SELECT
      * @param array $_valuesToSave On UPDATE calls SET these values
      * @return ADORecordSet
@@ -600,12 +600,12 @@ abstract class RecordAbstract
      */
     protected function _resolveFieldsAlias(&$options = [], $table = 'main.')
     {
-        $campos = &$options['campos'];
+        $fieldDefinitions = &$options['field_definitions'];
         $aliases = &$options['aliases'];
         $fields = $options['fields'];
 
         foreach ($fields as $key => $field) {
-            // Traduzindo 'join.campo' para 'join' => array('campo')
+            // Translate 'join.field' into 'join' => array('field')
             if (is_string($field) && strpos($field, '.') !== false && strpos($field, '(') === false) {
                 list($join, $name) = explode('.', $field);
                 $fields[$join][] = $name;
@@ -625,7 +625,7 @@ abstract class RecordAbstract
                     $joinType = null; // Just ignore select_multi used on legacy code, lazy load them
                     /*
                     $fields[] = $table.$name.(($table != 'main.') ? ' AS `'.$table.$name.'`' : '');
-                    // Processamento dos campos do select_multi é feito depois
+                    // select_multi fields are processed later
                     $joinType = null;
                     $options['select_multi_fields'][$join] = [
                         'fields' => $fields[$join],
@@ -640,15 +640,15 @@ abstract class RecordAbstract
                     $fields[] = $table.$name.(($table != 'main.') ? ' AS `'.$table.$name.'`' : '');
                     // Join e Recursividade
                     if (empty($options['from_alias']) || !in_array($join, (array) $options['from_alias'])) {
-                        if (!isset($campos[$name])) {
+                        if (!isset($fieldDefinitions[$name])) {
                             throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
                         }
-                        $joinClasse = $this->_addJoinAlias($options, $join, $campos[$name]);
+                        $joinClasse = $this->_addJoinAlias($options, $join, $fieldDefinitions[$name]);
                         if ($joinClasse !== 'type') {
                             $fields[$join][] = 'id';
                         }
                     }
-                    $joinType = $this->getFieldType($campos[$name]);
+                    $joinType = $this->getFieldType($fieldDefinitions[$name]);
                 }
                 if ($joinType) {
                     $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinType);
@@ -657,7 +657,7 @@ abstract class RecordAbstract
                     $joinOptions = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
-                        'campos' => $joinType->getFields(),
+                        'field_definitions' => $joinType->getFields(),
                         'aliases' => array_flip($joinType->getFieldAliases()),
                     ];
                     $this->_resolveFieldsAlias($joinOptions, $join.'.');
@@ -734,7 +734,7 @@ abstract class RecordAbstract
      */
     protected function _getAttributesFromRow($row, $object, $options)
     {
-        //$campos = &$options['campos'];
+        //$fieldDefinitions = &$options['field_definitions'];
         $attributes = &$object->attributes;
 
         foreach ($row as $key => $value) {
@@ -748,7 +748,7 @@ abstract class RecordAbstract
                 $attributes[$field] = $value;
                 /*
                 if (!empty($options['select_multi_fields'])) {
-                    if (strpos($campos[$field]['type'], 'select_multi_') === 0) {
+                    if (strpos($fieldDefinitions[$field]['type'], 'select_multi_') === 0) {
                         $multi_options = $options['select_multi_fields'][$alias];
                         if ($multi_options) {
                             Relation::getFieldsValues($value, $multi_options['fields'], $multi_options['fields_alias']);
@@ -895,7 +895,7 @@ abstract class RecordAbstract
      * name this class got wrong -- and it is not a fact worth keeping for even a second.
      *
      * Keeping it wedges the whole tenant instead of the one call that failed. Type's attribute
-     * names ARE this listing, so an empty one stops Type::__get() recognising `campos` as a
+     * names ARE this listing, so an empty one stops Type::__get() recognising `fields` as a
      * column; the types row then never lazy-loads, getFields() parses '' into an empty field
      * map, and every relation field throws out of _resolveFieldsAlias(). It reads as a schema
      * problem while the schema is perfectly fine. Nor does the TTL bound it: remember() rewrote

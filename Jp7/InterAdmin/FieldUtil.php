@@ -14,7 +14,7 @@ class FieldUtil
     /**
      * Construtor p￺úblico.
      *
-     * @param array $field Formato dos campos do Type [optional]
+     * @param array $field One row of the Type's field definitions [optional]
      *
      * @return
      */
@@ -46,7 +46,7 @@ class FieldUtil
         return ['tipos_multi', 'tipos'];
     }
     /**
-     * Retorna os xtra dos campos do tipo special_ que armazenam m￺últiplos registros.
+     * The xtras of the special_ fields that store multiple records.
      *
      * @return array
      */
@@ -55,7 +55,7 @@ class FieldUtil
         return ['registros_multi', 'tipos_multi'];
     }
     /**
-     * Retorna o valor do campo no header (cabeçalho da listagem).
+     * The field's value in the list header.
      *
      * @param array $field
      *

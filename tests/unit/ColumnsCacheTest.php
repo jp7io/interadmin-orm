@@ -6,7 +6,7 @@ use Jp7\InterAdmin\Type;
  * The failure these cover: an empty column listing, once cached, wedges a whole tenant.
  *
  * getColumns() IS Type::getAttributesNames(), so an empty listing stops Type::__get()
- * recognising `campos` as a column. The types row then never lazy-loads, getFields() parses ''
+ * recognising `fields` as a column. The types row then never lazy-loads, getFields() parses ''
  * into an empty field map, and _resolveFieldsAlias() throws `The field "x" cannot be used with
  * select()` for every relation field -- while the database is fine and the types row still
  * holds the full field map. It reads as a schema problem and is not one.
@@ -89,11 +89,11 @@ class ColumnsCacheTest extends TestCase
     {
         $userType = $this->createUserType();
         Cache::put(self::TYPES_KEY, [], 5);
-        Cache::tag(Type::CACHE_TAG)->flush(); // force campos to be re-derived from the row
+        Cache::tag(Type::CACHE_TAG)->flush(); // force the field definitions to be re-derived from the row
 
-        $campos = (new Type($userType->type_id))->getFields();
+        $fieldDefinitions = (new Type($userType->type_id))->getFields();
 
-        $this->assertArrayHasKey('varchar_key', $campos);
+        $this->assertArrayHasKey('varchar_key', $fieldDefinitions);
     }
 
     /**
@@ -103,7 +103,7 @@ class ColumnsCacheTest extends TestCase
     {
         $type = $this->createType(['name' => 'Fieldless'], []);
         $cache = Cache::tag(Type::CACHE_TAG);
-        $cacheKey = 'campos,,'.$type->type_id;
+        $cacheKey = 'field_definitions,,'.$type->type_id;
 
         $this->assertSame([], $type->getFields());
         $this->assertNull($cache->get($cacheKey), 'An empty field map must not be persisted.');

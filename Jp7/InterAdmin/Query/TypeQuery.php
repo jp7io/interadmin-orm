@@ -42,7 +42,7 @@ class TypeQuery extends BaseQuery
             $options['fields'] = ['COUNT(DISTINCT type_id) AS count_type_id'];
             unset($options['group']);
         } else {
-            // Se houver GROUP BY com outro campo, retornará a contagem errada
+            // A GROUP BY on any other field would return the wrong count.
             throw new \Exception('GROUP BY is not supported when using count().');
         }
 

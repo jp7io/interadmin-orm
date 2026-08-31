@@ -84,14 +84,8 @@ class DynamicLoader
     protected static function getPhpDocField($type, array $field): string
     {
         if (strpos($field['type'], 'special_') === 0 && $field['xtra']) {
-//            $isMulti = in_array($field['xtra'], InterAdminField::getSpecialMultiXtras());
-//            $isType = in_array($field['xtra'], InterAdminField::getSpecialTypeXtras());
-//            $retorno = self::_getCampoTypeClass($type->getFieldType($field), $isType, $isMulti);
             $phpDocType = 'int';
         } elseif (strpos($field['type'], 'select_') === 0) {
-//            $isMulti = (strpos($field['type'], 'select_multi') === 0);
-//            $isType = in_array($field['xtra'], InterAdminField::getSelectTypeXtras());
-//            $retorno = self::_getCampoTypeClass($field['name'], $isType, $isMulti);
             $phpDocType = 'int';
         } elseif (strpos($field['type'], 'int') === 0 || strpos($field['type'], 'id') === 0) {
             $phpDocType = 'string';

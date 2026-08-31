@@ -34,8 +34,8 @@ class FileField
     }
 
     /**
-     * Retorna texto para ser usado no "alt" ou "title" da imagem.
-     * Utiliza o campo "Creditos/Leg.:" do arquivo ou o varchar_key do Registro.
+     * Text for the image's "alt" or "title".
+     * Uses the file's "Creditos/Leg.:" field, or the record's varchar_key.
      *
      * @return string
      */

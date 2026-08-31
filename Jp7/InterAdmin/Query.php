@@ -24,7 +24,7 @@ class Query extends Query\BaseQuery
     }
 
     /**
-     * Toggle field aliasing (campos alias) for the returned records. Pass false to
+     * Toggle field aliasing for the returned records. Pass false to
      * get raw column names as properties (e.g. for export/serialization round-trips),
      * the fluent equivalent of the array-options `'fields_alias' => false`.
      */

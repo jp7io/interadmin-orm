@@ -856,7 +856,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $options['order'] = (isset($options['order']) ? $options['order'].',' : '').' position';
         // Internal use
         $options['aliases'] = $arquivoModel->getAttributesAliases();
-        $options['campos'] = $arquivoModel->getAttributesFields();
+        $options['field_definitions'] = $arquivoModel->getAttributesFields();
 
         $rs = $this->_executeQuery($options);
 

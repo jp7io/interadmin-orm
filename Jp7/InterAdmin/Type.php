@@ -358,7 +358,7 @@ class Type extends RecordAbstract
         // Internal use
         $options['from'] = $this->getTableName().' AS main';
         $options['aliases'] = $this->getAttributesAliases();
-        $options['campos'] = $this->getAttributesFields();
+        $options['field_definitions'] = $this->getAttributesFields();
 
         $rs = self::getCacheRepository()->remember($cacheKey, self::CACHE_TTL, function () use ($options) {
             return $this->_executeQuery($options);
@@ -510,7 +510,7 @@ class Type extends RecordAbstract
             $options['fields'] = ['COUNT(DISTINCT id) AS count_id'];
             unset($options['group']);
         } else {
-            // Se houver GROUP BY com outro campo, retornará a contagem errada
+            // A GROUP BY on any other field would return the wrong count.
             throw new Exception('GROUP BY is not supported when using count().');
         }
         if ($_typeless) {
@@ -592,30 +592,30 @@ class Type extends RecordAbstract
         }
     }
     /**
-     * Returns an array with data about the fields on this type, which is then cached on the $_campos property.
+     * Returns an array with data about the fields on this type, which is then cached under the type's `field_definitions` cache key.
      *
      * @return array
      */
     public function getFields()
     {
-        return $this->getCacheUnlessEmpty('campos', function () {
+        return $this->getCacheUnlessEmpty('field_definitions', function () {
             // The blob is POSITIONAL, so these names are this decoder's invention, not stored
             // data. They must stay identical to InterAdmin's Field::FIELDS_ATTRIBUTES, which
             // encodes the same 16 slots back.
-            $campos_parameters = [
+            $fieldAttributeNames = [
                 'type', 'name', 'help', 'size', 'required', 'separator', 'xtra',
                 'list', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissions',
                 'default', 'name_id',
             ];
-            $campos    = explode('{;}', (string) $this->fields);
+            $fieldRows = explode('{;}', (string) $this->fields);
             $A = [];
-            for ($i = 0; $i < count($campos); $i++) {
-                $parameters = explode('{,}', $campos[$i]);
+            for ($i = 0; $i < count($fieldRows); $i++) {
+                $parameters = explode('{,}', $fieldRows[$i]);
                 if ($parameters[0]) {
                     $A[$parameters[0]]['order'] = ($i+1);
                     $isSelect = strpos($parameters[0], 'select_') === 0;
                     for ($j = 0; $j < count($parameters); $j++) {
-                        $A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
+                        $A[$parameters[0]][$fieldAttributeNames[$j]] = $parameters[$j];
                     }
                     if ($isSelect && $A[$parameters[0]]['name'] != 'all') {
                         $type_id = $A[$parameters[0]]['name'];
@@ -683,7 +683,7 @@ class Type extends RecordAbstract
     public function getFieldAliases($fields = null)
     {
         if (!$this->_interadminAliases) {
-            $this->_interadminAliases = $this->getCache('campos_alias', function () {
+            $this->_interadminAliases = $this->getCache('field_definitions_alias', function () {
                 $aliases = [];
                 foreach ($this->getFields() as $column => $array) {
                     if (strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0) {
@@ -778,12 +778,12 @@ class Type extends RecordAbstract
 
     public function getFieldTypeByAlias($alias)
     {
-        $campos = $this->getFields();
+        $fieldDefinitions = $this->getFields();
         $aliases = array_flip($this->getFieldAliases());
 
         $columnName = $aliases[$alias] ? $aliases[$alias] : $alias;
 
-        return $this->getFieldType($campos[$columnName]);
+        return $this->getFieldType($fieldDefinitions[$columnName]);
     }
     /**
      * Returns this object´s name.
@@ -958,9 +958,9 @@ class Type extends RecordAbstract
     {
         return $this->getCache('order', function () {
             $order = [];
-            $campos = $this->getFields();
-            if ($campos) {
-                foreach ($campos as $key => $row) {
+            $fieldDefinitions = $this->getFields();
+            if ($fieldDefinitions) {
+                foreach ($fieldDefinitions as $key => $row) {
                     if (!$row['orderby'] || strpos($key, 'func_') !== false) {
                         continue;
                     }
@@ -1036,8 +1036,8 @@ class Type extends RecordAbstract
         $cache = self::getCacheRepository();
         $cache->forget($this->getCacheKey('__call'));
         $cache->forget($this->getCacheKey('attributes'));
-        $cache->forget($this->getCacheKey('campos'));
-        $cache->forget($this->getCacheKey('campos_alias'));
+        $cache->forget($this->getCacheKey('field_definitions'));
+        $cache->forget($this->getCacheKey('field_definitions_alias'));
         $cache->forget($this->getCacheKey('children'));
         $cache->forget($this->getCacheKey('order'));
         $cache->forget($this->getCacheKey('typesUsingThisModel'));
@@ -1056,7 +1056,7 @@ class Type extends RecordAbstract
      * getCache(), minus the part where an empty result gets persisted.
      *
      * Only for values whose emptiness always means the read failed, rather than that the
-     * answer is nothing. getFields() is that: `campos` is parsed out of an attribute, so an
+     * answer is nothing. getFields() is that: `fields` is parsed out of an attribute, so an
      * empty field map is what you get whenever the types row did not load -- and a type with
      * no field map cannot be selected from at all, every relation field throwing out of
      * _resolveFieldsAlias(). Keeping one buys an explode() on '' and costs a wedged type.
@@ -1352,12 +1352,12 @@ class Type extends RecordAbstract
 
         // Internal use
         $options['aliases'] = $recordModel->getAttributesAliases();
-        $options['campos'] = $recordModel->getAttributesFields();
+        $options['field_definitions'] = $recordModel->getAttributesFields();
         $options['model'] = $recordModel;
         $options['eager_load'] = [];
 
-        if (!$options['campos']) {
-            \Log::notice('Querying a type without "campos" - type_id: '.$this->type_id);
+        if (!$options['field_definitions']) {
+            \Log::notice('Querying a type without field definitions - type_id: '.$this->type_id);
         }
 
         if (isset($options['with'])) {
