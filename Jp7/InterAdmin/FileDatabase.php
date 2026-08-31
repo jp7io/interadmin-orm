@@ -3,11 +3,11 @@
 namespace Jp7\InterAdmin;
 
 /**
- * @property int $id_arquivo_banco  PK
+ * @property int $files_database_id  PK
  * @property int $type_id
  * @property int $id    Parent record ID
- * @property int $parte  0, 2, 3 - Abas "arquivos"
- * @property string $tipo gif, bmp - Extensão
+ * @property int $part  0, 2, 3 - the arquivos tabs
+ * @property string $kind gif, bmp - the extension
  * @property string $keywords
  * @property string $thumb obsoleto
  * @property string $zoom obsoleto
@@ -25,7 +25,7 @@ class FileDatabase extends RecordAbstract
 {
     use Downloadable;
 
-    protected $_primary_key = 'id_arquivo_banco';
+    protected $_primary_key = 'files_database_id';
      /**
      * Contains the Type, i.e. the record with an 'type_id' equal to this record�s 'type_id'.
      *
@@ -66,7 +66,7 @@ class FileDatabase extends RecordAbstract
 
     public function getBasename(): string
     {
-        return str_pad((int) $this->id_arquivo_banco, 8, '0', STR_PAD_LEFT).'.'.$this->tipo;
+        return str_pad((int) $this->files_database_id, 8, '0', STR_PAD_LEFT).'.'.$this->kind;
     }
 
     public function save()
@@ -142,7 +142,7 @@ class FileDatabase extends RecordAbstract
 
     public function getAttributesNames(): array
     {
-        return ['id_arquivo', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_arquivo', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
 
     public function getTagFilters(): string
