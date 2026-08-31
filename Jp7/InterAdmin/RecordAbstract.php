@@ -28,6 +28,17 @@ abstract class RecordAbstract
 
     protected $_primary_key = 'id';
     /**
+     * Whether a `file_` column on this class is a tenant-defined FILE FIELD - a stored path with a
+     * `_text` caption beside it - rather than an ordinary column that happens to start that way.
+     *
+     * ⚠ False makes `file_` an ordinary prefix again, which is what lets the framework tables carry
+     * a `file_database_id`. True is the default because a subclass outside these repos is a record
+     * table until it says otherwise.
+     *
+     * @var bool
+     */
+    protected $hasFileFields = true;
+    /**
      * Array of all the attributes with their names as keys and the values of the attributes as values.
      *
      * @var array
@@ -184,7 +195,7 @@ abstract class RecordAbstract
             if (strpos($name, 'date_') === 0) {
                return new \Date($value);
             }
-            if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
+            if ($this->hasFileFields && strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
                 static $fileClassName = [];
                 if (!isset($fileClassName[static::DEFAULT_NAMESPACE])) {
                     if (class_exists(static::DEFAULT_NAMESPACE.'InterAdminFieldFile')) {
@@ -669,7 +680,7 @@ abstract class RecordAbstract
             // Sem join
             } else {
                 $name = $this->_aliasToColumn($field, $aliases);
-                if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false) {
+                if ($this->hasFileFields && strpos($name, 'file_') === 0 && strpos($name, '_text') === false) {
                     $fields[] = $table.$name.'_text';
                 }
 

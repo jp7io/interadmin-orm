@@ -3,7 +3,7 @@
 namespace Jp7\InterAdmin;
 
 /**
- * @property int $files_database_id  PK
+ * @property int $file_database_id  PK
  * @property int $type_id
  * @property int $id    Parent record ID
  * @property int $part  0, 2, 3 - the arquivos tabs
@@ -25,7 +25,10 @@ class FileDatabase extends RecordAbstract
 {
     use Downloadable;
 
-    protected $_primary_key = 'files_database_id';
+    protected $_primary_key = 'file_database_id';
+    /** A fixed column list, so `file_` is an ordinary prefix here and `file_database_id` is an int. */
+    protected $hasFileFields = false;
+
      /**
      * Contains the Type, i.e. the record with an 'type_id' equal to this record�s 'type_id'.
      *
@@ -66,7 +69,7 @@ class FileDatabase extends RecordAbstract
 
     public function getBasename(): string
     {
-        return str_pad((int) $this->files_database_id, 8, '0', STR_PAD_LEFT).'.'.$this->kind;
+        return str_pad((int) $this->file_database_id, 8, '0', STR_PAD_LEFT).'.'.$this->kind;
     }
 
     public function save()

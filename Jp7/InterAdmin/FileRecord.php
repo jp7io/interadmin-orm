@@ -13,6 +13,8 @@ class FileRecord extends RecordAbstract
     use Downloadable;
 
     protected $_primary_key = 'id_arquivo';
+    /** A fixed column list, so `file_` is an ordinary prefix here and `file_id` is an int. */
+    protected $hasFileFields = false;
 
     /**
      * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
