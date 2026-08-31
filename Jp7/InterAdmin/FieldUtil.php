@@ -74,7 +74,7 @@ class FieldUtil
             if ($field['label']) {
                 return $field['label'];
             }
-            // Type::getFields() resolves a select_'s `nome` to a Type; only 'all' stays a string.
+            // Type::getFields() resolves a select_'s `name` to a Type; only 'all' stays a string.
             return $field['name'] instanceof Type ? $field['name']->name : 'Tipos';
         }
         return $field['name'];

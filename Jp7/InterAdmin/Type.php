@@ -629,7 +629,7 @@ class Type extends RecordAbstract
             // Alias
             foreach ($A as $column => $array) {
                 if (empty($array['name_id'])) {
-                    // Gerar nome_id
+                    // Generate name_id
                     $alias = $array['name'];
                     if (is_object($alias)) {
                         $alias = empty($array['label']) ? $alias->name : $array['label'];
@@ -786,7 +786,7 @@ class Type extends RecordAbstract
         return $this->getFieldType($campos[$columnName]);
     }
     /**
-     * Returns this object´s nome.
+     * Returns this object´s name.
      *
      * @return string
      */
@@ -795,7 +795,7 @@ class Type extends RecordAbstract
         return $this->name;
     }
     /**
-     * Returns the nome according to the $lang.
+     * Returns the name according to the $lang.
      *
      * @return string
      */
@@ -1175,25 +1175,25 @@ class Type extends RecordAbstract
                     $childrenArrParts = array_pad($childrenArrParts, 4, '');
                 }
                 $child = array_combine(['type_id', 'nome', 'ajuda', 'netos'], $childrenArrParts);
-                $nome_id = Str::studly(to_slug($child['nome']));
-                $children[$nome_id] = $child;
+                $name_id = Str::studly(to_slug($child['nome']));
+                $children[$name_id] = $child;
             }
             return $children;
         });
     }
 
     /**
-     * Returns a Type if the $nome_id is found in getInterAdminsChildren().
+     * Returns a Type if the $name_id is found in getInterAdminsChildren().
      *
-     * @param string $nome_id Camel Case name, e.g.: DadosPessoais
+     * @param string $name_id Camel Case name, e.g.: DadosPessoais
      *
-     * @return Type|null Null when $nome_id is not among getInterAdminsChildren().
+     * @return Type|null Null when $name_id is not among getInterAdminsChildren().
      */
-    public function getInterAdminsChildrenType($nome_id)
+    public function getInterAdminsChildrenType($name_id)
     {
         $childrenTypes = $this->getInterAdminsChildren();
-        if (isset($childrenTypes[$nome_id])) {
-            $type_id = $childrenTypes[$nome_id]['type_id'];
+        if (isset($childrenTypes[$name_id])) {
+            $type_id = $childrenTypes[$name_id]['type_id'];
 
             return self::getInstance($type_id, [
                 'db' => $this->_db,
@@ -1214,8 +1214,8 @@ class Type extends RecordAbstract
     public function getInterAdminsChildrenTypes()
     {
         $types = [];
-        foreach ($this->getInterAdminsChildren() as $nome_id => $metadata) {
-            $types[] = $this->getInterAdminsChildrenType($nome_id);
+        foreach ($this->getInterAdminsChildren() as $name_id => $metadata) {
+            $types[] = $this->getInterAdminsChildrenType($name_id);
         }
         return $types;
     }

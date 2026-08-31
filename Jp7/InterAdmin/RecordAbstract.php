@@ -596,8 +596,8 @@ abstract class RecordAbstract
         foreach ($fields as $key => $field) {
             // Traduzindo 'join.campo' para 'join' => array('campo')
             if (is_string($field) && strpos($field, '.') !== false && strpos($field, '(') === false) {
-                list($join, $nome) = explode('.', $field);
-                $fields[$join][] = $nome;
+                list($join, $name) = explode('.', $field);
+                $fields[$join][] = $name;
                 unset($fields[$key]);
             }
         }
@@ -605,7 +605,7 @@ abstract class RecordAbstract
         foreach ($fields as $join => $field) {
             // Com join
             if (is_array($field)) {
-                //$nome = isset($aliases[$join]) ? $aliases[$join] : $join;
+                //$name = isset($aliases[$join]) ? $aliases[$join] : $join;
 
                 // Join e Recursividade
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
@@ -613,7 +613,7 @@ abstract class RecordAbstract
                 } elseif (strpos($join, 'select_multi_') === 0) {
                     $joinType = null; // Just ignore select_multi used on legacy code, lazy load them
                     /*
-                    $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
+                    $fields[] = $table.$name.(($table != 'main.') ? ' AS `'.$table.$name.'`' : '');
                     // Processamento dos campos do select_multi é feito depois
                     $joinType = null;
                     $options['select_multi_fields'][$join] = [
@@ -625,19 +625,19 @@ abstract class RecordAbstract
                     throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
                 } else {
                     // Select
-                    $nome = isset($aliases[$join.'_id']) ? $aliases[$join.'_id'] : $join;
-                    $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
+                    $name = isset($aliases[$join.'_id']) ? $aliases[$join.'_id'] : $join;
+                    $fields[] = $table.$name.(($table != 'main.') ? ' AS `'.$table.$name.'`' : '');
                     // Join e Recursividade
                     if (empty($options['from_alias']) || !in_array($join, (array) $options['from_alias'])) {
-                        if (!isset($campos[$nome])) {
+                        if (!isset($campos[$name])) {
                             throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
                         }
-                        $joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
+                        $joinClasse = $this->_addJoinAlias($options, $join, $campos[$name]);
                         if ($joinClasse !== 'type') {
                             $fields[$join][] = 'id';
                         }
                     }
-                    $joinType = $this->getFieldType($campos[$nome]);
+                    $joinType = $this->getFieldType($campos[$name]);
                 }
                 if ($joinType) {
                     $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinType);
@@ -668,12 +668,12 @@ abstract class RecordAbstract
                 $fields[$join] = $this->_resolveSql($field, $options, true).' AS `'.$table.$aggregateAlias.'`';
             // Sem join
             } else {
-                $nome = $this->_aliasToColumn($field, $aliases);
-                if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-                    $fields[] = $table.$nome.'_text';
+                $name = $this->_aliasToColumn($field, $aliases);
+                if (strpos($name, 'file_') === 0 && strpos($name, '_text') === false) {
+                    $fields[] = $table.$name.'_text';
                 }
 
-                $fields[$join] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
+                $fields[$join] = $table.$name.(($table != 'main.') ? ' AS `'.$table.$name.'`' : '');
             }
         }
         $options['fields'] = $fields;

@@ -574,22 +574,22 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     /**
      * Finds a Child Type by a camelcase keyword.
      *
-     * @param string $nome_id CamelCase
+     * @param string $name_id CamelCase
      *
      * @return array|null Null when the Type declares no child under that name.
      */
-    protected function _findChild($nome_id)
+    protected function _findChild($name_id)
     {
         $children = $this->getType()->getInterAdminsChildren();
 
-        if (isset($children[$nome_id])) {
-            return $children[$nome_id];
+        if (isset($children[$name_id])) {
+            return $children[$name_id];
         }
     }
 
-    public function getChildrenTypeByNome($nome_id)
+    public function getChildrenTypeByName($name_id)
     {
-        $child = $this->_findChild($nome_id);
+        $child = $this->_findChild($name_id);
         if ($child) {
             return $this->getChildrenType($child['type_id']);
         }

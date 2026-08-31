@@ -187,10 +187,10 @@ class SqlCompiler
                         $childrenArr = $this->record->getInterAdminsChildren();
                     }
 
-                    $joinNome = Str::studly($table);
-                    if (isset($childrenArr[$joinNome])) {
+                    $joinName = Str::studly($table);
+                    if (isset($childrenArr[$joinName])) {
                         // Children
-                        $joinType = Type::getInstance($childrenArr[$joinNome]['type_id'], [
+                        $joinType = Type::getInstance($childrenArr[$joinName]['type_id'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
                         ]);
@@ -213,9 +213,9 @@ class SqlCompiler
                         $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinType->getInterAdminsTableName(), $table) : '';
                         $existsMatches[2] = 'SELECT id FROM '.$joinType->getInterAdminsTableName().' AS '.$table.
                         ' WHERE '.$joinFilter.$this->clauses($onClause, $use_published_filters).(($existsMatches[4]) ? ' AND ' : '');
-                    } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
+                    } elseif (isset($options['model']) && method_exists($options['model'], $joinName)) {
                         // Metodo estilo Eloquent
-                        $relationshipData = $options['model']->$joinNome()->getRelationshipData();
+                        $relationshipData = $options['model']->$joinName()->getRelationshipData();
 
                         $joinType = $relationshipData['tipo'];
 
@@ -258,11 +258,11 @@ class SqlCompiler
                     }
 
                     // Joins com children
-                    $joinNome = Str::studly($table);
+                    $joinName = Str::studly($table);
                     // Support for old join alias: ChildrenLojas => Lojas
-                    $joinNome = replace_prefix('Children', '', $joinNome);
-                    if (isset($childrenArr[$joinNome])) {
-                        $joinType = Type::getInstance($childrenArr[$joinNome]['type_id'], [
+                    $joinName = replace_prefix('Children', '', $joinName);
+                    if (isset($childrenArr[$joinName])) {
+                        $joinType = Type::getInstance($childrenArr[$joinName]['type_id'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
                         ]);
@@ -288,7 +288,7 @@ class SqlCompiler
                         }
                         $joinAliases = [];
                     } else {
-                        $joinNome = isset($aliases[$table]) ? $aliases[$table] : $table;
+                        $joinName = isset($aliases[$table]) ? $aliases[$table] : $table;
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (isset($options['joins'][$table])) {
                             if ($subTerm) {
@@ -296,27 +296,27 @@ class SqlCompiler
                             }
                             $joinType = $options['joins'][$table][1];
                         // Joins de select
-                        } elseif (isset($aliases[$joinNome.'_id']) && isset($campos[$aliases[$joinNome.'_id']])) {
-                            $joinNome = $aliases[$joinNome.'_id'];
+                        } elseif (isset($aliases[$joinName.'_id']) && isset($campos[$aliases[$joinName.'_id']])) {
+                            $joinName = $aliases[$joinName.'_id'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $this->addJoin($options, $table, $campos[$joinNome]);
+                                $this->addJoin($options, $table, $campos[$joinName]);
                             }
-                            $joinType = $this->record->getFieldType($campos[$joinNome]);
+                            $joinType = $this->record->getFieldType($campos[$joinName]);
                         // Joins de select_multi
-                        } elseif (isset($aliases[$joinNome.'_ids']) && isset($campos[$aliases[$joinNome.'_ids']])) {
-                            $joinNome = $aliases[$joinNome.'_ids'];
+                        } elseif (isset($aliases[$joinName.'_ids']) && isset($campos[$aliases[$joinName.'_ids']])) {
+                            $joinName = $aliases[$joinName.'_ids'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $this->addJoin($options, $table, $campos[$joinNome]);
+                                $this->addJoin($options, $table, $campos[$joinName]);
                             }
-                            $joinType = $this->record->getFieldType($campos[$joinNome]);
+                            $joinType = $this->record->getFieldType($campos[$joinName]);
                         // Joins de special
-                        } elseif (isset($campos[$joinNome])) {
+                        } elseif (isset($campos[$joinName])) {
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
-                                $this->addJoin($options, $table, $campos[$joinNome]);
+                                $this->addJoin($options, $table, $campos[$joinName]);
                             }
-                            $joinType = $this->record->getFieldType($campos[$joinNome]);
-                        } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
-                            $relationshipData = $options['model']->$joinNome()->getRelationshipData();
+                            $joinType = $this->record->getFieldType($campos[$joinName]);
+                        } elseif (isset($options['model']) && method_exists($options['model'], $joinName)) {
+                            $relationshipData = $options['model']->$joinName()->getRelationshipData();
 
                             $joinType = $relationshipData['tipo'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
@@ -332,7 +332,7 @@ class SqlCompiler
                                 $options['auto_group_flag'] = true;
                             }
                         } else {
-                            throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
+                            throw new Exception('The field "'.$joinName.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
                         }
                         if ($joinType instanceof Type) {
                             $joinAliases = array_flip($joinType->getFieldAliases());

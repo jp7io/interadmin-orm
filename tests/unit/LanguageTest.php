@@ -55,15 +55,15 @@ class LanguageTest extends TestCase
     {
         $newsType = $this->createI18nNewsType(['language' => 'S', 'name_en' => 'News']);
 
-        $nomePtBr = $newsType->getName();
+        $namePtBr = $newsType->getName();
 
-        $this->assertEquals($newsType->name, $nomePtBr);
+        $this->assertEquals($newsType->name, $namePtBr);
 
         App::setLocale('en');
 
-        $nomeEnUs = $newsType->getName();
+        $nameEnUs = $newsType->getName();
 
-        $this->assertEquals($newsType->name_en, $nomeEnUs);
+        $this->assertEquals($newsType->name_en, $nameEnUs);
 
         App::setLocale('pt-BR');
     }
