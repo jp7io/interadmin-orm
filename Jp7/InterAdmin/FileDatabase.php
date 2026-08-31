@@ -12,7 +12,7 @@ namespace Jp7\InterAdmin;
  * @property string $thumb obsoleto
  * @property string $zoom obsoleto
  * @property string $lang
- * @property int $versao  contagem de mudanças
+ * @property int $version  change count
  * @property Date $date_modify
  * @property string $directory noticias, mediabox, can't be the type's name because it can change
  * @property int $width
@@ -59,7 +59,7 @@ class FileDatabase extends RecordAbstract
         return config('interadmin.storage.backend_path').'/upload/'.
             ($this->directory ? $this->directory.'/' : '').
             $this->getBasename().
-            ($this->versao ? '?v='.$this->versao : '');
+            ($this->version ? '?v='.$this->version : '');
     }
 
     public function setDateModifyAttribute($value): void
