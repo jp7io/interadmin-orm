@@ -98,7 +98,7 @@ class RecordTest extends TestCase
     {
         return [
             [[
-                'char_key' => '', // sem mostrar
+                'char_key' => '', // not shown
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,

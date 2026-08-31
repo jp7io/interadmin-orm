@@ -163,10 +163,14 @@ abstract class TestCase extends BaseTestCase
         return interadmin_tipos_campos_encode($fieldsVector);
     }
 
+    /**
+     * The 16 positional slots of Type::getFields(), in order. No display-order key belongs
+     * here: interadmin_tipos_campos_encode() implode()s whatever it is given, dropping only a
+     * key literally spelled `ordem`, so any other name shifts every field one slot right.
+     */
     protected function createField(array $field): array
     {
         return [
-            'order' => 1,
             'type' => $field['type'],
             'name' => $field['name'],
             'help' => $field['help'] ?? '',
@@ -195,7 +199,7 @@ abstract class TestCase extends BaseTestCase
             'varchar_2' => 'pamela@jp7.com.br',
             'char_key' => 'S',
             'publish' => 'S',
-            'order' => 0,
+            'position' => 0,
         ];
         $user->setRawAttributes($attributes);
         $user->save();
@@ -209,8 +213,8 @@ abstract class TestCase extends BaseTestCase
             ['type' => 'varchar_key', 'name' => 'Username'],
             ['type' => 'password_key', 'name' => 'Password'],
             ['type' => 'varchar_2', 'name' => 'E-mail'],
-            ['type' => 'char_key', 'name' => 'Mostrar'],
-            ['type' => 'int_key', 'name' => 'Ordem']
+            ['type' => 'char_key', 'name' => 'Show'],
+            ['type' => 'int_key', 'name' => 'Position']
         ]);
     }
 
@@ -220,7 +224,7 @@ abstract class TestCase extends BaseTestCase
             $attributes + ['name' => 'Noticia'],
             [
                 ['type' => 'varchar_key', 'name' => 'Title'],
-                ['type' => 'char_key', 'name' => 'Mostrar']
+                ['type' => 'char_key', 'name' => 'Show']
             ]
         );
     }
@@ -231,7 +235,7 @@ abstract class TestCase extends BaseTestCase
         for ($i = 0; $i < $count; $i++) {
             $list[] = $this->createUser([
                 'varchar_key' => 'User #'.$i,
-                'order' => $i
+                'position' => $i
             ]);
         }
 

@@ -31,7 +31,7 @@ class QueryTest extends TestCase
         $userCompositeQuery = Test_User::where('varchar_key', '=', $newUser->username)
             ->where('char_key', '=', 'S')
             ->first();
-        $this->assertEquals($newUser->mostrar, $userCompositeQuery->mostrar);
+        $this->assertEquals($newUser->show, $userCompositeQuery->show);
     }
 
     public function testOptionsArray()
@@ -195,26 +195,26 @@ class QueryTest extends TestCase
     {
         $this->createUsersBulk(10);
 
-        Test_User::where('ordem', '<', 5)->update([
+        Test_User::where('position', '<', 5)->update([
             'e_mail' => 'updated@jp7.com.br',
-            'ordem' => 0,
+            'position' => 0,
             'username' => \DB::raw('CONCAT(username, \' suffix\')'),
         ]);
 
         $this->assertEquals('User #0 suffix', Test_User::orderBy('username')->first()->username);
         $this->assertEquals(5, Test_User::where('e_mail', 'updated@jp7.com.br')->count());
         $this->assertEquals(5, Test_User::where('username', 'LIKE', '%suffix')->count());
-        // Ordered by id: the update leaves five rows sharing ordem 0, so no order the
+        // Ordered by id: the update leaves five rows sharing position 0, so no order the
         // column itself could give is total and an unordered SELECT rotates them.
-        $this->assertEquals('0,0,0,0,0,5,6,7,8,9', Test_User::orderBy('id')->pluck('ordem')->implode(','));
+        $this->assertEquals('0,0,0,0,0,5,6,7,8,9', Test_User::orderBy('id')->pluck('position')->implode(','));
     }
 
     public function testIncrement()
     {
         $this->createUsersBulk(10);
 
-        Test_User::where('ordem', '>=', 5)->increment('ordem', 10);
-        $this->assertEquals('0,1,2,3,4,15,16,17,18,19', Test_User::pluck('ordem')->implode(','));
+        Test_User::where('position', '>=', 5)->increment('position', 10);
+        $this->assertEquals('0,1,2,3,4,15,16,17,18,19', Test_User::pluck('position')->implode(','));
     }
 
     #[DataProvider('publishedProvider')]
@@ -286,7 +286,7 @@ class QueryTest extends TestCase
     {
         return [
             'not active' => [[
-                'char_key' => '', // sem mostrar
+                'char_key' => '', // not shown
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
