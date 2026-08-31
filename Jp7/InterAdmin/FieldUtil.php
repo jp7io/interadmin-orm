@@ -28,20 +28,20 @@ class FieldUtil
     }
 
     /**
-     * Retorna os xtra dos campos do tipo select_ que armazenam tipos.
+     * The xtra values of select_ fields which store types.
      *
      * @return array
      */
-    public static function getSelectTipoXtras(): array
+    public static function getSelectTypeXtras(): array
     {
         return ['S', 'X_tipos', 'ajax_tipos', 'radio_tipos'];
     }
     /**
-     * Retorna os xtra dos campos do tipo special_ que armazenam tipos.
+     * The xtra values of special_ fields which store types.
      *
      * @return array
      */
-    public static function getSpecialTipoXtras(): array
+    public static function getSpecialTypeXtras(): array
     {
         return ['tipos_multi', 'tipos'];
     }

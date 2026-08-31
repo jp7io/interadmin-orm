@@ -23,7 +23,7 @@ class_alias(Carbon\Carbon::class, 'Date');
 
 Jp7\Laravel\CacheExtension::apply();
 
-// Registers the autoloader that evals a class body for every row in `tipos`, which is how
+// Registers the autoloader that evals a class body for every row in `types`, which is how
 // the tests' Test_User / Test_Store come into existence at all.
 Jp7\InterAdmin\DynamicLoader::register();
 

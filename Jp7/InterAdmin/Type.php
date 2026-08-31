@@ -27,7 +27,7 @@ use DB;
  */
 
 /**
- * Class which represents records on the table interadmin_{client name}_tipos.
+ * Class which represents records on the table interadmin_{client name}_types.
  *
  * The @method block is what __callStatic() forwards to Query\TypeQuery -- it declares nothing and
  * adds nothing. first(), delete(), forceDelete() and restore() are absent on purpose: each is a
@@ -250,21 +250,21 @@ class Type extends RecordAbstract
     {
         if (isset($options['class'])) {
             // Classe foi forçada
-            $classTipo = $options['class'];
+            $classType = $options['class'];
         } else {
             // Classe não foi forçada, verificar classMap
-            $classTipo = TypeClassMap::getInstance()->getClass($type_id);
+            $classType = TypeClassMap::getInstance()->getClass($type_id);
             // As in Record::getInstance(): a `class_type` PHP cannot declare is no binding.
-            if (!$classTipo || !DynamicLoader::isDeclarable($classTipo)) {
+            if (!$classType || !DynamicLoader::isDeclarable($classType)) {
                 if (isset($options['default_namespace'])) {
-                    $classTipo = $options['default_namespace'].'Type';
+                    $classType = $options['default_namespace'].'Type';
                 } else {
-                    $classTipo = self::$_defaultClass;
+                    $classType = self::$_defaultClass;
                 }
             }
         }
         // Classe foi encontrada, instanciar o objeto
-        $type = new $classTipo($type_id);
+        $type = new $classType($type_id);
         if (!empty($options['db'])) {
             $type->setDb($options['db']);
         }
@@ -723,7 +723,7 @@ class Type extends RecordAbstract
                     }
                     if (strpos($column, 'select_') === 0) {
                         $multi = strpos($column, 'select_multi_') === 0;
-                        $hasType = in_array($array['xtra'], FieldUtil::getSelectTipoXtras());
+                        $hasType = in_array($array['xtra'], FieldUtil::getSelectTypeXtras());
                         if ($multi) {
                             $relation = substr($array['name_id'], 0, -4); // _ids = 4 chars
                         } else {
@@ -736,14 +736,14 @@ class Type extends RecordAbstract
                         ];
                     } elseif (strpos($column, 'special_') === 0 && $array['xtra']) {
                         $multi = in_array($array['xtra'], FieldUtil::getSpecialMultiXtras());
-                        $hasType = in_array($array['xtra'], FieldUtil::getSpecialTipoXtras());
+                        $hasType = in_array($array['xtra'], FieldUtil::getSpecialTypeXtras());
                         if ($multi) {
                             $relation = substr($array['name_id'], 0, -4); // _ids = 4 chars
                         } else {
                             $relation = substr($array['name_id'], 0, -3); // _id = 3 chars
                         }
-                        if ($specialTipo = $this->getFieldType($array)) {
-                            $query = $specialTipo->records();
+                        if ($specialType = $this->getFieldType($array)) {
+                            $query = $specialType->records();
                         } else {
                             $query = new TypelessQuery(static::getInstance(0));
                         }
@@ -1040,9 +1040,9 @@ class Type extends RecordAbstract
         $cache->forget($this->getCacheKey('campos_alias'));
         $cache->forget($this->getCacheKey('children'));
         $cache->forget($this->getCacheKey('order'));
-        $cache->forget($this->getCacheKey('tiposUsingThisModel'));
+        $cache->forget($this->getCacheKey('typesUsingThisModel'));
 
-        // different values for getTipo() depending on class
+        // different values for getType() depending on class
         $cache->forget(static::class.','.$this->getCacheKey('relationships'));
     }
 
@@ -1057,7 +1057,7 @@ class Type extends RecordAbstract
      *
      * Only for values whose emptiness always means the read failed, rather than that the
      * answer is nothing. getFields() is that: `campos` is parsed out of an attribute, so an
-     * empty field map is what you get whenever the tipos row did not load -- and a type with
+     * empty field map is what you get whenever the types row did not load -- and a type with
      * no field map cannot be selected from at all, every relation field throwing out of
      * _resolveFieldsAlias(). Keeping one buys an explode() on '' and costs a wedged type.
      *
@@ -1159,7 +1159,7 @@ class Type extends RecordAbstract
     }
 
     /**
-     * Returns metadata about the children tipos that the Records have.
+     * Returns metadata about the children types that the Records have.
      *
      * @return array
      */
@@ -1171,7 +1171,7 @@ class Type extends RecordAbstract
             for ($i = 0; $i < count($childrenArr) - 1; $i++) {
                 $childrenArrParts = explode('{,}', $childrenArr[$i]);
                 if (count($childrenArrParts) < 4) { // 4 = 'type_id', 'nome', 'ajuda', 'netos'
-                    // Fix para tipos com estrutura antiga e desatualizada
+                    // Fix for types with an old, outdated structure
                     $childrenArrParts = array_pad($childrenArrParts, 4, '');
                 }
                 $child = array_combine(['type_id', 'nome', 'ajuda', 'netos'], $childrenArrParts);
@@ -1189,7 +1189,7 @@ class Type extends RecordAbstract
      *
      * @return Type|null Null when $nome_id is not among getInterAdminsChildren().
      */
-    public function getInterAdminsChildrenTipo($nome_id)
+    public function getInterAdminsChildrenType($nome_id)
     {
         $childrenTypes = $this->getInterAdminsChildren();
         if (isset($childrenTypes[$nome_id])) {
@@ -1215,7 +1215,7 @@ class Type extends RecordAbstract
     {
         $types = [];
         foreach ($this->getInterAdminsChildren() as $nome_id => $metadata) {
-            $types[] = $this->getInterAdminsChildrenTipo($nome_id);
+            $types[] = $this->getInterAdminsChildrenType($nome_id);
         }
         return $types;
     }
@@ -1238,10 +1238,10 @@ class Type extends RecordAbstract
         }
         // As children
         $studlyCased = ucfirst($relationship);
-        if ($childrenTipo = $this->getInterAdminsChildrenTipo($studlyCased)) {
+        if ($childrenType = $this->getInterAdminsChildrenType($studlyCased)) {
             return [
                 'type' => 'children',
-                'tipo' => $childrenTipo,
+                'tipo' => $childrenType,
                 'name' => $relationship,
                 'alias' => true,
                 'multi' => true,
@@ -1290,11 +1290,11 @@ class Type extends RecordAbstract
      *
      * @param array $options [optional]
      *
-     * @return Type[] Array of Tipos indexed by their type_id.
+     * @return Type[] Array of Types indexed by their type_id.
      */
-    public function getTiposUsingThisModel($options = [])
+    public function getTypesUsingThisModel($options = [])
     {
-        $typesUsingThisModel = $this->getCache('tiposUsingThisModel', function () {
+        $typesUsingThisModel = $this->getCache('typesUsingThisModel', function () {
             $options2 = [
                 'fields' => 'type_id',
                 'from' => $this->getTableName().' AS main',
@@ -1414,7 +1414,7 @@ class Type extends RecordAbstract
      */
     public function modelRecords()
     {
-        $types = $this->getTiposUsingThisModel();
+        $types = $this->getTypesUsingThisModel();
 
         $query = new TypelessQuery($this);
 

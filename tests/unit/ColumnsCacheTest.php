@@ -6,9 +6,9 @@ use Jp7\InterAdmin\Type;
  * The failure these cover: an empty column listing, once cached, wedges a whole tenant.
  *
  * getColumns() IS Type::getAttributesNames(), so an empty listing stops Type::__get()
- * recognising `campos` as a column. The tipos row then never lazy-loads, getFields() parses ''
+ * recognising `campos` as a column. The types row then never lazy-loads, getFields() parses ''
  * into an empty field map, and _resolveFieldsAlias() throws `The field "x" cannot be used with
- * select()` for every relation field -- while the database is fine and the tipos row still
+ * select()` for every relation field -- while the database is fine and the types row still
  * holds the full field map. It reads as a schema problem and is not one.
  *
  * Nothing here sleeps waiting for a TTL, deliberately: "the bad entry expires in 5 seconds" is
@@ -18,18 +18,18 @@ use Jp7\InterAdmin\Type;
  */
 class ColumnsCacheTest extends TestCase
 {
-    private const TIPOS_KEY = 'columns,,interadmin_teste_types';
+    private const TYPES_KEY = 'columns,,interadmin_teste_types';
 
     protected function setUp(): void
     {
         parent::setUp();
-        Cache::forget(self::TIPOS_KEY);
+        Cache::forget(self::TYPES_KEY);
     }
 
     protected function tearDown(): void
     {
         // A leaked empty entry would surface as unrelated failures in later test classes.
-        Cache::forget(self::TIPOS_KEY);
+        Cache::forget(self::TYPES_KEY);
         parent::tearDown();
     }
 
@@ -38,7 +38,7 @@ class ColumnsCacheTest extends TestCase
         $columns = (new Type)->getColumns();
 
         $this->assertContains('fields', $columns);
-        $this->assertSame($columns, Cache::get(self::TIPOS_KEY));
+        $this->assertSame($columns, Cache::get(self::TYPES_KEY));
     }
 
     public function testDoesNotCacheAnEmptyListing()
@@ -57,12 +57,12 @@ class ColumnsCacheTest extends TestCase
      */
     public function testIgnoresAndReplacesAnEmptyCachedListing()
     {
-        Cache::put(self::TIPOS_KEY, [], 5);
+        Cache::put(self::TYPES_KEY, [], 5);
 
         $columns = (new Type)->getColumns();
 
         $this->assertContains('fields', $columns);
-        $this->assertContains('fields', Cache::get(self::TIPOS_KEY));
+        $this->assertContains('fields', Cache::get(self::TYPES_KEY));
     }
 
     /**
@@ -88,7 +88,7 @@ class ColumnsCacheTest extends TestCase
     public function testAnEmptyCachedListingDoesNotWedgeTheType()
     {
         $userType = $this->createUserType();
-        Cache::put(self::TIPOS_KEY, [], 5);
+        Cache::put(self::TYPES_KEY, [], 5);
         Cache::tag(Type::CACHE_TAG)->flush(); // force campos to be re-derived from the row
 
         $campos = (new Type($userType->type_id))->getFields();

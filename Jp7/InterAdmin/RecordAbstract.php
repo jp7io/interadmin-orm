@@ -609,13 +609,13 @@ abstract class RecordAbstract
 
                 // Join e Recursividade
                 if (isset($options['joins']) && isset($options['joins'][$join])) {
-                    $joinTipo = $options['joins'][$join][1];
+                    $joinType = $options['joins'][$join][1];
                 } elseif (strpos($join, 'select_multi_') === 0) {
-                    $joinTipo = null; // Just ignore select_multi used on legacy code, lazy load them
+                    $joinType = null; // Just ignore select_multi used on legacy code, lazy load them
                     /*
                     $fields[] = $table.$nome.(($table != 'main.') ? ' AS `'.$table.$nome.'`' : '');
                     // Processamento dos campos do select_multi é feito depois
-                    $joinTipo = null;
+                    $joinType = null;
                     $options['select_multi_fields'][$join] = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
@@ -633,21 +633,21 @@ abstract class RecordAbstract
                             throw new Exception('The field "'.$join.'" cannot be used with select() ('.get_class($this).' - PK: '.$this->__toString().').');
                         }
                         $joinClasse = $this->_addJoinAlias($options, $join, $campos[$nome]);
-                        if ($joinClasse !== 'tipo') {
+                        if ($joinClasse !== 'type') {
                             $fields[$join][] = 'id';
                         }
                     }
-                    $joinTipo = $this->getFieldType($campos[$nome]);
+                    $joinType = $this->getFieldType($campos[$nome]);
                 }
-                if ($joinTipo) {
-                    $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinTipo);
+                if ($joinType) {
+                    $joinModel = Record::getInstance(0, ['default_namespace' => static::DEFAULT_NAMESPACE], $joinType);
                     $this->_resolveWildcard($fields[$join], $joinModel);
 
                     $joinOptions = [
                         'fields' => $fields[$join],
                         'fields_alias' => $options['fields_alias'],
-                        'campos' => $joinTipo->getFields(),
-                        'aliases' => array_flip($joinTipo->getFieldAliases()),
+                        'campos' => $joinType->getFields(),
+                        'aliases' => array_flip($joinType->getFieldAliases()),
                     ];
                     $this->_resolveFieldsAlias($joinOptions, $join.'.');
                     foreach ($joinOptions['fields'] as $joinField) {
@@ -885,7 +885,7 @@ abstract class RecordAbstract
      *
      * Keeping it wedges the whole tenant instead of the one call that failed. Type's attribute
      * names ARE this listing, so an empty one stops Type::__get() recognising `campos` as a
-     * column; the tipos row then never lazy-loads, getFields() parses '' into an empty field
+     * column; the types row then never lazy-loads, getFields() parses '' into an empty field
      * map, and every relation field throws out of _resolveFieldsAlias(). It reads as a schema
      * problem while the schema is perfectly fine. Nor does the TTL bound it: remember() rewrote
      * the empty value on every miss, so a condition that recurs kept the poison topped up.

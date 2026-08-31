@@ -190,14 +190,14 @@ class SqlCompiler
                     $joinNome = Str::studly($table);
                     if (isset($childrenArr[$joinNome])) {
                         // Children
-                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['type_id'], [
+                        $joinType = Type::getInstance($childrenArr[$joinNome]['type_id'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
                         ]);
 
-                        $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
-                        $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
-                        ' WHERE '.$joinFilter.$table.'.parent_id = main.id AND '.$table.'.type_id = '.$joinTipo->type_id.''.
+                        $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinType->getInterAdminsTableName(), $table) : '';
+                        $existsMatches[2] = 'SELECT id FROM '.$joinType->getInterAdminsTableName().' AS '.$table.
+                        ' WHERE '.$joinFilter.$table.'.parent_id = main.id AND '.$table.'.type_id = '.$joinType->type_id.''.
                         (($existsMatches[4]) ? ' AND ' : '');
                     } elseif ($table == 'tags') {
                         // Tags
@@ -205,29 +205,29 @@ class SqlCompiler
                         ' WHERE '.$table.'.parent_id = main.id'.(($existsMatches[4]) ? ' AND ' : '');
                     } elseif (isset($options['joins'][$table])) {
                         // Joins custom
-                        $joinTipo = $options['joins'][$table][1];
+                        $joinType = $options['joins'][$table][1];
                         $onClause = [
                             'joins' => $options['joins'],
                             'where' => $options['joins'][$table][2],
                         ];
-                        $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
-                        $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
+                        $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinType->getInterAdminsTableName(), $table) : '';
+                        $existsMatches[2] = 'SELECT id FROM '.$joinType->getInterAdminsTableName().' AS '.$table.
                         ' WHERE '.$joinFilter.$this->clauses($onClause, $use_published_filters).(($existsMatches[4]) ? ' AND ' : '');
                     } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
                         // Metodo estilo Eloquent
                         $relationshipData = $options['model']->$joinNome()->getRelationshipData();
 
-                        $joinTipo = $relationshipData['tipo'];
+                        $joinType = $relationshipData['tipo'];
 
-                        $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
+                        $joinFilter = ($use_published_filters) ? $this->record::getPublishedFilters($joinType->getInterAdminsTableName(), $table) : '';
 
                         $conditions = array_map(function ($x) use ($table): string {
                                 return $table.'.'.$x;
                             }, $relationshipData['conditions']);
 
-                        $existsMatches[2] = 'SELECT id FROM '.$joinTipo->getInterAdminsTableName().' AS '.$table.
+                        $existsMatches[2] = 'SELECT id FROM '.$joinType->getInterAdminsTableName().' AS '.$table.
                             ' WHERE '.$joinFilter.implode(' AND ', $conditions).
-                            ' AND '.$table.'.type_id = '.$joinTipo->type_id.''.
+                            ' AND '.$table.'.type_id = '.$joinType->type_id.''.
                             (($existsMatches[4]) ? ' AND ' : '');
                     }
 
@@ -246,7 +246,7 @@ class SqlCompiler
                 // Reset per term: both survive an iteration otherwise, so a term that skips
                 // the branch assigning them would compile a join off the PREVIOUS term's type.
                 $subTerm = null;
-                $joinTipo = null;
+                $joinType = null;
                 if (strpos($term, '.') !== false) {
                     list($table, $term, $subTerm) = explode('.', $term) + [2 => null];
                 }
@@ -262,20 +262,20 @@ class SqlCompiler
                     // Support for old join alias: ChildrenLojas => Lojas
                     $joinNome = replace_prefix('Children', '', $joinNome);
                     if (isset($childrenArr[$joinNome])) {
-                        $joinTipo = Type::getInstance($childrenArr[$joinNome]['type_id'], [
+                        $joinType = Type::getInstance($childrenArr[$joinNome]['type_id'], [
                             'db' => $this->record->getDbName(),
                             'default_namespace' => $this->record::DEFAULT_NAMESPACE,
                         ]);
 
                         if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                             $options['from_alias'][] = $table;
-                            $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
+                            $options['from'][] = ' LEFT JOIN '.$joinType->getInterAdminsTableName().
                                 ' AS '.$table.' ON '.$table.'.parent_id = main.id'.
-                                ' AND '.$table.'.type_id = '.$joinTipo->type_id;
+                                ' AND '.$table.'.type_id = '.$joinType->type_id;
 
                             $options['auto_group_flag'] = true;
                         }
-                        $joinAliases = array_flip($joinTipo->getFieldAliases());
+                        $joinAliases = array_flip($joinType->getFieldAliases());
 
                     // Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins
                     } elseif ($table == 'tags') {
@@ -294,74 +294,74 @@ class SqlCompiler
                             if ($subTerm) {
                                 $options['pre_joins'][$table] = true;
                             }
-                            $joinTipo = $options['joins'][$table][1];
+                            $joinType = $options['joins'][$table][1];
                         // Joins de select
                         } elseif (isset($aliases[$joinNome.'_id']) && isset($campos[$aliases[$joinNome.'_id']])) {
                             $joinNome = $aliases[$joinNome.'_id'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->addJoin($options, $table, $campos[$joinNome]);
                             }
-                            $joinTipo = $this->record->getFieldType($campos[$joinNome]);
+                            $joinType = $this->record->getFieldType($campos[$joinNome]);
                         // Joins de select_multi
                         } elseif (isset($aliases[$joinNome.'_ids']) && isset($campos[$aliases[$joinNome.'_ids']])) {
                             $joinNome = $aliases[$joinNome.'_ids'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->addJoin($options, $table, $campos[$joinNome]);
                             }
-                            $joinTipo = $this->record->getFieldType($campos[$joinNome]);
+                            $joinType = $this->record->getFieldType($campos[$joinNome]);
                         // Joins de special
                         } elseif (isset($campos[$joinNome])) {
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $this->addJoin($options, $table, $campos[$joinNome]);
                             }
-                            $joinTipo = $this->record->getFieldType($campos[$joinNome]);
+                            $joinType = $this->record->getFieldType($campos[$joinNome]);
                         } elseif (isset($options['model']) && method_exists($options['model'], $joinNome)) {
                             $relationshipData = $options['model']->$joinNome()->getRelationshipData();
 
-                            $joinTipo = $relationshipData['tipo'];
+                            $joinType = $relationshipData['tipo'];
                             if ($offset > $ignoreJoinsUntil && !in_array($table, $options['from_alias'])) {
                                 $conditions = array_map(function ($x) use ($table): string {
                                     return $table.'.'.$x;
                                 }, $relationshipData['conditions']);
 
                                 $options['from_alias'][] = $table;
-                                $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
+                                $options['from'][] = ' LEFT JOIN '.$joinType->getInterAdminsTableName().
                                     ' AS '.$table.' ON '.implode(' AND ', $conditions).
-                                    ' AND '.$table.'.type_id = '.$joinTipo->type_id;
+                                    ' AND '.$table.'.type_id = '.$joinType->type_id;
 
                                 $options['auto_group_flag'] = true;
                             }
                         } else {
                             throw new Exception('The field "'.$joinNome.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
                         }
-                        if ($joinTipo instanceof Type) {
-                            $joinAliases = array_flip($joinTipo->getFieldAliases());
+                        if ($joinType instanceof Type) {
+                            $joinAliases = array_flip($joinType->getFieldAliases());
                         } else {
                             $joinAliases = [];
                         }
                     }
                     // TEMPORARIO FIXME, necessario melhor maneira
                     if ($subTerm) {
-                        if (!$joinTipo instanceof Type) {
+                        if (!$joinType instanceof Type) {
                             throw new Exception('The field "'.$table.'.'.$term.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
                         }
                         $subtable = $table.'__'.$term;
                         $term = $term.'_id';
 
-                        $subCampos = $joinTipo->getFields();
-                        $subJoinTipo = $joinTipo->getFieldType($subCampos[$joinAliases[$term]]);
+                        $subCampos = $joinType->getFields();
+                        $subJoinType = $joinType->getFieldType($subCampos[$joinAliases[$term]]);
 
                         // Permite utilizar relacionamentos no where sem ter usado o campo no fields
                         if (!in_array($subtable, $options['from_alias'])) {
                             $options['from_alias'][] = $subtable;
-                            $options['from'][] = ' LEFT JOIN '.$subJoinTipo->getInterAdminsTableName().
+                            $options['from'][] = ' LEFT JOIN '.$subJoinType->getInterAdminsTableName().
                                 ' AS '.$subtable.' ON '.$subtable.'.id = '.$table.'.'.$joinAliases[$term].
-                                ' AND '.$subtable.'.type_id = '.$subJoinTipo->type_id;
+                                ' AND '.$subtable.'.type_id = '.$subJoinType->type_id;
                         }
 
                         $table = $subtable;
                         $term = $subTerm;
-                        $joinAliases = array_flip($subJoinTipo->getFieldAliases());
+                        $joinAliases = array_flip($subJoinType->getFieldAliases());
                     }
                     $column = $this->record->_aliasToColumn($term, $joinAliases);
                 }
@@ -376,12 +376,12 @@ class SqlCompiler
 
     /**
      * Appends the LEFT JOIN a relation field needs, and reports which table it landed on:
-     * 'tipo' for a join to tipos, 'interadmin' for one to a records table.
+     * 'type' for a join to the types table, 'interadmin' for one to a records table.
      */
     public function addJoin(array &$options, $alias, array $field, $table = 'main'): string
     {
-        $joinTipo = $this->record->getFieldType($field);
-        if (!$joinTipo ) { //  || strpos($field['type'], 'select_multi_') === 0
+        $joinType = $this->record->getFieldType($field);
+        if (!$joinType ) { //  || strpos($field['type'], 'select_multi_') === 0
             throw new Exception('The field "'.$alias.'" cannot be used as a join ('.get_class($this->record).' - PK: '.$this->record->__toString().').');
         }
         $options['from_alias'][] = $alias; // Used as cache when resolving Where
@@ -389,23 +389,23 @@ class SqlCompiler
         $column = $field['type'];
         $xtra = $field['xtra'];
         $isMulti = strpos($column, 'select_multi_') === 0 || in_array($xtra, FieldUtil::getSpecialMultiXtras());
-        if (in_array($xtra, FieldUtil::getSelectTipoXtras()) || in_array($xtra, FieldUtil::getSpecialTipoXtras())) {
-            $options['from'][] = ' LEFT JOIN '.$joinTipo->getTableName().
+        if (in_array($xtra, FieldUtil::getSelectTypeXtras()) || in_array($xtra, FieldUtil::getSpecialTypeXtras())) {
+            $options['from'][] = ' LEFT JOIN '.$joinType->getTableName().
                 ' AS '.$alias.' ON '.
                 ($isMulti ?
                     'FIND_IN_SET('.$alias.'.type_id, '.$table.'.'.$column.')' :
                     $table.'.'.$column.' = '.$alias.'.type_id'
                 );
 
-            return 'tipo';
+            return 'type';
         } else {
-            $options['from'][] = ' LEFT JOIN '.$joinTipo->getInterAdminsTableName().
+            $options['from'][] = ' LEFT JOIN '.$joinType->getInterAdminsTableName().
                 ' AS '.$alias.' ON '.
                 ($isMulti ?
                     'FIND_IN_SET('.$alias.'.id, '.$table.'.'.$column.')' :
                     $table.'.'.$column.' = '.$alias.'.id'
                 ).
-                ' AND '.$alias.'.type_id = '.$joinTipo->type_id;
+                ' AND '.$alias.'.type_id = '.$joinType->type_id;
 
             return 'interadmin';
         }

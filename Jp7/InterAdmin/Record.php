@@ -97,7 +97,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @var Type
      */
-    protected $_tipo;
+    protected $_type;
     /**
      * Contains the parent Record object, i.e. the record with an 'id' equal to this record's 'parent_id'.
      *
@@ -260,7 +260,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function setTypeIdAttribute($value)
     {
         $this->attributes['type_id'] = $value;
-        if (!$this->_tipo) {
+        if (!$this->_type) {
             $this->getType(); // Set Type and Aliases
         }
     }
@@ -547,7 +547,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @param int   $id      This record's 'id'.
      * @param array $options Default array of options. Available keys: fields, fields_alias, class, default_class.
-     * @param Type Set the record´s Tipo.
+     * @param Type Set the record's Type.
      *
      * @return Record Returns an Record or a child class in case it's defined on the 'class' property of its Type.
      */
@@ -572,7 +572,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return $instance;
     }
     /**
-     * Finds a Child Tipo by a camelcase keyword.
+     * Finds a Child Type by a camelcase keyword.
      *
      * @param string $nome_id CamelCase
      *
@@ -587,11 +587,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         }
     }
 
-    public function getChildrenTipoByNome($nome_id)
+    public function getChildrenTypeByNome($nome_id)
     {
         $child = $this->_findChild($nome_id);
         if ($child) {
-            return $this->getChildrenTipo($child['type_id']);
+            return $this->getChildrenType($child['type_id']);
         }
     }
 
@@ -641,18 +641,18 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     {
         // childName() - relacionamento
         if ($child = $this->_findChild(ucfirst($name))) {
-            $childrenTipo = $this->getChildrenTipo($child['type_id']);
+            $childrenType = $this->getChildrenType($child['type_id']);
             if (array_key_exists($name, $this->relations)) {
-                return new EagerLoadedQuery($childrenTipo, $this->relations[$name]);
+                return new EagerLoadedQuery($childrenType, $this->relations[$name]);
             }
-            return new Query($childrenTipo);
+            return new Query($childrenType);
         } elseif ($name === 'arquivos' && $this->hasArquivosTab()) {
             return new Query\FileQuery($this);
         }
     }
 
     /**
-     * Gets the Type object for this record, which is then cached on the $_tipo property.
+     * Gets the Type object for this record, which is then cached on the $_type property.
      *
      * @param array $options Default array of options. Available keys: class.
      *
@@ -660,8 +660,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function getType($options = [])
     {
-        if ($this->_tipo) {
-            return $this->_tipo;
+        if ($this->_type) {
+            return $this->_type;
         }
         // Instance was not brought from DB, type_id is empty
         if (empty($this->attributes['type_id'])) {
@@ -677,18 +677,18 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             ]);
         }
         $this->setType($type);
-        return $this->_tipo;
+        return $this->_type;
     }
 
     /**
-     * Sets the Type object for this record, changing the $_tipo property.
+     * Sets the Type object for this record, changing the $_type property.
      *
      * @param Type $type
      */
     public function setType(?Type $type = null)
     {
         $this->attributes['type_id'] = $type ? $type->type_id : 0;
-        $this->_tipo = $type;
+        $this->_type = $type;
         $this->_aliases = $type ? $this->getAttributesAliases() : [];
     }
     /**
@@ -716,11 +716,11 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                     ->records()
                     ->find($this->parent_id);
                 if ($this->_parent) {
-                    if (!$this->getType()->hasLoadedParent() || !$this->_tipo->getParent() instanceof Record) {
+                    if (!$this->getType()->hasLoadedParent() || !$this->_type->getParent() instanceof Record) {
                         // Dangerous side effect changing Type's parent record, clone to mitigate side effect
-                        $this->_tipo = clone $this->_tipo;
+                        $this->_type = clone $this->_type;
                     }
-                    $this->_tipo->setParent($this->_parent);
+                    $this->_type->setParent($this->_parent);
                 }
             }
         }
@@ -751,14 +751,14 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      *
      * @return Type
      */
-    public function getChildrenTipo($type_id, $options = [])
+    public function getChildrenType($type_id, $options = [])
     {
         $options['default_namespace'] = static::DEFAULT_NAMESPACE;
         $options['db'] = $this->_db;
-        $childrenTipo = Type::getInstance($type_id, $options);
-        $childrenTipo->setParent($this);
+        $childrenType = Type::getInstance($type_id, $options);
+        $childrenType->setParent($this);
 
-        return $childrenTipo;
+        return $childrenType;
     }
 
     /**
@@ -773,7 +773,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return $childrenTypes;
     }
 
-    public function hasChildrenTipo($type_id)
+    public function hasChildrenType($type_id)
     {
         foreach ($this->getType()->getInterAdminsChildren() as $childrenArr) {
             if ($childrenArr['type_id'] == $type_id) {

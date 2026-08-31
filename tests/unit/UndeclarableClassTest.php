@@ -10,7 +10,7 @@ use Jp7\InterAdmin\TypeClassMap;
 /**
  * A content type bound to a class name PHP cannot declare.
  *
- * `tipos.class` becomes a class name by a literal `_` → `\` swap, so a type called "Include" or
+ * `types.class` becomes a class name by a literal `_` → `\` swap, so a type called "Include" or
  * "String" asks DynamicLoader to generate `class Include {}`. It cannot; the question is what the
  * ORM does about it. It used to generate the code anyway and let the eval fail — a RuntimeException
  * out of `class_exists()`, which is not something an autoloader is allowed to throw, and it took

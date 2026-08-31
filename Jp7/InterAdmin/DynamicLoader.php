@@ -26,7 +26,7 @@ class DynamicLoader
     /**
      * Whether PHP can declare a class by this name at all.
      *
-     * `tipos.class` becomes a class name by a literal `_` → `\` swap, so a content type named
+     * `types.class` becomes a class name by a literal `_` → `\` swap, so a content type named
      * "Include" asks for `class Include {}` and a type named "String" asks for something worse.
      * Callers treat such a binding as NO binding: nothing can make the name exist, so the only
      * question is whether they degrade to the default class or take the request down with them.
@@ -85,13 +85,13 @@ class DynamicLoader
     {
         if (strpos($field['type'], 'special_') === 0 && $field['xtra']) {
 //            $isMulti = in_array($field['xtra'], InterAdminField::getSpecialMultiXtras());
-//            $isTipo = in_array($field['xtra'], InterAdminField::getSpecialTipoXtras());
-//            $retorno = self::_getCampoTypeClass($type->getFieldType($field), $isTipo, $isMulti);
+//            $isType = in_array($field['xtra'], InterAdminField::getSpecialTypeXtras());
+//            $retorno = self::_getCampoTypeClass($type->getFieldType($field), $isType, $isMulti);
             $phpDocType = 'int';
         } elseif (strpos($field['type'], 'select_') === 0) {
 //            $isMulti = (strpos($field['type'], 'select_multi') === 0);
-//            $isTipo = in_array($field['xtra'], InterAdminField::getSelectTipoXtras());
-//            $retorno = self::_getCampoTypeClass($field['name'], $isTipo, $isMulti);
+//            $isType = in_array($field['xtra'], InterAdminField::getSelectTypeXtras());
+//            $retorno = self::_getCampoTypeClass($field['name'], $isType, $isMulti);
             $phpDocType = 'int';
         } elseif (strpos($field['type'], 'int') === 0 || strpos($field['type'], 'id') === 0) {
             $phpDocType = 'string';

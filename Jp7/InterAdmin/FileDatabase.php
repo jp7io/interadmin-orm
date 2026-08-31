@@ -31,7 +31,7 @@ class FileDatabase extends RecordAbstract
      *
      * @var Type
      */
-    protected $_tipo;
+    protected $_type;
     /**
      * Contains the parent Record object, i.e. the record with an 'id' equal to this record's 'parent_id'.
      *
@@ -76,7 +76,7 @@ class FileDatabase extends RecordAbstract
     }
 
     /**
-     * Gets the Type object for this record, which is then cached on the $_tipo property.
+     * Gets the Type object for this record, which is then cached on the $_type property.
      *
      * @param array $options Default array of options. Available keys: class.
      *
@@ -84,22 +84,22 @@ class FileDatabase extends RecordAbstract
      */
     public function getType()
     {
-        if (!$this->_tipo && $this->attributes['type_id']) {
-            $this->_tipo = Type::getInstance($this->attributes['type_id'], [
+        if (!$this->_type && $this->attributes['type_id']) {
+            $this->_type = Type::getInstance($this->attributes['type_id'], [
                 'db' => $this->_db
             ]);
         }
-        return $this->_tipo;
+        return $this->_type;
     }
     /**
-     * Sets the Type object for this record, changing the $_tipo property.
+     * Sets the Type object for this record, changing the $_type property.
      *
      * @param Type $type
      */
     public function setType($type): void
     {
         $this->attributes['type_id'] = $type->type_id;
-        $this->_tipo = $type;
+        $this->_type = $type;
     }
     /**
      * Gets the parent Record object for this record, which is then cached on the $_parent property.
