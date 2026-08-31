@@ -37,7 +37,7 @@ use DB;
  *
  * @property string $interadminsOrderby SQL Order By for the records of this Type.
  * @property string $class Class to be instantiated for the records of this Type.
- * @property string $tabela Table of this Type, or of its Model, if it has no table.
+ * @property string $table_name Table of this Type, or of its Model, if it has no table.
  * @property int|string $type_id This Type's primary key.
  * @property string $children The child Types, as the '{,}'/'{;}' delimited blob the column stores.
  * @property ?string $deleted_at When this Type was soft-deleted, NULL while it is live.
@@ -110,9 +110,9 @@ class Type extends RecordAbstract
     const CACHE_TTL = 300;
 
     private static $inheritedFields = [
-        'class', 'class_tipo', 'icon', 'layout', 'layout_registros', 'tabela',
-        'template', 'children', 'fields', 'language', 'editar', 'unico', 'disparo',
-        'editpage', 'visualizar', 'template_inserir', 'tags_list', 'hits', 'texto',
+        'class', 'class_type', 'icon', 'layout', 'layout_records', 'table_name',
+        'template', 'children', 'fields', 'language', 'edit', 'single', 'trigger_function',
+        'editpage', 'template_view', 'template_insert', 'tags_list', 'hits', 'description',
         'xtra_disabledfields', 'xtra_disabledchildren', 'arquivos'
     ];
     private static $privateFields = ['children', 'fields'];
@@ -244,7 +244,7 @@ class Type extends RecordAbstract
      * @param int   $type_id This record's 'type_id'.
      * @param array $options Default array of options. Available keys: class, default_class.
      *
-     * @return static Returns an Type or a child class in case it's defined on its 'class_tipo' property.
+     * @return static Returns an Type or a child class in case it's defined on its 'class_type' property.
      */
     public static function getInstance($type_id, $options = [])
     {
@@ -254,7 +254,7 @@ class Type extends RecordAbstract
         } else {
             // Classe não foi forçada, verificar classMap
             $classTipo = TypeClassMap::getInstance()->getClass($type_id);
-            // As in Record::getInstance(): a `class_tipo` PHP cannot declare is no binding.
+            // As in Record::getInstance(): a `class_type` PHP cannot declare is no binding.
             if (!$classTipo || !DynamicLoader::isDeclarable($classTipo)) {
                 if (isset($options['default_namespace'])) {
                     $classTipo = $options['default_namespace'].'Type';
@@ -273,7 +273,7 @@ class Type extends RecordAbstract
     /*
     public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
         if (!isset($this->attributes['model_type_id'])) {
-            $eagerload = array('name', 'language', 'parent_type_id', 'fields', 'model_type_id', 'tabela', 'class', 'class_tipo', 'template', 'children');
+            $eagerload = array('name', 'language', 'parent_type_id', 'fields', 'model_type_id', 'table_name', 'class', 'class_type', 'template', 'children');
             $neededFields = array_unique(array_merge((array) $fields, $eagerload));
             $values = parent::getFieldsValues($neededFields);
             if (is_array($fields)) {
@@ -345,7 +345,7 @@ class Type extends RecordAbstract
         $cacheKey = __METHOD__.serialize($options);
 
         if (empty($options['order'])) {
-            $options['order'] = 'ordem, name';
+            $options['order'] = 'position, name';
         }
         if (empty($options['where'])) {
             $options['where'] = ['1=1'];
@@ -984,7 +984,7 @@ class Type extends RecordAbstract
      */
     public function getInterAdminsTableName()
     {
-        return $this->_getTableLang().($this->tabela ?: 'records');
+        return $this->_getTableLang().($this->table_name ?: 'records');
     }
     /**
      * Returns the table name for the files.
@@ -1007,9 +1007,9 @@ class Type extends RecordAbstract
     public function getTypeClass()
     {
         if (config('interadmin.psr-4')) {
-            return str_replace('_', '\\', $this->class_tipo);
+            return str_replace('_', '\\', $this->class_type);
         }
-        return $this->class_tipo;
+        return $this->class_type;
     }
 
     /**

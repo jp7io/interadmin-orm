@@ -79,13 +79,13 @@ class UndeclarableClassTest extends TestCase
         $this->assertSame(Type::class, get_class(Type::getInstance($type->type_id)));
     }
 
-    /** A type whose `class` AND `class_tipo` are the undeclarable name, with the maps rebuilt. */
+    /** A type whose `class` AND `class_type` are the undeclarable name, with the maps rebuilt. */
     private function createBoundType(string $name): Type
     {
         $type = $this->createType([
             'name' => $name,
             'class' => $name,
-            'class_tipo' => $name,
+            'class_type' => $name,
         ], [
             ['type' => 'varchar_key', 'name' => 'Nome'],
         ]);

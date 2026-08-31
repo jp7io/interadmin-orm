@@ -40,7 +40,7 @@ abstract class BaseClassMap
                 ->select($attr, 'type_id', 'inherited')
                 ->where($attr, '<>', '')
                 ->whereNull('deleted_at')
-                ->where('mostrar', '<>', '')
+                ->where('visible', '<>', '')
                 ->orderByRaw("inherited LIKE '%".$attr."%'")
                 ->get();
 

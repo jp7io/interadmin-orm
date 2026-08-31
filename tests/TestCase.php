@@ -144,8 +144,8 @@ abstract class TestCase extends BaseTestCase
 
         $type->setRawAttributes($attributes + [
             'class' => 'Test_'.$attributes['name'],
-            'class_tipo' => 'Test_'.$attributes['name'].'Tipo',
-            'mostrar' => 'S',
+            'class_type' => 'Test_'.$attributes['name'].'Tipo',
+            'visible' => 'S',
             'deleted_at' => null,
             'fields' => $this->createFields($fields)
         ]);

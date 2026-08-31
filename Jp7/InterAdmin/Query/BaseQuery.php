@@ -51,22 +51,22 @@ abstract class BaseQuery
     ];
 
     protected $typeChars = [
-        'mostrar',
+        'visible',
         'language',
         'menu',
         'search',
-        'restrito',
+        'restricted',
         'admin',
-        'editar',
-        'unico',
-        'versoes',
+        'edit',
+        'single',
+        'versions',
         'hits',
         'tags',
         'tags_list',
-        'tags_tipo',
-        'tags_registros',
-        'publish_tipo',
-        'visualizar',
+        'tags_type',
+        'tags_records',
+        'publish_type',
+        'template_view',
     ];
 
     protected $initialOptions = [

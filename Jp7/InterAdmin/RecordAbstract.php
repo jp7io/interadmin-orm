@@ -906,7 +906,7 @@ abstract class RecordAbstract
 
         $db = $this->getDb();
         // getColumnListing() puts the prefix back on, so it has to come off first. Anchored,
-        // and once: a table whose own name repeats the prefix (a type whose `tabela` holds the
+        // and once: a table whose own name repeats the prefix (a type whose `table_name` holds the
         // fully qualified name, say) was rewritten by the old unanchored str_replace() into a
         // DIFFERENT table, which answers with the wrong columns when it happens to exist.
         $prefix = $db->getTablePrefix();
