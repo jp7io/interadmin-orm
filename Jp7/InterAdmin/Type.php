@@ -582,7 +582,7 @@ class Type extends RecordAbstract
             if (is_numeric($this->model_type_id)) {
                 $model = Type::getInstance($this->model_type_id, ['default_namespace' => static::DEFAULT_NAMESPACE]);
             } else {
-                $className = 'Jp7_Model_'.$this->model_type_id.'Tipo';
+                $className = 'Jp7_Model_'.$this->model_type_id.'Type';
                 $model = new $className();
             }
 
@@ -857,7 +857,7 @@ class Type extends RecordAbstract
             if (is_numeric($this->model_type_id)) {
                 $model = new self($this->model_type_id);
             } else {
-                $className = 'Jp7_Model_'.$this->model_type_id.'Tipo';
+                $className = 'Jp7_Model_'.$this->model_type_id.'Type';
                 $model = new $className();
             }
             foreach (self::$inheritedFields as $field) {
