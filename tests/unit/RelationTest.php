@@ -25,7 +25,7 @@ class RelationTest extends TestCase
             [
                 ['type' => 'varchar_key', 'name' => 'Name'],
                 ['type' => 'varchar_1', 'name' => 'UF'],
-                ['type' => 'char_key', 'name' => 'Show']
+                ['type' => 'bool_key', 'name' => 'Show']
             ]
         );
 
@@ -37,7 +37,7 @@ class RelationTest extends TestCase
             [
                 ['type' => 'varchar_key', 'name' => 'Name'],
                 ['type' => 'select_1', 'name' => $this->cityType->type_id, 'xtra' => SelectField::XTRA_RECORD, 'name_id' => 'city'],
-                ['type' => 'char_key', 'name' => 'Show']
+                ['type' => 'bool_key', 'name' => 'Show']
             ]
         );
 
@@ -47,7 +47,7 @@ class RelationTest extends TestCase
             ],
             [
                 ['type' => 'varchar_key', 'name' => 'Title'],
-                ['type' => 'char_key', 'name' => 'Show']
+                ['type' => 'bool_key', 'name' => 'Show']
             ]
         );
 

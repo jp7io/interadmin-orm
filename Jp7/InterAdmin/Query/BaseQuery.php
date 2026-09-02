@@ -531,38 +531,34 @@ abstract class BaseQuery
         return $this->prefix.$column.' '.$operator.' '.$this->_escapeParam($value);
     }
 
+    /**
+     * Whether a boolean compared against this column becomes an emptiness test. The three char(1)
+     * flag families still need it: `types`, `files` ({@see FileQuery}) and a record's own
+     * `deleted`/`publish`.
+     *
+     * ⚠ A record's `bool_*` slot is NOT one of them any more. It is a tinyint, so `= true` reaches
+     * SQL as `= 1`; rewriting it to `<> ''` would compare an integer against a string and match
+     * every row.
+     */
     protected function _isChar($field)
     {
         if (str_contains($field, '.')) {
             list($relationship, $field) = explode('.', $field);
 
             if (isset($this->options['joins'][$relationship])) {
-                $joinType = $this->options['joins'][$relationship][1];
-                $data = [
-                    'tipo' => $joinType,
-                    'has_type' => $joinType === Type::class
-                ];
+                $hasType = $this->options['joins'][$relationship][1] === Type::class;
             } else {
-                $data = $this->provider->getRelationshipData($relationship);
+                $hasType = $this->provider->getRelationshipData($relationship)['has_type'];
             }
-            if ($data['has_type']) {
-                return in_array($field, $this->typeChars);
-            }
-            $type = $data['tipo'];
-        } elseif ($this instanceof TypeQuery) {
-            return in_array($field, $this->typeChars);
-        } elseif (in_array($field, ['deleted', 'publish'])) {
-            return true;
-        } else {
-            $type = $this->provider;
+
+            return $hasType && in_array($field, $this->typeChars);
         }
 
-        $aliases = array_flip($type->getFieldAliases());
-        if (isset($aliases[$field])) {
-            return strpos($aliases[$field], 'char_') === 0;
-        } else {
-            return strpos($field, 'char_') === 0;
+        if ($this instanceof TypeQuery) {
+            return in_array($field, $this->typeChars);
         }
+
+        return in_array($field, ['deleted', 'publish']);
     }
 
     protected function _resolveType($var)
@@ -594,6 +590,11 @@ abstract class BaseQuery
                 return RawSql::toSql($value);
             }
             $value = $value->__toString();
+        }
+        if (is_bool($value)) {
+            // ⚠ These are concatenated into the clause, and (string) false is the empty string --
+            // so an unconverted bool compiles `bool_1 = ` and MySQL rejects the statement.
+            $value = (int) $value;
         }
         if (is_string($value) && !ctype_digit($value)) {
             $binding = ':val'.count($this->options['bindings']);

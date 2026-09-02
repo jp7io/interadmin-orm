@@ -67,7 +67,7 @@ parameters:
 			path: Jp7/InterAdmin/Query/BaseQuery.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$char_key\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$bool_key\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Record.php

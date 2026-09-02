@@ -198,7 +198,7 @@ abstract class TestCase extends BaseTestCase
             'varchar_key' => 'argentinopam',
             'password_key' => '123',
             'varchar_2' => 'pamela@jp7.com.br',
-            'char_key' => 'S',
+            'bool_key' => 1,
             'publish' => 'S',
             'position' => 0,
         ];
@@ -214,7 +214,7 @@ abstract class TestCase extends BaseTestCase
             ['type' => 'varchar_key', 'name' => 'Username'],
             ['type' => 'password_key', 'name' => 'Password'],
             ['type' => 'varchar_2', 'name' => 'E-mail'],
-            ['type' => 'char_key', 'name' => 'Show'],
+            ['type' => 'bool_key', 'name' => 'Show'],
             ['type' => 'int_key', 'name' => 'Position']
         ]);
     }
@@ -225,7 +225,7 @@ abstract class TestCase extends BaseTestCase
             $attributes + ['name' => 'Noticia'],
             [
                 ['type' => 'varchar_key', 'name' => 'Title'],
-                ['type' => 'char_key', 'name' => 'Show']
+                ['type' => 'bool_key', 'name' => 'Show']
             ]
         );
     }

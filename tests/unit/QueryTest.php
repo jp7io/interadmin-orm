@@ -29,7 +29,7 @@ class QueryTest extends TestCase
         $this->assertEmpty($userQueryShouldFail);
 
         $userCompositeQuery = Test_User::where('varchar_key', '=', $newUser->username)
-            ->where('char_key', '=', 'S')
+            ->where('bool_key', '=', 1)
             ->first();
         $this->assertEquals($newUser->show, $userCompositeQuery->show);
     }
@@ -256,7 +256,7 @@ class QueryTest extends TestCase
     {
         return [
             'no date_expire' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -264,7 +264,7 @@ class QueryTest extends TestCase
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
             ]],
             'not expired yet' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -272,7 +272,7 @@ class QueryTest extends TestCase
                 'date_expire' => '2016-01-01 02:01:00' // date_expire no futuro
             ]],
             'children without publish' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => '', // sem publish
                 'deleted'  => '',
                 'parent_id'  => 123, // com parent
@@ -286,7 +286,7 @@ class QueryTest extends TestCase
     {
         return [
             'not active' => [[
-                'char_key' => '', // not shown
+                'bool_key' => 0, // not shown
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -294,7 +294,7 @@ class QueryTest extends TestCase
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             'deleted' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => 'S', // com deleted
                 'parent_id'  => 0,
@@ -302,7 +302,7 @@ class QueryTest extends TestCase
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             'expired' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -310,7 +310,7 @@ class QueryTest extends TestCase
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
             ]],
             'not published yet' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -318,7 +318,7 @@ class QueryTest extends TestCase
                 'date_expire' => '2016-01-01 03:00:00'
             ]],
             'no publish' => [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => '', // sem publish
                 'deleted'  => '',
                 'parent_id'  => 0, // sem parent

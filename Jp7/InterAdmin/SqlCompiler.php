@@ -25,8 +25,8 @@ use Exception;
  *     compiles when what is being queried is a type.
  *
  * That is why this is an object holding a record and not a set of pure functions, and it is
- * the reason the two collaborators that came out first ({@see PublishedFilter},
- * {@see CharBooleanRewriter}) are the only pure ones there were.
+ * the reason the first collaborator to come out ({@see PublishedFilter}) is the only pure one
+ * there was.
  *
  * @see RecordAbstract::_resolveSql() -- the entry point subclasses still call
  */
@@ -42,6 +42,9 @@ class SqlCompiler
         'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING', 'DISTINCT', 'UNSIGNED', 'AS',
         'INTERVAL', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CASE', 'WHEN', 'THEN', 'END', 'BINARY',
         'HOUR', 'MINUTE', 'SECOND',
+        // ⚠ Load-bearing since the char slots became tinyint: without them the alias walk reads
+        // `true` as an identifier and compiles `main.bool_1 = main.true`.
+        'TRUE', 'FALSE',
     ];
 
     protected \Jp7\InterAdmin\RecordAbstract $record;
@@ -159,11 +162,6 @@ class SqlCompiler
 
         while (preg_match('/('.$quoted.'|'.$keyword.$not_function.'|EXISTS)/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
             list($term, $pos) = $matches[1];
-            // Resolvendo true e false para char
-            if (CharBooleanRewriter::handles($term)) {
-                list($clause, $offset) = CharBooleanRewriter::rewrite($clause, $term, $pos);
-                continue;
-            }
 
             if ($term === 'FROM') {
                 $insideFrom = true;

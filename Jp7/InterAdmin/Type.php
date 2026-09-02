@@ -1268,8 +1268,8 @@ class Type extends RecordAbstract
     {
         $options = ['default_namespace' => static::DEFAULT_NAMESPACE];
         $record = Record::getInstance(0, $options, $this);
-        if ($mostrar = $this->getFieldAliases('char_key')) {
-            $record->$mostrar = 'S';
+        if ($mostrar = $this->getFieldAliases('bool_key')) {
+            $record->$mostrar = true;
         }
         $record->date_publish = date('c');
         $record->date_insert = date('c');

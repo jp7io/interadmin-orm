@@ -59,8 +59,8 @@ class UndeclarableClassTest extends TestCase
         $type = $this->createBoundType($name);
 
         $record = $type->records()->build();
-        // char_key/publish, or the ORM's own published filter hides the row again.
-        $record->setRawAttributes(['varchar_key' => 'Um registro', 'char_key' => 'S', 'publish' => 'S']);
+        // bool_key/publish, or the ORM's own published filter hides the row again.
+        $record->setRawAttributes(['varchar_key' => 'Um registro', 'bool_key' => 1, 'publish' => 'S']);
         $record->save();
 
         $loaded = $type->records()->get();

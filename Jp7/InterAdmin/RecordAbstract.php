@@ -365,12 +365,6 @@ abstract class RecordAbstract
                 case 'NULL':
                     $valuesToSave[$key] = in_array($key, static::$nullableAttributes, true) ? null : '';
                     break;
-                case 'boolean':
-                    if (str_starts_with($key, 'char_')) {
-                        $valuesToSave[$key] = $value ? 'S' : '';
-                        break;
-                    }
-                    // fall through
                 default:
                     $valuesToSave[$key] = $value;
                     break;

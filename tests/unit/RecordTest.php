@@ -68,7 +68,7 @@ class RecordTest extends TestCase
     {
         return [
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -76,7 +76,7 @@ class RecordTest extends TestCase
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
             ]],
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -84,7 +84,7 @@ class RecordTest extends TestCase
                 'date_expire' => '2016-01-01 02:00:01' // date_expire no futuro
             ]],
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => '', // sem publish
                 'deleted'  => '',
                 'parent_id'  => 123, // com parent
@@ -98,7 +98,7 @@ class RecordTest extends TestCase
     {
         return [
             [[
-                'char_key' => '', // not shown
+                'bool_key' => 0, // not shown
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -106,7 +106,7 @@ class RecordTest extends TestCase
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => 'S', // com deleted
                 'parent_id'  => 0,
@@ -114,7 +114,7 @@ class RecordTest extends TestCase
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -122,7 +122,7 @@ class RecordTest extends TestCase
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
             ]],
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => 'S',
                 'deleted'  => '',
                 'parent_id'  => 0,
@@ -130,7 +130,7 @@ class RecordTest extends TestCase
                 'date_expire' => '2016-01-01 03:00:00'
             ]],
             [[
-                'char_key' => 'S',
+                'bool_key' => 1,
                 'publish'  => '', // sem publish
                 'deleted'  => '',
                 'parent_id'  => 0, // sem parent

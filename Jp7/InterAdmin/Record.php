@@ -908,7 +908,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
      */
     public function isPublished()
     {
-        return $this->char_key &&
+        return $this->bool_key &&
             !$this->deleted &&
             ($this->parent_id || $this->publish || !config('interadmin.preview')) &&
             $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
