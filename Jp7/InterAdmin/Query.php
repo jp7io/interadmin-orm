@@ -216,14 +216,14 @@ class Query extends Query\BaseQuery
     }
 
     /**
-     * Set deleted = 'S' and update the records.
+     * Set deleted = 1 and update the records.
      *
      * @return int
      */
     public function delete()
     {
         return $this->provider->deprecated_updateInterAdmins([
-            'deleted' => 'S',
+            'deleted' => 1,
         ], $this->options);
     }
 

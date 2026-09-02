@@ -1273,7 +1273,7 @@ class Type extends RecordAbstract
         }
         $record->date_publish = date('c');
         $record->date_insert = date('c');
-        $record->publish = 'S';
+        $record->publish = true;
         $record->log = '';
 
         if ($this->_parent instanceof Record) {

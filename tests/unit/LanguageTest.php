@@ -16,7 +16,7 @@ class LanguageTest extends TestCase
 
     public function testWithLanguageChecked()
     {
-        $this->createI18nNewsType(['language' => 'S']);
+        $this->createI18nNewsType(['language' =>  1]);
 
         $news = Test_Noticia::build();
         $news->title = 'Doria eleito prefeito';
@@ -53,7 +53,7 @@ class LanguageTest extends TestCase
     
     public function testTypeName()
     {
-        $newsType = $this->createI18nNewsType(['language' => 'S', 'name_en' => 'News']);
+        $newsType = $this->createI18nNewsType(['language' =>  1, 'name_en' => 'News']);
 
         $namePtBr = $newsType->getName();
 

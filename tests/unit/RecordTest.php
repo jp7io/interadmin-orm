@@ -69,24 +69,24 @@ class RecordTest extends TestCase
         return [
             [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
             ]],
             [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01' // date_expire no futuro
             ]],
             [[
                 'bool_key' => 1,
-                'publish'  => '', // sem publish
-                'deleted'  => '',
+                'publish'  =>  0, // sem publish
+                'deleted'  =>  0,
                 'parent_id'  => 123, // com parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01'
@@ -99,40 +99,40 @@ class RecordTest extends TestCase
         return [
             [[
                 'bool_key' => 0, // not shown
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => 'S', // com deleted
+                'publish'  =>  1,
+                'deleted'  =>  1, // com deleted
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:00:00',
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
             ]],
             [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 02:00:01', // date_publish no futuro
                 'date_expire' => '2016-01-01 03:00:00'
             ]],
             [[
                 'bool_key' => 1,
-                'publish'  => '', // sem publish
-                'deleted'  => '',
+                'publish'  =>  0, // sem publish
+                'deleted'  =>  0,
                 'parent_id'  => 0, // sem parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:00:01'

@@ -831,7 +831,7 @@ abstract class RecordAbstract
      */
     public function delete()
     {
-        $this->deleted = 'S';
+        $this->deleted = true;
         return $this->save();
     }
     /**
@@ -853,7 +853,7 @@ abstract class RecordAbstract
 
     public function restore()
     {
-        $this->deleted = '';
+        $this->deleted = false;
         return $this->save();
     }
 

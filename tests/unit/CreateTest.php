@@ -95,7 +95,7 @@ class CreateTest extends TestCase
 
         $user->delete();
 
-        $this->seeInDatabase('interadmin_teste_records', ['id' => $user->id, 'deleted' => 'S']);
+        $this->seeInDatabase('interadmin_teste_records', ['id' => $user->id, 'deleted' =>  1]);
     }
 
     public function testForceDelete()

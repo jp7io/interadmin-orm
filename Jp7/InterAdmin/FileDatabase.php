@@ -18,7 +18,7 @@ namespace Jp7\InterAdmin;
  * @property int $width
  * @property int $height
  * @property int $pages   PDF page count, 0 where nothing counted it
- * @property string $deleted   'S' or ''
+ * @property bool $deleted
  * @property string $url    getUrlAttribute() mutator
  */
 class FileDatabase extends RecordAbstract

@@ -7,18 +7,6 @@ use BadMethodCallException;
 
 class FileQuery extends BaseQuery
 {
-    protected function _isChar($field): bool
-    {
-        $chars = [
-            'visible',
-            'featured',
-            'deleted',
-            'link_blank',
-        ];
-
-        return in_array($field, $chars);
-    }
-
     /**
      * @return FileRecord[]
      */

@@ -91,7 +91,7 @@ class TypeQuery extends BaseQuery
 
         $child = new $className();
         $child->parent_type_id = $this->provider->type_id;
-        $child->visible = 'S';
+        $child->visible = true;
 
         return $child->fill($attributes);
     }

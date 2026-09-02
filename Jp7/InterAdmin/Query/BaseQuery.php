@@ -50,24 +50,6 @@ abstract class BaseQuery
         'rlike', 'regexp', 'not regexp',
     ];
 
-    protected $typeChars = [
-        'visible',
-        'language',
-        'menu',
-        'search',
-        'restricted',
-        'admin',
-        'edit',
-        'single',
-        'versions',
-        'hits',
-        'tags',
-        'tags_list',
-        'tags_type',
-        'tags_records',
-        'publish_type',
-        'template_view',
-    ];
 
     protected $initialOptions = [
             'fields' => [],
@@ -242,7 +224,7 @@ abstract class BaseQuery
     }
 
     /**
-     * Set deleted = 'S' and update the records.
+     * Set deleted = 1 and update the records.
      *
      * @return int
      */
@@ -513,52 +495,11 @@ abstract class BaseQuery
                 throw new \InvalidArgumentException('Invalid operator: '.$operator);
             }
         }
-        if (is_bool($value) && $this->_isChar($column)) {
-            if ($operator !== '=') {
-                if (in_array($operator , ['<>', '!='])) {
-                    $operator = '=';
-                    $value = !$value;
-                } else {
-                    throw new \InvalidArgumentException('Invalid operator for boolean: '.$operator);
-                }
-            }
-            $operator = ($value ? '<>' : '=');
-            $value = '';
-        } elseif (is_null($value) && in_array($operator, ['=', '<>', '!='])) {
+        if (is_null($value) && in_array($operator, ['=', '<>', '!='])) {
             $operator = 'IS' . ($operator === '=' ? '' : ' NOT');
         }
 
         return $this->prefix.$column.' '.$operator.' '.$this->_escapeParam($value);
-    }
-
-    /**
-     * Whether a boolean compared against this column becomes an emptiness test. The three char(1)
-     * flag families still need it: `types`, `files` ({@see FileQuery}) and a record's own
-     * `deleted`/`publish`.
-     *
-     * ⚠ A record's `bool_*` slot is NOT one of them any more. It is a tinyint, so `= true` reaches
-     * SQL as `= 1`; rewriting it to `<> ''` would compare an integer against a string and match
-     * every row.
-     */
-    protected function _isChar($field)
-    {
-        if (str_contains($field, '.')) {
-            list($relationship, $field) = explode('.', $field);
-
-            if (isset($this->options['joins'][$relationship])) {
-                $hasType = $this->options['joins'][$relationship][1] === Type::class;
-            } else {
-                $hasType = $this->provider->getRelationshipData($relationship)['has_type'];
-            }
-
-            return $hasType && in_array($field, $this->typeChars);
-        }
-
-        if ($this instanceof TypeQuery) {
-            return in_array($field, $this->typeChars);
-        }
-
-        return in_array($field, ['deleted', 'publish']);
     }
 
     protected function _resolveType($var)

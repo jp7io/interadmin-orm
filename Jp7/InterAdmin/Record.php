@@ -815,7 +815,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         $file = new $className();
         $file->setParent($this);
         $file->setType($this->getType());
-        $file->visible = 'S';
+        $file->visible = true;
 
         return $file->fill($attributes);
     }

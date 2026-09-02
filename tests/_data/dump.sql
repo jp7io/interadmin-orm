@@ -101,8 +101,8 @@ CREATE TABLE `interadmin_teste_records` (
   `float_1` float NOT NULL DEFAULT '0',
   `log` text NOT NULL,
   `log_user` varchar(50) NOT NULL DEFAULT '',
-  `publish` char(1) NOT NULL DEFAULT '',
-  `deleted` char(1) NOT NULL DEFAULT ''
+  `publish` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -190,8 +190,8 @@ CREATE TABLE `interadmin_teste_en_records` (
   `float_1` float NOT NULL DEFAULT '0',
   `log` text NOT NULL,
   `log_user` varchar(50) NOT NULL DEFAULT '',
-  `publish` char(1) NOT NULL DEFAULT '',
-  `deleted` char(1) NOT NULL DEFAULT ''
+  `publish` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -225,11 +225,11 @@ CREATE TABLE `interadmin_teste_files` (
   `caption` varchar(255) NOT NULL DEFAULT '',
   `credits` varchar(255) NOT NULL DEFAULT '',
   `link` varchar(255) NOT NULL DEFAULT '',
-  `link_blank` char(1) NOT NULL DEFAULT '',
-  `visible` char(1) NOT NULL DEFAULT '',
-  `featured` char(1) NOT NULL DEFAULT '',
+  `link_blank` tinyint(1) NOT NULL DEFAULT 0,
+  `visible` tinyint(1) NOT NULL DEFAULT 0,
+  `featured` tinyint(1) NOT NULL DEFAULT 0,
   `position` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
-  `deleted` char(1) NOT NULL DEFAULT ''
+  `deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -267,22 +267,22 @@ CREATE TABLE `interadmin_teste_types` (
   `links` varchar(50) NOT NULL DEFAULT '',
   `links_help` varchar(255) NOT NULL DEFAULT '',
   `children` text NOT NULL,
-  `visible` char(1) NOT NULL DEFAULT '',
-  `language` char(1) NOT NULL DEFAULT '',
-  `menu` char(1) NOT NULL DEFAULT '',
-  `search` char(1) NOT NULL DEFAULT '',
-  `restricted` char(1) NOT NULL DEFAULT '',
-  `admin` char(1) NOT NULL DEFAULT '',
-  `edit` char(1) NOT NULL DEFAULT '',
-  `single` char(1) NOT NULL DEFAULT '',
-  `versions` char(1) NOT NULL DEFAULT '',
-  `hits` char(1) NOT NULL,
-  `tags` char(1) NOT NULL,
-  `tags_list` char(1) NOT NULL,
-  `tags_type` char(1) NOT NULL,
-  `tags_records` char(1) NOT NULL,
-  `publish_type` char(1) NOT NULL DEFAULT '',
-  `template_view` char(1) NOT NULL DEFAULT '',
+  `visible` tinyint(1) NOT NULL DEFAULT 0,
+  `language` tinyint(1) NOT NULL DEFAULT 0,
+  `menu` tinyint(1) NOT NULL DEFAULT 0,
+  `search` tinyint(1) NOT NULL DEFAULT 0,
+  `restricted` tinyint(1) NOT NULL DEFAULT 0,
+  `admin` tinyint(1) NOT NULL DEFAULT 0,
+  `edit` tinyint(1) NOT NULL DEFAULT 0,
+  `single` tinyint(1) NOT NULL DEFAULT 0,
+  `versions` tinyint(1) NOT NULL DEFAULT 0,
+  `hits` tinyint(1) NOT NULL DEFAULT 0,
+  `tags` tinyint(1) NOT NULL DEFAULT 0,
+  `tags_list` tinyint(1) NOT NULL DEFAULT 0,
+  `tags_type` tinyint(1) NOT NULL DEFAULT 0,
+  `tags_records` tinyint(1) NOT NULL DEFAULT 0,
+  `publish_type` tinyint(1) NOT NULL DEFAULT 0,
+  `template_view` tinyint(1) NOT NULL DEFAULT 0,
   `layout` tinyint(1) UNSIGNED NOT NULL,
   `layout_records` tinyint(1) UNSIGNED NOT NULL,
   `position` tinyint(4) NOT NULL DEFAULT '0',

@@ -20,7 +20,7 @@ class RelationTest extends TestCase
         $this->cityType = $this->createType(
             [
                 'name' => 'City',
-                //'tags' => 'S',
+                //'tags' =>  1,
             ],
             [
                 ['type' => 'varchar_key', 'name' => 'Name'],

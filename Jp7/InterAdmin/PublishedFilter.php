@@ -44,7 +44,7 @@ class PublishedFilter
         // name, so this is latent rather than live. Preserved exactly; changing it is a
         // behavior change, not part of the extraction.
         if ($table === 'types' && count($tableParts) === 3) {
-            return $alias.".visible <> '' AND ".$alias.'.deleted_at IS NULL AND ';
+            return $alias.'.visible = 1 AND '.$alias.'.deleted_at IS NULL AND ';
         } elseif ($table === 'tags' && count($tableParts) === 3) {
             // Tags carry no publishing state of their own -- returns null, and callers
             // concatenate that as ''.
@@ -52,7 +52,7 @@ class PublishedFilter
         } elseif ($table === 'files') {
             // Same `visible` as the types branch since increment 7, and still a branch of its own:
             // a type is soft-deleted through `deleted_at`, a file through `deleted`.
-            return $alias.".visible <> '' AND ".$alias.".deleted = '' AND ";
+            return $alias.'.visible = 1 AND '.$alias.'.deleted = 0 AND ';
         }
 
         return self::recordsSql($alias);
@@ -69,12 +69,12 @@ class PublishedFilter
         $filter = $alias.".date_publish <= '".date('Y-m-d H:i:59', $now)."'".
             ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
             ' AND '.$alias.'.bool_key = 1'.
-            ' AND '.$alias.".deleted = ''".
+            ' AND '.$alias.'.deleted = 0'.
             ' AND ';
 
         // Preview mode (the admin) also shows unpublished rows and any child row.
         if (config('interadmin.preview')) {
-            $filter .= '('.$alias.".publish <> '' OR ".$alias.'.parent_id > 0) AND ';
+            $filter .= '('.$alias.'.publish = 1 OR '.$alias.'.parent_id > 0) AND ';
         }
 
         return $filter;

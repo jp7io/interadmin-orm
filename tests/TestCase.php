@@ -146,7 +146,7 @@ abstract class TestCase extends BaseTestCase
         $type->setRawAttributes($attributes + [
             'class' => 'Test_'.$attributes['name'],
             'class_type' => 'Test_'.$attributes['name'].'Tipo',
-            'visible' => 'S',
+            'visible' => 1,
             'deleted_at' => null,
             'fields' => $this->createFields($fields)
         ]);
@@ -199,7 +199,7 @@ abstract class TestCase extends BaseTestCase
             'password_key' => '123',
             'varchar_2' => 'pamela@jp7.com.br',
             'bool_key' => 1,
-            'publish' => 'S',
+            'publish' => 1,
             'position' => 0,
         ];
         $user->setRawAttributes($attributes);

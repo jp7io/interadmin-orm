@@ -257,24 +257,24 @@ class QueryTest extends TestCase
         return [
             'no date_expire' => [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00' // sem date_expire
             ]],
             'not expired yet' => [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:01:00' // date_expire no futuro
             ]],
             'children without publish' => [[
                 'bool_key' => 1,
-                'publish'  => '', // sem publish
-                'deleted'  => '',
+                'publish'  =>  0, // sem publish
+                'deleted'  =>  0,
                 'parent_id'  => 123, // com parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:01:00'
@@ -287,40 +287,40 @@ class QueryTest extends TestCase
         return [
             'not active' => [[
                 'bool_key' => 0, // not shown
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             'deleted' => [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => 'S', // com deleted
+                'publish'  =>  1,
+                'deleted'  =>  1, // com deleted
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
                 'date_expire' => '0000-00-00 00:00:00'
             ]],
             'expired' => [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:00:00',
                 'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
             ]],
             'not published yet' => [[
                 'bool_key' => 1,
-                'publish'  => 'S',
-                'deleted'  => '',
+                'publish'  =>  1,
+                'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 02:01:00', // date_publish no futuro
                 'date_expire' => '2016-01-01 03:00:00'
             ]],
             'no publish' => [[
                 'bool_key' => 1,
-                'publish'  => '', // sem publish
-                'deleted'  => '',
+                'publish'  =>  0, // sem publish
+                'deleted'  =>  0,
                 'parent_id'  => 0, // sem parent
                 'date_publish'  => '2016-01-01 00:00:00',
                 'date_expire' => '2016-01-01 02:01:00'
