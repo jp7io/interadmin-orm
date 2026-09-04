@@ -67,7 +67,8 @@ class PublishedFilter
         $now = Record::getTimestamp();
 
         $filter = $alias.".date_publish <= '".date('Y-m-d H:i:59', $now)."'".
-            ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.".date_expire = '0000-00-00 00:00:00')".
+            ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.
+                ".date_expire = '0000-00-00 00:00:00' OR ".$alias.'.date_expire IS NULL)'.
             ' AND '.$alias.'.bool_key = 1'.
             ' AND '.$alias.'.deleted = 0'.
             ' AND ';

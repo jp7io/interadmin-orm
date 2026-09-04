@@ -191,6 +191,13 @@ abstract class RecordAbstract
      */
     protected function getMutatedAttribute($name, $value)
     {
+        // A NULL datetime and the '0000-00-00' sentinel are one absent value, and \Date reads a
+        // null as NOW -- which would publish every record with a null date_publish and expire
+        // every one with a null date_expire, silently.
+        if ($value === null && strpos($name, 'date_') === 0) {
+            return new \Date(self::ABSENT_DATE);
+        }
+
         if (is_string($value)) {
             if (strpos($name, 'date_') === 0) {
                return new \Date($value);
@@ -342,6 +349,12 @@ abstract class RecordAbstract
      * so the blanket null -> '' below is right; a nullable datetime would land on 0000-00-00.
      */
     protected static $nullableAttributes = ['deleted_at'];
+
+    /**
+     * What an absent date reads as in PHP: the year -0001 Carbon underflows '0000-00-00' to.
+     * Both encodings map onto it, so a reader tests the year and not the storage.
+     */
+    public const ABSENT_DATE = '0000-00-00 00:00:00';
 
     protected function _convertForDatabase($attributes, $aliases)
     {
