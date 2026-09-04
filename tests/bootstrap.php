@@ -23,6 +23,10 @@ class_alias(Carbon\Carbon::class, 'Date');
 
 Jp7\Laravel\CacheExtension::apply();
 
+// DynamicLoader's guard asks the container whether an application is up, and this suite boots
+// none, so the one binding it looks for stands in for one.
+Illuminate\Container\Container::getInstance()->instance('config', new Illuminate\Config\Repository());
+
 // Registers the autoloader that evals a class body for every row in `types`, which is how
 // the tests' Test_User / Test_Store come into existence at all.
 Jp7\InterAdmin\DynamicLoader::register();

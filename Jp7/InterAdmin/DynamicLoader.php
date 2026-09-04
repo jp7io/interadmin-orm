@@ -2,7 +2,7 @@
 
 namespace Jp7\InterAdmin;
 
-use App;
+use Illuminate\Container\Container;
 
 class DynamicLoader
 {
@@ -59,8 +59,10 @@ class DynamicLoader
     // Cria classes cadastradas no InterAdmin sem a necessidade de criar um arquivo para isso
     public static function load($class): bool
     {
-        if (!App::bound('config')) {
-            return false; // there was a problem with codeception after running all tests
+        // The container, not the App facade: between two test applications the facade still
+        // points at the flushed one, where resolving 'app' builds the facade class and fatals.
+        if (!Container::getInstance()->bound('config')) {
+            return false;
         }
         // An autoloader that cannot provide a name has to return quietly. This one used to
         // generate the class anyway and let the eval below blow up — as a RuntimeException for a

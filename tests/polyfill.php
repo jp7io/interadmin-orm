@@ -59,11 +59,6 @@ class DB extends Illuminate\Support\Facades\DB
 
 class App
 {
-    public static function bound($interface)
-    {
-        return $interface === 'config';
-    }
-
     public static function setLocale($locale)
     {
         Lang::setLocale($locale);
