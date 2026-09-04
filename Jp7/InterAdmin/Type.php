@@ -1167,7 +1167,7 @@ class Type extends RecordAbstract
     {
         return $this->getCache('children', function () {
             $children = [];
-            $childrenArr = explode('{;}', $this->children);
+            $childrenArr = explode('{;}', (string) $this->children);
             for ($i = 0; $i < count($childrenArr) - 1; $i++) {
                 $childrenArrParts = explode('{,}', $childrenArr[$i]);
                 if (count($childrenArrParts) < 4) { // 4 = 'type_id', 'nome', 'ajuda', 'netos'

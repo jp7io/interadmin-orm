@@ -345,8 +345,11 @@ abstract class RecordAbstract
     }
 
     /**
-     * Columns whose empty value is a real NULL. Everywhere else this schema spells "empty" as '',
-     * so the blanket null -> '' below is right; a nullable datetime would land on 0000-00-00.
+     * Columns whose empty value is a real NULL whatever the schema says. Everywhere else this
+     * schema spells "empty" as '', so the blanket null -> '' below is right.
+     *
+     * A `date_` column is NOT listed here: it is nullable only once the column is, which
+     * writesNull() asks the schema (docs/zero-date-plan.md, step 2).
      */
     protected static $nullableAttributes = ['deleted_at'];
 
@@ -376,7 +379,7 @@ abstract class RecordAbstract
                     $valuesToSave[$key] = implode(',', $value);
                     break;
                 case 'NULL':
-                    $valuesToSave[$key] = in_array($key, static::$nullableAttributes, true) ? null : '';
+                    $valuesToSave[$key] = $this->writesNull($key) ? null : '';
                     break;
                 default:
                     $valuesToSave[$key] = $value;
@@ -384,6 +387,75 @@ abstract class RecordAbstract
             }
         }
         return $valuesToSave;
+    }
+
+    /**
+     * Does an absent value for this column go in as NULL rather than as ''?
+     *
+     * An absent DATE is NULL only where the column already accepts one. Under the app's own
+     * sql_mode a NULL handed to a NOT NULL datetime is not lenient in both directions: an UPDATE
+     * and a multi-row INSERT quietly store '0000-00-00 00:00:00', but the single-row INSERT this
+     * class saves with is ERROR 1048. So a blanket rule would make creating a record a fatal on
+     * every table the migration has not reached -- jp7, a tenant mid-window, a test fixture.
+     *
+     * Asking the schema instead makes the write path correct on both sides of that migration,
+     * which is what lets the ORM and the columns move in either order.
+     */
+    protected function writesNull(string $column): bool
+    {
+        if (in_array($column, static::$nullableAttributes, true)) {
+            return true;
+        }
+
+        if (strpos($column, 'date_') !== 0) {
+            return false;
+        }
+
+        return in_array($column, $this->getNullableColumns(), true);
+    }
+
+    /**
+     * The nullable columns of this record's table, as reported by the schema.
+     *
+     * ⚠ Cached for Type::CACHE_TTL, so for up to five minutes after the columns are nulled a save
+     * still writes '' and lands the sentinel back in a nullable column -- both encodings in one
+     * place. Flush after the migration rather than waiting it out.
+     *
+     * @see getColumns() same guard, for the same reason: [] from a FAILED read is never cached.
+     *      Here [] is also a legitimate answer -- it is every table before the migration -- so a
+     *      cached one is returned rather than being read as a miss.
+     */
+    public function getNullableColumns(): array
+    {
+        $table = $this->getTableName();
+        $cacheKey = 'nullable,'.$this->_db.','.$table;
+
+        $cached = \Cache::get($cacheKey);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $db = $this->getDb();
+        $prefix = $db->getTablePrefix();
+        if ($prefix && str_starts_with($table, $prefix)) {
+            $table = substr($table, strlen($prefix));
+        }
+
+        $all = $db->getSchemaBuilder()->getColumns($table);
+        if (!$all) {
+            return [];
+        }
+
+        $nullable = [];
+        foreach ($all as $column) {
+            if (!empty($column['nullable'])) {
+                $nullable[] = $column['name'];
+            }
+        }
+
+        \Cache::put($cacheKey, $nullable, Type::CACHE_TTL);
+
+        return $nullable;
     }
 
     /**

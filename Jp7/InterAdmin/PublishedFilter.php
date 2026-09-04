@@ -66,7 +66,13 @@ class PublishedFilter
     {
         $now = Record::getTimestamp();
 
-        $filter = $alias.".date_publish <= '".date('Y-m-d H:i:59', $now)."'".
+        // ⚠ BOTH dates take the IS NULL branch, and date_publish is the one that is easy to miss.
+        // The sentinel SATISFIED `date_publish <= now()` -- '0000-00-00' sorts before every real
+        // date -- so an absent publish date has always meant "published". NULL makes the same
+        // comparison UNKNOWN, which drops the row from every published query with no error:
+        // 6,290 live rows on ci, 43% of intermail's, measured on a migrated clone 2026-09-04.
+        $filter = '('.$alias.".date_publish <= '".date('Y-m-d H:i:59', $now)."' OR ".$alias.
+                '.date_publish IS NULL)'.
             ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.
                 ".date_expire = '0000-00-00 00:00:00' OR ".$alias.'.date_expire IS NULL)'.
             ' AND '.$alias.'.bool_key = 1'.
