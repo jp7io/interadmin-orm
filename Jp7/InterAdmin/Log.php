@@ -205,7 +205,12 @@ class Log extends RecordAbstract
     {
         $instance = new self;
         if (isset($options['fields'])) {
-            $options['fields'] = array_merge(['id_log'], (array) $options['fields']);
+            // ⚠ Not under a GROUP BY. Which row's log id would it be? MySQL answers with an
+            // arbitrary one and ONLY_FULL_GROUP_BY refuses the question, so a grouped caller
+            // gets the columns it grouped on and nothing else.
+            $options['fields'] = isset($options['group'])
+                ? (array) $options['fields']
+                : array_merge(['id_log'], (array) $options['fields']);
         } else {
             $options['fields'] = static::DEFAULT_FIELDS;
         }
@@ -225,7 +230,7 @@ class Log extends RecordAbstract
         $logs = [];
 
         foreach ($rs as $row) {
-            $log = new static(['id_log' => $row->id_log]);
+            $log = new static(['id_log' => $row->id_log ?? 0]);
             $instance->_getAttributesFromRow($row, $log, $options);
             $logs[] = $log;
         }
