@@ -1,5 +1,6 @@
 <?php
 
+use Jp7\InterAdmin\Query\TypeQuery;
 use Jp7\InterAdmin\RecordClassMap;
 use Jp7\InterAdmin\Type;
 
@@ -71,6 +72,15 @@ class AggregateQueryTest extends TestCase
     public function testTheAggregateHelpersCarryNoDefaultOrder()
     {
         $this->assertSame('3', (string) $this->type->deprecated_max('position', ['use_published_filters' => false]));
+    }
+
+    /**
+     * The types table has the same two, and no suite reached this one: it is COUNT(type_id)
+     * beside a bare type_id, ordered by `position, name`.
+     */
+    public function testATypeCountCarriesNeitherTheKeyNorTheDefaultOrder()
+    {
+        $this->assertSame(1, (new TypeQuery(new Type))->where('name', 'User')->count());
     }
 
     /**

@@ -344,7 +344,8 @@ class Type extends RecordAbstract
         $this->_whereArrayFix($options['where']); // FIXME
         $cacheKey = __METHOD__.serialize($options);
 
-        if (empty($options['order'])) {
+        $aggregating = self::selectsAnAggregate($options['fields'] ?? null);
+        if (empty($options['order']) && !$aggregating) {
             $options['order'] = 'position, name';
         }
         if (empty($options['where'])) {
@@ -352,7 +353,7 @@ class Type extends RecordAbstract
         }
         if (empty($options['fields'])) {
             $options['fields'] = $this->getAttributesNames();
-        } else {
+        } elseif (!$aggregating) {
             $options['fields'] = array_merge(['type_id'], (array) $options['fields']);
         }
         // Internal use
@@ -366,7 +367,9 @@ class Type extends RecordAbstract
 
         $types = [];
         foreach ($rs as $row) {
-            $type = self::getInstance($row->type_id, [
+            // 0 under an aggregate, which selects no key -- the spelling Record::getInstance()
+            // already uses for "no id", and null is an array offset the class map deprecates.
+            $type = self::getInstance($row->type_id ?? 0, [
                 'db' => $this->_db,
                 'class' => isset($options['class']) ? $options['class'] : null,
                 'default_namespace' => static::DEFAULT_NAMESPACE,
