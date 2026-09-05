@@ -359,6 +359,10 @@ abstract class RecordAbstract
      */
     public const ABSENT_DATE = '0000-00-00 00:00:00';
 
+    /** Types whose empty value is 0 rather than ''. */
+    private const NUMERIC_TYPES = ['tinyint', 'smallint', 'mediumint', 'int', 'integer', 'bigint',
+        'decimal', 'numeric', 'float', 'double', 'year', 'bit'];
+
     protected function _convertForDatabase($attributes, $aliases)
     {
         $valuesToSave = [];
@@ -379,10 +383,12 @@ abstract class RecordAbstract
                     $valuesToSave[$key] = implode(',', $value);
                     break;
                 case 'NULL':
-                    $valuesToSave[$key] = $this->writesNull($key) ? null : '';
+                    $valuesToSave[$key] = $this->absentValueFor($key);
                     break;
                 default:
-                    $valuesToSave[$key] = $value;
+                    // ⚠ '' is what a form posts for an unset number, so this is the common path,
+                    // not the NULL one: MySQL coerces it to 0 and a strict mode rejects it.
+                    $valuesToSave[$key] = ($value === '' && $this->isNumericColumn($key)) ? 0 : $value;
                     break;
             }
         }
@@ -412,6 +418,68 @@ abstract class RecordAbstract
         }
 
         return in_array($column, $this->getNullableColumns(), true);
+    }
+
+    /**
+     * What an absent value goes into this column as: NULL where it takes one, otherwise the empty
+     * value of the column's own TYPE.
+     *
+     * ⚠ '' is not that value for a number. MySQL coerces it to 0 under the app's own sql_mode and
+     * raises `Incorrect integer value: ''` under a strict one, so the blanket '' was a silent
+     * coercion on every numeric column a record left unset -- `parent_type_id`, `position`,
+     * `language`, `select_key`, `layout`. 0 is what was being stored either way.
+     */
+    protected function absentValueFor(string $column)
+    {
+        if ($this->writesNull($column)) {
+            return null;
+        }
+
+        return $this->isNumericColumn($column) ? 0 : '';
+    }
+
+    protected function isNumericColumn(string $column): bool
+    {
+        return in_array($column, $this->getNumericColumns(), true);
+    }
+
+    /**
+     * The numeric columns of this record's table, as reported by the schema.
+     *
+     * @see getNullableColumns() same shape, same caching, and the same reason a FAILED read is
+     *      never cached while an empty answer legitimately can be.
+     */
+    public function getNumericColumns(): array
+    {
+        $table = $this->getTableName();
+        $cacheKey = 'numeric,'.$this->_db.','.$table;
+
+        $cached = \Cache::get($cacheKey);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $db = $this->getDb();
+        $prefix = $db->getTablePrefix();
+        if ($prefix && str_starts_with($table, $prefix)) {
+            $table = substr($table, strlen($prefix));
+        }
+
+        $all = $db->getSchemaBuilder()->getColumns($table);
+        if (!$all) {
+            return [];
+        }
+
+        $numeric = [];
+        foreach ($all as $column) {
+            if (in_array($column['type_name'] ?? '', self::NUMERIC_TYPES, true)) {
+                $numeric[] = $column['name'];
+            }
+        }
+
+        \Cache::put($cacheKey, $numeric, Type::CACHE_TTL);
+
+        return $numeric;
     }
 
     /**
