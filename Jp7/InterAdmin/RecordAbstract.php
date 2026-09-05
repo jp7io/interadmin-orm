@@ -368,6 +368,10 @@ abstract class RecordAbstract
         $valuesToSave = [];
         foreach ($attributes as $key => $value) {
             $key = isset($aliases[$key]) ? $aliases[$key] : $key;
+            if ($this->isAbsentDate($key, $value)) {
+                $valuesToSave[$key] = $this->absentValueFor($key);
+                continue;
+            }
             switch (gettype($value)) {
                 case 'object':
                     if ($value instanceof Expression) {
@@ -393,6 +397,33 @@ abstract class RecordAbstract
             }
         }
         return $valuesToSave;
+    }
+
+    /**
+     * The absent date in all four spellings one column carries: NULL, '', the sentinel, and the
+     * year -0001 Date the first two read back as.
+     *
+     * ⚠ Record::__get() assigns the mutated value through a REFERENCE into $this->attributes, so
+     * a READ leaves a Date where the raw value was and a save then wrote '-0001-11-30 00:00:00' --
+     * ERROR 1292 under the app's modes, a silent re-zero without them. writesNull() cannot reach
+     * it: that is consulted for a PHP null alone, so a stored sentinel round-tripped forever.
+     */
+    protected function isAbsentDate(string $column, $value): bool
+    {
+        if (strpos($column, 'date_') !== 0) {
+            return false;
+        }
+
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return (int) $value->format('Y') < 1;
+        }
+
+        // is_string, so an Expression assigned to a date column falls through untouched.
+        return is_string($value) && (int) substr($value, 0, 4) < 1;
     }
 
     /**

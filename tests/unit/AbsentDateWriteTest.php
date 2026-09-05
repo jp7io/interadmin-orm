@@ -108,6 +108,70 @@ class AbsentDateWriteTest extends TestCase
         $this->assertNull($row->{self::NULLABLE});
     }
 
+    /**
+     * ⚠ Reading is a write: Record::__get() assigns the mutated value through a reference into
+     * $this->attributes, so a touched absent date stringifies to '-0001-11-30 00:00:00' on save.
+     */
+    public function testReadingAnAbsentDateAndSavingLeavesItAbsent(): void
+    {
+        $record = new Record();
+        $record->type_id = 1;
+        $record->{self::NULLABLE} = null;
+        $record->save();
+
+        // The read any list renderer or isPublished() makes.
+        $this->assertSame(-1, (int) $record->{self::NULLABLE}->format('Y'));
+        $record->save();
+
+        $row = self::pdo()
+            ->query('SELECT * FROM interadmin_teste_records WHERE id = '.(int) $record->id)
+            ->fetch(PDO::FETCH_OBJ);
+
+        $this->assertNull($row->{self::NULLABLE});
+    }
+
+    /** The same read on a column the migration has not reached keeps the sentinel, not year -0001. */
+    public function testReadingAnAbsentDateAndSavingLeavesANotNullColumnOnTheSentinel(): void
+    {
+        $record = new Record();
+        $record->type_id = 1;
+        $record->{self::NOT_NULL} = null;
+        $record->save();
+
+        $this->assertSame(-1, (int) $record->{self::NOT_NULL}->format('Y'));
+        $record->save();
+
+        $row = self::pdo()
+            ->query('SELECT * FROM interadmin_teste_records WHERE id = '.(int) $record->id)
+            ->fetch(PDO::FETCH_OBJ);
+
+        $this->assertSame('0000-00-00 00:00:00', $row->{self::NOT_NULL});
+    }
+
+    /** writesNull() alone never repairs one: it is consulted for a PHP null, not for a sentinel. */
+    public function testAStoredSentinelIsNormalisedOnTheNextSave(): void
+    {
+        $row = $this->saved([self::NULLABLE => '0000-00-00 00:00:00']);
+
+        $this->assertNull($row->{self::NULLABLE});
+    }
+
+    /** The date-only spelling too: `date` columns hold '0000-00-00' rather than the datetime one. */
+    public function testTheDateOnlySentinelIsNormalisedAsWell(): void
+    {
+        $row = $this->saved([self::NULLABLE => '0000-00-00']);
+
+        $this->assertNull($row->{self::NULLABLE});
+    }
+
+    /** ⚠ The `date_` gate again: a non-date column's '' is not an absent date. */
+    public function testAnEmptyStringInANonDateColumnIsStillTheEmptyString(): void
+    {
+        $row = $this->saved(['varchar_1' => '']);
+
+        $this->assertSame('', $row->varchar_1);
+    }
+
     public function testTheNullableListingIsReadFromTheSchemaAndCached(): void
     {
         $record = new Record();
