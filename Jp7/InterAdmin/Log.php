@@ -204,11 +204,13 @@ class Log extends RecordAbstract
     public static function findLogs(array $options = []): array
     {
         $instance = new self;
+        $aggregating = false;
         if (isset($options['fields'])) {
-            // ⚠ Not under a GROUP BY. Which row's log id would it be? MySQL answers with an
-            // arbitrary one and ONLY_FULL_GROUP_BY refuses the question, so a grouped caller
-            // gets the columns it grouped on and nothing else.
-            $options['fields'] = isset($options['group'])
+            // ⚠ Neither under a GROUP BY nor beside an aggregate. Which row's log id would it
+            // be? MySQL answers with an arbitrary one and ONLY_FULL_GROUP_BY refuses the
+            // question, so such a caller gets what it asked for and nothing else.
+            $aggregating = isset($options['group']) || self::selectsAnAggregate($options['fields']);
+            $options['fields'] = $aggregating
                 ? (array) $options['fields']
                 : array_merge(['id_log'], (array) $options['fields']);
         } else {
@@ -219,7 +221,7 @@ class Log extends RecordAbstract
         if (empty($options['where'])) {
             $options['where'][] = '1 = 1';
         }
-        if (empty($options['order'])) {
+        if (empty($options['order']) && !$aggregating) {
             $options['order'] = 'date_insert DESC';
         }
         // Internal use

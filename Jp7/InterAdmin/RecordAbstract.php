@@ -941,6 +941,23 @@ abstract class RecordAbstract
         }
     }
     /**
+     * Whether the caller's own field list asks for an aggregate. When it does, this class adds
+     * nothing of its own beside it: not the keys a hydrated object wants, not a default sort.
+     *
+     * @param array|string $fields
+     */
+    protected static function selectsAnAggregate($fields): bool
+    {
+        foreach ((array) $fields as $field) {
+            if (is_string($field) && preg_match('/\b(COUNT|SUM|AVG|MIN|MAX|GROUP_CONCAT)\s*\(/i', $field)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Resolves '*'.
      *
      * @param array              $fields

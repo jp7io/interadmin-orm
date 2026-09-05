@@ -478,6 +478,9 @@ class Type extends RecordAbstract
         $this->_prepareInterAdminsOptions($options, $optionsInstance, true);
 
         $options['fields'] = $function.'('.$column.') AS values';
+        // The field list is replaced after _prepareInterAdminsOptions() has already appended
+        // the type's default sort, which names a column this one row cannot carry.
+        unset($options['order']);
 
         if (isset($options['group'])) {
             throw new Exception('This method cannot be used with GROUP BY.');
@@ -1342,13 +1345,22 @@ class Type extends RecordAbstract
 
         $this->_resolveWildcard($options['fields'], $recordModel);
 
-        if (count($options['fields']) != 1 || strpos($options['fields'][0] ?? '', 'COUNT(') === false) {
+        $aggregating = self::selectsAnAggregate($options['fields']);
+        if (!$aggregating) {
             $requiredFields = array_intersect(['id', 'type_id', 'id_slug'], $recordModel->getColumns());
             $options['fields'] = array_merge($requiredFields, (array) $options['fields']);
         }
 
         $options['from'] = $recordModel->getTableName().' AS main';
-        $options['order'] = (isset($options['order']) ? $options['order'].', ' : '').$this->getInterAdminsOrder();
+        $order = array_filter([
+            $options['order'] ?? null,
+            $aggregating ? null : $this->getInterAdminsOrder(),
+        ]);
+        if ($order) {
+            $options['order'] = implode(', ', $order);
+        } else {
+            unset($options['order']);
+        }
 
         // Internal use
         $options['aliases'] = $recordModel->getAttributesAliases();
