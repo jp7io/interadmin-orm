@@ -16,13 +16,13 @@ use Jp7\InterAdmin\Record;
  * would make creating a record a hard fatal on every table the migration has not reached -- jp7,
  * a tenant mid-window, any fixture. Hence writesNull() asks the schema.
  *
- * The dump carries one of each on purpose: `date_5` is nullable, `date_expire` is not.
+ * The dump carries one of each on purpose: `date_5` is nullable, `date_hit` is not.
  */
 class AbsentDateWriteTest extends TestCase
 {
     private const NULLABLE = 'date_5';
 
-    private const NOT_NULL = 'date_expire';
+    private const NOT_NULL = 'date_hit';
 
     protected function setUp(): void
     {

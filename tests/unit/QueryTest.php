@@ -261,7 +261,7 @@ class QueryTest extends TestCase
                 'deleted'  =>  0,
                 'parent_id'  => 0,
                 'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => '0000-00-00 00:00:00' // sem date_expire
+                'date_expire' => null // sem date_expire
             ]],
             'not expired yet' => [[
                 'bool_key' => 1,
