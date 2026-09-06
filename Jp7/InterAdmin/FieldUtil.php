@@ -42,6 +42,15 @@ class FieldUtil
     ];
 
     /**
+     * The attributes that are a FLAG and nothing else, stored as real booleans.
+     *
+     * ⚠ `xtra` is NOT one, and that is the whole trap: it holds 30 distinct values on ci and `'S'`
+     * is one of their NAMES, on 1,988 rows. A sweep that reads `'S'` as a flag rather than asking
+     * which attribute holds it destroys every one of them, and nothing errors.
+     */
+    const BOOLEAN_ATTRIBUTES = ['required', 'separator', 'list', 'combo', 'readonly', 'form'];
+
+    /**
      * Read `types.fields` as definitions in the order the record form renders them, keyed by the
      * row's position so a caller's `order` is the position it always was.
      *
@@ -66,9 +75,13 @@ class FieldUtil
             ? self::decodeJson($fields)
             : self::decodePositional($fields);
 
-        return array_filter($rows, function ($row) {
+        $rows = array_filter($rows, function ($row) {
             return (string) ($row['type'] ?? '') !== '';
         });
+
+        // Cast on the way OUT, both formats alike, so the app reads the same booleans either side
+        // of the migration and the two can be deployed in either order.
+        return array_map([self::class, 'castFlags'], $rows);
     }
 
     /**
@@ -90,7 +103,7 @@ class FieldUtil
             foreach (self::ATTRIBUTES as $attribute) {
                 $row[$attribute] = (string) ($field[$attribute] ?? '');
             }
-            $rows[] = $row;
+            $rows[] = self::castFlags($row);
         }
 
         // ⚠ A type with no fields stores the EMPTY STRING, never `[]`: `holds_records` and the
@@ -102,6 +115,22 @@ class FieldUtil
         // Unescaped, so a tenant reading the column by hand sees the accents and the slashes it
         // typed. Both are legal JSON and json_decode reads them back identically.
         return json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * ⚠ `(bool)` and not `=== 'S'`: the grid posts the string `S`, a JSON row already holds a real
+     * boolean, and the empty string is what both formats spell false as. `'0'` is false too, and
+     * that is right -- no flag on ci has ever held it.
+     */
+    private static function castFlags(array $row): array
+    {
+        foreach (self::BOOLEAN_ATTRIBUTES as $attribute) {
+            if (array_key_exists($attribute, $row)) {
+                $row[$attribute] = (bool) $row[$attribute];
+            }
+        }
+
+        return $row;
     }
 
     private static function decodeJson(string $fields): array
