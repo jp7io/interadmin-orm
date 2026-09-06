@@ -605,31 +605,18 @@ class Type extends RecordAbstract
     public function getFields()
     {
         return $this->getCacheUnlessEmpty('field_definitions', function () {
-            // The blob is POSITIONAL, so these names are this decoder's invention, not stored
-            // data. They must stay identical to InterAdmin's Field::FIELDS_ATTRIBUTES, which
-            // encodes the same 16 slots back.
-            $fieldAttributeNames = [
-                'type', 'name', 'help', 'size', 'required', 'separator', 'xtra',
-                'list', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissions',
-                'default', 'name_id',
-            ];
-            $fieldRows = explode('{;}', (string) $this->fields);
             $A = [];
-            for ($i = 0; $i < count($fieldRows); $i++) {
-                $parameters = explode('{,}', $fieldRows[$i]);
-                if ($parameters[0]) {
-                    $A[$parameters[0]]['order'] = ($i+1);
-                    $isSelect = strpos($parameters[0], 'select_') === 0;
-                    for ($j = 0; $j < count($parameters); $j++) {
-                        $A[$parameters[0]][$fieldAttributeNames[$j]] = $parameters[$j];
-                    }
-                    if ($isSelect && $A[$parameters[0]]['name'] != 'all') {
-                        $type_id = $A[$parameters[0]]['name'];
-                        $A[$parameters[0]]['name'] = self::getInstance($type_id, [
-                            'db' => $this->_db,
-                            'default_namespace' => static::DEFAULT_NAMESPACE,
-                        ]);
-                    }
+            // Keyed by position, so `order` is the row's place in the column whichever format
+            // stored it.
+            foreach (FieldUtil::decode($this->fields) as $i => $row) {
+                $column = $row['type'];
+                $A[$column] = ['order' => $i + 1] + $row;
+
+                if (strpos($column, 'select_') === 0 && $A[$column]['name'] != 'all') {
+                    $A[$column]['name'] = self::getInstance($A[$column]['name'], [
+                        'db' => $this->_db,
+                        'default_namespace' => static::DEFAULT_NAMESPACE,
+                    ]);
                 }
             }
             // Alias

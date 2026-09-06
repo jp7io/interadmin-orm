@@ -91,12 +91,6 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$deleted\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Jp7/InterAdmin/Record.php
-
-		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 8
@@ -145,7 +139,7 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\RecordAbstract\:\:\$deleted\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\RecordAbstract\:\:\$deleted_at\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/RecordAbstract.php
