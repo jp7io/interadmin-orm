@@ -975,12 +975,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jp7io/classes.git",
-                "reference": "bbd74593102579fd93b27b153a497632703adef6"
+                "reference": "6edae1beaabad4d9255827eb5a9ce0c90002f0fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7io/classes/zipball/bbd74593102579fd93b27b153a497632703adef6",
-                "reference": "bbd74593102579fd93b27b153a497632703adef6",
+                "url": "https://api.github.com/repos/jp7io/classes/zipball/6edae1beaabad4d9255827eb5a9ce0c90002f0fd",
+                "reference": "6edae1beaabad4d9255827eb5a9ce0c90002f0fd",
                 "shasum": ""
             },
             "require": {
@@ -1008,7 +1008,7 @@
                 "source": "https://github.com/jp7io/classes/tree/main",
                 "issues": "https://github.com/jp7io/classes/issues"
             },
-            "time": "2026-08-19T18:04:55+00:00"
+            "time": "2026-09-06T01:56:30+00:00"
         },
         {
             "name": "laravel/serializable-closure",
