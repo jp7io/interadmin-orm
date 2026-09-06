@@ -911,12 +911,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         return $this->bool_key &&
             !$this->deleted &&
             ($this->parent_id || $this->publish || !config('interadmin.preview')) &&
-            $this->date_publish->getTimestamp() <= Record::getTimestamp() &&
-            ($this->date_expire->getTimestamp() >= Record::getTimestamp() || $this->date_expire->format('Y') < 1);
+            $this->publish_at->getTimestamp() <= Record::getTimestamp() &&
+            ($this->expire_at->getTimestamp() >= Record::getTimestamp() || $this->expire_at->format('Y') < 1);
     }
 
     /**
-     * Saves this record and updates date_modify.
+     * Saves this record and updates updated_at.
      */
     public function save()
     {
@@ -935,8 +935,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
             chr(13).
             $this->log;
 
-        // date_modify
-        $this->date_modify = date('c');
+        // updated_at
+        $this->updated_at = date('c');
 
         return $this->saveRaw();
     }

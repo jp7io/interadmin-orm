@@ -189,17 +189,36 @@ abstract class RecordAbstract
      *
      * @return mixed
      */
+    /**
+     * The five system dates, which used to be spelled with the `date_` prefix and no longer are.
+     *
+     * ⚠ Every `date_` branch in this class has to consult this as well as the prefix, or the
+     * rename silently un-does what the prefix bought: a system date would stop being cast to a
+     * \Date, stop being normalised when absent, and - worst of the three - stop being writable as
+     * NULL, so a null publish_at would go in as '' and land on '0000-00-00'. That is ERROR 1292
+     * under the app's own modes and a silent re-zero without them.
+     *
+     * What the rename actually bought is that `date_` now means exactly one thing: a tenant field
+     * of date type. This list is the price, and it is a closed one - a tenant cannot add to it.
+     */
+    public const SYSTEM_DATES = ['created_at', 'updated_at', 'publish_at', 'expire_at', 'hit_at'];
+
+    public static function isDateColumn(string $name): bool
+    {
+        return strpos($name, 'date_') === 0 || in_array($name, self::SYSTEM_DATES, true);
+    }
+
     protected function getMutatedAttribute($name, $value)
     {
         // A NULL datetime and the '0000-00-00' sentinel are one absent value, and \Date reads a
-        // null as NOW -- which would publish every record with a null date_publish and expire
-        // every one with a null date_expire, silently.
-        if ($value === null && strpos($name, 'date_') === 0) {
+        // null as NOW -- which would publish every record with a null publish_at and expire
+        // every one with a null expire_at, silently.
+        if ($value === null && self::isDateColumn($name)) {
             return new \Date(self::ABSENT_DATE);
         }
 
         if (is_string($value)) {
-            if (strpos($name, 'date_') === 0) {
+            if (self::isDateColumn($name)) {
                return new \Date($value);
             }
             if ($this->hasFileFields && strpos($name, 'file_') === 0 && strpos($name, '_text') === false && $value) {
@@ -410,7 +429,7 @@ abstract class RecordAbstract
      */
     protected function isAbsentDate(string $column, $value): bool
     {
-        if (strpos($column, 'date_') !== 0) {
+        if (!self::isDateColumn($column)) {
             return false;
         }
 
@@ -444,7 +463,7 @@ abstract class RecordAbstract
             return true;
         }
 
-        if (strpos($column, 'date_') !== 0) {
+        if (!self::isDateColumn($column)) {
             return false;
         }
 

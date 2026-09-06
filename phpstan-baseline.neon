@@ -73,19 +73,19 @@ parameters:
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$date_expire\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$expire_at\.$#'
 			identifier: property.notFound
 			count: 2
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$date_modify\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$updated_at\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Record.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$date_publish\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Record\:\:\$publish_at\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Record.php
@@ -157,7 +157,7 @@ parameters:
 			path: Jp7/InterAdmin/Type.php
 
 		-
-			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$date_modify\.$#'
+			message: '#^Access to an undefined property Jp7\\InterAdmin\\Type\:\:\$updated_at\.$#'
 			identifier: property.notFound
 			count: 1
 			path: Jp7/InterAdmin/Type.php

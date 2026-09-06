@@ -823,7 +823,7 @@ class Type extends RecordAbstract
         // log
         $this->log = date('d/m/Y H:i').' - '.Record::getLogUser().' - '.
             Request::ip().chr(13).$this->log;
-        $this->date_modify = date('c');
+        $this->updated_at = date('c');
         // Inheritance
         $this->syncInheritance();
         $result = $this->saveRaw();
@@ -937,7 +937,7 @@ class Type extends RecordAbstract
         unset($options['order']);
 
         $valuesToSave = $this->_convertForDatabase(
-            $attributes + ['date_modify' => date('c')],
+            $attributes + ['updated_at' => date('c')],
             array_flip($options['aliases'])
         );
         return $this->_executeQuery($options, 'UPDATE', $valuesToSave);
@@ -979,7 +979,7 @@ class Type extends RecordAbstract
                     ksort($order);
                 }
             }
-            $order[] = 'date_publish DESC';
+            $order[] = 'publish_at DESC';
             return implode(',', $order);
         });
     }
@@ -1132,7 +1132,7 @@ class Type extends RecordAbstract
 
         // check if types changed
         $modified = strtotime(DB::table('types')
-            ->select(DB::raw('MAX(date_modify) AS modified'))
+            ->select(DB::raw('MAX(updated_at) AS modified'))
             ->value('modified'));
         if ($modified === $cache->get('modified')) {
             return; // not changed
@@ -1264,7 +1264,7 @@ class Type extends RecordAbstract
     }
 
     /**
-     * Creates a record with type_id, mostrar, date_insert and date_publish filled.
+     * Creates a record with type_id, mostrar, created_at and publish_at filled.
      *
      * @param array $attributes Attributes to be merged into the new record.
      *
@@ -1277,8 +1277,8 @@ class Type extends RecordAbstract
         if ($mostrar = $this->getFieldAliases('bool_key')) {
             $record->$mostrar = true;
         }
-        $record->date_publish = date('c');
-        $record->date_insert = date('c');
+        $record->publish_at = date('c');
+        $record->created_at = date('c');
         $record->publish = true;
         $record->log = '';
 
@@ -1412,7 +1412,7 @@ class Type extends RecordAbstract
 
     public function getInterAdminsAdminAttributes()
     {
-        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted', 'hits'];
+        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'publish_at', 'created_at', 'expire_at', 'updated_at', 'log', 'publish', 'deleted', 'hits'];
     }
 
     public function getFillable()

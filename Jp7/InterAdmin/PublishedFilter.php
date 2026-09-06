@@ -66,13 +66,13 @@ class PublishedFilter
     {
         $now = Record::getTimestamp();
 
-        // ⚠ BOTH dates take the IS NULL branch, and date_publish is the one that is easy to miss:
+        // ⚠ BOTH dates take the IS NULL branch, and publish_at is the one that is easy to miss:
         // an absent publish date means published, and `NULL <= now()` is UNKNOWN, so leaving that
         // arm off drops the row from every published query with no error -- 6,290 live rows on ci.
-        $filter = '('.$alias.".date_publish <= '".date('Y-m-d H:i:59', $now)."' OR ".$alias.
-                '.date_publish IS NULL)'.
-            ' AND ('.$alias.".date_expire > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.
-                '.date_expire IS NULL)'.
+        $filter = '('.$alias.".publish_at <= '".date('Y-m-d H:i:59', $now)."' OR ".$alias.
+                '.publish_at IS NULL)'.
+            ' AND ('.$alias.".expire_at > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.
+                '.expire_at IS NULL)'.
             ' AND '.$alias.'.bool_key = 1'.
             ' AND '.$alias.'.deleted = 0'.
             ' AND ';

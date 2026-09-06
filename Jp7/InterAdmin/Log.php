@@ -32,7 +32,7 @@ use Request;
  * @property string $ip
  * @property string $data  Free text: the user agent on a login, the view's start time
  * @property int $select_user  The InterAdmin user this log belongs to
- * @property Date $date_insert
+ * @property Date $created_at
  */
 class Log extends RecordAbstract
 {
@@ -152,7 +152,7 @@ class Log extends RecordAbstract
     }
     public function getAttributesNames(): array
     {
-        return ['log_id', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
+        return ['log_id', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'created_at'];
     }
     public function getTableName(): string
     {
@@ -183,7 +183,7 @@ class Log extends RecordAbstract
         //$log->lang = $lang->lang;
         $log->ip = Request::ip();
         //$log->select_user = $s_user['id'];
-        $log->date_insert = new Date;
+        $log->created_at = new Date;
         $log->fill($attributes);
 
         return $log;
@@ -222,7 +222,7 @@ class Log extends RecordAbstract
             $options['where'][] = '1 = 1';
         }
         if (empty($options['order']) && !$aggregating) {
-            $options['order'] = 'date_insert DESC';
+            $options['order'] = 'created_at DESC';
         }
         // Internal use
         $options['aliases'] = $instance->getAttributesAliases();

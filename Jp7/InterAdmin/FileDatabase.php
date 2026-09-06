@@ -13,7 +13,7 @@ namespace Jp7\InterAdmin;
  * @property string $zoom obsoleto
  * @property string $lang
  * @property int $version  change count
- * @property Date $date_modify
+ * @property Date $updated_at
  * @property string $directory noticias, mediabox, can't be the type's name because it can change
  * @property int $width
  * @property int $height
@@ -64,7 +64,7 @@ class FileDatabase extends RecordAbstract
 
     public function setDateModifyAttribute($value): void
     {
-        $this->attributes['date_modify'] = new \Date($value);
+        $this->attributes['updated_at'] = new \Date($value);
     }
 
     public function getBasename(): string
@@ -74,7 +74,7 @@ class FileDatabase extends RecordAbstract
 
     public function save()
     {
-        $this->attributes['date_modify'] = new \Date;
+        $this->attributes['updated_at'] = new \Date;
         return parent::save();
     }
 

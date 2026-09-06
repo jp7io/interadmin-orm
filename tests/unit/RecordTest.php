@@ -46,8 +46,8 @@ class RecordTest extends TestCase
         unset($user->newProp);
         $this->assertFalse(isset($user->newProp));
 
-        $user->date_publish = date('c');
-        $this->assertInstanceOf('Date', $user->date_publish);
+        $user->publish_at = date('c');
+        $this->assertInstanceOf('Date', $user->publish_at);
     }
 
     #[DataProvider('publishedProvider')]
@@ -72,24 +72,24 @@ class RecordTest extends TestCase
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => '0000-00-00 00:00:00' // sem date_expire
+                'publish_at'  => '2016-01-01 01:59:59',
+                'expire_at' => '0000-00-00 00:00:00' // sem expire_at
             ]],
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 00:00:00',
-                'date_expire' => '2016-01-01 02:00:01' // date_expire no futuro
+                'publish_at'  => '2016-01-01 00:00:00',
+                'expire_at' => '2016-01-01 02:00:01' // expire_at no futuro
             ]],
             [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
                 'deleted'  =>  0,
                 'parent_id'  => 123, // com parent
-                'date_publish'  => '2016-01-01 00:00:00',
-                'date_expire' => '2016-01-01 02:00:01'
+                'publish_at'  => '2016-01-01 00:00:00',
+                'expire_at' => '2016-01-01 02:00:01'
             ]],
         ];
     }
@@ -102,40 +102,40 @@ class RecordTest extends TestCase
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => '0000-00-00 00:00:00'
+                'publish_at'  => '2016-01-01 01:59:59',
+                'expire_at' => '0000-00-00 00:00:00'
             ]],
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  1, // com deleted
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => '0000-00-00 00:00:00'
+                'publish_at'  => '2016-01-01 01:59:59',
+                'expire_at' => '0000-00-00 00:00:00'
             ]],
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:00:00',
-                'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
+                'publish_at'  => '2016-01-01 01:00:00',
+                'expire_at' => '2016-01-01 01:59:59' // expire_at no passado
             ]],
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 02:00:01', // date_publish no futuro
-                'date_expire' => '2016-01-01 03:00:00'
+                'publish_at'  => '2016-01-01 02:00:01', // publish_at no futuro
+                'expire_at' => '2016-01-01 03:00:00'
             ]],
             [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
                 'deleted'  =>  0,
                 'parent_id'  => 0, // sem parent
-                'date_publish'  => '2016-01-01 00:00:00',
-                'date_expire' => '2016-01-01 02:00:01'
+                'publish_at'  => '2016-01-01 00:00:00',
+                'expire_at' => '2016-01-01 02:00:01'
             ]],
         ];
     }

@@ -111,7 +111,7 @@ class DynamicLoader
             foreach ($type->getFields() as $field) {
                 $phpdoc .= ' * @property '.self::getPhpDocField($type, $field)."\r\n";
             }
-            $phpdoc .= ' * @property \\Date $date_publish'."\r\n";
+            $phpdoc .= ' * @property \\Date $publish_at'."\r\n";
             $phpdoc .= ' */';
         }
 

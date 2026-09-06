@@ -46,10 +46,10 @@ class QueryTest extends TestCase
     {
         $newUser = $this->createUser();
 
-        $userRawQuery = Test_User::whereRaw('DATE(date_insert) = CURDATE()')->first();
-        $this->assertEquals(date('Y-m-d'), date('Y-m-d', $userRawQuery->date_insert->timestamp));
+        $userRawQuery = Test_User::whereRaw('DATE(created_at) = CURDATE()')->first();
+        $this->assertEquals(date('Y-m-d'), date('Y-m-d', $userRawQuery->created_at->timestamp));
 
-        $userRawQuery = Test_User::whereRaw('DATE(date_insert) > CURDATE()')->first();
+        $userRawQuery = Test_User::whereRaw('DATE(created_at) > CURDATE()')->first();
         $this->assertNull($userRawQuery);
     }
 
@@ -62,10 +62,10 @@ class QueryTest extends TestCase
     {
         $newUser = $this->createUser();
 
-        $found = Test_User::where('date_insert', '<=', \DB::raw('NOW()'))->first();
+        $found = Test_User::where('created_at', '<=', \DB::raw('NOW()'))->first();
         $this->assertEquals($newUser->username, $found->username);
 
-        $this->assertNull(Test_User::where('date_insert', '>', \DB::raw('NOW()'))->first());
+        $this->assertNull(Test_User::where('created_at', '>', \DB::raw('NOW()'))->first());
     }
 
     public function testWhereYear()
@@ -73,11 +73,11 @@ class QueryTest extends TestCase
         $tblee = $this->createUser([
             'varchar_key' => 'tblee',
             'varchar_2' => 'timbernerslee@cern.org',
-            'date_insert'=> new Date('1955-01-01')
+            'created_at'=> new Date('1955-01-01')
         ]);
 
-        $user = Test_User::whereYear('date_insert', 1955)->first();
-        $this->assertEquals($tblee->date_insert->year, $user->date_insert->year);
+        $user = Test_User::whereYear('created_at', 1955)->first();
+        $this->assertEquals($tblee->created_at->year, $user->created_at->year);
     }
 
     public function testWhereMonth()
@@ -85,11 +85,11 @@ class QueryTest extends TestCase
         $lpage = $this->createUser([
             'varchar_key' => 'lpage',
             'varchar_2' => 'larrypage@gmail.com',
-            'date_insert'=> new Date('2016-10-03')
+            'created_at'=> new Date('2016-10-03')
         ]);
 
-        $user = Test_User::whereMonth('date_insert', 10)->first();
-        $this->assertEquals($lpage->date_insert->month, $user->date_insert->month);
+        $user = Test_User::whereMonth('created_at', 10)->first();
+        $this->assertEquals($lpage->created_at->month, $user->created_at->month);
     }
 
     public function testWhereDay()
@@ -97,11 +97,11 @@ class QueryTest extends TestCase
         $sbrin = $this->createUser([
             'varchar_key' => 'sbrin',
             'varchar_2' => 'sergeybrin@gmail.com',
-            'date_insert'=> new Date('2016-10-03')
+            'created_at'=> new Date('2016-10-03')
         ]);
 
-        $user = Test_User::whereDay('date_insert', 3)->first();
-        $this->assertEquals($sbrin->date_insert->day, $user->date_insert->day);
+        $user = Test_User::whereDay('created_at', 3)->first();
+        $this->assertEquals($sbrin->created_at->day, $user->created_at->day);
     }
 
     public function testWhereIn()
@@ -255,29 +255,29 @@ class QueryTest extends TestCase
     public static function publishedProvider()
     {
         return [
-            'no date_expire' => [[
+            'no expire_at' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => null // sem date_expire
+                'publish_at'  => '2016-01-01 01:59:59',
+                'expire_at' => null // sem expire_at
             ]],
             'not expired yet' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 00:00:00',
-                'date_expire' => '2016-01-01 02:01:00' // date_expire no futuro
+                'publish_at'  => '2016-01-01 00:00:00',
+                'expire_at' => '2016-01-01 02:01:00' // expire_at no futuro
             ]],
             'children without publish' => [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
                 'deleted'  =>  0,
                 'parent_id'  => 123, // com parent
-                'date_publish'  => '2016-01-01 00:00:00',
-                'date_expire' => '2016-01-01 02:01:00'
+                'publish_at'  => '2016-01-01 00:00:00',
+                'expire_at' => '2016-01-01 02:01:00'
             ]],
         ];
     }
@@ -290,40 +290,40 @@ class QueryTest extends TestCase
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => '0000-00-00 00:00:00'
+                'publish_at'  => '2016-01-01 01:59:59',
+                'expire_at' => '0000-00-00 00:00:00'
             ]],
             'deleted' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  1, // com deleted
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:59:59',
-                'date_expire' => '0000-00-00 00:00:00'
+                'publish_at'  => '2016-01-01 01:59:59',
+                'expire_at' => '0000-00-00 00:00:00'
             ]],
             'expired' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 01:00:00',
-                'date_expire' => '2016-01-01 01:59:59' // date_expire no passado
+                'publish_at'  => '2016-01-01 01:00:00',
+                'expire_at' => '2016-01-01 01:59:59' // expire_at no passado
             ]],
             'not published yet' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
                 'deleted'  =>  0,
                 'parent_id'  => 0,
-                'date_publish'  => '2016-01-01 02:01:00', // date_publish no futuro
-                'date_expire' => '2016-01-01 03:00:00'
+                'publish_at'  => '2016-01-01 02:01:00', // publish_at no futuro
+                'expire_at' => '2016-01-01 03:00:00'
             ]],
             'no publish' => [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
                 'deleted'  =>  0,
                 'parent_id'  => 0, // sem parent
-                'date_publish'  => '2016-01-01 00:00:00',
-                'date_expire' => '2016-01-01 02:01:00'
+                'publish_at'  => '2016-01-01 00:00:00',
+                'expire_at' => '2016-01-01 02:01:00'
             ]],
         ];
     }
