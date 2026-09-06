@@ -51,6 +51,48 @@ class FieldUtil
     const BOOLEAN_ATTRIBUTES = ['required', 'separator', 'list', 'combo', 'readonly', 'form'];
 
     /**
+     * The xtra values renamed on 2026-09-06, per field type.
+     *
+     * ⚠ Keyed by field type because `S` meant SIX different things: MD5 on a password, no-time on
+     * a date, HTML on a text, checked on a bool, and by-types on both selects. A sweep keyed on
+     * the literal rather than on the field holding it gets every one of them wrong.
+     *
+     * Applied on the way OUT of both formats, so the app reads the new names whether or not
+     * 2026_09_06_300000 has run on the tenant.
+     */
+    const XTRA_RENAMES = [
+        'varchar' => ['telefone' => 'phone', 'cor' => 'color', 'hora' => 'time'],
+        'password' => ['S' => 'md5'],
+        'file' => ['imagens' => 'images'],
+        'date' => ['S' => 'notime'],
+        'text' => ['S' => 'html'],
+        'bool' => ['S' => 'checked'],
+        'float' => ['moeda' => 'currency'],
+        'select' => [
+            'S' => 'types', 'radio' => 'records_radio', 'ajax' => 'records_ajax',
+            'radio_tipos' => 'types_radio', 'ajax_tipos' => 'types_ajax',
+        ],
+        'select_multi' => ['S' => 'types', 'X' => 'records_search', 'X_tipos' => 'types_search'],
+        'special' => [
+            'registros' => 'records', 'registros_multi' => 'records_multi',
+            'tipos' => 'types', 'tipos_multi' => 'types_multi',
+        ],
+    ];
+
+    /**
+     * The field type a column belongs to, as Field\Factory classifies it: the first segment, plus
+     * `_multi` for a select_multi. ⚠ Not the `_<n>`/`_key` suffix strip the type editor uses --
+     * that leaves a custom table's named column (`special_produtos`) unclassified, and six of ci's
+     * carry an xtra that has to move.
+     */
+    public static function baseType(string $column): string
+    {
+        $base = explode('_', $column)[0];
+
+        return $base === 'select' && strpos($column, 'select_multi_') === 0 ? 'select_multi' : $base;
+    }
+
+    /**
      * Read `types.fields` as definitions in the order the record form renders them, keyed by the
      * row's position so a caller's `order` is the position it always was.
      *
@@ -79,9 +121,9 @@ class FieldUtil
             return (string) ($row['type'] ?? '') !== '';
         });
 
-        // Cast on the way OUT, both formats alike, so the app reads the same booleans either side
-        // of the migration and the two can be deployed in either order.
-        return array_map([self::class, 'castFlags'], $rows);
+        // Normalised on the way OUT, both formats alike, so the app reads the same values either
+        // side of the migration and the two can be deployed in either order.
+        return array_map([self::class, 'normalise'], $rows);
     }
 
     /**
@@ -103,7 +145,7 @@ class FieldUtil
             foreach (self::ATTRIBUTES as $attribute) {
                 $row[$attribute] = (string) ($field[$attribute] ?? '');
             }
-            $rows[] = self::castFlags($row);
+            $rows[] = self::normalise($row);
         }
 
         // ⚠ A type with no fields stores the EMPTY STRING, never `[]`: `holds_records` and the
@@ -122,12 +164,21 @@ class FieldUtil
      * boolean, and the empty string is what both formats spell false as. `'0'` is false too, and
      * that is right -- no flag on ci has ever held it.
      */
-    private static function castFlags(array $row): array
+    private static function normalise(array $row): array
     {
         foreach (self::BOOLEAN_ATTRIBUTES as $attribute) {
             if (array_key_exists($attribute, $row)) {
                 $row[$attribute] = (bool) $row[$attribute];
             }
+        }
+
+        if (array_key_exists('xtra', $row)) {
+            // '0' and '' were two spellings of "no xtra"; '' is the one every field type but
+            // select_multi already declared, and the one an emptied input posts.
+            $xtra = (string) $row['xtra'];
+            $row['xtra'] = $xtra === '0'
+                ? ''
+                : (self::XTRA_RENAMES[self::baseType($row['type'] ?? '')][$xtra] ?? $xtra);
         }
 
         return $row;
@@ -171,7 +222,7 @@ class FieldUtil
      */
     public static function getSelectTypeXtras(): array
     {
-        return ['S', 'X_tipos', 'ajax_tipos', 'radio_tipos'];
+        return ['types', 'types_search', 'types_ajax', 'types_radio'];
     }
     /**
      * The xtra values of special_ fields which store types.
@@ -180,7 +231,7 @@ class FieldUtil
      */
     public static function getSpecialTypeXtras(): array
     {
-        return ['tipos_multi', 'tipos'];
+        return ['types_multi', 'types'];
     }
     /**
      * The xtras of the special_ fields that store multiple records.
@@ -189,7 +240,7 @@ class FieldUtil
      */
     public static function getSpecialMultiXtras(): array
     {
-        return ['registros_multi', 'tipos_multi'];
+        return ['records_multi', 'types_multi'];
     }
     /**
      * The field's value in the list header.
