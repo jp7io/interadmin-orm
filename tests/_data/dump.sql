@@ -102,7 +102,7 @@ CREATE TABLE `interadmin_teste_records` (
   `log` text NOT NULL,
   `log_user` varchar(50) NOT NULL DEFAULT '',
   `publish` tinyint(1) NOT NULL DEFAULT 0,
-  `deleted` tinyint(1) NOT NULL DEFAULT 0
+  `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -191,7 +191,7 @@ CREATE TABLE `interadmin_teste_en_records` (
   `log` text NOT NULL,
   `log_user` varchar(50) NOT NULL DEFAULT '',
   `publish` tinyint(1) NOT NULL DEFAULT 0,
-  `deleted` tinyint(1) NOT NULL DEFAULT 0
+  `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -201,7 +201,7 @@ CREATE TABLE `interadmin_teste_en_records` (
 --
 
 CREATE TABLE `interadmin_teste_tags` (
-  `id_tag` mediumint(8) UNSIGNED NOT NULL,
+  `tag_id` mediumint(8) UNSIGNED NOT NULL,
   `parent_id` mediumint(8) UNSIGNED NOT NULL,
   `type_id` smallint(5) UNSIGNED NOT NULL,
   `id` mediumint(8) UNSIGNED NOT NULL
@@ -229,7 +229,7 @@ CREATE TABLE `interadmin_teste_files` (
   `visible` tinyint(1) NOT NULL DEFAULT 0,
   `featured` tinyint(1) NOT NULL DEFAULT 0,
   `position` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0
+  `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -320,7 +320,7 @@ ALTER TABLE `interadmin_teste_en_records`
 -- Indexes for table `interadmin_teste_tags`
 --
 ALTER TABLE `interadmin_teste_tags`
-  ADD PRIMARY KEY (`id_tag`);
+  ADD PRIMARY KEY (`tag_id`);
 
 --
 -- Indexes for table `interadmin_teste_files`
@@ -354,7 +354,7 @@ ALTER TABLE `interadmin_teste_en_records`
 -- AUTO_INCREMENT for table `interadmin_teste_tags`
 --
 ALTER TABLE `interadmin_teste_tags`
-  MODIFY `id_tag` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `tag_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `interadmin_teste_files`
 --

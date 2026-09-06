@@ -95,7 +95,28 @@ class CreateTest extends TestCase
 
         $user->delete();
 
-        $this->seeInDatabase('interadmin_teste_records', ['id' => $user->id, 'deleted' =>  1]);
+        // The row survives carrying a stamp, and the stamp's value cannot be asserted -- delete()
+        // writes date('c'). "Not null" is the whole question the column answers.
+        $this->seeInDatabase('interadmin_teste_records', ['id' => $user->id]);
+        $this->dontSeeInDatabase('interadmin_teste_records', ['id' => $user->id, 'deleted_at' => null]);
+    }
+
+    /**
+     * The only place a NULL is written to the database, and it only reaches one because
+     * `deleted_at` is on RecordAbstract::$nullableAttributes -- every other attribute goes in as
+     * '' , which on a datetime is the sentinel and leaves the row deleted forever.
+     */
+    public function testRestore()
+    {
+        $user = $this->createUser([
+            'varchar_key' => 'isommerville',
+            'password_key' => '123'
+        ]);
+
+        $user->delete();
+        $user->restore();
+
+        $this->seeInDatabase('interadmin_teste_records', ['id' => $user->id, 'deleted_at' => null]);
     }
 
     public function testForceDelete()

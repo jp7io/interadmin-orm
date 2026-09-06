@@ -95,17 +95,25 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
+    /** A null criterion is `IS NULL`: `= NULL` matches nothing, so it would assert the opposite. */
     private function countInDatabase(string $table, array $criteria): int
     {
         $where = [];
-        foreach (array_keys($criteria) as $column) {
+        $bindings = [];
+
+        foreach ($criteria as $column => $value) {
+            if ($value === null) {
+                $where[] = "`{$column}` IS NULL";
+                continue;
+            }
             $where[] = "`{$column}` = ?";
+            $bindings[] = $value;
         }
 
         $statement = self::pdo()->prepare(
             "SELECT COUNT(*) FROM `{$table}` WHERE ".implode(' AND ', $where)
         );
-        $statement->execute(array_values($criteria));
+        $statement->execute($bindings);
 
         return (int) $statement->fetchColumn();
     }
