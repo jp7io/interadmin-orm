@@ -24,7 +24,7 @@ use Request;
  * guessing at a tenant's field layout. A `date_` value arrives as a Date, getMutatedAttribute()
  * casting every string on that prefix.
  *
- * @property int $id_log  PK
+ * @property int $log_id  PK
  * @property int $id  Parent record ID
  * @property int $type_id
  * @property string $lang
@@ -41,7 +41,7 @@ class Log extends RecordAbstract
     const ACTION_INSERT = 'insert';
     const ACTION_MODIFY = 'modify';
 
-    protected $_primary_key = 'id_log';
+    protected $_primary_key = 'log_id';
 
     /**
      * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
@@ -67,7 +67,7 @@ class Log extends RecordAbstract
      */
     public function __construct(array $attributes = [])
     {
-        $this->setRawAttributes($attributes + ['id_log' => 0]);
+        $this->setRawAttributes($attributes + ['log_id' => 0]);
     }
 
     public function &__get($name)
@@ -152,7 +152,7 @@ class Log extends RecordAbstract
     }
     public function getAttributesNames(): array
     {
-        return ['id_log', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
+        return ['log_id', 'id', 'type_id', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert'];
     }
     public function getTableName(): string
     {
@@ -212,7 +212,7 @@ class Log extends RecordAbstract
             $aggregating = isset($options['group']) || self::selectsAnAggregate($options['fields']);
             $options['fields'] = $aggregating
                 ? (array) $options['fields']
-                : array_merge(['id_log'], (array) $options['fields']);
+                : array_merge(['log_id'], (array) $options['fields']);
         } else {
             $options['fields'] = static::DEFAULT_FIELDS;
         }
@@ -232,7 +232,7 @@ class Log extends RecordAbstract
         $logs = [];
 
         foreach ($rs as $row) {
-            $log = new static(['id_log' => $row->id_log ?? 0]);
+            $log = new static(['log_id' => $row->log_id ?? 0]);
             $instance->_getAttributesFromRow($row, $log, $options);
             $logs[] = $log;
         }

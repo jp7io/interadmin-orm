@@ -199,7 +199,7 @@ class SqlCompiler
                         (($existsMatches[4]) ? ' AND ' : '');
                     } elseif ($table == 'tags') {
                         // Tags
-                        $existsMatches[2] = 'SELECT id_tag FROM '.$this->record->getDb()->getTablePrefix().'tags AS '.$table.
+                        $existsMatches[2] = 'SELECT tag_id FROM '.$this->record->getDb()->getTablePrefix().'tags AS '.$table.
                         ' WHERE '.$table.'.parent_id = main.id'.(($existsMatches[4]) ? ' AND ' : '');
                     } elseif (isset($options['joins'][$table])) {
                         // Joins custom
