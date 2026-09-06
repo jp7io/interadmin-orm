@@ -258,7 +258,7 @@ class QueryTest extends TestCase
             'no expire_at' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:59:59',
                 'expire_at' => null // sem expire_at
@@ -266,7 +266,7 @@ class QueryTest extends TestCase
             'not expired yet' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 00:00:00',
                 'expire_at' => '2016-01-01 02:01:00' // expire_at no futuro
@@ -274,7 +274,7 @@ class QueryTest extends TestCase
             'children without publish' => [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 123, // com parent
                 'publish_at'  => '2016-01-01 00:00:00',
                 'expire_at' => '2016-01-01 02:01:00'
@@ -288,7 +288,7 @@ class QueryTest extends TestCase
             'not active' => [[
                 'bool_key' => 0, // not shown
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:59:59',
                 'expire_at' => '0000-00-00 00:00:00'
@@ -296,7 +296,7 @@ class QueryTest extends TestCase
             'deleted' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  1, // com deleted
+                'deleted_at'  =>  date('c'), // com deleted
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:59:59',
                 'expire_at' => '0000-00-00 00:00:00'
@@ -304,7 +304,7 @@ class QueryTest extends TestCase
             'expired' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:00:00',
                 'expire_at' => '2016-01-01 01:59:59' // expire_at no passado
@@ -312,7 +312,7 @@ class QueryTest extends TestCase
             'not published yet' => [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 02:01:00', // publish_at no futuro
                 'expire_at' => '2016-01-01 03:00:00'
@@ -320,7 +320,7 @@ class QueryTest extends TestCase
             'no publish' => [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0, // sem parent
                 'publish_at'  => '2016-01-01 00:00:00',
                 'expire_at' => '2016-01-01 02:01:00'

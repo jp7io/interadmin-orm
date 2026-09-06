@@ -224,7 +224,7 @@ abstract class BaseQuery
     }
 
     /**
-     * Set deleted = 1 and update the records.
+     * Soft-delete every matched record, one save each.
      *
      * @return int
      */

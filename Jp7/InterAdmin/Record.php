@@ -89,6 +89,13 @@ use RecordUrl;
  * @method static Query whereNotNull(string $column)
  * @method static Query whereYear(string $column, mixed $operator, mixed $value = null)
  * @method static Query with(string ...$relationships)
+ *
+ * ⚠ The one column declared here, and deliberately the only one: a Record's other
+ * attributes are a tenant's `fields` aliases, so enumerating those would pin one tenant's
+ * layout into the framework. `deleted_at` is a SYSTEM column of the record shape, like
+ * Type::$deleted_at, and declaring it is what keeps the soft-delete readable to the analyser.
+ *
+ * @property ?string $deleted_at  When this row was soft-deleted, NULL while it is live
  */
 class Record extends RecordAbstract implements Arrayable, Jsonable
 {
@@ -909,7 +916,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
     public function isPublished()
     {
         return $this->bool_key &&
-            !$this->deleted &&
+            !$this->deleted_at &&
             ($this->parent_id || $this->publish || !config('interadmin.preview')) &&
             $this->publish_at->getTimestamp() <= Record::getTimestamp() &&
             ($this->expire_at->getTimestamp() >= Record::getTimestamp() || $this->expire_at->format('Y') < 1);

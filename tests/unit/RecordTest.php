@@ -70,7 +70,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:59:59',
                 'expire_at' => '0000-00-00 00:00:00' // sem expire_at
@@ -78,7 +78,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 00:00:00',
                 'expire_at' => '2016-01-01 02:00:01' // expire_at no futuro
@@ -86,7 +86,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 123, // com parent
                 'publish_at'  => '2016-01-01 00:00:00',
                 'expire_at' => '2016-01-01 02:00:01'
@@ -100,7 +100,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 0, // not shown
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:59:59',
                 'expire_at' => '0000-00-00 00:00:00'
@@ -108,7 +108,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  1, // com deleted
+                'deleted_at'  =>  date('c'), // com deleted
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:59:59',
                 'expire_at' => '0000-00-00 00:00:00'
@@ -116,7 +116,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 01:00:00',
                 'expire_at' => '2016-01-01 01:59:59' // expire_at no passado
@@ -124,7 +124,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  1,
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0,
                 'publish_at'  => '2016-01-01 02:00:01', // publish_at no futuro
                 'expire_at' => '2016-01-01 03:00:00'
@@ -132,7 +132,7 @@ class RecordTest extends TestCase
             [[
                 'bool_key' => 1,
                 'publish'  =>  0, // sem publish
-                'deleted'  =>  0,
+                'deleted_at'  =>  null,
                 'parent_id'  => 0, // sem parent
                 'publish_at'  => '2016-01-01 00:00:00',
                 'expire_at' => '2016-01-01 02:00:01'

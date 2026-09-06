@@ -216,14 +216,14 @@ class Query extends Query\BaseQuery
     }
 
     /**
-     * Set deleted = 1 and update the records.
+     * Stamp deleted_at and update the records.
      *
      * @return int
      */
     public function delete()
     {
         return $this->provider->deprecated_updateInterAdmins([
-            'deleted' => 1,
+            'deleted_at' => date('c'),
         ], $this->options);
     }
 

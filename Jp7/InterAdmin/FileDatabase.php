@@ -18,7 +18,7 @@ namespace Jp7\InterAdmin;
  * @property int $width
  * @property int $height
  * @property int $pages   PDF page count, 0 where nothing counted it
- * @property bool $deleted
+ * @property ?string $deleted_at  When this row was soft-deleted, NULL while it is live
  * @property string $url    getUrlAttribute() mutator
  */
 class FileDatabase extends RecordAbstract
@@ -147,7 +147,7 @@ class FileDatabase extends RecordAbstract
      * getColumns() -- but a name here is not evidence of a column on files_database. */
     public function getAttributesNames(): array
     {
-        return ['file_id', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'name', 'caption', 'credits', 'link', 'link_blank', 'visible', 'featured', 'position', 'deleted'];
+        return ['file_id', 'type_id', 'id', 'part', 'url', 'url_thumb', 'url_zoom', 'name', 'caption', 'credits', 'link', 'link_blank', 'visible', 'featured', 'position', 'deleted_at'];
     }
 
     public function getTagFilters(): string

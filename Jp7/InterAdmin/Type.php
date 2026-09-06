@@ -1412,7 +1412,7 @@ class Type extends RecordAbstract
 
     public function getInterAdminsAdminAttributes()
     {
-        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'publish_at', 'created_at', 'expire_at', 'updated_at', 'log', 'publish', 'deleted', 'hits'];
+        return ['id_slug', 'id_string', 'parent_id', 'parent_type_id', 'publish_at', 'created_at', 'expire_at', 'updated_at', 'log', 'publish', 'deleted_at', 'hits'];
     }
 
     public function getFillable()

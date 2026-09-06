@@ -43,16 +43,17 @@ class PublishedFilter
         // filtered on columns it does not have. Every in-ORM caller passes a prefixed
         // name, so this is latent rather than live. Preserved exactly; changing it is a
         // behavior change, not part of the extraction.
-        if ($table === 'types' && count($tableParts) === 3) {
-            return $alias.'.visible = 1 AND '.$alias.'.deleted_at IS NULL AND ';
-        } elseif ($table === 'tags' && count($tableParts) === 3) {
+        if ($table === 'tags' && count($tableParts) === 3) {
             // Tags carry no publishing state of their own -- returns null, and callers
             // concatenate that as ''.
             return null;
-        } elseif ($table === 'files') {
-            // Same `visible` as the types branch since increment 7, and still a branch of its own:
-            // a type is soft-deleted through `deleted_at`, a file through `deleted`.
-            return $alias.'.visible = 1 AND '.$alias.'.deleted = 0 AND ';
+        }
+
+        // Types and files are one branch again. They took the same `visible` in increment 7 and
+        // the same `deleted_at` in increment 14, so the two arms this method used to keep apart
+        // now emit the same string; only the records calendar below is still different.
+        if (($table === 'types' && count($tableParts) === 3) || $table === 'files') {
+            return $alias.'.visible = 1 AND '.$alias.'.deleted_at IS NULL AND ';
         }
 
         return self::recordsSql($alias);
@@ -74,7 +75,7 @@ class PublishedFilter
             ' AND ('.$alias.".expire_at > '".date('Y-m-d H:i:00', $now)."' OR ".$alias.
                 '.expire_at IS NULL)'.
             ' AND '.$alias.'.bool_key = 1'.
-            ' AND '.$alias.'.deleted = 0'.
+            ' AND '.$alias.'.deleted_at IS NULL'.
             ' AND ';
 
         // Preview mode (the admin) also shows unpublished rows and any child row.

@@ -203,6 +203,14 @@ abstract class RecordAbstract
      */
     public const SYSTEM_DATES = ['created_at', 'updated_at', 'publish_at', 'expire_at', 'hit_at'];
 
+    /**
+     * ⚠ `deleted_at` is a date and is deliberately NOT in that list. The cast above turns a NULL
+     * into a \Date of the absent year, which is an OBJECT and therefore truthy - so every
+     * `!$record->deleted_at` would read as deleted, and `isPublished()` would return false for the
+     * whole table. It stays a nullable string, exactly as `Type::$deleted_at` has been since
+     * increment 4, and `$nullableAttributes` is what keeps it writable as NULL.
+     */
+
     public static function isDateColumn(string $name): bool
     {
         return strpos($name, 'date_') === 0 || in_array($name, self::SYSTEM_DATES, true);
@@ -1047,11 +1055,12 @@ abstract class RecordAbstract
     }
 
     /**
-     * Sets this row as deleted as saves it.
+     * Soft-deletes this row and saves it. The stamp is the same `date('c')` Type::destroy() has
+     * used since increment 4, so a record and a type record the moment the same way.
      */
     public function delete()
     {
-        $this->deleted = true;
+        $this->deleted_at = date('c');
         return $this->save();
     }
     /**
@@ -1073,7 +1082,7 @@ abstract class RecordAbstract
 
     public function restore()
     {
-        $this->deleted = false;
+        $this->deleted_at = null;
         return $this->save();
     }
 
