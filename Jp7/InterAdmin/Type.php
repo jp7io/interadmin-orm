@@ -39,7 +39,7 @@ use DB;
  * @property string $class Class to be instantiated for the records of this Type.
  * @property string $table_name Table of this Type, or of its Model, if it has no table.
  * @property int|string $type_id This Type's primary key.
- * @property string $children The child Types, as the '{,}'/'{;}' delimited blob the column stores.
+ * @property string $children The child Types, as the JSON the column stores -- see ChildUtil.
  * @property ?string $deleted_at When this Type was soft-deleted, NULL while it is live.
  *
  * @method static Type build(array $attributes = [])
@@ -1152,25 +1152,22 @@ class Type extends RecordAbstract
     }
 
     /**
-     * Returns metadata about the children types that the Records have.
+     * Returns metadata about the children types that the Records have, keyed by studly name.
      *
-     * @return array
+     * ⚠ The KEY derives from the declaration's `name`, not from the child type's own, so a parent
+     * that renames a tab renames the relationship `$record->dadosPessoais()` resolves through.
+     *
+     * @return array<string, array{type_id: string, name: string, help: string, grandchildren: bool}>
      */
     public function getInterAdminsChildren()
     {
         return $this->getCache('children', function () {
             $children = [];
-            $childrenArr = explode('{;}', (string) $this->children);
-            for ($i = 0; $i < count($childrenArr) - 1; $i++) {
-                $childrenArrParts = explode('{,}', $childrenArr[$i]);
-                if (count($childrenArrParts) < 4) { // 4 = 'type_id', 'nome', 'ajuda', 'netos'
-                    // Fix for types with an old, outdated structure
-                    $childrenArrParts = array_pad($childrenArrParts, 4, '');
-                }
-                $child = array_combine(['type_id', 'nome', 'ajuda', 'netos'], $childrenArrParts);
-                $name_id = Str::studly(to_slug($child['nome']));
-                $children[$name_id] = $child;
+
+            foreach (ChildUtil::decode($this->children) as $child) {
+                $children[Str::studly(to_slug($child['name']))] = $child;
             }
+
             return $children;
         });
     }
