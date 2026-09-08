@@ -290,7 +290,7 @@ class Query extends Query\BaseQuery
     public function findMany($ids)
     {
         if (!$ids) {
-            return jp7_collect();  // save a query
+            return new Collection();  // save a query
         }
         $sample = reset($ids);
         if (is_string($sample) && !is_numeric($sample)) {

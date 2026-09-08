@@ -7,7 +7,7 @@ class Relation
     public static function eagerLoad($records, $relationships, $selectStack = null)
     {
         if (is_array($records)) {
-            $records = jp7_collect($records);
+            $records = new Collection($records);
         }
         if (!count($records)) {
             return;
@@ -104,7 +104,7 @@ class Relation
         $ids = array_unique($ids);
         if ($ids) {
             if ($data['has_type']) {
-                $rows = jp7_collect([]);
+                $rows = new Collection([]);
                 foreach ($ids as $id) {
                     $rows[$id] = Type::getInstance($id);
                 }
@@ -125,7 +125,7 @@ class Relation
         foreach ($records as $record) {
             $loaded = (object) [
                 'fks' => $record->$alias,
-                'values' => jp7_collect([])
+                'values' => new Collection([])
             ];
             if (isset($rows)) {
                 $fksArray = is_array($loaded->fks) ? $loaded->fks : array_filter(explode(',', $loaded->fks));
@@ -158,7 +158,7 @@ class Relation
         }
 
         if ($data['has_type']) {
-            $rows = jp7_collect([]);
+            $rows = new Collection([]);
             foreach ($ids as $id) {
                 $rows[$id] = Type::getInstance($id);
             }
@@ -209,7 +209,7 @@ class Relation
 
         foreach ($records as $record) {
             if (!isset($children[$record->id])) {
-                $children[$record->id] = jp7_collect();
+                $children[$record->id] = new Collection();
             }
             foreach ($children[$record->id] as $child) {
                 $child->setParent($record);

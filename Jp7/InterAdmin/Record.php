@@ -384,7 +384,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
         if ($data['multi']) {
             $fks = $this->{$name.'_ids'};
             if (!$fks) {
-                return jp7_collect([]);
+                return new Collection([]);
             }
             $loaded = &$this->relations[$name];
             if (!$loaded) {
@@ -395,7 +395,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 $loaded->fks = $fks;
                 $fksArray = is_array($fks) ? $fks : array_filter(explode(',', $fks));
                 if ($data['type']) {
-                    $multi = jp7_collect([]);
+                    $multi = new Collection([]);
                     foreach ($fksArray as $fk) {
                         $multi[] = Type::getInstance($fk, ['default_namespace' => static::DEFAULT_NAMESPACE]);
                     }

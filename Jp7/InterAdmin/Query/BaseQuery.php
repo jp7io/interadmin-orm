@@ -208,7 +208,7 @@ abstract class BaseQuery
                 'fields' => array_filter([$column, $key]),
             ] + $this->options);
 
-        return jp7_collect(Arr::pluck($array, $column, $key));
+        return new Collection(Arr::pluck($array, $column, $key));
     }
 
     /**
