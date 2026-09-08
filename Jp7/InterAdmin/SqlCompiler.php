@@ -258,7 +258,7 @@ class SqlCompiler
                     // Joins com children
                     $joinName = Str::studly($table);
                     // Support for old join alias: ChildrenLojas => Lojas
-                    $joinName = replace_prefix('Children', '', $joinName);
+                    $joinName = Str::replaceStart('Children', '', $joinName);
                     if (isset($childrenArr[$joinName])) {
                         $joinType = Type::getInstance($childrenArr[$joinName]['type_id'], [
                             'db' => $this->record->getDbName(),

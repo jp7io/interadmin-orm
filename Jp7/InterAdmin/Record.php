@@ -967,7 +967,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable
                 ->orderByRaw('LENGTH(id_slug) DESC, id_slug DESC')
                 ->value('id_slug');
 
-            $max = replace_prefix($id_slug, '', $max) ?: 1;
+            $max = Str::replaceStart($id_slug, '', $max) ?: 1;
             $id_slug .= $max + 1;
         }
 

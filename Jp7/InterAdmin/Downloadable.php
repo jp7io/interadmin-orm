@@ -2,6 +2,7 @@
 
 namespace Jp7\InterAdmin;
 
+use Illuminate\Support\Str;
 use ImgResize;
 use Exception;
 use Storage;
@@ -23,7 +24,7 @@ trait Downloadable
         $config = config('interadmin.storage');
 
         // '../..' => ''
-        return replace_prefix($config['backend_path'], $config['path'], $this->url);
+        return Str::replaceStart($config['backend_path'], $config['path'], $this->url);
     }
 
     // For client side use
@@ -33,7 +34,7 @@ trait Downloadable
         $storageUrl = $config['scheme'].'://'.$config['host'].$config['path'];
 
         // '../..' => 'http://www.example.com'
-        $url = replace_prefix($config['backend_path'], $storageUrl, $this->url);
+        $url = Str::replaceStart($config['backend_path'], $storageUrl, $this->url);
 
         if ($this->isImage()) {
             $url = ImgResize::addTemplate($url, $template);
@@ -52,7 +53,7 @@ trait Downloadable
         $backendPath = config('interadmin.storage.backend_path');
         $url = $this->removeQueryString();
 
-        return replace_prefix($backendPath.'/', '', $url);
+        return Str::replaceStart($backendPath.'/', '', $url);
     }
 
     private function removeQueryString(): string|false|null
