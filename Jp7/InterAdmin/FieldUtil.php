@@ -117,7 +117,7 @@ class FieldUtil
             ? self::decodeJson($fields)
             : self::decodePositional($fields);
 
-        $rows = array_filter($rows, function ($row) {
+        $rows = array_filter($rows, function (array $row): bool {
             return (string) ($row['type'] ?? '') !== '';
         });
 

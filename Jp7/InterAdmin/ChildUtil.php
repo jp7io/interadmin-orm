@@ -55,7 +55,7 @@ class ChildUtil
             ? self::decodeJson($children)
             : self::decodePositional($children);
 
-        $rows = array_filter($rows, function ($row) {
+        $rows = array_filter($rows, function (array $row): bool {
             return (string) ($row['type_id'] ?? '') !== '';
         });
 
