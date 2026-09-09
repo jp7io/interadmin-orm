@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use Jp7\Laravel\RouterFacade as r;
 use BadMethodCallException;
 use InvalidArgumentException;
-use UnexpectedValueException;
 use Exception;
 use Lang;
 use Request;
@@ -605,50 +604,38 @@ class Type extends RecordAbstract
     public function getFields()
     {
         return $this->getCacheUnlessEmpty('field_definitions', function () {
+            $rows = FieldUtil::decode($this->fields);
+            $aliases = FieldUtil::aliases($rows, function ($type_id) {
+                return $this->relatedType($type_id)->name;
+            });
+
             $A = [];
             // Keyed by position, so `order` is the row's place in the column whichever format
             // stored it.
-            foreach (FieldUtil::decode($this->fields) as $i => $row) {
+            foreach ($rows as $i => $row) {
                 $column = $row['type'];
                 $A[$column] = ['order' => $i + 1] + $row;
+                $A[$column]['name_id'] = $aliases[$column];
 
-                if (strpos($column, 'select_') === 0 && $A[$column]['name'] != 'all') {
-                    $A[$column]['name'] = self::getInstance($A[$column]['name'], [
-                        'db' => $this->_db,
-                        'default_namespace' => static::DEFAULT_NAMESPACE,
-                    ]);
+                // A select_ hands its consumers the TYPE it points at rather than that type's id:
+                // the renderers and getRelationships() query through it. The alias needs only the
+                // name, which is why the derivation above takes a resolver instead of this object.
+                if (strpos($column, 'select_') === 0 && $row['name'] != 'all') {
+                    $A[$column]['name'] = $this->relatedType($row['name']);
                 }
             }
-            // Alias
-            foreach ($A as $column => $array) {
-                if (empty($array['name_id'])) {
-                    // Generate name_id
-                    $alias = $array['name'];
-                    if (is_object($alias)) {
-                        $alias = empty($array['label']) ? $alias->name : $array['label'];
-                    }
-                    if (!$alias) {
-                        throw new UnexpectedValueException('An alias was expected.');
-                        //$alias = $column;
-                    }
-                    $A[$column]['name_id'] = to_slug($alias, '_');
-                }
-                if (strpos($column, 'select_') === 0) {
-                    if (strpos($column, 'select_multi_') === 0) {
-                        $A[$column]['name_id'] .= '_ids';
-                    } else {
-                        $A[$column]['name_id'] .= '_id';
-                    }
-                } elseif (strpos($column, 'special_') === 0 && $array['xtra']) {
-                    if (in_array($array['xtra'], FieldUtil::getSpecialMultiXtras())) {
-                        $A[$column]['name_id'] .= '_ids';
-                    } else {
-                        $A[$column]['name_id'] .= '_id';
-                    }
-                }
-            }
+
             return $A;
         });
+    }
+
+    /** The type a select_ points at, on this type's own database and namespace. */
+    private function relatedType($type_id)
+    {
+        return self::getInstance($type_id, [
+            'db' => $this->_db,
+            'default_namespace' => static::DEFAULT_NAMESPACE,
+        ]);
     }
     /**
      * Returns an array with the names of all the fields available.
@@ -659,7 +646,7 @@ class Type extends RecordAbstract
     {
         $fields = array_keys($this->getFields());
         foreach ($fields as $key => $field) {
-            if (strpos($field, 'tit_') === 0 || strpos($field, 'func_') === 0) {
+            if (FieldUtil::isVirtualField($field)) {
                 unset($fields[$key]);
             }
         }
@@ -679,7 +666,7 @@ class Type extends RecordAbstract
             $this->_interadminAliases = $this->getCache('field_definitions_alias', function () {
                 $aliases = [];
                 foreach ($this->getFields() as $column => $array) {
-                    if (strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0) {
+                    if (FieldUtil::isVirtualField($column)) {
                         continue;
                     }
                     $aliases[$column] = $array['name_id'];
@@ -711,7 +698,7 @@ class Type extends RecordAbstract
                 $relationships = [];
 
                 foreach ($this->getFields() as $column => $array) {
-                    if (strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0) {
+                    if (FieldUtil::isVirtualField($column)) {
                         continue;
                     }
                     if (strpos($column, 'select_') === 0) {

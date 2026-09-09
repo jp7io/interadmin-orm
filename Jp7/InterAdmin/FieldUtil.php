@@ -216,6 +216,83 @@ class FieldUtil
     }
 
     /**
+     * `column => name_id`: the name a RECORD answers to, which is not the one the blob stores.
+     * The ONE home for that derivation -- InterAdmin\Models\Type asks it of the same rows, and a
+     * second implementation disagrees the way increment 16's three decoders did.
+     * ⚠ The suffix lands on a STORED name_id too, so a select_ row saying `moeda` answers to
+     * `moeda_id`; suffixing only the generated half drops 931 of ci's 936.
+     * ⚠ $typeName is the one impure step, needed by 4 of ci's 10,391 rows.
+     *
+     * @param array $rows Field definitions, as decode() returns them.
+     * @param callable $typeName Given a select_'s stored `name`, that type's own name.
+     *
+     * @return array
+     */
+    public static function aliases(array $rows, callable $typeName): array
+    {
+        $aliases = [];
+
+        foreach ($rows as $row) {
+            $column = $row['type'];
+            $alias = $row['name_id'] ?? '';
+
+            if (!$alias) {
+                $alias = self::aliasSource($row, $column, $typeName);
+
+                if (!$alias) {
+                    throw new UnexpectedValueException('An alias was expected.');
+                }
+
+                $alias = to_slug($alias, '_');
+            }
+
+            $aliases[$column] = $alias.self::aliasSuffix($column, $row);
+        }
+
+        return $aliases;
+    }
+
+    /**
+     * A select_ stores the RELATED TYPE's id in `name`, so its alias reads off the field's own
+     * label or, failing that, off that type's name -- `all` being the one value naming no type.
+     * ⚠ Loose `!=`, as the derivation this replaces has it: under PHP 8 a type id of 0 is not
+     * `all`, and tightening the comparison is a behaviour change wearing a port's clothes.
+     */
+    private static function aliasSource(array $row, string $column, callable $typeName)
+    {
+        $name = $row['name'] ?? '';
+
+        if (strpos($column, 'select_') === 0 && $name != 'all') {
+            return empty($row['label']) ? $typeName($name) : $row['label'];
+        }
+
+        return $name;
+    }
+
+    /** ⚠ Loose in_array, matching the derivation this replaces. */
+    private static function aliasSuffix(string $column, array $row): string
+    {
+        if (strpos($column, 'select_') === 0) {
+            return strpos($column, 'select_multi_') === 0 ? '_ids' : '_id';
+        }
+
+        if (strpos($column, 'special_') === 0 && ($row['xtra'] ?? '')) {
+            return in_array($row['xtra'], self::getSpecialMultiXtras()) ? '_ids' : '_id';
+        }
+
+        return '';
+    }
+
+    /**
+     * A `tit_` or `func_` row: it renders on the form and backs no column, so it is not a name a
+     * record answers to. Every caller asking "which fields does a RECORD have" excludes these.
+     */
+    public static function isVirtualField(string $column): bool
+    {
+        return strpos($column, 'tit_') === 0 || strpos($column, 'func_') === 0;
+    }
+
+    /**
      * The xtra values of select_ fields which store types.
      *
      * @return array
