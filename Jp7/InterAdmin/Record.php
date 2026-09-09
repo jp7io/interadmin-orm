@@ -23,6 +23,16 @@ use RecordUrl;
  *
  * @method Query\FileQuery files()
  *
+ * @property int $id
+ * @property int $type_id
+ * @property int $parent_id
+ * @property int $parent_type_id
+ * @property ?string $varchar_key
+ * @property ?string $id_slug
+ * @property ?string $log
+ * @property string $log_user The records column; the protected static of this name is the audit actor.
+ * @property int $version
+ *
  * @method static mixed avg(string $column)
  * @method static static build(array $attributes = [])
  * @method static bool chunk(int $count, callable $callback)

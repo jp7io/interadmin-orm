@@ -40,6 +40,21 @@ use DB;
  * @property int|string $type_id This Type's primary key.
  * @property string $children The child Types, as the JSON the column stores -- see ChildUtil.
  * @property ?string $deleted_at When this Type was soft-deleted, NULL while it is live.
+ * @property string $fields
+ * @property string $name
+ * @property string $icon
+ * @property string $model_type_id
+ * @property string $editpage
+ * @property string $class_type
+ * @property string $template_view
+ * @property string $template_insert
+ * @property string $xtra_disabledchildren
+ * @property int $language
+ * @property int $single
+ * @property int $tags
+ * @property int $tags_list
+ * @property int $versions
+ * @property int $hits
  *
  * @method static Type build(array $attributes = [])
  * @method static bool chunk(int $count, callable $callback)
