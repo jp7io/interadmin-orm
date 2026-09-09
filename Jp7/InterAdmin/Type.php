@@ -48,6 +48,7 @@ use DB;
  * @property string $class_type
  * @property string $template_view
  * @property string $template_insert
+ * @property string $xtra_disabledfields
  * @property string $xtra_disabledchildren
  * @property int $language
  * @property int $single
