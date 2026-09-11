@@ -13,6 +13,7 @@ use App;
 use Cache;
 use RecordUrl;
 use DB;
+use Jp7\InterAdmin\Schema\TypeCache;
 
 /**
  * JP7's PHP Functions.
@@ -116,13 +117,11 @@ class Type extends RecordAbstract
     use \Jp7\Laravel\Routable;
 
     const TYPE_ID = 0;
-    const CACHE_TAG = 'type';
 
-    /**
-     * Seconds. Cache::remember() has taken seconds since Laravel 5.8, and the 5 written here
-     * meant five minutes; as five seconds it expired between two views of the same page.
-     */
-    const CACHE_TTL = 300;
+    /** The one store every Type writes, @see TypeCache. */
+    const CACHE_TAG = TypeCache::TAG;
+
+    const CACHE_TTL = TypeCache::TTL;
 
     private static $inheritedFields = [
         'class', 'class_type', 'icon', 'layout', 'layout_records', 'table_name',
