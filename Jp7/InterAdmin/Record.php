@@ -5,6 +5,7 @@ namespace Jp7\InterAdmin;
 use Jp7\InterAdmin\Relation\HasMany;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Jp7\InterAdmin\Field\RecordInterface;
 use Illuminate\Support\Str;
 use BadMethodCallException;
 use UnexpectedValueException;
@@ -107,7 +108,7 @@ use RecordUrl;
  *
  * @property ?string $deleted_at  When this row was soft-deleted, NULL while it is live
  */
-class Record extends RecordAbstract implements Arrayable, Jsonable
+class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterface
 {
     /**
      * Contains the Type, i.e. the record with an 'type_id' equal to this record´s 'type_id'.

@@ -13,6 +13,7 @@ use App;
 use Cache;
 use RecordUrl;
 use DB;
+use Jp7\InterAdmin\Field\TypeInterface;
 use Jp7\InterAdmin\Schema\TypeCache;
 
 /**
@@ -112,7 +113,7 @@ use Jp7\InterAdmin\Schema\TypeCache;
  * @method static Query\TypeQuery whereYear(string $column, mixed $operator, mixed $value = null)
  * @method static Query\TypeQuery with(string ...$relationships)
  */
-class Type extends RecordAbstract
+class Type extends RecordAbstract implements TypeInterface
 {
     use \Jp7\Laravel\Routable;
 
@@ -1487,6 +1488,17 @@ class Type extends RecordAbstract
     public function records()
     {
         return new Query($this);
+    }
+
+    /** records() already hands out what the field layer wants, @see TypeInterface::selectableRecords() */
+    public function selectableRecords()
+    {
+        return $this->records();
+    }
+
+    public function recordFromAttributes(array $attributes)
+    {
+        return Record::getInstance($attributes['id'] ?? 0, [], $this)->setRawAttributes($attributes);
     }
 
     /**
