@@ -583,6 +583,12 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
                 $className = (isset($options['default_namespace']) ? $options['default_namespace'] : static::DEFAULT_NAMESPACE).'Record';
             }
         }
+        // ⚠ A class off this tree is no binding either, forced or mapped: a query forces the bound one
+        // through `class`. Models\Record::boundClass()'s mirror, since an Eloquent model's constructor
+        // fill()s these attributes, which it guards, and throws.
+        if (!is_a($className, self::class, true) && class_exists($className)) {
+            $className = self::class;
+        }
 
         $instance = new $className(['id' => $id], $type);
         $instance->setDb($type->getDbName());

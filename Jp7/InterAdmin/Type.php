@@ -278,6 +278,12 @@ class Type extends RecordAbstract implements TypeInterface
                 }
             }
         }
+        // ⚠ As in Record::getInstance(): a class off this tree is no binding, forced or mapped. A
+        // consumer's default class or namespace can name Eloquent models, whose constructor takes
+        // attributes, not an id.
+        if (!is_a($classType, self::class, true) && class_exists($classType)) {
+            $classType = self::class;
+        }
         // Classe foi encontrada, instanciar o objeto
         $type = new $classType($type_id);
         if (!empty($options['db'])) {
