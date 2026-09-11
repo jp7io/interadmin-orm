@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Query\Expression;
 use Jp7\TryMethod;
+use Jp7\InterAdmin\Schema\RecordColumns;
 use Exception;
 use UnexpectedValueException;
 use DB;
@@ -189,31 +190,12 @@ abstract class RecordAbstract
      *
      * @return mixed
      */
-    /**
-     * The five system dates, which used to be spelled with the `date_` prefix and no longer are.
-     *
-     * ⚠ Every `date_` branch in this class has to consult this as well as the prefix, or the
-     * rename silently un-does what the prefix bought: a system date would stop being cast to a
-     * \Date, stop being normalised when absent, and - worst of the three - stop being writable as
-     * NULL, so a null publish_at would go in as '' and land on '0000-00-00'. That is ERROR 1292
-     * under the app's own modes and a silent re-zero without them.
-     *
-     * What the rename actually bought is that `date_` now means exactly one thing: a tenant field
-     * of date type. This list is the price, and it is a closed one - a tenant cannot add to it.
-     */
-    public const SYSTEM_DATES = ['created_at', 'updated_at', 'publish_at', 'expire_at', 'hit_at'];
-
-    /**
-     * ⚠ `deleted_at` is a date and is deliberately NOT in that list. The cast above turns a NULL
-     * into a \Date of the absent year, which is an OBJECT and therefore truthy - so every
-     * `!$record->deleted_at` would read as deleted, and `isPublished()` would return false for the
-     * whole table. It stays a nullable string, exactly as `Type::$deleted_at` has been since
-     * increment 4, and `$nullableAttributes` is what keeps it writable as NULL.
-     */
+    /** @see RecordColumns::SYSTEM_DATES, and why `deleted_at` is not one of them */
+    public const SYSTEM_DATES = RecordColumns::SYSTEM_DATES;
 
     public static function isDateColumn(string $name): bool
     {
-        return strpos($name, 'date_') === 0 || in_array($name, self::SYSTEM_DATES, true);
+        return RecordColumns::isDate($name);
     }
 
     protected function getMutatedAttribute($name, $value)
