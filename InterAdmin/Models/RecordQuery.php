@@ -23,6 +23,8 @@ final class RecordQuery extends Builder
 
     private ?Record $record = null;
 
+    private bool $typeOrdered = false;
+
     /** The record whose alias map and columns this query resolves against. */
     public function forRecord(Record $record): static
     {
@@ -46,6 +48,24 @@ final class RecordQuery extends Builder
     public function select($columns = ['*'])
     {
         return parent::select($this->selectList(is_array($columns) ? $columns : func_get_args()));
+    }
+
+    /**
+     * The type's own ORDER BY, after the caller's, for a class that opts in: tenant code written
+     * against the ORM leans on it at every first() and list. An aggregate never gets here with
+     * `aggregate` unset, which is the ORM's own exemption, and exists() never gets here at all.
+     */
+    protected function runSelect()
+    {
+        $typeId = $this->record ? ((int) $this->record->type_id ?: $this->record::boundTypeId()) : null;
+
+        if ($typeId && !$this->typeOrdered && !$this->aggregate && $this->record::ordersByType()
+            && $order = Type::find($typeId)?->recordsOrder()) {
+            $this->typeOrdered = true;
+            $this->orderByRaw($order);
+        }
+
+        return parent::runSelect();
     }
 
     /**
@@ -124,6 +144,26 @@ final class RecordQuery extends Builder
     public function pluck($column, $key = null)
     {
         return parent::pluck($this->columns($column), is_null($key) ? null : $this->columns($key));
+    }
+
+    /** FIND_IN_SET over a comma column, named by alias or by a `<select>.<column>` path as in where(). */
+    public function whereFindInSet($column, $value, string $boolean = 'and'): static
+    {
+        if ($path = $this->relationPath($column)) {
+            $sql = $this->relationPathSql($path);
+        } else {
+            $column = $this->columns($column);
+            $sql = $this->grammar->wrap($this->record && !str_contains($column, '.')
+                ? $this->record->getTable().'.'.$column
+                : $column);
+        }
+
+        return $this->whereRaw('FIND_IN_SET(?, '.$sql.')', [$value], $boolean);
+    }
+
+    public function orWhereFindInSet($column, $value): static
+    {
+        return $this->whereFindInSet($column, $value, 'or');
     }
 
     /**

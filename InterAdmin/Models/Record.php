@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use InterAdmin\Models\Relations\ChildRecords;
 use InterAdmin\Models\Relations\SelectMulti;
@@ -22,6 +23,7 @@ use Jp7\InterAdmin\Schema\PublishedFilterSql;
 use Jp7\InterAdmin\Schema\RecordColumns;
 use Jp7\InterAdmin\RecordClassMap;
 use Jp7\Laravel\RecordUrl;
+use Jp7\TryMethod;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
@@ -52,6 +54,14 @@ use UnexpectedValueException;
  */
 class Record extends Model implements RecordInterface
 {
+    use TryMethod;
+
+    /** The global scope narrowing a bound class to its own type's rows. */
+    public const BOUND_TYPE_SCOPE = 'interadminBoundType';
+
+    /** The global scope standing in for the ORM's automatic filter while its switch is on. */
+    public const PUBLISHED_SCOPE = 'interadminPublished';
+
     /** The ORM's getInterAdminsAdminAttributes(), rehoused: the columns every record has beside its fields. */
     public const ADMIN_COLUMNS = [
         'id_slug', 'id_string', 'parent_id', 'parent_type_id', 'publish_at', 'created_at', 'expire_at',
@@ -89,6 +99,17 @@ class Record extends Model implements RecordInterface
 
     private ?Type $typeModel = null;
 
+    /** A subclass naming a class here reads its `file_` columns as that object, as the ORM read every one. */
+    protected static ?string $fileFieldClass = null;
+
+    /** A subclass setting this has its queries end in its type's own ORDER BY, as every ORM query did. */
+    protected static bool $ordersByType = false;
+
+    public static function ordersByType(): bool
+    {
+        return static::$ordersByType;
+    }
+
     public function type()
     {
         return $this->belongsTo(Type::class, 'type_id');
@@ -97,6 +118,12 @@ class Record extends Model implements RecordInterface
     public function files()
     {
         return $this->hasMany(File::class, 'id');
+    }
+
+    /** The tags this record carries: `parent_id` is the tagged row, `type_id`/`id` what tags it. */
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class, 'parent_id', 'id');
     }
 
     /**
@@ -268,9 +295,19 @@ class Record extends Model implements RecordInterface
      */
     protected static function booted(): void
     {
-        static::addGlobalScope('interadminBoundType', function (Builder $query): void {
-            if ($typeId = static::boundTypeId()) {
-                $query->where($query->getModel()->getTable().'.type_id', $typeId);
+        static::addGlobalScope(self::BOUND_TYPE_SCOPE, function (Builder $query): void {
+            // A bound TEMPLATE names its own type: the one a class shared by several types means.
+            $model = $query->getModel();
+            if (static::class !== self::class
+                && $typeId = ((int) ($model->attributes['type_id'] ?? 0) ?: static::boundTypeId())) {
+                $query->where($model->getTable().'.type_id', $typeId);
+            }
+        });
+
+        // The ORM's filter is ON by default and read per query; the admin turns it off at boot.
+        static::addGlobalScope(self::PUBLISHED_SCOPE, function (Builder $query): void {
+            if (static::isPublishedFiltersEnabled()) {
+                $query->getModel()->applyPublishedFilter($query);
             }
         });
     }
@@ -792,7 +829,8 @@ class Record extends Model implements RecordInterface
     /**
      * Writes just these columns: no log line and no `updated_at`, the whole of what the ORM's
      * updateRawAttributes() did differently from save(). Keys arrive by alias or by column.
-     * ⚠ toBase(), or Eloquent's own update() stamps `updated_at` back on.
+     * ⚠ toBase(), or Eloquent's own update() stamps `updated_at` back on. And newModelQuery(), as
+     * save() uses: a global scope on this UPDATE makes a shared class's other types match nothing.
      * @param  array<string, mixed>  $values
      */
     public function updateWithoutLog(array $values): void
@@ -804,7 +842,7 @@ class Record extends Model implements RecordInterface
 
         $this->forceFill($values);
 
-        $this->newQuery()->toBase()
+        $this->newModelQuery()->toBase()
             ->where($this->getKeyName(), $this->getKey())
             ->update($values);
 
@@ -938,6 +976,35 @@ class Record extends Model implements RecordInterface
     #[Scope]
     protected function published(Builder $query): void
     {
+        // The switch's own copy goes first, or the predicate reaches MySQL twice.
+        $query->withoutGlobalScope(self::PUBLISHED_SCOPE);
+        $this->applyPublishedFilter($query);
+    }
+
+    /** The ORM's `published(false)`: this query without the switch's automatic filter. */
+    #[Scope]
+    protected function withUnpublished(Builder $query): void
+    {
+        $query->withoutGlobalScope(self::PUBLISHED_SCOPE);
+    }
+
+    /** The ORM's taggedWith(): tagged with every one of $tags, one EXISTS each. */
+    #[Scope]
+    protected function taggedWith(Builder $query, ...$tags): void
+    {
+        foreach ($tags as $tag) {
+            $query->whereHas('tags', fn (Builder $tagged) => $tagged->where($tag->getTagFilters()));
+        }
+    }
+
+    /** A record tags another as itself: its own id under its type. */
+    public function getTagFilters(): array
+    {
+        return ['id' => $this->id, 'type_id' => (int) $this->type_id];
+    }
+
+    private function applyPublishedFilter(Builder $query): void
+    {
         // getPublishedFilters(), not PublishedFilterSql::build(): it is where this model feeds the
         // builder the ORM's clock and the preview config.
         $table = $this->getConnection()->getTablePrefix().$this->getTable();
@@ -974,11 +1041,23 @@ class Record extends Model implements RecordInterface
         // a tenant may alias one column to ANOTHER column's name, so translating before looking
         // would answer the wrong slot, and a mutator named for the alias has to win or defining
         // one silently stops it being called.
-        if (array_key_exists($key, $this->attributes) || $this->hasFieldMutator('get', $key)) {
-            return parent::getAttribute($key);
-        }
+        $column = array_key_exists($key, $this->attributes) || $this->hasFieldMutator('get', $key)
+            ? $key
+            : $this->aliasToColumn($key);
+        $value = parent::getAttribute($column);
 
-        return parent::getAttribute($this->aliasToColumn($key));
+        return static::$fileFieldClass && $value && str_starts_with($column, 'file_') && !str_contains($column, '_text')
+            ? $this->fileField($column, $value)
+            : $value;
+    }
+
+    /** The ORM's FileField over one `file_` value, captioned by the `_text` column beside it. */
+    private function fileField(string $column, $url): object
+    {
+        $file = new (static::$fileFieldClass)($url, (string) parent::getAttribute($column.'_text'));
+        $file->setParent($this);
+
+        return $file;
     }
 
     public function setAttribute($key, $value)

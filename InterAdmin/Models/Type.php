@@ -327,14 +327,15 @@ class Type extends Model implements TypeInterface
     }
 
     /**
-     * A blank record of this type, on the type's own table -- a custom-table type's rows do not
-     * live in `records`, and ids being per-table would resolve a same-id row of another type.
+     * A blank record of this type on its own table, a custom-table type's ids being per-table.
      * ⚠ The type BEFORE any newQuery(): the query's alias layer reads it off the instance, and a
      * template carries no row, so without it a `where('<alias>')` reaches a column of that name.
+     * ⚠ The type's BOUND class where it has one, or a tenant scope called on records() finds no method.
      */
     public function recordTemplate(): Record
     {
-        $instance = (new Record)->setTable($this->recordsTable());
+        $class = Record::boundClass($this->type_id) ?? Record::class;
+        $instance = (new $class)->setTable($this->recordsTable());
         $instance->setRawAttributes(['type_id' => $this->type_id]);
 
         return $instance;
@@ -461,6 +462,62 @@ class Type extends Model implements TypeInterface
     public function childTypes(): HasMany
     {
         return $this->hasMany(self::class, 'parent_type_id', 'type_id');
+    }
+
+    /**
+     * The child types as the ORM's children() listed them: `position, name` order, and only the
+     * visible, undeleted ones while the published switch is on. ⚠ Not named children(): that is
+     * a column here, and a relation of the same name answers whichever a SELECT left out.
+     * @return HasMany<self, $this>
+     */
+    public function listedChildTypes(): HasMany
+    {
+        $relation = $this->childTypes()->orderBy('position')->orderBy('name');
+
+        if (Record::isPublishedFiltersEnabled()) {
+            $relation->where('visible', 1)->whereNull('deleted_at');
+        }
+
+        return $relation;
+    }
+
+    /**
+     * The types built on this one as their Modelo, keyed by id, and THIS type last, as the ORM's:
+     * so modelRecords() spans the model's own rows too. Visible and undeleted alone while the
+     * published switch is on, which its type queries honour.
+     * @return array<int, self>
+     */
+    public function getTypesUsingThisModel(): array
+    {
+        $query = self::query()->where('model_type_id', $this->type_id)->orderBy('type_id');
+
+        if (Record::isPublishedFiltersEnabled()) {
+            $query->where('visible', 1)->whereNull('deleted_at');
+        }
+
+        $types = $query->get()->keyBy('type_id')->all();
+        $types[$this->type_id] = $this;
+
+        return $types;
+    }
+
+    /**
+     * Every record of those types in one query, the ORM's TypelessQuery: on THIS type's template,
+     * so its tenant scopes answer, with the bound class's single-type scope lifted.
+     */
+    public function modelRecords(): Builder
+    {
+        $template = $this->recordTemplate();
+
+        return $template->newQuery()
+            ->withoutGlobalScope(Record::BOUND_TYPE_SCOPE)
+            ->whereIn($template->getTable().'.type_id', array_keys($this->getTypesUsingThisModel()));
+    }
+
+    /** A type tags a record as itself, `id` 0 marking the whole type rather than a record of it. */
+    public function getTagFilters(): array
+    {
+        return ['type_id' => $this->type_id, 'id' => 0];
     }
 
     /**
