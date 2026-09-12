@@ -24,6 +24,7 @@ use Jp7\InterAdmin\Schema\FieldDefinitions;
 use Jp7\InterAdmin\Schema\TypeCache;
 use Jp7\InterAdmin\Type as OrmType;
 use Jp7\InterAdmin\TypeClassMap;
+use Jp7\Laravel\RecordUrl;
 use Jp7\Laravel\RouterFacade;
 use BadMethodCallException;
 use InvalidArgumentException;
@@ -101,10 +102,13 @@ class Type extends Model implements TypeInterface
 
     /**
      * Memo over the class map, as Record's is. ⚠ array_key_exists, never ??=: null IS the answer
-     * for every type ci binds today, and ??= would retry the autoload once per call.
+     * for every unbound type, and ??= would retry the autoload once per call.
      * @var array<int, ?class-string<self>>
      */
     private static array $boundClasses = [];
+
+    /** The tenant's own Type, which an unbound type hydrates as: the ORM's Type::setDefaultClass(). */
+    private static ?string $defaultClass = null;
 
     /**
      * ⚠ The ORM's memo is PERSISTENT where this is per-request: `getInstance()` reads its row
@@ -151,6 +155,20 @@ class Type extends Model implements TypeInterface
     }
 
     /**
+     * Names the tenant's Type, as classes' boot does off `interadmin.namespace`: an unbound type then
+     * hydrates as it, and its records as `<DEFAULT_NAMESPACE>Record`. Null is the admin, which names none.
+     */
+    public static function setDefaultClass(?string $class): void
+    {
+        if ($class !== null && !is_subclass_of($class, self::class)) {
+            throw new InvalidArgumentException($class.' is not a '.self::class);
+        }
+
+        self::$defaultClass = $class;
+        self::$instances = [];
+    }
+
+    /**
      * Loads many rows in ONE query, INTO the identity map, and hands them back keyed by id.
      * ⚠ A bulk load that skips the map is worse than no bulk load: the caller holds the rows
      * while every collaborator resolving the same type through find() queries it again -- 33
@@ -187,8 +205,8 @@ class Type extends Model implements TypeInterface
 
     /**
      * The class `types.class_type` binds this type to, or null when it binds none usable.
-     * ⚠ A binding on the ORM's tree counts as NO binding, exactly as on Record: all 591 of
-     * ci's extend the ORM's Type, and one name cannot serve both object models.
+     * ⚠ A binding on the ORM's tree counts as NO binding, exactly as on Record: one class name
+     * cannot serve both object models.
      * @return class-string<self>|null
      */
     public static function boundClass(?int $typeId): ?string
@@ -228,7 +246,8 @@ class Type extends Model implements TypeInterface
     public function newFromBuilder($attributes = [], $connection = null)
     {
         $attributes = (array) $attributes;
-        $class = static::boundClass((int) ($attributes['type_id'] ?? 0));
+        $class = static::boundClass((int) ($attributes['type_id'] ?? 0))
+            ?? (static::class === self::class ? self::$defaultClass : null);
 
         // The bound instance resolves to ITSELF, which is what ends the recursion.
         return $class === null || $class === static::class
@@ -334,11 +353,22 @@ class Type extends Model implements TypeInterface
      */
     public function recordTemplate(): Record
     {
-        $class = Record::boundClass($this->type_id) ?? Record::class;
+        $class = Record::boundClass($this->type_id) ?? $this->defaultRecordClass();
         $instance = (new $class)->setTable($this->recordsTable());
         $instance->setRawAttributes(['type_id' => $this->type_id]);
 
         return $instance;
+    }
+
+    /**
+     * An unbound type's records: the ORM gave them `<DEFAULT_NAMESPACE>Record` of the type's own class,
+     * which only a tenant naming its default class reaches here -- the admin keeps Record.
+     */
+    private function defaultRecordClass(): string
+    {
+        $class = self::$defaultClass && defined(static::class.'::DEFAULT_NAMESPACE') ? constant(static::class.'::DEFAULT_NAMESPACE').'Record' : null;
+
+        return $class && is_subclass_of($class, Record::class) ? $class : Record::class;
     }
 
     public function records($parent_type_id = null, $parent_id = null)
@@ -488,6 +518,20 @@ class Type extends Model implements TypeInterface
     }
 
     /**
+     * The ORM's magic child: `$type->guiaPratico()` is the records of the listed child type slugged
+     * `guia-pratico`, a name tenant code calls. ⚠ Only a real child answers, so every other name
+     * still reaches Eloquent, the builder behind a static Type::where() included.
+     */
+    public function __call($method, $parameters)
+    {
+        if ($this->type_id && ($child = $this->listedChildTypes()->where('id_slug', Str::snake($method, '-'))->first())) {
+            return $child->records();
+        }
+
+        return parent::__call($method, $parameters);
+    }
+
+    /**
      * The types built on this one as their Modelo, keyed by id, and THIS type last, as the ORM's:
      * so modelRecords() spans the model's own rows too. Visible and undeleted alone while the
      * published switch is on, which its type queries honour.
@@ -510,14 +554,17 @@ class Type extends Model implements TypeInterface
     /**
      * Every record of those types in one query, the ORM's TypelessQuery: on THIS type's template,
      * so its tenant scopes answer, with the bound class's single-type scope lifted.
+     * ⚠ Each type's own id, never the keys: a tenant override answers a plain list (ci's
+     * SuperbannerModel), which the ORM's whereIn over the objects read the same way.
      */
     public function modelRecords(): Builder
     {
         $template = $this->recordTemplate();
+        $typeIds = array_map(fn (self $type) => $type->type_id, array_values($this->getTypesUsingThisModel()));
 
         return $template->newQuery()
             ->withoutGlobalScope(Record::BOUND_TYPE_SCOPE)
-            ->whereIn($template->getTable().'.type_id', array_keys($this->getTypesUsingThisModel()));
+            ->whereIn($template->getTable().'.type_id', $typeIds);
     }
 
     /** A type tags a record as itself, `id` 0 marking the whole type rather than a record of it. */
@@ -671,6 +718,25 @@ class Type extends Model implements TypeInterface
         }
 
         return RouterFacade::getRouteByTypeId($this->type_id, $action);
+    }
+
+    /**
+     * The ORM's getUrl(): RecordUrl::getTypeUrl() over this type. ⚠ Parameters undeclared, as the
+     * ORM's were: ci's EscolaTipo and PassagemAereaTipo override it with none.
+     */
+    public function getUrl()
+    {
+        return RecordUrl::getTypeUrl($this, ...func_get_args());
+    }
+
+    /**
+     * What a type's route variables are filled with: the record setParent() scoped it to, the ORM's rule.
+     * @param array<int, string> $variables
+     * @return array<int, Record>
+     */
+    public function getUrlParameters(array $variables): array
+    {
+        return $this->parentRecord ? [$this->parentRecord] : [];
     }
 
     /** Where this type's RECORDS live, prefixed. The ORM spells it getInterAdminsTableName(). */

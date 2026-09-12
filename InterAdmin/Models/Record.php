@@ -105,6 +105,9 @@ class Record extends Model implements RecordInterface
     /** A subclass setting this has its queries end in its type's own ORDER BY, as every ORM query did. */
     protected static bool $ordersByType = false;
 
+    /** Read by Model::newEloquentBuilder(), so every record query is one. */
+    protected static string $builder = RecordBuilder::class;
+
     public static function ordersByType(): bool
     {
         return static::$ordersByType;

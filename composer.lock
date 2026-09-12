@@ -67,12 +67,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jp7io/classes.git",
-                "reference": "67695c3bbed5fb93fd78d2228a357a6ac909b9c2"
+                "reference": "9085bd39d6431d2f6aed11cf3b4613286e3846a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7io/classes/zipball/67695c3bbed5fb93fd78d2228a357a6ac909b9c2",
-                "reference": "67695c3bbed5fb93fd78d2228a357a6ac909b9c2",
+                "url": "https://api.github.com/repos/jp7io/classes/zipball/9085bd39d6431d2f6aed11cf3b4613286e3846a7",
+                "reference": "9085bd39d6431d2f6aed11cf3b4613286e3846a7",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "source": "https://github.com/jp7io/classes/tree/eloquent-2026",
                 "issues": "https://github.com/jp7io/classes/issues"
             },
-            "time": "2026-09-12T18:47:55+00:00"
+            "time": "2026-09-12T20:34:23+00:00"
         }
     ],
     "packages-dev": [

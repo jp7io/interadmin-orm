@@ -111,6 +111,32 @@ final class RecordQuery extends Builder
         return parent::whereNotNull($this->columns($columns), ...$rest);
     }
 
+    /** whereDate() and its four siblings: Laravel builds these without passing through where(). */
+    protected function addDateBasedWhere($type, $column, $operator, $value, $boolean = 'and')
+    {
+        return parent::addDateBasedWhere($type, $this->columns($column), $operator, $value, $boolean);
+    }
+
+    public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
+    {
+        return parent::whereBetween($this->columns($column), $values, $boolean, $not);
+    }
+
+    /** ⚠ Both columns are names, and the two-argument form hands the second one in as the operator. */
+    public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
+    {
+        if (!is_array($first) && $second === null && $this->invalidOperator($operator)) {
+            [$second, $operator] = [$operator, '='];
+        }
+
+        return parent::whereColumn(is_array($first) ? $first : $this->columns($first), $operator, $this->columns($second), $boolean);
+    }
+
+    public function whereLike($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+    {
+        return parent::whereLike($this->columns($column), $value, $caseSensitive, $boolean, $not);
+    }
+
     public function orderBy($column, ...$rest)
     {
         return parent::orderBy($this->columns($column), ...$rest);
@@ -299,6 +325,10 @@ final class RecordQuery extends Builder
             ->where('relation_path.type_id', $target->type_id)
             ->where('relation_path.'.$targetColumn, $operator, $value);
 
+        if ($published = $this->publishedPathSql($target)) {
+            $matches->whereRaw($published);
+        }
+
         return parent::whereIn($column, $matches, $rest[2] ?? 'and');
     }
 
@@ -307,10 +337,29 @@ final class RecordQuery extends Builder
     {
         [$column, $target, $targetColumn] = $path;
         $grammar = $this->grammar;
+        $published = $this->publishedPathSql($target);
 
         return '(select '.$grammar->wrap('relation_path.'.$targetColumn)
             .' from '.$grammar->wrapTable($target->recordsTable().' as relation_path')
             .' where '.$grammar->wrap('relation_path.id').' = '.$grammar->wrap($this->record->getTable().'.'.$column)
-            .' and '.$grammar->wrap('relation_path.type_id').' = '.(int) $target->type_id.')';
+            .' and '.$grammar->wrap('relation_path.type_id').' = '.(int) $target->type_id
+            .($published ? ' and '.$published : '').')';
+    }
+
+    /**
+     * The target's published predicates while the switch is on: the ORM joined a path's record with
+     * them in the ON, so a row pointing at an unpublished one matched nothing. ⚠ On the PREFIXED
+     * alias, which is what the grammar wraps `relation_path` into; these predicates are raw.
+     */
+    private function publishedPathSql(Type $target): ?string
+    {
+        if (!Record::isPublishedFiltersEnabled()) {
+            return null;
+        }
+
+        $prefix = $this->grammar->getTablePrefix();
+        $sql = Record::getPublishedFilters($prefix.$target->recordsTable(), $prefix.'relation_path');
+
+        return $sql === null ? null : preg_replace('/ AND $/', '', $sql);
     }
 }
