@@ -481,6 +481,12 @@ class Type extends Model implements TypeInterface
         return $relation;
     }
 
+    /** classes' Routable::getChildrenMenu(), which the ORM Type used. ⚠ Untyped: ci's Ci\Type overrides it. */
+    public function getChildrenMenu()
+    {
+        return $this->listedChildTypes()->where('menu', true)->get();
+    }
+
     /**
      * The types built on this one as their Modelo, keyed by id, and THIS type last, as the ORM's:
      * so modelRecords() spans the model's own rows too. Visible and undeleted alone while the
