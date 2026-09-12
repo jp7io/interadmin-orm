@@ -11,10 +11,10 @@
     ],
     "require": {
         "php": "^8.5",
-        "doctrine/sql-formatter": "^1.5"
+        "doctrine/sql-formatter": "^1.5",
+        "jp7io/classes": "dev-eloquent-2026 as dev-main"
     },
     "require-dev": {
-        "jp7io/classes": "dev-main",
         "illuminate/support": "^13.0",
         "illuminate/database": "^13.0",
         "illuminate/cache": "^13.0",

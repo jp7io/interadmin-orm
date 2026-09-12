@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e4522f14e552c8501b2aa1e64f2e52dd",
+    "content-hash": "a0847e9aa8375ec9280ff346e508caa3",
     "packages": [
         {
             "name": "doctrine/sql-formatter",
@@ -60,6 +60,46 @@
                 "source": "https://github.com/doctrine/sql-formatter/tree/1.5.4"
             },
             "time": "2026-02-08T16:21:46+00:00"
+        },
+        {
+            "name": "jp7io/classes",
+            "version": "dev-eloquent-2026",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jp7io/classes.git",
+                "reference": "5905cea8aa833504048cb2bd9dd3d4f01d2900b7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jp7io/classes/zipball/5905cea8aa833504048cb2bd9dd3d4f01d2900b7",
+                "reference": "5905cea8aa833504048cb2bd9dd3d4f01d2900b7",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "illuminate/support": "^13.0",
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jp7\\": "Jp7/"
+                },
+                "files": [
+                    "Jp7/Laravel/functions.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "JP7 Classes",
+            "support": {
+                "source": "https://github.com/jp7io/classes/tree/eloquent-2026",
+                "issues": "https://github.com/jp7io/classes/issues"
+            },
+            "time": "2026-09-11T19:38:21+00:00"
         }
     ],
     "packages-dev": [
@@ -968,47 +1008,6 @@
                 "source": "https://github.com/laravel/framework"
             },
             "time": "2026-08-10T13:19:41+00:00"
-        },
-        {
-            "name": "jp7io/classes",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jp7io/classes.git",
-                "reference": "bc3d69dc2ed308bed3fd2bfa9cda015085b514d4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jp7io/classes/zipball/bc3d69dc2ed308bed3fd2bfa9cda015085b514d4",
-                "reference": "bc3d69dc2ed308bed3fd2bfa9cda015085b514d4",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.5"
-            },
-            "require-dev": {
-                "illuminate/support": "^13.0",
-                "phpunit/phpunit": "^12.5"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Jp7\\": "Jp7/"
-                },
-                "files": [
-                    "Jp7/Laravel/functions.php"
-                ]
-            },
-            "license": [
-                "proprietary"
-            ],
-            "description": "JP7 Classes",
-            "support": {
-                "source": "https://github.com/jp7io/classes/tree/main",
-                "issues": "https://github.com/jp7io/classes/issues"
-            },
-            "time": "2026-09-08T21:44:14+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -4138,7 +4137,14 @@
             "time": "2026-04-26T05:33:54+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "jp7io/classes",
+            "version": "dev-eloquent-2026",
+            "alias": "dev-main",
+            "alias_normalized": "dev-main"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "jp7io/classes": 20
