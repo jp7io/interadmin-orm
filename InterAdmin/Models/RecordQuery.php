@@ -296,7 +296,8 @@ final class RecordQuery extends Builder
             return null;
         }
 
-        $type = Type::find((int) $this->record->type_id);
+        // ⚠ A static call's template carries no type_id: its type is the bound class's, as in runSelect().
+        $type = Type::find((int) $this->record->type_id ?: (int) $this->record::boundTypeId());
         $definitions = $type?->fieldDefinitions() ?? [];
         $column = $this->record->aliasToColumn($match[1]);
         // Or the RELATION's name, as graphql's FilterJSON and the ORM's joins spell it: `evento.nome`.
