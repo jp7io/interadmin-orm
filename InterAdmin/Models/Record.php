@@ -1160,6 +1160,22 @@ class Record extends Model implements RecordInterface
     }
 
     /**
+     * ⚠ A field relationship or declared child answers BEFORE a real method of that name, the order
+     * Jp7\InterAdmin\Record::&__get() reads in, which never calls one: InterMail renders its
+     * `special_variation` through the static Email::variation, and Eloquent called that as the relation.
+     */
+    protected function getRelationshipFromMethod($method)
+    {
+        $relation = Relation::withConstraintsForNestedRelation(fn () => $this->fieldRelation($method));
+
+        if (!$relation) {
+            return parent::getRelationshipFromMethod($method);
+        }
+
+        return tap($relation->getResults(), fn ($results) => $this->setRelation($method, $results));
+    }
+
+    /**
      * ⚠ A record serializes its COLUMNS and never its relations: the ORM's own toArray() is
      * getAliasedAttributes() and nothing else, and Eloquent's bag is where one lives now.
      * @return array<string, mixed>
