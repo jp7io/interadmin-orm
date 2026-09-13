@@ -53,6 +53,18 @@ class ChildRecords extends HasMany
         return $this->childType->buildRecord(array_merge($this->parentColumns(), $attributes));
     }
 
+    /**
+     * The ORM's `create()`, which is build() then save(). ⚠ Eloquent's own bypasses make(): it
+     * fill()s a model with no $fillable, which throws, and would skip the insert defaults.
+     */
+    public function create(array $attributes = [])
+    {
+        return tap($this->make($attributes), function (Record $record) {
+            $record->save();
+            $this->applyInverseRelationToModel($record);
+        });
+    }
+
     protected function setForeignAttributesForCreate(Model $model)
     {
         parent::setForeignAttributesForCreate($model);
