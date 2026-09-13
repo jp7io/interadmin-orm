@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use InterAdmin\Models\Relations\ChildRecords;
 use InterAdmin\Models\Relations\SelectMulti;
@@ -124,10 +123,13 @@ class Record extends Model implements RecordInterface
         return $this->hasMany(File::class, 'id');
     }
 
-    /** The tags this record carries: `parent_id` is the tagged row, `type_id`/`id` what tags it. */
-    public function tags(): HasMany
+    /**
+     * The tags table's rows for this record, only where no relationship or child claims the name:
+     * the ORM's whereHas() asked those first, and InterMail's e-mail products declare Tags.
+     */
+    public function tags(): Relation
     {
-        return $this->hasMany(Tag::class, 'parent_id', 'id');
+        return $this->fieldRelation('tags') ?? $this->hasMany(Tag::class, 'parent_id', 'id');
     }
 
     /**
