@@ -28,6 +28,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use UnexpectedValueException;
+use ReflectionClass;
 
 /**
  * ⚠ SYSTEM columns only. Which `varchar_*`/`bool_*`/`date_*` slots a type declares is DATA, and
@@ -253,7 +254,13 @@ class Record extends Model implements RecordInterface
         // is generated `extends <tenant>\Record`, so the whole tenant tree changes tree with its
         // base class. It answers false for an undeclarable name without a fatal, so neither
         // class_exists() nor isDeclarable() adds anything: disarming each of those bit nothing.
-        return $class && is_subclass_of($class, self::class) ? $class : null;
+        if (!$class || !is_subclass_of($class, self::class)) {
+            return null;
+        }
+
+        // ⚠ The CANONICAL name: an aliased one (the admin's `Ci_*`) never equals static::class, so
+        // newFromBuilder() kept hydrating through the alias until memory ran out.
+        return (new ReflectionClass($class))->getName();
     }
 
     public static function forgetBoundClasses(): void
@@ -1192,18 +1199,19 @@ class Record extends Model implements RecordInterface
     /**
      * ⚠ `parent_type_id` as well as `parent_id`: on the shared table the child type's rows hang
      * off every type that declares it, so the id alone lists another parent's children too.
+     * ChildRecords applies it per path: a list of parents can span several types.
      */
     private function childRelation(Type $type): ChildRecords
     {
         $related = $type->recordTemplate();
         $table = $related->getTable();
 
-        $query = $related->newQuery()
-            ->where($table.'.type_id', $type->type_id)
-            ->where($table.'.parent_type_id', $this->typeId())
-            ->orderByRaw($type->recordsOrder());
+        $query = $related->newQuery()->where($table.'.type_id', $type->type_id);
+        /** @var RecordQuery $base */
+        $base = $query->getQuery();
+        $base->orderByType($type->recordsOrder());
 
-        return new ChildRecords($query, $this->keylessWhenUnsaved(), $table.'.parent_id', 'id', $type);
+        return new ChildRecords($query, $this->keylessWhenUnsaved(), $table.'.parent_id', 'id', $type, $this->typeId());
     }
 
     /**
@@ -1234,9 +1242,10 @@ class Record extends Model implements RecordInterface
         $table = $template->getTable();
         $column = $this->aliasToColumn($name.($multi ? '_ids' : '_id'));
 
-        $query = $template->newQuery()
-            ->where($table.'.type_id', $related->type_id)
-            ->orderByRaw($related->recordsOrder());
+        $query = $template->newQuery()->where($table.'.type_id', $related->type_id);
+        /** @var RecordQuery $base */
+        $base = $query->getQuery();
+        $base->orderByType($related->recordsOrder());
 
         return $multi
             ? new SelectMulti($query, $this, $column)

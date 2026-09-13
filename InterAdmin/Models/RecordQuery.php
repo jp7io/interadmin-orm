@@ -59,13 +59,39 @@ final class RecordQuery extends Builder
     {
         $typeId = $this->record ? ((int) $this->record->type_id ?: $this->record::boundTypeId()) : null;
 
-        if ($typeId && !$this->typeOrdered && !$this->aggregate && $this->record::ordersByType()
+        // ⚠ Nor on a GROUP BY past the key: ONLY_FULL_GROUP_BY refuses an ORDER BY outside the group
+        // and accepts one the primary key determines, the `GROUP BY id` the ORM deduped its joins with.
+        if ($typeId && !$this->typeOrdered && !$this->aggregate && !$this->groupedPastTheKey() && $this->record::ordersByType()
             && $order = Type::find($typeId)?->recordsOrder()) {
+            $this->orderByType($order);
+        }
+
+        return parent::runSelect();
+    }
+
+    private function groupedPastTheKey(): bool
+    {
+        $key = $this->record?->getKeyName() ?? 'id';
+        $keys = [$key, $this->record?->qualifyColumn($key)];
+
+        foreach ((array) $this->groups as $group) {
+            if (!in_array($group, $keys, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** The type's own ORDER BY, once: runSelect() adds it for a class that opts in, selectableRecords() for any. */
+    public function orderByType(string $order): static
+    {
+        if (!$this->typeOrdered) {
             $this->typeOrdered = true;
             $this->orderByRaw($order);
         }
 
-        return parent::runSelect();
+        return $this;
     }
 
     /**
@@ -137,8 +163,15 @@ final class RecordQuery extends Builder
         return parent::whereLike($this->columns($column), $value, $caseSensitive, $boolean, $not);
     }
 
+    /** A `<select>.<column>` path sorts through the correlated subquery where() and orderByRaw() use. */
     public function orderBy($column, ...$rest)
     {
+        if ($path = $this->relationPath($column)) {
+            $direction = strtolower((string) ($rest[0] ?? 'asc')) === 'desc' ? 'desc' : 'asc';
+
+            return parent::orderByRaw($this->relationPathSql($path).' '.$direction);
+        }
+
         return parent::orderBy($this->columns($column), ...$rest);
     }
 

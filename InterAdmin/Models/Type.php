@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 use InterAdmin\Models\TypeFillable;
 use InterAdmin\Models\Field;
@@ -204,6 +205,16 @@ class Type extends Model implements TypeInterface
     }
 
     /**
+     * ⚠ Whether a row hydrates as the class `types.class_type` binds. A host app's own role class
+     * answers false: the admin reads its users type through UserType, and a tenant's bound class
+     * (ci's Ciintranet\UsuarioTipo) carries none of that API.
+     */
+    protected static function hydratesAsBound(): bool
+    {
+        return true;
+    }
+
+    /**
      * The class `types.class_type` binds this type to, or null when it binds none usable.
      * ⚠ A binding on the ORM's tree counts as NO binding, exactly as on Record: one class name
      * cannot serve both object models.
@@ -229,7 +240,13 @@ class Type extends Model implements TypeInterface
 
         // is_subclass_of() AUTOLOADS, which is what declares the generated markers. Record's
         // twin carries why neither class_exists() nor isDeclarable() adds anything to it.
-        return $class && is_subclass_of($class, self::class) ? $class : null;
+        if (!$class || !is_subclass_of($class, self::class)) {
+            return null;
+        }
+
+        // ⚠ The CANONICAL name: an aliased one (the admin's `Ci_*`) never equals static::class, so
+        // newFromBuilder() kept hydrating through the alias until memory ran out.
+        return (new ReflectionClass($class))->getName();
     }
 
     public static function forgetBoundClasses(): void
@@ -246,8 +263,8 @@ class Type extends Model implements TypeInterface
     public function newFromBuilder($attributes = [], $connection = null)
     {
         $attributes = (array) $attributes;
-        $class = static::boundClass((int) ($attributes['type_id'] ?? 0))
-            ?? (static::class === self::class ? self::$defaultClass : null);
+        $class = !static::hydratesAsBound() ? null : (static::boundClass((int) ($attributes['type_id'] ?? 0))
+            ?? (static::class === self::class ? self::$defaultClass : null));
 
         // The bound instance resolves to ITSELF, which is what ends the recursion.
         return $class === null || $class === static::class
@@ -435,7 +452,9 @@ class Type extends Model implements TypeInterface
     public function blankRecord(): Record
     {
         $record = $this->recordTemplate()->newInstance();
-        $record->setRawAttributes(['type_id' => $this->type_id, 'id' => 0]);
+        // ⚠ Merged, as the ORM's build() merged: a tenant constructor defaults a new row (ci's Fale
+        // com a CI contact sets its `procedencia`), and setRawAttributes() alone REPLACES.
+        $record->setRawAttributes(['type_id' => $this->type_id, 'id' => 0] + $record->getAttributes());
 
         return $record;
     }
@@ -520,15 +539,15 @@ class Type extends Model implements TypeInterface
     /**
      * The ORM's magic child: `$type->guiaPratico()` is the records of the listed child type slugged
      * `guia-pratico`, a name tenant code calls. ⚠ Only a real child answers, so every other name
-     * still reaches Eloquent, the builder behind a static Type::where() included.
+     * still reaches Eloquent, the builder behind a static Type::where() included. ⚠ Two children can
+     * share a slug (ci's 382 has two `guia-pratico`); the ORM keyed them by it, so the LAST answers.
      */
     public function __call($method, $parameters)
     {
-        if ($this->type_id && ($child = $this->listedChildTypes()->where('id_slug', Str::snake($method, '-'))->first())) {
-            return $child->records();
-        }
+        /** @var self|null $child */
+        $child = $this->type_id ? $this->listedChildTypes()->where('id_slug', Str::snake($method, '-'))->orderBy('type_id')->get()->last() : null;
 
-        return parent::__call($method, $parameters);
+        return $child ? $child->records() : parent::__call($method, $parameters);
     }
 
     /**
@@ -873,7 +892,8 @@ class Type extends Model implements TypeInterface
         $relation = $this->everyRecord();
         $order = $this->recordsOrder();
 
-        $relation->getQuery()->getQuery()->beforeQuery(fn (QueryBuilder $query) => $query->orderByRaw($order));
+        // ⚠ beforeQuery() runs as the SQL compiles, AFTER runSelect() ordered a class that opts in.
+        $relation->getQuery()->getQuery()->beforeQuery(fn (RecordQuery $query) => $query->orderByType($order));
 
         return $relation;
     }
