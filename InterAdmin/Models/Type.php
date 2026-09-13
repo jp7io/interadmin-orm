@@ -186,6 +186,12 @@ class Type extends Model implements TypeInterface
         self::$instances = [];
     }
 
+    /** What setDefaultClass() named; classes' DynamicLoader extends generated classes into its namespace. */
+    public static function defaultClass(): ?string
+    {
+        return self::$defaultClass;
+    }
+
     /**
      * Loads many rows in ONE query, INTO the identity map, and hands them back keyed by id.
      * ⚠ A bulk load that skips the map is worse than no bulk load: the caller holds the rows
