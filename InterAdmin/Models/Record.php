@@ -190,6 +190,9 @@ class Record extends Model implements RecordInterface
     /** @var array<int, array<string, int>> Models\Type::childTypeIds(), memoised as the two above */
     private static array $childrenByType = [];
 
+    /** @var array<int, true> the types whose childTypeIds() is running right now, see childType() */
+    private static array $listingChildren = [];
+
     public static function forgetTypeDerivations(): void
     {
         self::$aliasesByType = [];
@@ -1213,12 +1216,31 @@ class Record extends Model implements RecordInterface
         return ($type = $this->childType($name)) ? $this->childRelation($type) : null;
     }
 
-    /** ⚠ ucfirst(), as `_findChild()` has it: the map is studly and the call site is camel. */
+    /**
+     * ⚠ ucfirst(), as `_findChild()` has it: the map is studly and the call site is camel.
+     * ⚠ No child while the type is still LISTING them: InterMail's EmailType lists its children by
+     * loading an e-mail, every query on which asks isRelation('type_id'), so the list recursed
+     * into itself until memory ran out. A type's own children cannot help compute them.
+     */
     private function childType(string $method): ?Type
     {
-        $children = self::$childrenByType[(int) $this->typeId()] ??= $this->typeModel()?->childTypeIds() ?? [];
+        $typeId = (int) $this->typeId();
 
-        return self::relatedType($children[ucfirst($method)] ?? null);
+        if (!isset(self::$childrenByType[$typeId])) {
+            if (isset(self::$listingChildren[$typeId])) {
+                return null;
+            }
+
+            self::$listingChildren[$typeId] = true;
+
+            try {
+                self::$childrenByType[$typeId] = $this->typeModel()?->childTypeIds() ?? [];
+            } finally {
+                unset(self::$listingChildren[$typeId]);
+            }
+        }
+
+        return self::relatedType(self::$childrenByType[$typeId][ucfirst($method)] ?? null);
     }
 
     /**
