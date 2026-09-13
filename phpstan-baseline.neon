@@ -1,24 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Access to an undefined static property static\(Jp7\\InterAdmin\\BaseClassMap\)\:\:\$instance\.$#'
-			identifier: staticProperty.notFound
-			count: 2
-			path: Jp7/InterAdmin/BaseClassMap.php
-
-		-
-			message: '#^Access to undefined constant static\(Jp7\\InterAdmin\\BaseClassMap\)\:\:CACHE_KEY\.$#'
-			identifier: classConstant.notFound
-			count: 3
-			path: Jp7/InterAdmin/BaseClassMap.php
-
-		-
-			message: '#^Access to undefined constant static\(Jp7\\InterAdmin\\BaseClassMap\)\:\:CLASS_ATTRIBUTE\.$#'
-			identifier: classConstant.notFound
-			count: 1
-			path: Jp7/InterAdmin/BaseClassMap.php
-
-		-
 			message: '#^Access to an undefined property Jp7\\InterAdmin\\FileRecord\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2

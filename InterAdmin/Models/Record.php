@@ -17,10 +17,9 @@ use InterAdmin\Models\Type;
 use InterAdmin\Models\File;
 use Illuminate\Routing\Route;
 use Jp7\InterAdmin\Field\RecordInterface;
-use Jp7\InterAdmin\Record as OrmRecord;
 use Jp7\InterAdmin\Schema\PublishedFilterSql;
+use Jp7\InterAdmin\Schema\RecordClassMap;
 use Jp7\InterAdmin\Schema\RecordColumns;
-use Jp7\InterAdmin\RecordClassMap;
 use Jp7\Laravel\RecordUrl;
 use Jp7\TryMethod;
 use InvalidArgumentException;
@@ -96,6 +95,15 @@ class Record extends Model implements RecordInterface
 
     /** The bound type's own records table, so a custom-table class does not query `records`. */
     private static array $boundTables = [];
+
+    /**
+     * The context a save and the calendar read. ⚠ ONE copy, the ORM's Record forwarding here:
+     * ci-intranet and intermail set it, and a second would stamp a save with whoever it last heard of.
+     */
+    private static string $logUser = 'site';
+    private static string $logAction = '';
+    private static bool $publishedFiltersEnabled = true;
+    private static ?int $timestamp = null;
 
     private ?Type $typeModel = null;
 
@@ -756,44 +764,60 @@ class Record extends Model implements RecordInterface
             && (!$this->expire_at || $this->expire_at->getTimestamp() >= self::getTimestamp());
     }
 
-    /**
-     * The process-wide context a save and the calendar read: who and what a `log` line names, the
-     * clock, and the published-filter switch. ⚠ Each SLOT stays the ORM's static -- ci-intranet and
-     * intermail set it directly, so a copy here would stamp a save with whoever it last heard of.
-     */
     public static function getLogUser(): string
     {
-        return (string) OrmRecord::getLogUser();
+        return self::$logUser;
     }
 
+    /** Each setter answers what it replaced, which the caller puts back when it is done. */
     public static function setLogUser(string $user): string
     {
-        return (string) OrmRecord::setLogUser($user);
+        $previous = self::$logUser;
+        self::$logUser = $user;
+
+        return $previous;
     }
 
     public static function getLogAction(): string
     {
-        return (string) OrmRecord::getLogAction();
+        return self::$logAction;
     }
 
     public static function setLogAction(string $action): string
     {
-        return (string) OrmRecord::setLogAction($action);
+        $previous = self::$logAction;
+        self::$logAction = $action;
+
+        return $previous;
     }
 
     public static function getTimestamp(): int
     {
-        return (int) OrmRecord::getTimestamp();
+        return self::$timestamp ?? time();
+    }
+
+    public static function hasTimestamp(): bool
+    {
+        return self::$timestamp !== null;
+    }
+
+    /** Freezes the clock the calendar reads; null hands it back to time(). */
+    public static function setTimestamp(?int $time): void
+    {
+        self::$timestamp = $time;
     }
 
     public static function setPublishedFiltersEnabled(bool $enabled): bool
     {
-        return OrmRecord::setPublishedFiltersEnabled($enabled);
+        $previous = self::$publishedFiltersEnabled;
+        self::$publishedFiltersEnabled = $enabled;
+
+        return $previous;
     }
 
     public static function isPublishedFiltersEnabled(): bool
     {
-        return (bool) OrmRecord::isPublishedFiltersEnabled();
+        return self::$publishedFiltersEnabled;
     }
 
     /** The ORM's clock and the preview config, into the one builder both ORMs call. */
@@ -807,7 +831,6 @@ class Record extends Model implements RecordInterface
     /**
      * ⚠ The log line is FROZEN at `d/m/Y H:i` whatever the locale: it goes INTO the `log` column
      * and Record\LogHistory parses it back out, so a localized entry corrupts existing history.
-     * The actor and the action come off the ORM's own statics rather than a second copy of them.
      */
     public function save(array $options = [])
     {

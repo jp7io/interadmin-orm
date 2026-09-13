@@ -3,6 +3,7 @@
 namespace Jp7\InterAdmin;
 
 use Jp7\InterAdmin\Relation\HasMany;
+use InterAdmin\Models\Record as EloquentRecord;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Jp7\InterAdmin\Field\RecordInterface;
@@ -138,26 +139,6 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
 
     protected $relations = [];
 
-    /**
-     * Username to be inserted in the log when saving this record.
-     *
-     * @var string
-     */
-    protected static $log_user = 'site';
-
-    protected static $log_action = '';
-    /**
-     * If TRUE the records will be filtered using the method getPublishedFilters().
-     *
-     * @var bool
-     */
-    protected static $publish_filters_enabled = true;
-    /**
-     * Timestamp for testing filters with a different date.
-     *
-     * @var int
-     */
-    protected static $timestamp;
     /**
      * @var bool
      */
@@ -953,8 +934,8 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
 
         // log
         $this->log = date('d/m/Y H:i').' - '.
-            self::$log_user.' - '.
-            (self::$log_action ? self::$log_action.' - ' : '').
+            self::getLogUser().' - '.
+            (self::getLogAction() ? self::getLogAction().' - ' : '').
             Request::ip().
             chr(13).
             $this->log;
@@ -1023,45 +1004,33 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
     }
 
     /**
-     * Returns $log_user. If $log_user is NULL, returns 'site'.
-     *
-     * @see Record::$log_user
+     * The context statics are Models\Record's, the one copy both object models read.
      *
      * @return string
      */
     public static function getLogUser()
     {
-        return self::$log_user;
+        return EloquentRecord::getLogUser();
     }
 
     /**
-     * Sets $log_user and returns the old value.
-     *
-     * @see     Record::$log_user
-     *
      * @param string $log_user
      *
      * @return string Old value.
      */
     public static function setLogUser($log_user)
     {
-        $old_user = self::$log_user;
-        self::$log_user = $log_user;
-
-        return $old_user;
+        return EloquentRecord::setLogUser((string) $log_user);
     }
 
     public static function getLogAction()
     {
-        return self::$log_action;
+        return EloquentRecord::getLogAction();
     }
 
     public static function setLogAction($log_action)
     {
-        $old_action = self::$log_action;
-        self::$log_action = $log_action;
-
-        return $old_action;
+        return EloquentRecord::setLogAction((string) $log_action);
     }
 
     /**
@@ -1073,10 +1042,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
      */
     public static function setPublishedFiltersEnabled($bool)
     {
-        $oldValue = self::$publish_filters_enabled;
-        self::$publish_filters_enabled = (bool) $bool;
-
-        return $oldValue;
+        return EloquentRecord::setPublishedFiltersEnabled((bool) $bool);
     }
     /**
      * Returns TRUE if published filters are enabled.
@@ -1085,7 +1051,7 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
      */
     public static function isPublishedFiltersEnabled()
     {
-        return self::$publish_filters_enabled;
+        return EloquentRecord::isPublishedFiltersEnabled();
     }
     public static function debugLazyLoading(bool $bool = true) {
         self::$lazy_loading_debug = $bool;
@@ -1100,15 +1066,15 @@ class Record extends RecordAbstract implements Arrayable, Jsonable, RecordInterf
 
     public static function hasTimestamp()
     {
-        return isset(self::$timestamp);
+        return EloquentRecord::hasTimestamp();
     }
     public static function getTimestamp()
     {
-        return isset(self::$timestamp) ? self::$timestamp : time();
+        return EloquentRecord::getTimestamp();
     }
     public static function setTimestamp($time)
     {
-        self::$timestamp = $time;
+        EloquentRecord::setTimestamp($time === null ? null : (int) $time);
     }
     /**
      * Merges two option arrays.

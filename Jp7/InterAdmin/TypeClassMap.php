@@ -2,12 +2,13 @@
 
 namespace Jp7\InterAdmin;
 
-class TypeClassMap extends BaseClassMap
-{
-    protected static $instance;
+use Jp7\InterAdmin\Schema\TypeClassMap as SchemaTypeClassMap;
 
-    // Keeps the pre-recase spelling on purpose: this is a live cache key, not a class
-    // reference, and changing it orphans every tenant's entry rather than moving it.
-    const CACHE_KEY = 'Interadmin.TypeClassMap';
-    const CLASS_ATTRIBUTE = 'class_type';
+/** The ORM's name for jp7io/classes' type class map, which it hands out: one map, never a second. */
+class TypeClassMap
+{
+    public static function getInstance(): SchemaTypeClassMap
+    {
+        return SchemaTypeClassMap::getInstance();
+    }
 }

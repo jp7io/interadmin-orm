@@ -2,12 +2,13 @@
 
 namespace Jp7\InterAdmin;
 
-class RecordClassMap extends BaseClassMap
-{
-    protected static $instance;
+use Jp7\InterAdmin\Schema\RecordClassMap as SchemaRecordClassMap;
 
-    // Keeps the pre-recase spelling on purpose: this is a live cache key, not a class
-    // reference, and changing it orphans every tenant's entry rather than moving it.
-    const CACHE_KEY = 'Interadmin.RecordClassMap';
-    const CLASS_ATTRIBUTE = 'class';
+/** The ORM's name for jp7io/classes' record class map, which it hands out: one map, never a second. */
+class RecordClassMap
+{
+    public static function getInstance(): SchemaRecordClassMap
+    {
+        return SchemaRecordClassMap::getInstance();
+    }
 }

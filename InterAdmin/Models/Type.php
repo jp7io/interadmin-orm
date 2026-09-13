@@ -23,8 +23,7 @@ use Jp7\InterAdmin\Field\TypeInterface;
 use Jp7\InterAdmin\Schema\ChildDeclarations;
 use Jp7\InterAdmin\Schema\FieldDefinitions;
 use Jp7\InterAdmin\Schema\TypeCache;
-use Jp7\InterAdmin\Type as OrmType;
-use Jp7\InterAdmin\TypeClassMap;
+use Jp7\InterAdmin\Schema\TypeClassMap;
 use Jp7\Laravel\RecordUrl;
 use Jp7\Laravel\RouterFacade;
 use BadMethodCallException;
@@ -916,11 +915,16 @@ class Type extends Model implements TypeInterface
         return is_numeric($id) ? Type::find((int) $id) : null;
     }
 
-    /** A type that is gone, as the ORM's getInstance() answers it: its id and nothing else. */
+    /**
+     * A type that is gone, as the ORM's getInstance() answers it: its id and nothing else.
+     * ⚠ `exists`, so a relation off it LIMITs plainly: to Laravel an unsaved parent is an
+     * eager-load template, and its per-parent window limit repeats `id` in a derived table.
+     */
     public static function blank(mixed $id): self
     {
         $type = new self;
         $type->setRawAttributes(['type_id' => $id]);
+        $type->exists = true;
 
         return $type;
     }
@@ -962,18 +966,13 @@ class Type extends Model implements TypeInterface
     }
 
     /**
-     * The ORM's answer while this class answers no `special_` itself, as every ci type does:
-     * FuncField::searchOptions() reaches it for one, and ci's 419 are overrides on ORM-tree
-     * classes. A class overriding getFieldType() answers here, as graphql and the field layer read it.
+     * A relation as FuncField::searchOptions() reads it: a `select_`, a `special_` (typed where this
+     * class overrides getFieldType(), typeless where nothing resolves it), or a declared child.
      * @return array<string, mixed>
      */
     public function getRelationshipData(string $relationship): array
     {
-        if (!$this->answersSpecials()) {
-            return OrmType::getInstance($this->type_id)->getRelationshipData($relationship);
-        }
-
-        if ($shape = $this->relationships()[$relationship] ?? null) {
+        if ($shape = $this->relationships()[$relationship] ?? $this->typelessSpecials()[$relationship] ?? null) {
             return $this->relationshipData(
                 'select', $relationship, $shape['type_id'], $shape['multi'], $shape['holds_type']
             );
@@ -986,12 +985,39 @@ class Type extends Model implements TypeInterface
         throw new InvalidArgumentException('Unknown relationship: '.$relationship);
     }
 
+    /**
+     * ⚠ Each `special_` no override resolves, answered TYPELESS as the ORM's getRelationships() did
+     * rather than refused. Its `tipo` is a blank with NO id, so its search offers nothing, where the
+     * ORM's searched type 0 (its orphan rows, or the top-level types). Kept out of relationships():
+     * a record's `$record->parte` stays null, where the ORM found that id in any type.
+     * @return array<string, array{type_id: null, multi: bool, holds_type: bool}>
+     */
+    private function typelessSpecials(): array
+    {
+        $specials = [];
+
+        foreach ($this->fieldDefinitions() as $column => $row) {
+            $xtra = $row['xtra'] ?? '';
+
+            if (strpos($column, 'special_') === 0 && $xtra) {
+                $multi = in_array($xtra, FieldDefinitions::getSpecialMultiXtras(), true);
+                $specials[substr($row['name_id'], 0, $multi ? -4 : -3)] = [
+                    'type_id' => null,
+                    'multi' => $multi,
+                    'holds_type' => in_array($xtra, FieldDefinitions::getSpecialTypeXtras(), true),
+                ];
+            }
+        }
+
+        return $specials;
+    }
+
     /** The ORM's shape but for its `query`, which nothing reading this tree asks for. */
     private function relationshipData(string $kind, string $name, ?int $typeId, bool $multi, bool $hasType): array
     {
         return [
             'type' => $kind,
-            'tipo' => ($typeId ? Type::find($typeId) : null) ?? self::blank((int) $typeId),
+            'tipo' => ($typeId ? Type::find($typeId) : null) ?? self::blank($typeId),
             'name' => $name,
             'alias' => true,
             'multi' => $multi,
@@ -1003,7 +1029,7 @@ class Type extends Model implements TypeInterface
      * What a RECORD of this type answers to as a RELATION: its `select_` fields, keyed by the
      * alias with its `_id`/`_ids` suffix off, so `select_3` aliased `status_id` is `status`.
      * ⚠ A `special_` joins them only where this class overrides getFieldType(): the type one
-     * points at is that override, and ci's 419 live on ORM-tree classes this model cannot see.
+     * points at is that override's answer, the base resolving no special_ at all.
      * @return array<string, array{type_id: ?int, multi: bool, holds_type: bool}>
      */
     public function relationships(): array
