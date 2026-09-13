@@ -2,6 +2,7 @@
 
 namespace InterAdmin\Models\Relations;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -63,6 +64,12 @@ class ChildRecords extends HasMany
             $record->save();
             $this->applyInverseRelationToModel($record);
         });
+    }
+
+    /** ⚠ Eloquent's own bypasses make() as well, building the new row with fill(). */
+    public function firstOrNew(array $attributes = [], Closure|array $values = [])
+    {
+        return $this->where($attributes)->first() ?? $this->make(array_merge($attributes, value($values)));
     }
 
     protected function setForeignAttributesForCreate(Model $model)
