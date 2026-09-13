@@ -170,6 +170,7 @@ class Type extends Model implements TypeInterface
         self::forgetBoundClasses();
         Record::forgetTypeDerivations();
         Record::forgetBoundClasses();
+        TypeCache::forgetCheck();
     }
 
     /**
@@ -829,7 +830,7 @@ class Type extends Model implements TypeInterface
             return $this->deriveRecordsOrder();
         }
 
-        return Cache::tag(self::CACHE_TAG)->remember(
+        return TypeCache::store()->remember(
             'order,,'.$this->type_id,
             self::CACHE_TTL,
             fn () => $this->deriveRecordsOrder()
@@ -869,7 +870,7 @@ class Type extends Model implements TypeInterface
             return $this->decodeFieldDefinitions();
         }
 
-        return Cache::tag(self::CACHE_TAG)->remember(
+        return TypeCache::store()->remember(
             'eloquent_field_definitions,,'.$this->type_id,
             self::CACHE_TTL,
             fn () => $this->decodeFieldDefinitions()
@@ -1179,7 +1180,7 @@ class Type extends Model implements TypeInterface
             return $this->deriveFieldAliases();
         }
 
-        return Cache::tag(self::CACHE_TAG)->remember(
+        return TypeCache::store()->remember(
             'field_definitions_alias,,'.$this->type_id,
             self::CACHE_TTL,
             fn () => $this->deriveFieldAliases()
