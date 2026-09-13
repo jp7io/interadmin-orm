@@ -114,7 +114,9 @@ final class RecordQuery extends Builder
             return $this->whereRelationPath($path, ...$rest);
         }
 
-        return parent::where($this->columns($column), ...$rest);
+        // ⚠ An ARRAY of conditions untouched: Laravel re-enters where() for each key on a nested
+        // query of ours, and walking it here would read its VALUES as names.
+        return parent::where(is_array($column) ? $column : $this->columns($column), ...$rest);
     }
 
     public function whereIn($column, ...$rest)
@@ -247,6 +249,32 @@ final class RecordQuery extends Builder
         return parent::update($this->values($values));
     }
 
+    /** ⚠ Laravel wraps the NAME into a raw `<name> + n` before update() sees a key to translate. */
+    public function incrementEach(array $columns, array $extra = [])
+    {
+        return parent::incrementEach($this->keyedColumns($columns), $extra);
+    }
+
+    public function decrementEach(array $columns, array $extra = [])
+    {
+        return parent::decrementEach($this->keyedColumns($columns), $extra);
+    }
+
+    /** `max('position')` and the rest, whose column reaches the grammar through no method above. */
+    public function aggregate($function, $columns = ['*'])
+    {
+        return parent::aggregate($function, $this->columns($columns));
+    }
+
+    /**
+     * @param  array<string, mixed>  $columns
+     * @return array<string, mixed>
+     */
+    private function keyedColumns(array $columns): array
+    {
+        return array_combine(array_map($this->columns(...), array_keys($columns)), $columns);
+    }
+
     /**
      * ⚠ array_is_list, never `is_array(reset($values))` -- which is how Laravel's own insert()
      * tells one row from many, and reads a single row whose select_multi value IS an array as a
@@ -263,11 +291,12 @@ final class RecordQuery extends Builder
     /** @return array<int, mixed> */
     private function selectList($columns): array
     {
-        $columns = (array) $this->columns($columns);
+        $columns = (array) $this->columns(is_array($columns) ? $this->nestedSelectsAsKeys($columns) : $columns);
 
         // ⚠ An aggregate keeps exactly what it asked for: an added column is not a convenience
-        // there but an ONLY_FULL_GROUP_BY error, which is the rule the ORM applies too.
-        if ($columns === ['*'] || $this->selectsAnAggregate($columns)) {
+        // there but an ONLY_FULL_GROUP_BY error, which is the rule the ORM applies too. `*` has
+        // the identity already, and a column ahead of it is ERROR 1064.
+        if (in_array('*', $columns, true) || $this->selectsAnAggregate($columns)) {
             return $columns;
         }
 
@@ -281,6 +310,31 @@ final class RecordQuery extends Builder
         );
 
         return array_values(array_unique(array_merge($identity, $columns)));
+    }
+
+    /**
+     * The ORM's nested `'<relation>' => [columns]` named what to eager-load, and no grammar takes an
+     * array. A relation read loads its own rows here, so the entry becomes the KEY that read needs.
+     * @param  array<array-key, mixed>  $columns
+     * @return list<mixed>
+     */
+    private function nestedSelectsAsKeys(array $columns): array
+    {
+        $flat = [];
+
+        foreach ($columns as $key => $column) {
+            if (!is_array($column)) {
+                $flat[] = $column;
+            } elseif (is_string($key) && $this->record) {
+                foreach ([$key.'_id', $key.'_ids'] as $alias) {
+                    if ($this->record->aliasToColumn($alias) !== $alias) {
+                        $flat[] = $alias;
+                    }
+                }
+            }
+        }
+
+        return $flat;
     }
 
     /**
@@ -305,8 +359,8 @@ final class RecordQuery extends Builder
 
     /**
      * ⚠ Strings only, and an ARRAY is walked rather than treated as one name: `whereNull([...])`
-     * takes a list of columns, while `where([...])` takes conditions whose values are not names
-     * and match no alias. A Closure and an Expression pass through, both carrying their own.
+     * takes a list of columns. where()'s conditions never come here. A Closure and an Expression
+     * pass through, both carrying their own.
      */
     private function columns($columns)
     {

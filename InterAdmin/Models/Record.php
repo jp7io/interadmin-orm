@@ -158,6 +158,9 @@ class Record extends Model implements RecordInterface
     public function setRawAttributes(array $attributes, $sync = false)
     {
         parent::setRawAttributes($attributes, $sync);
+        // ⚠ The row's type, never one resolved before it arrived: a blank of a class several types
+        // share falls back to ONE bound type, and a memo kept from then answers for every row.
+        $this->typeModel = null;
 
         return $this->mergeCasts($this->dateCasts(array_keys($attributes)));
     }
@@ -603,8 +606,10 @@ class Record extends Model implements RecordInterface
         foreach ($values as $key => $value) {
             $column = $this->aliasToColumn($key);
 
+            // A model is its key, as the ORM's record stringified to its id: PDO writes Eloquent's JSON.
             $converted[$column] = match (true) {
                 is_array($value) => implode(',', $value),
+                $value instanceof Model => $value->getKey(),
                 $value === null || $value === '' || $this->isAbsentDate($column, $value)
                     => $this->absentValueFor($column),
                 default => $value,
@@ -700,8 +705,8 @@ class Record extends Model implements RecordInterface
 
     /**
      * ⚠ Through the ELOQUENT Type: the ORM's setParent() hints RecordAbstract, so it cannot take
-     * an Eloquent record at all. Instances come from the identity map, so setParent() aliases --
-     * mirrored rather than corrected.
+     * an Eloquent record at all. ⚠ Each a CLONE: find() hands out the identity map's instance, and
+     * the ORM's getInstance() built a fresh one, so its scope never outlived the call.
      * @return Type[] each already scoped to this record, which is what records() reads
      */
     public function getChildrenTypes(): array
@@ -710,6 +715,7 @@ class Record extends Model implements RecordInterface
 
         foreach ($this->typeModel()?->childTypeIds() ?? [] as $childTypeId) {
             if ($childType = Type::find($childTypeId)) {
+                $childType = clone $childType;
                 $childType->setParent($this);
                 $types[] = $childType;
             }
@@ -917,6 +923,48 @@ class Record extends Model implements RecordInterface
         return (bool) parent::delete();
     }
 
+    /** The physical step forceDelete() reaches through Model::delete(): RecordBuilder's delete() is soft. */
+    protected function performDeleteOnModel()
+    {
+        $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
+
+        $this->exists = false;
+    }
+
+    /**
+     * ⚠ A null is ON: ci's user classes declare a bare `public $timestamps;` from the ORM days, when
+     * Laravel's logout set one and the ORM would have saved it as a column. Only false turns it off.
+     */
+    public function usesTimestamps()
+    {
+        return $this->timestamps !== false && !static::isIgnoringTimestamps(static::class);
+    }
+
+    /**
+     * ⚠ An empty fill does nothing, as Eloquent's own does, minus the getFillable() it asks first:
+     * every construction fills [], and that ran before the row, per row.
+     */
+    public function fill(array $attributes)
+    {
+        return $attributes === [] ? $this : parent::fill($attributes);
+    }
+
+    /**
+     * The type's FORM fields by alias, as the ORM's fill() kept: `update($request->all())` fills
+     * those and drops the rest, where an empty list made Eloquent throw MassAssignmentException.
+     * @return array<int, string>
+     */
+    public function getFillable()
+    {
+        if ($this->fillable) {
+            return $this->fillable;
+        }
+
+        $form = array_filter($this->typeModel()?->fieldDefinitions() ?? [], fn (array $row) => (bool) $row['form']);
+
+        return array_values(array_intersect_key($this->fieldAliases(), $form));
+    }
+
     /** Undelete. Not SoftDeletes' restore(): this model deliberately declines that trait. */
     public function restore(): bool
     {
@@ -1113,8 +1161,42 @@ class Record extends Model implements RecordInterface
 
         // A slot written on a model hydration never reached, so setRawAttributes() never saw it.
         $this->mergeCasts($this->dateCasts([$column]));
+        if ($column === 'type_id') {
+            $this->typeModel = null;
+        }
 
         return parent::setAttribute($column, $value);
+    }
+
+    /**
+     * The ORM's increment(): the one column through the alias map, with no `updated_at`. Laravel
+     * puts the name raw into `<name> + n` and into its original, so an alias there is a 42S22.
+     */
+    protected function incrementOrDecrement($column, $amount, $extra, $method)
+    {
+        return $this->withoutTimestampsHere(fn () => parent::incrementOrDecrement(
+            is_string($column) ? $this->aliasToColumn($column) : $column, $amount, $extra, $method
+        ));
+    }
+
+    protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
+    {
+        $keys = array_map($this->aliasToColumn(...), array_keys($columns));
+
+        return $this->withoutTimestampsHere(fn () => parent::incrementOrDecrementEach(
+            array_combine($keys, $columns), $extra, $method
+        ));
+    }
+
+    private function withoutTimestampsHere(\Closure $write): mixed
+    {
+        [$timestamps, $this->timestamps] = [$this->timestamps, false];
+
+        try {
+            return $write();
+        } finally {
+            $this->timestamps = $timestamps;
+        }
     }
 
     /**
@@ -1147,10 +1229,11 @@ class Record extends Model implements RecordInterface
     {
         $shape = $this->relationLoaded($key) ? null : ($this->fieldRelationships()[$key] ?? null);
 
-        // ⚠ Two shapes have NO query behind them and so cannot be an Eloquent relation: an id
-        // naming a TYPE rather than a record (13 of ci's 936 names, answered from the type cache),
-        // and one naming a type whose row is gone -- null there, never a BadMethodCall.
-        if ($shape && ($shape['holds_type'] || !self::relatedType($shape['type_id']))) {
+        // ⚠ Three shapes have NO query behind them: an id naming a TYPE rather than a record (13 of
+        // ci's 936 names, answered from the type cache), one naming a type whose row is gone -- null
+        // there, never a BadMethodCall -- and an empty key, which the ORM answered without `id = 0`.
+        if ($shape && ($shape['holds_type'] || !self::relatedType($shape['type_id'])
+            || (!$shape['multi'] && !$this->getAttribute($key.'_id')))) {
             $this->setRelation($key, $shape['holds_type']
                 ? $this->relatedTypes($key, $shape['multi'])
                 : ($shape['multi'] ? new Collection : null));
@@ -1185,6 +1268,42 @@ class Record extends Model implements RecordInterface
         return [];
     }
 
+    /**
+     * The ORM's collection registry: the first lazy read of a relation loads it for every model.
+     * ⚠ Only where every model reads its relations the SAME way, whatever automaticallyEagerLoad-
+     * Relationships() says: Laravel builds that load off the FIRST model's map.
+     */
+    public function newCollection(array $models = [])
+    {
+        static::$resolvedCollectionClasses[static::class] ??= ($this->resolveCollectionFromAttribute() ?? static::$collectionClass);
+        $collection = new static::$resolvedCollectionClasses[static::class]($models);
+
+        return count($models) > 1 && self::shareRelations($models) ? $collection->withRelationshipAutoloading() : $collection;
+    }
+
+    /**
+     * One type does; several do when their aliases, relationships and children agree, which types
+     * sharing a model do. ci-intranet's news pages mix those and batch through it.
+     * @param  array<array-key, mixed>  $models
+     */
+    private static function shareRelations(array $models): bool
+    {
+        $first = reset($models);
+        $byType = [];
+
+        foreach ($models as $model) {
+            if (!$model instanceof self || $model::class !== $first::class) {
+                return false;
+            }
+            $byType[(int) $model->typeId()] ??= $model;
+        }
+
+        return count($byType) === 1 || count(array_unique(array_map(
+            fn (self $model) => serialize([$model->fieldAliases(), $model->fieldRelationships(), $model->childTypeIdMap()]),
+            $byType
+        ))) === 1;
+    }
+
     /** @return array<string, array<string, mixed>> */
     private function fieldRelationships(): array
     {
@@ -1198,10 +1317,10 @@ class Record extends Model implements RecordInterface
      */
     private function relatedTypes(string $key, bool $multi): Collection|Type|null
     {
-        $types = array_values(array_filter(array_map(
-            fn ($id) => self::relatedType((int) $id),
-            array_filter(explode(',', (string) $this->getAttribute($key.($multi ? '_ids' : '_id'))))
-        )));
+        $ids = array_filter(array_map('intval', explode(',', (string) $this->getAttribute($key.($multi ? '_ids' : '_id')))));
+        // One query for every id the identity map lacks, where a find() apiece was one per type.
+        $found = Type::prime($ids);
+        $types = array_values(array_filter(array_map(fn (int $id) => $found[$id] ?? null, $ids)));
 
         return $multi ? new Collection($types) : ($types[0] ?? null);
     }
@@ -1232,19 +1351,25 @@ class Record extends Model implements RecordInterface
         return ($type = $this->childType($name)) ? $this->childRelation($type) : null;
     }
 
-    /**
-     * ⚠ ucfirst(), as `_findChild()` has it: the map is studly and the call site is camel.
-     * ⚠ No child while the type is still LISTING them: InterMail's EmailType lists its children by
-     * loading an e-mail, every query on which asks isRelation('type_id'), so the list recursed
-     * into itself until memory ran out. A type's own children cannot help compute them.
-     */
+    /** ⚠ ucfirst(), as `_findChild()` has it: the map is studly and the call site is camel. */
     private function childType(string $method): ?Type
+    {
+        return self::relatedType($this->childTypeIdMap()[ucfirst($method)] ?? null);
+    }
+
+    /**
+     * Models\Type::childTypeIds() of this record's type, memoised. ⚠ EMPTY while the type is still
+     * LISTING them: InterMail's EmailType lists its children by loading an e-mail, every query on
+     * which asks isRelation('type_id'), so the list recursed into itself until memory ran out.
+     * @return array<string, int>
+     */
+    private function childTypeIdMap(): array
     {
         $typeId = (int) $this->typeId();
 
         if (!isset(self::$childrenByType[$typeId])) {
             if (isset(self::$listingChildren[$typeId])) {
-                return null;
+                return [];
             }
 
             self::$listingChildren[$typeId] = true;
@@ -1256,7 +1381,7 @@ class Record extends Model implements RecordInterface
             }
         }
 
-        return self::relatedType(self::$childrenByType[$typeId][ucfirst($method)] ?? null);
+        return self::$childrenByType[$typeId];
     }
 
     /**

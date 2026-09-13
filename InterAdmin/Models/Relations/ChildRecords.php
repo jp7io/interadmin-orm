@@ -48,10 +48,13 @@ class ChildRecords extends HasMany
         return $query->where($query->getModel()->getTable().'.parent_type_id', $this->parentTypeId);
     }
 
-    /** The ORM's `$record->child()->build()`: the child type's insert defaults, hanging off this parent. */
+    /**
+     * The ORM's `$record->child()->build()`: the child type's insert defaults, hanging off this parent.
+     * ⚠ The parent's columns WIN, as on the ORM and on Eloquent: a posted `parent_id` re-parented the row.
+     */
     public function make(array $attributes = [])
     {
-        return $this->childType->buildRecord(array_merge($this->parentColumns(), $attributes));
+        return $this->childType->buildRecord(array_merge($attributes, $this->parentColumns()));
     }
 
     /**

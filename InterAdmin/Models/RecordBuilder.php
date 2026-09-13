@@ -26,6 +26,15 @@ final class RecordBuilder extends Builder
         return parent::find($id, $columns);
     }
 
+    /**
+     * Soft, as the ORM's Query::delete() stamped `deleted_at`: a relation's or a query's delete()
+     * was Eloquent's physical one. forceDelete() stays physical, as does Record::forceDelete().
+     */
+    public function delete()
+    {
+        return $this->toBase()->update(['deleted_at' => $this->model->freshTimestampString()]);
+    }
+
     public function make(array $attributes = [])
     {
         return $this->newRecord($attributes);
@@ -56,6 +65,6 @@ final class RecordBuilder extends Builder
         }
 
         return $type->buildRecord(array_merge($this->pendingAttributes, $attributes))
-            ->setConnection($this->query->getConnection()->getName());
+            ->setConnection($this->model->getConnectionName());
     }
 }

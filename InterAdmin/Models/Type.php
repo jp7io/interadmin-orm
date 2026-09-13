@@ -119,6 +119,12 @@ class Type extends Model implements TypeInterface
      */
     public static function find(mixed $id, array $columns = ['*']): mixed
     {
+        // ⚠ Loud: tenant code still calling `$type->find($options)` reached this through the
+        // instance and answered `type_id IN (0)`, an empty page where the ORM's had records.
+        if (is_array($id) && !array_is_list($id)) {
+            throw new InvalidArgumentException('Type::find() takes ids; the ORM\'s find($options) is gone.');
+        }
+
         // A partial row must never answer a later whole-row read, and neither it nor an array
         // of ids is the single row this map keys. Declaring the Collection in the return type
         // is what makes every property read off find() an error, so it is left out.
@@ -152,6 +158,18 @@ class Type extends Model implements TypeInterface
     public static function forgetInstances(): void
     {
         self::$instances = [];
+    }
+
+    /**
+     * Everything both models derived from `types` rows. A boot calls it, and so must a process that
+     * outlives one unit of work (a queue job, a send loop), or it serves a type edited since.
+     */
+    public static function forgetTypeState(): void
+    {
+        self::forgetInstances();
+        self::forgetBoundClasses();
+        Record::forgetTypeDerivations();
+        Record::forgetBoundClasses();
     }
 
     /**
@@ -633,9 +651,14 @@ class Type extends Model implements TypeInterface
 
         $this->inherited = implode(',', $inherited);
 
+        // In a finally: the instance is the identity map's, so a throwing save would leave every
+        // later save of this type in the request unstamped.
         $this->timestamps = false;
-        $this->save();
-        $this->timestamps = true;
+        try {
+            $this->save();
+        } finally {
+            $this->timestamps = true;
+        }
     }
 
     /**
@@ -794,27 +817,36 @@ class Type extends Model implements TypeInterface
      */
     public function recordsOrder(): string
     {
+        // ⚠ An id-less type derives its own, as fieldDefinitions() does: under the bare `order,,`
+        // key one such type's order would be served to every other for the TTL.
+        if (!$this->type_id) {
+            return $this->deriveRecordsOrder();
+        }
+
         return Cache::tag(self::CACHE_TAG)->remember(
             'order,,'.$this->type_id,
             self::CACHE_TTL,
-            function () {
-                $order = [];
-
-                foreach ($this->fieldDefinitions() as $column => $row) {
-                    // ⚠ `func_` only: a `tit_` row is deliberately NOT excluded, as the ORM has
-                    // it, so an `orderby` on one is a 42S22 on both objects rather than on one.
-                    if (!$row['orderby'] || str_starts_with($column, 'func_')) {
-                        continue;
-                    }
-                    $order[$row['orderby']] = $column.($row['orderby'] < 0 ? ' DESC' : '');
-                }
-
-                ksort($order);
-                $order[] = 'publish_at DESC';
-
-                return implode(',', $order);
-            }
+            fn () => $this->deriveRecordsOrder()
         );
+    }
+
+    private function deriveRecordsOrder(): string
+    {
+        $order = [];
+
+        foreach ($this->fieldDefinitions() as $column => $row) {
+            // ⚠ `func_` only: a `tit_` row is deliberately NOT excluded, as the ORM has
+            // it, so an `orderby` on one is a 42S22 on both objects rather than on one.
+            if (!$row['orderby'] || str_starts_with($column, 'func_')) {
+                continue;
+            }
+            $order[$row['orderby']] = $column.($row['orderby'] < 0 ? ' DESC' : '');
+        }
+
+        ksort($order);
+        $order[] = 'publish_at DESC';
+
+        return implode(',', $order);
     }
 
     /**
@@ -1098,13 +1130,6 @@ class Type extends Model implements TypeInterface
     }
 
     /**
-     * The same declarations WHOLE, which is the shape `getInterAdminsChildren()` names them in.
-     * ⚠ Uncached where the ORM memoises it into `_tag_type`: this is a json_decode, and a second
-     * writer of a shared entry is the stale-blob trap increments 10 to 12 paid for twice.
-     *
-     * @return array<string, array<string, mixed>>
-     */
-    /**
      * The columns that make up a record's display string: whatever is flagged `combo`, plus the
      * title column itself. @see Record::getStringValue()
      * @return array<int, string>
@@ -1117,6 +1142,13 @@ class Type extends Model implements TypeInterface
         ));
     }
 
+    /**
+     * The same declarations as childTypeIds(), WHOLE and keyed alike.
+     * ⚠ Uncached where the ORM memoises it into `_tag_type`: this is a json_decode, and a second
+     * writer of a shared entry is the stale-blob trap increments 10 to 12 paid for twice.
+     *
+     * @return array<string, array<string, mixed>>
+     */
     public function getInterAdminsChildren(): array
     {
         $children = [];
@@ -1182,7 +1214,11 @@ class Type extends Model implements TypeInterface
      */
     public function recordColumns(): array
     {
-        return array_values(array_unique(['id', 'type_id', ...Record::ADMIN_COLUMNS, ...$this->getFieldNames()]));
+        // Only what the TABLE has, as the ORM's wildcard intersected: 26 of ci's lack an admin column.
+        return array_values(array_intersect(
+            array_unique(['id', 'type_id', ...Record::ADMIN_COLUMNS, ...$this->getFieldNames()]),
+            $this->recordTemplate()->getColumns()
+        ));
     }
 
     public function editorFields()
