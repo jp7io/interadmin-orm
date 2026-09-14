@@ -800,7 +800,7 @@ class Type extends Model implements TypeInterface
      * The child type declared under this name, or null where this type declares none.
      * ⚠ The DECLARED name (`children`), not the child's own -- `Dados Pessoais` is the key.
      */
-    public function getInterAdminsChildrenType(string $name): ?self
+    public function childType(string $name): ?self
     {
         return Type::find($this->childTypeIds()[$name] ?? null);
     }
@@ -809,9 +809,9 @@ class Type extends Model implements TypeInterface
      * One `children` declaration, found by the type it points at rather than by its key.
      * @return ?array<string, mixed>
      */
-    public function getInterAdminsChildrenData($typeId): ?array
+    public function childDeclaration($typeId): ?array
     {
-        foreach ($this->getInterAdminsChildren() as $declaration) {
+        foreach ($this->childDeclarations() as $declaration) {
             if ($declaration['type_id'] == $typeId) {
                 return $declaration;
             }
@@ -903,8 +903,8 @@ class Type extends Model implements TypeInterface
         return $this->parentRecord ? [$this->parentRecord] : [];
     }
 
-    /** Where this type's RECORDS live, prefixed. The ORM spells it getInterAdminsTableName(). */
-    public function getInterAdminsTableName(): string
+    /** Where this type's RECORDS live, prefixed as raw SQL names them; recordsTable() is the bare name. */
+    public function prefixedRecordsTable(): string
     {
         return $this->getConnection()->getTablePrefix().$this->recordsTable();
     }
@@ -1142,7 +1142,7 @@ class Type extends Model implements TypeInterface
 
     /**
      * ⚠ Each `special_` no override resolves, answered TYPELESS as the ORM's getRelationships() did
-     * rather than refused. Its `tipo` is a blank with NO id, so its search offers nothing, where the
+     * rather than refused. Its `related_type` is a blank with NO id, so its search offers nothing, where the
      * ORM's searched type 0 (its orphan rows, or the top-level types). Kept out of relationships():
      * a record's `$record->parte` stays null, where the ORM found that id in any type.
      * @return array<string, array{type_id: null, multi: bool, holds_type: bool}>
@@ -1172,7 +1172,7 @@ class Type extends Model implements TypeInterface
     {
         return [
             'type' => $kind,
-            'tipo' => ($typeId ? Type::find($typeId) : null) ?? self::blank($typeId),
+            'related_type' => ($typeId ? Type::find($typeId) : null) ?? self::blank($typeId),
             'name' => $name,
             'alias' => true,
             'multi' => $multi,
@@ -1249,7 +1249,7 @@ class Type extends Model implements TypeInterface
      */
     public function childTypeIds(): array
     {
-        return array_map(fn (array $child) => (int) $child['type_id'], $this->getInterAdminsChildren());
+        return array_map(fn (array $child) => (int) $child['type_id'], $this->childDeclarations());
     }
 
     /**
@@ -1272,7 +1272,7 @@ class Type extends Model implements TypeInterface
      *
      * @return array<string, array<string, mixed>>
      */
-    public function getInterAdminsChildren(): array
+    public function childDeclarations(): array
     {
         $children = [];
 

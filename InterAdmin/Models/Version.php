@@ -48,7 +48,7 @@ class Version extends Model
      */
     public static function tableFor(Type $type): string
     {
-        $records = Str::after($type->getInterAdminsTableName(), DB::getTablePrefix());
+        $records = Str::after($type->prefixedRecordsTable(), DB::getTablePrefix());
 
         return $type->table_name ? $records.'_versions' : Str::replaceLast('records', 'versions', $records);
     }
