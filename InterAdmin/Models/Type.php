@@ -22,6 +22,7 @@ use Illuminate\Routing\Route;
 use Jp7\InterAdmin\Field\TypeInterface;
 use Jp7\InterAdmin\Schema\ChildDeclarations;
 use Jp7\InterAdmin\Schema\FieldDefinitions;
+use Jp7\InterAdmin\Schema\RecordClassMap;
 use Jp7\InterAdmin\Schema\TypeCache;
 use Jp7\InterAdmin\Schema\TypeClassMap;
 use Jp7\Laravel\RecordUrl;
@@ -77,6 +78,18 @@ class Type extends Model implements TypeInterface
 
     const CACHE_TTL = TypeCache::TTL;
 
+    /** The whole row find() and prime() keep in the tag, under a key the ORM never wrote. */
+    private const ROW_KEY = 'eloquent_row,,';
+
+    /** What a write makes stale, the ORM's keys among them: the outgoing release still reads those. */
+    private const DERIVED_KEYS = [
+        'eloquent_row', 'eloquent_field_definitions', 'field_definitions_alias', 'order',
+        'attributes', 'field_definitions', 'children', 'typesUsingThisModel', '__call',
+    ];
+
+    /** The columns BaseClassMap::prepareMap() reads or filters on. */
+    private const CLASS_MAP_COLUMNS = ['class', 'class_type', 'deleted_at', 'visible', 'inherited'];
+
     /**
      * ⚠ `types` has no created_at and never had a date_insert, so this cannot go the way UPDATED_AT
      * did: dropped, Eloquent would write its own `created_at` on every INSERT and 42S22.
@@ -111,10 +124,9 @@ class Type extends Model implements TypeInterface
     private static ?string $defaultClass = null;
 
     /**
-     * ⚠ The ORM's memo is PERSISTENT where this is per-request: `getInstance()` reads its row
-     * from a `_tag_type` cache entry, so a warm store answers with ZERO queries. Not copied --
-     * find() also loads the row update() and destroy() WRITE, and a model hydrated from a stale
-     * cache computes isDirty() against stale originals, i.e. it writes the wrong columns.
+     * The identity map, over the row cache the ORM's getInstance() kept in the type tag, so a warm
+     * store answers with ZERO queries. ⚠ A writer loads through findFresh(): Eloquent computes
+     * isDirty() against the originals, and a cached original drops an edit.
      * @return static|null The single row; an array of ids answers an undeclared Collection.
      */
     public static function find(mixed $id, array $columns = ['*']): mixed
@@ -138,10 +150,79 @@ class Type extends Model implements TypeInterface
 
         // ⚠ array_key_exists, never ??=: a type_id naming no row would re-query on every call.
         if (!array_key_exists($key, self::$instances)) {
-            self::$instances[$key] = static::query()->find($id);
+            self::$instances[$key] = self::loadRow($id);
         }
 
         return self::$instances[$key];
+    }
+
+    /**
+     * The row through the type tag, which a miss never enters. ⚠ `self`, never `static`: a row
+     * hydrates as the class its type binds, a SIBLING of a tenant's Type (ci's users type, found
+     * through Ci\Type, is Ciintranet\UsuarioTipo), as the query path always answered it.
+     */
+    private static function loadRow(mixed $id): ?self
+    {
+        $attributes = TypeCache::store()->get(self::ROW_KEY.$id);
+        if (is_array($attributes)) {
+            return self::hydrateRow($attributes);
+        }
+
+        $type = static::query()->find($id);
+        if ($type) {
+            TypeCache::store()->put(self::ROW_KEY.$id, $type->getAttributes(), self::CACHE_TTL);
+        }
+
+        return $type;
+    }
+
+    /** As a query hydrates, bound class included. @param array<string, mixed> $attributes */
+    private static function hydrateRow(array $attributes): self
+    {
+        $template = static::query()->getModel();
+
+        return $template->newFromBuilder($attributes, $template->getConnection()->getName());
+    }
+
+    /** The row as the database holds it NOW, into the identity map: every writer's load. */
+    public static function findFresh(mixed $id): ?self
+    {
+        return self::$instances[static::class.':'.$id] = static::query()->find($id);
+    }
+
+    public static function findFreshOrFail(mixed $id): self
+    {
+        return static::findFresh($id) ?? throw (new ModelNotFoundException)->setModel(static::class, [$id]);
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn (self $type) => $type->forgetCached());
+        static::deleted(fn (self $type) => $type->forgetCached());
+    }
+
+    /**
+     * What a write makes stale, in the store and in this process: its row and derivations, the
+     * class maps where a binding could have moved, and every memo built off either.
+     */
+    private function forgetCached(): void
+    {
+        $id = $this->getKey();
+        TypeCache::forget(...array_map(fn (string $key) => $key.',,'.$id, self::DERIVED_KEYS));
+
+        if (!$this->exists || $this->wasRecentlyCreated || $this->wasChanged(self::CLASS_MAP_COLUMNS)) {
+            RecordClassMap::getInstance()->clearCache();
+            TypeClassMap::getInstance()->clearCache();
+            self::forgetBoundClasses();
+            Record::forgetBoundClasses();
+        }
+
+        foreach (array_keys(self::$instances) as $key) {
+            if (str_ends_with($key, ':'.$id)) {
+                unset(self::$instances[$key]);
+            }
+        }
+        Record::forgetTypeDerivations();
     }
 
     /**
@@ -206,11 +287,25 @@ class Type extends Model implements TypeInterface
         $ids = array_unique(array_filter($ids));
         $wanted = array_filter($ids, fn ($id) => !array_key_exists(static::class.':'.$id, self::$instances));
 
+        $misses = [];
+        if ($wanted) {
+            $cached = TypeCache::store()->many(array_map(fn ($id) => self::ROW_KEY.$id, $wanted));
+            foreach ($wanted as $id) {
+                $attributes = $cached[self::ROW_KEY.$id] ?? null;
+                if (is_array($attributes)) {
+                    self::$instances[static::class.':'.$id] = self::hydrateRow($attributes);
+                } else {
+                    $misses[] = $id;
+                }
+            }
+        }
+
         // whereKey, not whereIn: PHPStan models the whereIn forward as answering the QUERY
         // builder, so the chain reads as stdClass rows and no model. Runtime is fine either way.
-        if ($wanted) {
-            foreach (static::query()->whereKey($wanted)->get() as $row) {
+        if ($misses) {
+            foreach (static::query()->whereKey($misses)->get() as $row) {
                 self::$instances[static::class.':'.$row->getKey()] = $row;
+                TypeCache::store()->put(self::ROW_KEY.$row->getKey(), $row->getAttributes(), self::CACHE_TTL);
             }
         }
 
