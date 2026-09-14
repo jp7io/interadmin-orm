@@ -446,8 +446,7 @@ final class RecordQuery extends Builder
         }
 
         $prefix = $this->grammar->getTablePrefix();
-        $sql = Record::getPublishedFilters($prefix.$target->recordsTable(), $prefix.'relation_path');
 
-        return $sql === null ? null : preg_replace('/ AND $/', '', $sql);
+        return Record::publishedPredicate($prefix.$target->recordsTable(), $prefix.'relation_path');
     }
 }

@@ -80,6 +80,9 @@ class Record extends Model implements RecordInterface
      */
     private static array $aliasesByType = [];
 
+    /** @var array<int, array<string, string>> the same maps inverted, alias => column, for aliasToColumn() */
+    private static array $inverseAliasesByType = [];
+
     /**
      * Memo over the class map. ⚠ array_key_exists, never ??=: null IS the answer for most types,
      * and ??= would re-resolve it -- an autoload attempt per row rather than one per type.
@@ -218,6 +221,7 @@ class Record extends Model implements RecordInterface
     public static function forgetTypeDerivations(): void
     {
         self::$aliasesByType = [];
+        self::$inverseAliasesByType = [];
         self::$relationsByType = [];
         self::$childrenByType = [];
         self::$columnsByTable = [];
@@ -589,12 +593,6 @@ class Record extends Model implements RecordInterface
         $this->syncOriginalAttributes($absent);
     }
 
-    /** @return array<string, string> column => alias, the name the ORM's getAttributesAliases() has. */
-    public function getAttributesAliases(): array
-    {
-        return $this->fieldAliases();
-    }
-
     /**
      * This record keyed by ALIAS rather than by column, values cast. The ORM builds the same map
      * off `$_aliases` and `getMutatedAttribute()`; here the casts do the second half.
@@ -889,11 +887,6 @@ class Record extends Model implements RecordInterface
         return self::$timestamp ?? time();
     }
 
-    public static function hasTimestamp(): bool
-    {
-        return self::$timestamp !== null;
-    }
-
     /** Freezes the clock the calendar reads; null hands it back to time(). */
     public static function setTimestamp(?int $time): void
     {
@@ -919,6 +912,12 @@ class Record extends Model implements RecordInterface
         $preview = (bool) config('interadmin.preview');
 
         return PublishedFilterSql::build($table, $alias, self::getTimestamp(), $preview);
+    }
+
+    /** getPublishedFilters() without its joiner, for a builder's whereRaw(). */
+    public static function publishedPredicate(string $table, string $alias): ?string
+    {
+        return PublishedFilterSql::predicate($table, $alias, self::getTimestamp(), (bool) config('interadmin.preview'));
     }
 
     /**
@@ -1123,7 +1122,7 @@ class Record extends Model implements RecordInterface
     {
         $params = [
             $this->getTable(),
-            array_search($column, $this->fieldAliases(), true) ?: $column,
+            $this->aliasToColumn($column),
             $this->id,
             'id',
             'type_id', $this->type_id,
@@ -1175,19 +1174,14 @@ class Record extends Model implements RecordInterface
 
     private function applyPublishedFilter(Builder $query): void
     {
-        // getPublishedFilters(), not PublishedFilterSql::build(): it is where this model feeds the
-        // builder the ORM's clock and the preview config.
+        // publishedPredicate(), not PublishedFilterSql::predicate(): it is where this model feeds
+        // the builder the ORM's clock and the preview config.
         $table = $this->getConnection()->getTablePrefix().$this->getTable();
-        $sql = self::getPublishedFilters($table, $table);
+        $sql = self::publishedPredicate($table, $table);
 
-        if ($sql === null) {
-            return;
+        if ($sql !== null) {
+            $query->whereRaw($sql);
         }
-
-        // ⚠ Every predicate ends in ' AND ' deliberately, an ORM caller concatenating it onto the
-        // front of its own clause. A builder does not, so the joiner comes off ANCHORED: rtrim()
-        // takes a character LIST and would eat a trailing D, N or A of a value.
-        $query->whereRaw(preg_replace('/ AND $/', '', $sql));
     }
 
     /**
@@ -1302,9 +1296,12 @@ class Record extends Model implements RecordInterface
      */
     public function aliasToColumn(string $key): string
     {
-        $column = array_search($key, $this->fieldAliases(), true);
+        if (!$typeId = $this->typeId()) {
+            return $key;
+        }
 
-        return $column === false ? $key : $column;
+        // ⚠ The FIRST column wins where two fields of a type share a name; array_flip() alone keeps the last.
+        return (self::$inverseAliasesByType[$typeId] ??= array_flip(array_reverse($this->fieldAliases(), true)))[$key] ?? $key;
     }
 
     public function getRelationValue($key)

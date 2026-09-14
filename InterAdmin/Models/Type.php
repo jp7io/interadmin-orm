@@ -438,26 +438,6 @@ class Type extends Model implements TypeInterface
 
     protected $fillable = TypeFillable::FILLABLE;
 
-    const DEFAULT_FIELDS = [
-        'varchar_key' => [
-            'order' => 1,
-            'type' => 'varchar_key',
-            'name' => 'Título'
-        ],
-        'int_key' => [
-            'order' => 2,
-            'type' => 'int_key',
-            'name' => 'Ordem',
-            'orderby' => '1',
-        ],
-        'bool_key' => [
-            'order' => 3,
-            'type' => 'bool_key',
-            'name' => 'Mostrar',
-            'xtra' => 'S'
-        ],
-    ];
-
     /**
      * The only thing keeping system columns out of the fields editor, which is what `fields`
      * is rebuilt from on save -- so a system column rendered as a blank row is one typed name
@@ -849,9 +829,7 @@ class Type extends Model implements TypeInterface
     {
         $table = $this->getConnection()->getTablePrefix().$this->getTable();
 
-        // Anchored, not rtrim(): every predicate ends in ' AND ' for an ORM caller concatenating
-        // it, and a character list would eat a trailing D, N or A.
-        $query->whereRaw(preg_replace('/ AND $/', '', (string) Record::getPublishedFilters($table, $table)));
+        $query->whereRaw((string) Record::publishedPredicate($table, $table));
     }
 
     /** An UNSAVED child type on this model, which is what the caller then names and saves. */
