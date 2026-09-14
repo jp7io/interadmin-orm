@@ -151,6 +151,25 @@ class Record extends Model implements RecordInterface
         return array_fill_keys([...RecordColumns::SYSTEM_DATES, 'deleted_at'], 'datetime');
     }
 
+    /** @var array<string, string>|null getCasts()'s answer until mergeCasts() changes it */
+    private ?array $mergedCasts = null;
+
+    /**
+     * ⚠ Asked on every attribute read, and Eloquent's own array_merge()s the key's cast in each time.
+     * Only mergeCasts() moves the casts after construction; nothing here renames or retypes the key.
+     */
+    public function getCasts()
+    {
+        return $this->mergedCasts ??= parent::getCasts();
+    }
+
+    public function mergeCasts($casts)
+    {
+        $this->mergedCasts = null;
+
+        return parent::mergeCasts($casts);
+    }
+
     /**
      * Hydration is where a row's own date columns become known, and merging the casts HERE rather
      * than computing getCasts() per read keeps it O(row) instead of O(row x attribute).
@@ -804,17 +823,38 @@ class Record extends Model implements RecordInterface
     }
 
     /**
-     * The calendar in PHP, and it must agree row for row with the published() scope below.
-     * ⚠ An absent date means ALWAYS, which the ORM says by reading a \Date of year -0001 and this
-     * says by testing for null -- `NULL <= now()` being the arm that cost ci 6,290 live rows.
+     * The calendar in PHP, row for row with the published() scope. ⚠ An absent date means ALWAYS:
+     * the ORM read a \Date of year -0001, this tests null -- `NULL <= now()` cost ci 6,290 rows.
+     * ⚠ The RAW columns as `Y-m-d H:i:s`: a select asks this of every option, and the casts built
+     * three Carbons an option, over 1,973 options on ci's users.
      */
     public function isPublished(): bool
     {
-        return (bool) $this->bool_key
-            && !$this->deleted_at
-            && ($this->parent_id || $this->publish || !config('interadmin.preview'))
-            && (!$this->publish_at || $this->publish_at->getTimestamp() <= self::getTimestamp())
-            && (!$this->expire_at || $this->expire_at->getTimestamp() >= self::getTimestamp());
+        $now = self::stampAt(self::getTimestamp());
+        $raw = $this->attributes;
+
+        return (bool) ($raw['bool_key'] ?? false)
+            && empty($raw['deleted_at'])
+            && (($raw['parent_id'] ?? 0) || ($raw['publish'] ?? 0) || !config('interadmin.preview'))
+            && (empty($raw['publish_at']) || self::stamp($raw['publish_at']) <= $now)
+            && (empty($raw['expire_at']) || self::stamp($raw['expire_at']) >= $now);
+    }
+
+    /** @var array{0: int, 1: string}|null the last timestamp stampAt() formatted, and its string */
+    private static ?array $stampAt = null;
+
+    private static function stampAt(int $timestamp): string
+    {
+        if (self::$stampAt === null || self::$stampAt[0] !== $timestamp) {
+            self::$stampAt = [$timestamp, date('Y-m-d H:i:s', $timestamp)];
+        }
+
+        return self::$stampAt[1];
+    }
+
+    private static function stamp(mixed $value): string
+    {
+        return $value instanceof DateTimeInterface ? $value->format('Y-m-d H:i:s') : (string) $value;
     }
 
     public static function getLogUser(): string
