@@ -31,11 +31,6 @@
             "InterAdmin\\Models\\": "InterAdmin/Models/"
         }
     },
-    "autoload-dev": {
-        "classmap": [
-            "tests/TestCase.php"
-        ]
-    },
     "scripts": {
         "test": [
             "Composer\\Config::disableProcessTimeout",

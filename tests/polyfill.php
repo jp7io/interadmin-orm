@@ -5,13 +5,8 @@ use Illuminate\Cache\Repository;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /*
- * Minimal stand-ins for the Laravel services the ORM reaches for through global class names.
- *
- * The package always runs inside a real Laravel app in production; its own suite boots no
- * framework, so anything the ORM calls statically has to exist here or the tests cannot load.
- * Keep this list as small as the ORM's actual surface -- every entry added here is a Laravel
- * API the ORM depends on without declaring it, and therefore worth removing rather than
- * polyfilling.
+ * The Laravel services the legacy half reaches through global class names, declared for PHPStan's
+ * scanFiles (phpstan.neon). Nothing executes this file: the suite is two ratchets that boot nothing.
  */
 
 class Cache extends Illuminate\Support\Facades\Cache

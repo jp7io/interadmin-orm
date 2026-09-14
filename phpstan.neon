@@ -6,7 +6,7 @@ parameters:
     paths:
         - Jp7
     # Scanned, not executed: the ORM reaches Laravel through root-aliased facade names
-    # that only exist inside a booted app, and polyfill.php is where the suite declares them.
+    # that only exist inside a booted app, and polyfill.php declares them.
     scanFiles:
         - tests/polyfill.php
     treatPhpDocTypesAsCertain: false

@@ -46,9 +46,10 @@ $usedCeltas = Carro::where('modelo', 'Celta')
 ## Tests
 
 ```
-cp .env.example .env.testing
 composer test
 ```
+
+Two ratchets over `InterAdmin/Models`, with no database.
 
 ## Static analysis
 
