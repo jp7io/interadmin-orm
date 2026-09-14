@@ -47,6 +47,18 @@ final class RecordBuilder extends Builder
     }
 
     /**
+     * This query's keys as a subquery for whereIn(): the key column ALONE. select() would put the
+     * identity columns in front of it, and MySQL refuses an IN subquery of several columns.
+     */
+    public function keySubquery(): \Illuminate\Database\Query\Builder
+    {
+        $query = $this->toBase();
+        $query->columns = [$this->model->qualifyColumn($this->model->getKeyName())];
+
+        return $query;
+    }
+
+    /**
      * Soft, as the ORM's Query::delete() stamped `deleted_at`: a relation's or a query's delete()
      * was Eloquent's physical one. forceDelete() stays physical, as does Record::forceDelete().
      */

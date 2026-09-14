@@ -524,6 +524,31 @@ class Record extends Model implements RecordInterface
     private array $parentMemo = [];
 
     /**
+     * getParent() for many records at once, one query per parent type, as the ORM's collection
+     * registry eager-loaded `_parent`: a list drawing each row's parent then asks nothing per row.
+     * @param iterable<self> $records
+     */
+    public static function primeParents(iterable $records): void
+    {
+        $byType = [];
+        foreach ($records as $record) {
+            $record->loadAbsentParentColumns();
+            if ($record->parent_id && $record->parent_type_id) {
+                $byType[(int) $record->parent_type_id][(int) $record->parent_id][] = $record;
+            }
+        }
+
+        foreach ($byType as $typeId => $byId) {
+            $found = Type::find($typeId)?->records()->whereKey(array_keys($byId))->get()->keyBy('id');
+            foreach ($byId as $id => $children) {
+                foreach ($children as $record) {
+                    $record->parentMemo = [$record->parent_type_id.':'.$record->parent_id => $found?->get($id)];
+                }
+            }
+        }
+    }
+
+    /**
      * ⚠ A partial SELECT carries no parent columns -- GraphQL selects what a query names -- and the
      * ORM lazy-loaded an absent one where this reads null: `parent_id` would answer "no parent" and
      * `parent_type_id` would throw. Read from the row, as save() reads an absent `log`.

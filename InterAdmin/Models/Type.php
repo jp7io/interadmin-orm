@@ -184,7 +184,8 @@ class Type extends Model implements TypeInterface
      */
     private static function hydrateRow(array $attributes): self
     {
-        $template = new static;
+        // Reflection, not `new static`: PHPStan refuses that where a subclass redefines the constructor.
+        $template = (new ReflectionClass(static::class))->newInstance();
 
         return $template->newFromBuilder($attributes, $template->getConnection()->getName());
     }
@@ -214,6 +215,7 @@ class Type extends Model implements TypeInterface
     {
         $id = $this->getKey();
         TypeCache::forget(...array_map(fn (string $key) => $key.',,'.$id, self::DERIVED_KEYS));
+        TypeIndex::forget();
 
         if (!$this->exists || $this->wasRecentlyCreated || $this->wasChanged(self::CLASS_MAP_COLUMNS)) {
             RecordClassMap::getInstance()->clearCache();
@@ -257,6 +259,7 @@ class Type extends Model implements TypeInterface
         Record::forgetTypeDerivations();
         Record::forgetBoundClasses();
         TypeCache::forgetCheck();
+        TypeIndex::forgetMemo();
     }
 
     /**
@@ -657,7 +660,32 @@ class Type extends Model implements TypeInterface
     /** classes' Routable::getChildrenMenu(), which the ORM Type used. ⚠ Untyped: ci's Ci\Type overrides it. */
     public function getChildrenMenu()
     {
-        return $this->listedChildTypes()->where('menu', true)->get();
+        $ids = array_filter($this->listedChildIds(), fn (int $id) => (int) TypeIndex::row($id)['menu'] === 1);
+
+        return $this->newCollection(array_values(Type::prime($ids)));
+    }
+
+    /**
+     * listedChildTypes()->where(<type_id or id_slug>, $key)->first() off the type index: the id where
+     * $key is numeric, else the slug, compared case-blind as the column's collation compares it.
+     */
+    public function listedChild(string|int $key): ?self
+    {
+        foreach ($this->listedChildIds() as $id) {
+            if (is_numeric($key) ? $id === (int) $key : strcasecmp((string) TypeIndex::row($id)['id_slug'], (string) $key) === 0) {
+                return Type::find($id);
+            }
+        }
+
+        return null;
+    }
+
+    /** @return list<int> listedChildTypes()'s ids, in its order and under its published switch */
+    private function listedChildIds(): array
+    {
+        $key = $this->getKey();
+
+        return $key === null ? [] : TypeIndex::childIds((int) $key, Record::isPublishedFiltersEnabled());
     }
 
     /**
@@ -668,8 +696,17 @@ class Type extends Model implements TypeInterface
      */
     public function __call($method, $parameters)
     {
+        $childId = null;
+        if ($this->type_id) {
+            $slug = Str::snake($method, '-');
+            foreach ($this->listedChildIds() as $id) {
+                if (strcasecmp((string) TypeIndex::row($id)['id_slug'], $slug) === 0) {
+                    $childId = $id;
+                }
+            }
+        }
         /** @var self|null $child */
-        $child = $this->type_id ? $this->listedChildTypes()->where('id_slug', Str::snake($method, '-'))->orderBy('type_id')->get()->last() : null;
+        $child = $childId ? Type::find($childId) : null;
 
         return $child ? $child->records() : parent::__call($method, $parameters);
     }
@@ -682,13 +719,10 @@ class Type extends Model implements TypeInterface
      */
     public function getTypesUsingThisModel(): array
     {
-        $query = self::query()->where('model_type_id', $this->type_id)->orderBy('type_id');
-
-        if (Record::isPublishedFiltersEnabled()) {
-            $query->where('visible', 1)->whereNull('deleted_at');
-        }
-
-        $types = $query->get()->keyBy('type_id')->all();
+        // self::, forwarding the caller's class as the query this replaced did.
+        $types = $this->type_id
+            ? self::prime(TypeIndex::idsUsingModel((int) $this->type_id, Record::isPublishedFiltersEnabled()))
+            : [];
         $types[$this->type_id] = $this;
 
         return $types;
