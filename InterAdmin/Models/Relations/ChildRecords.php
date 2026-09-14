@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\UniqueConstraintViolationException;
 use InterAdmin\Models\Record;
 use InterAdmin\Models\Type;
 
@@ -48,13 +49,10 @@ class ChildRecords extends HasMany
         return $query->where($query->getModel()->getTable().'.parent_type_id', $this->parentTypeId);
     }
 
-    /**
-     * The ORM's `$record->child()->build()`: the child type's insert defaults, hanging off this parent.
-     * ⚠ The parent's columns WIN, as on the ORM and on Eloquent: a posted `parent_id` re-parented the row.
-     */
+    /** The ORM's `$record->child()->build()`: the child's insert defaults, then its form fields filled. */
     public function make(array $attributes = [])
     {
-        return $this->childType->buildRecord(array_merge($attributes, $this->parentColumns()));
+        return $this->build([])->fill($attributes);
     }
 
     /**
@@ -69,10 +67,38 @@ class ChildRecords extends HasMany
         });
     }
 
-    /** ⚠ Eloquent's own bypasses make() as well, building the new row with fill(). */
+    /** The explicit name forces what it is given; the parent's columns still win. */
+    public function forceCreate(array $attributes = [])
+    {
+        return tap($this->build($attributes), function (Record $record) {
+            $record->save();
+            $this->applyInverseRelationToModel($record);
+        });
+    }
+
+    /** ⚠ Eloquent's own bypasses make(), filling the keys too: here they are FORCED, the values filled. */
     public function firstOrNew(array $attributes = [], Closure|array $values = [])
     {
-        return $this->where($attributes)->first() ?? $this->make(array_merge($attributes, value($values)));
+        return $this->where($attributes)->first() ?? $this->build($attributes)->fill(value($values));
+    }
+
+    /** Where firstOrCreate() and updateOrCreate() create. */
+    public function createOrFirst(array $attributes = [], Closure|array $values = [])
+    {
+        try {
+            return $this->getQuery()->withSavepointIfNeeded(fn () => tap($this->build($attributes)->fill(value($values)), function (Record $record) {
+                $record->save();
+                $this->applyInverseRelationToModel($record);
+            }));
+        } catch (UniqueConstraintViolationException $e) {
+            return $this->useWritePdo()->where($attributes)->first() ?? throw $e;
+        }
+    }
+
+    /** ⚠ The parent's columns WIN, as on the ORM and on Eloquent: a posted `parent_id` re-parented the row. */
+    private function build(array $forced): Record
+    {
+        return $this->childType->buildRecord(array_merge($forced, $this->parentColumns()));
     }
 
     protected function setForeignAttributesForCreate(Model $model)

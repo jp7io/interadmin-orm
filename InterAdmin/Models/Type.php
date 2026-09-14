@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use InterAdmin\Models\Relations\TypeRecords;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
@@ -535,7 +536,7 @@ class Type extends Model implements TypeInterface
     {
         $instance = $this->recordTemplate();
 
-        return new HasMany($instance->newQuery(), $this, $instance->getTable().'.type_id', $this->getKeyName());
+        return new TypeRecords($instance->newQuery(), $this, $instance->getTable().'.type_id', $this->getKeyName());
     }
 
     /**

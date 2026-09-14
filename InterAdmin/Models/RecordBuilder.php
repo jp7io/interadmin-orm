@@ -4,6 +4,7 @@ namespace InterAdmin\Models;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 /**
  * The Eloquent builder every record query is, for the lookups the ORM answered its own way.
@@ -35,36 +36,52 @@ final class RecordBuilder extends Builder
         return $this->toBase()->update(['deleted_at' => $this->model->freshTimestampString()]);
     }
 
+    /** Laravel's name keeps Laravel's meaning: the caller's array FILLS, i.e. the type's form fields alone. */
     public function make(array $attributes = [])
     {
-        return $this->newRecord($attributes);
+        return $this->newRecord([], $attributes);
     }
 
     public function create(array $attributes = [])
     {
-        return tap($this->newRecord($attributes), fn (Record $record) => $record->save());
+        return tap($this->newRecord([], $attributes), fn (Record $record) => $record->save());
     }
 
+    /** The lookup keys are FORCED and the values FILLED: a key that is no form field still lands. */
     public function firstOrNew(array $attributes = [], Closure|array $values = [])
     {
-        return $this->where($attributes)->first() ?? $this->newRecord(array_merge($attributes, value($values)));
+        return $this->where($attributes)->first() ?? $this->newRecord($attributes, value($values));
+    }
+
+    /** Where firstOrCreate() and updateOrCreate() create, and Eloquent's own would fill the keys too. */
+    public function createOrFirst(array $attributes = [], Closure|array $values = [])
+    {
+        try {
+            return $this->withSavepointIfNeeded(
+                fn () => tap($this->newRecord($attributes, value($values)), fn (Record $record) => $record->save())
+            );
+        } catch (UniqueConstraintViolationException $e) {
+            return $this->useWritePdo()->where($attributes)->first() ?? throw $e;
+        }
     }
 
     /**
-     * The ORM's build(), which its create() and firstOrNew() stood on: the type's insert defaults
-     * under $attributes, the type read as Record::typeId() reads it. ⚠ Not newModelInstance(): it
-     * fill()s a model with no $fillable, which throws, and hydrate() calls it for every query.
+     * The ORM's build(), which its create() and firstOrNew() stood on: the type's insert defaults,
+     * $forced over them and $filled through its form fields, the type read as Record::typeId() reads
+     * it. ⚠ Not newModelInstance(): it fill()s before the type is known, and a model with no type has
+     * no $fillable, so any attribute throws; hydrate() calls it for every query.
      */
-    private function newRecord(array $attributes): Record
+    private function newRecord(array $forced, array $filled): Record
     {
         $typeId = (int) ($this->model->getAttributes()['type_id'] ?? 0) ?: $this->model::boundTypeId();
         $type = $typeId ? Type::find($typeId) : null;
 
         if (!$type) {
-            return $this->newModelInstance($attributes);
+            return $this->newModelInstance()->forceFill($forced)->fill($filled);
         }
 
-        return $type->buildRecord(array_merge($this->pendingAttributes, $attributes))
-            ->setConnection($this->model->getConnectionName());
+        return $type->buildRecord(array_merge($this->pendingAttributes, $forced))
+            ->setConnection($this->model->getConnectionName())
+            ->fill($filled);
     }
 }
