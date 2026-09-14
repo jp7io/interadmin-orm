@@ -111,6 +111,9 @@ class Type extends Model implements TypeInterface
     /** The record records() is scoped to, set by setParent(). Never the parent TYPE. */
     private ?Record $parentRecord = null;
 
+    /** @var list<string>|null getComboFieldNames(), which a select asks once per OPTION: a type-tag read each */
+    private ?array $comboFieldNames = null;
+
     /** @var array<string, ?static> The request-scoped identity map find() answers from. */
     private static array $instances = [];
 
@@ -214,6 +217,7 @@ class Type extends Model implements TypeInterface
     private function forgetCached(): void
     {
         $id = $this->getKey();
+        $this->comboFieldNames = null;
         TypeCache::forget(...array_map(fn (string $key) => $key.',,'.$id, self::DERIVED_KEYS));
         TypeIndex::forget();
 
@@ -1277,7 +1281,7 @@ class Type extends Model implements TypeInterface
      */
     public function getComboFieldNames(): array
     {
-        return array_keys(array_filter(
+        return $this->comboFieldNames ??= array_keys(array_filter(
             $this->fieldDefinitions(),
             fn (array $row) => (bool) $row['combo'] || $row['type'] === 'varchar_key'
         ));

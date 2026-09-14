@@ -29,6 +29,15 @@ final class RecordBuilder extends Builder
     }
 
     /**
+     * The builder's own hydrate(). Eloquent's asks the MODEL, which has none: that lands in
+     * Record::__call(), a relationship lookup and a second builder, once per query.
+     */
+    public function getModels($columns = ['*'])
+    {
+        return $this->hydrate($this->query->get($columns)->all())->all();
+    }
+
+    /**
      * ⚠ The KEY without a model per value: an incrementing key counts as a cast, so Eloquent's
      * pluck('id') hydrated every row to read it back as an int -- 32,333 models on one page.
      */
