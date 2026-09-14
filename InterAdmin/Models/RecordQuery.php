@@ -375,12 +375,16 @@ final class RecordQuery extends Builder
      */
     private function relationPath($path): ?array
     {
-        if (!$this->record || !is_string($path) || !preg_match('/^(\w+)\.(\w+)$/', $path, $match)) {
+        // ⚠ A column qualified by the record's OWN table is no path, and the bound-type scope sends
+        // one on every query: read as a path, it built the type's relationship map to answer no.
+        if (!$this->record || !is_string($path) || !preg_match('/^(\w+)\.(\w+)$/', $path, $match)
+            || ($match[1] === $this->record->getTable() && in_array($match[2], $this->record->getColumns(), true))) {
             return null;
         }
 
         // ⚠ A static call's template carries no type_id: its type is the bound class's, as in runSelect().
-        $type = Type::find((int) $this->record->type_id ?: (int) $this->record::boundTypeId());
+        // Read RAW: the magic read of an absent key asks isRelation(), which builds that same map.
+        $type = Type::find((int) ($this->record->getAttributes()['type_id'] ?? 0) ?: (int) $this->record::boundTypeId());
         $definitions = $type?->fieldDefinitions() ?? [];
         $column = $this->record->aliasToColumn($match[1]);
         // Or the RELATION's name, as graphql's FilterJSON and the ORM's joins spell it: `evento.nome`.

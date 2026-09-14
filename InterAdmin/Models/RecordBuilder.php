@@ -5,6 +5,7 @@ namespace InterAdmin\Models;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Str;
 
 /**
  * The Eloquent builder every record query is, for the lookups the ORM answered its own way.
@@ -25,6 +26,24 @@ final class RecordBuilder extends Builder
         }
 
         return parent::find($id, $columns);
+    }
+
+    /**
+     * ⚠ The KEY without a model per value: an incrementing key counts as a cast, so Eloquent's
+     * pluck('id') hydrated every row to read it back as an int -- 32,333 models on one page.
+     */
+    public function pluck($column, $key = null)
+    {
+        $name = is_string($column) ? Str::after($column, $this->model->getTable().'.') : null;
+
+        if ($name !== $this->model->getKeyName() || $this->model->getKeyType() !== 'int'
+            || $this->model->hasAnyGetMutator($name)) {
+            return parent::pluck($column, $key);
+        }
+
+        return $this->applyAfterQueryCallbacks(
+            $this->toBase()->pluck($column, $key)->map(fn ($id) => $id === null ? null : (int) $id)
+        );
     }
 
     /**

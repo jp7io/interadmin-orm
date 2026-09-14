@@ -177,10 +177,14 @@ class Type extends Model implements TypeInterface
         return $type;
     }
 
-    /** As a query hydrates, bound class included. @param array<string, mixed> $attributes */
+    /**
+     * As a query hydrates, bound class included, off the blank instance a query would hold:
+     * building the query itself per cached row cost more than the hydration.
+     * @param array<string, mixed> $attributes
+     */
     private static function hydrateRow(array $attributes): self
     {
-        $template = static::query()->getModel();
+        $template = new static;
 
         return $template->newFromBuilder($attributes, $template->getConnection()->getName());
     }

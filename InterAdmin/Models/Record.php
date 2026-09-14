@@ -91,7 +91,7 @@ class Record extends Model implements RecordInterface
      * The other direction, per CLASS: what `Ci\Loja::where()` has to scope to.
      * @var array<class-string, ?int>
      */
-    private static array $boundTypeIds = [];
+    protected static array $boundTypeIds = [];
 
     /** The bound type's own records table, so a custom-table class does not query `records`. */
     private static array $boundTables = [];
@@ -201,6 +201,7 @@ class Record extends Model implements RecordInterface
         self::$aliasesByType = [];
         self::$relationsByType = [];
         self::$childrenByType = [];
+        self::$columnsByTable = [];
     }
 
     /** ⚠ Guards the falsy id only: Type::find() is the identity map, memoised nulls included. */
@@ -509,8 +510,18 @@ class Record extends Model implements RecordInterface
             throw new RuntimeException('Field parent_type_id is required. Id: '.$this->id);
         }
 
-        return Type::find($this->parent_type_id)?->records()->find($this->parent_id);
+        // Memoised as the ORM's `_parent` was, keyed by the pair so a moved record asks again:
+        // one row of ci-intranet's downloads list asked four times.
+        $key = $this->parent_type_id.':'.$this->parent_id;
+        if (!array_key_exists($key, $this->parentMemo)) {
+            $this->parentMemo = [$key => Type::find($this->parent_type_id)?->records()->find($this->parent_id)];
+        }
+
+        return $this->parentMemo[$key];
     }
+
+    /** @var array<string, ?self> what getParent() found, under the parent_type_id:parent_id it read */
+    private array $parentMemo = [];
 
     /**
      * ⚠ A partial SELECT carries no parent columns -- GraphQL selects what a query names -- and the
@@ -571,20 +582,30 @@ class Record extends Model implements RecordInterface
     public function getColumns(): array
     {
         $table = $this->getTableName();
+
+        // Per process too: every partial SELECT asks, and each ask was a cache FILE read.
+        if (isset(self::$columnsByTable[$table])) {
+            return self::$columnsByTable[$table];
+        }
+
         $key = 'columns,,'.$table;
 
         if ($columns = Cache::get($key)) {
-            return $columns;
+            return self::$columnsByTable[$table] = $columns;
         }
 
         $columns = $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
 
         if ($columns) {
             Cache::put($key, $columns, Type::CACHE_TTL);
+            self::$columnsByTable[$table] = $columns;
         }
 
         return $columns;
     }
+
+    /** @var array<string, array<int, string>> getColumns() per prefixed table, never an empty one */
+    private static array $columnsByTable = [];
 
     /** Column types whose empty value is 0 rather than '', as RecordAbstract has them. */
     private const NUMERIC_TYPES = ['tinyint', 'smallint', 'mediumint', 'int', 'integer', 'bigint',
