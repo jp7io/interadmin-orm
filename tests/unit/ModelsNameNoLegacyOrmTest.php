@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
-/** The legacy half stays out of InterAdmin\Models before round 3 deletes it and after: its 24 classes by NAME, never by file. */
+/** The deleted legacy half stays out of InterAdmin\Models: its 24 classes by NAME, never by file. */
 class ModelsNameNoLegacyOrmTest extends PHPUnitTestCase
 {
     private const LEGACY = [
@@ -35,7 +35,7 @@ class ModelsNameNoLegacyOrmTest extends PHPUnitTestCase
             'The scan misreads a planted reference, so it proves nothing.'
         );
         $this->assertNotSame([], glob($root.'/*.php'), 'The scan found no models, so it proves nothing.');
-        $this->assertSame([], $found, "The models name the legacy half, which round 3 deletes:\n".implode("\n", $found));
+        $this->assertSame([], $found, "The models name the legacy half, deleted in round 3:\n".implode("\n", $found));
     }
 
     /** @return list<array{int, string}> each qualified name that resolves to one of the 24, case-blind as PHP is */

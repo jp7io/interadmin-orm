@@ -11,23 +11,13 @@
     ],
     "require": {
         "php": "^8.5",
-        "doctrine/sql-formatter": "^1.5",
         "jp7io/classes": "dev-eloquent-2026 as dev-main"
     },
     "require-dev": {
-        "illuminate/support": "^13.0",
-        "illuminate/database": "^13.0",
-        "illuminate/cache": "^13.0",
-        "illuminate/config": "^13.0",
-        "illuminate/pagination": "^13.0",
-        "symfony/var-dumper": "^8.1",
-        "phpunit/phpunit": "^12.5",
-        "phpstan/phpstan": "^2.2",
-        "vlucas/phpdotenv": "^5.6"
+        "phpunit/phpunit": "^12.5"
     },
     "autoload": {
         "psr-4": {
-            "Jp7\\InterAdmin\\": "Jp7/InterAdmin/",
             "InterAdmin\\Models\\": "InterAdmin/Models/"
         }
     },
@@ -35,10 +25,6 @@
         "test": [
             "Composer\\Config::disableProcessTimeout",
             "vendor/bin/phpunit"
-        ],
-        "analyse": [
-            "Composer\\Config::disableProcessTimeout",
-            "vendor/bin/phpstan analyse --memory-limit=1G"
         ]
     },
     "config": {

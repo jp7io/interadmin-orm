@@ -1,3 +1,10 @@
+## Unreleased
+* Removed the legacy `Jp7\InterAdmin` half, its 24 classes and its `Jp7\InterAdmin\` psr-4 entry: `InterAdmin\Models` is the ORM.
+* Breaking changes:
+  * What survived lives in jp7io/classes, on the same prefix: `Schema\DynamicLoader`, `Schema\RecordClassMap` and `Schema\TypeClassMap`, and `Schema\FieldDefinitions`, `Schema\ChildDeclarations` and `Schema\PublishedFilterSql` in place of `FieldUtil`, `ChildUtil` and `PublishedFilter`.
+  * `doctrine/sql-formatter` is no longer required: the legacy query dumper was its only user.
+  * The package keeps no PHPStan of its own; the admin's `composer analyse` covers `InterAdmin/Models`.
+
 ## 4.0
 * Removed the pre-namespace shim: `InterAdmin`, `InterAdminTipo`, `InterAdminArquivo`, `InterAdminArquivoBanco` and `InterAdminAbstract`, with the `legacy` classmap entry and DynamicLoader's `X_Record -> X_InterAdmin` name bridge.
 * Breaking changes:

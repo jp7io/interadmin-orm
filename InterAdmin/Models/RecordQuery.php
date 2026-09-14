@@ -6,12 +6,8 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Query\Builder;
 use Jp7\InterAdmin\Schema\FieldDefinitions;
 
-/**
- * What Jp7\InterAdmin\Query does to a record query before it runs, on Eloquent's builder: the
- * alias layer, and the identity columns a partial SELECT keeps.
- * ⚠ The column is parameter 0 of every method below, which is what makes them the set. One that
- * is missing compiles the alias as a column name -- a 42S22, not a wrong answer.
- */
+/** A record query's alias layer on Eloquent's builder. ⚠ Every builder method taking a column as
+ *  parameter 0 is overridden below; one left out compiles the alias as a column name, a 42S22. */
 final class RecordQuery extends Builder
 {
     /**

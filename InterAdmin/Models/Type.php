@@ -998,7 +998,7 @@ class Type extends Model implements TypeInterface
 
     /**
      * What the FIELD LAYER reads: fieldDefinitions() with a `select_`'s `name` resolved to its type,
-     * the shape Jp7\InterAdmin\Type::getFields() answers. ⚠ A type that is gone resolves to a blank
+     * the shape Field\TypeInterface::getFields() promises. ⚠ A type that is gone resolves to a blank
      * one carrying its id, as getInstance() had it: a null there is a select that throws on render.
      * @return array<string, array<string, mixed>>
      */

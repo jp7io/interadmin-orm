@@ -564,9 +564,8 @@ class Record extends Model implements RecordInterface
     }
 
     /**
-     * ⚠ Shares the ORM's cache KEY rather than opening a second one over the same question --
-     * `columns,<db>,<prefixed table>`, and an empty listing is never cached, both being
-     * RecordAbstract::getColumns()'s rules and its reasons.
+     * ⚠ An empty listing is never cached: one taken before the table exists would outlive its
+     * creation by the TTL, and every query built off it would lose its columns.
      * @return array<int, string>
      */
     public function getColumns(): array
@@ -704,9 +703,8 @@ class Record extends Model implements RecordInterface
     }
 
     /**
-     * ⚠ Through the ELOQUENT Type: the ORM's setParent() hints RecordAbstract, so it cannot take
-     * an Eloquent record at all. ⚠ Each a CLONE: find() hands out the identity map's instance, and
-     * the ORM's getInstance() built a fresh one, so its scope never outlived the call.
+     * ⚠ Each a CLONE: find() hands out the identity map's instance, and a setParent() on that one
+     * would scope every later records() of the type.
      * @return Type[] each already scoped to this record, which is what records() reads
      */
     public function getChildrenTypes(): array
@@ -1122,11 +1120,10 @@ class Record extends Model implements RecordInterface
 
     public function getAttribute($key)
     {
-        // A present column, then a get<Key>Attribute mutator, then the alias map: the order
-        // Jp7\InterAdmin\Record::&__get() resolves in. The first two arms are not defensive --
-        // a tenant may alias one column to ANOTHER column's name, so translating before looking
-        // would answer the wrong slot, and a mutator named for the alias has to win or defining
-        // one silently stops it being called.
+        // A present column, then a get<Key>Attribute mutator, then the alias map, the ORM's order.
+        // The first two arms are not defensive -- a tenant may alias one column to ANOTHER
+        // column's name, so translating before looking would answer the wrong slot, and a mutator
+        // named for the alias has to win or defining one silently stops it being called.
         $column = array_key_exists($key, $this->attributes) || $this->hasFieldMutator('get', $key)
             ? $key
             : $this->aliasToColumn($key);
@@ -1148,11 +1145,10 @@ class Record extends Model implements RecordInterface
 
     public function setAttribute($key, $value)
     {
-        // ⚠ ASYMMETRIC WITH THE READ PATH, and mirrored rather than corrected.
-        // Jp7\InterAdmin\Record::__set() checks the mutator and then the ALIAS, with no
-        // "is this already a column" arm, so where a tenant aliases one column to another
-        // column's name the ORM READS the column and WRITES the alias's slot. Step 1 is parity;
-        // RecordAliasParityTest pins the asymmetry so closing it is a deliberate later change.
+        // ⚠ ASYMMETRIC WITH THE READ PATH, mirroring the ORM rather than correcting it: the
+        // mutator, then the ALIAS, with no "is this already a column" arm, so where a tenant
+        // aliases one column to another column's name a record READS the column and WRITES the
+        // alias's slot. RecordAliasParityTest pins it, so closing it is a deliberate change.
         if ($this->hasFieldMutator('set', $key)) {
             return parent::setAttribute($key, $value);
         }
@@ -1243,9 +1239,9 @@ class Record extends Model implements RecordInterface
     }
 
     /**
-     * ⚠ A field relationship or declared child answers BEFORE a real method of that name, the order
-     * Jp7\InterAdmin\Record::&__get() reads in, which never calls one: InterMail renders its
-     * `special_variation` through the static Email::variation, and Eloquent called that as the relation.
+     * ⚠ A field relationship or declared child answers BEFORE a real method of that name, as the
+     * ORM's read did: InterMail renders its `special_variation` through the static
+     * Email::variation, and Eloquent called that as the relation.
      */
     protected function getRelationshipFromMethod($method)
     {

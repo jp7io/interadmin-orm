@@ -12,9 +12,4 @@
             <directory>tests/unit</directory>
         </testsuite>
     </testsuites>
-    <source>
-        <include>
-            <directory>Jp7/InterAdmin</directory>
-        </include>
-    </source>
 </phpunit>
