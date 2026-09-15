@@ -588,8 +588,10 @@ class Type extends Model implements TypeInterface
     {
         $record = $this->blankRecord();
 
+        // ⚠ setAttribute(), never `$record->{$visible}`: an alias named like a Model property
+        // (`visible`) IS that property from inside Type, and the flag never reached the row.
         if ($visible = $this->getFieldAliases()['bool_key'] ?? null) {
-            $record->{$visible} = true;
+            $record->setAttribute($visible, true);
         }
 
         $record->publish_at = date('c');
@@ -847,7 +849,7 @@ class Type extends Model implements TypeInterface
         $child = new self();
         $child->parent_type_id = $this->type_id;
         $child->model_type_id = $model;
-        $child->visible = true;
+        $child->setAttribute('visible', true); // `->visible` from inside Type is Eloquent's $visible property
 
         return $child;
     }

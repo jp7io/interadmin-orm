@@ -2,17 +2,27 @@
 
 namespace InterAdmin\Models\Concerns;
 
-/** ⚠ A form posts '' for an unset number, which strict mode refuses for an integer column: 0 is stored. */
+/** ⚠ Strict mode refuses '' for an integer column and null for a NOT NULL one: 0 is stored, as the legacy ORM did. */
 trait StoresEmptyNumbersAsZero
 {
     use ReadsSchemaColumns;
 
     public function setAttribute($key, $value)
     {
-        if ($value === '' && in_array($key, $this->getNumericColumns(), true)) {
+        if (($value === '' || $value === null) && $this->takesZeroFor($key, $value)) {
             $value = 0;
         }
 
         return parent::setAttribute($key, $value);
+    }
+
+    /** A form posts '' for an unset number and code passes null; a nullable column keeps its null. */
+    private function takesZeroFor(string $key, mixed $value): bool
+    {
+        if (!in_array($key, $this->getNumericColumns(), true)) {
+            return false;
+        }
+
+        return $value === '' || !in_array($key, $this->getNullableColumns(), true);
     }
 }
