@@ -161,21 +161,23 @@ class Type extends Model implements TypeInterface
     }
 
     /**
-     * The row through the type tag, which a miss never enters. ⚠ `self`, never `static`: a row
-     * hydrates as the class its type binds, a SIBLING of a tenant's Type (ci's users type, found
-     * through Ci\Type, is Ciintranet\UsuarioTipo), as the query path always answered it.
+     * The row through the type tag, and a miss as `false`: a stored id outlives its type (a user's
+     * favorites), and was asked again on every request. A save of that id forgets either.
+     * ⚠ `self`, never `static`: a row hydrates as the class its type binds, a SIBLING of a tenant's
+     * Type (ci's users type, found through Ci\Type, is Ciintranet\UsuarioTipo), as the query path always answered it.
      */
     private static function loadRow(mixed $id): ?self
     {
         $attributes = TypeCache::store()->get(self::ROW_KEY.$id);
+        if ($attributes === false) {
+            return null;
+        }
         if (is_array($attributes)) {
             return self::hydrateRow($attributes);
         }
 
         $type = static::query()->find($id);
-        if ($type) {
-            TypeCache::store()->put(self::ROW_KEY.$id, $type->getAttributes(), self::CACHE_TTL);
-        }
+        TypeCache::store()->put(self::ROW_KEY.$id, $type?->getAttributes() ?? false, self::CACHE_TTL);
 
         return $type;
     }
@@ -290,7 +292,7 @@ class Type extends Model implements TypeInterface
      * Loads many rows in ONE query, INTO the identity map, and hands them back keyed by id.
      * ⚠ A bulk load that skips the map is worse than no bulk load: the caller holds the rows
      * while every collaborator resolving the same type through find() queries it again -- 33
-     * extra on one ci search page, measured. Misses are remembered too, as find() does.
+     * extra on one ci search page, measured. Misses are remembered too, in the map and the tag, as find() does.
      * @param array<int, int|string> $ids
      * @return array<int, static>
      */
@@ -304,7 +306,9 @@ class Type extends Model implements TypeInterface
             $cached = TypeCache::store()->many(array_map(fn ($id) => self::ROW_KEY.$id, $wanted));
             foreach ($wanted as $id) {
                 $attributes = $cached[self::ROW_KEY.$id] ?? null;
-                if (is_array($attributes)) {
+                if ($attributes === false) {
+                    self::$instances[static::class.':'.$id] = null;
+                } elseif (is_array($attributes)) {
                     self::$instances[static::class.':'.$id] = self::hydrateRow($attributes);
                 } else {
                     $misses[] = $id;
@@ -318,6 +322,11 @@ class Type extends Model implements TypeInterface
             foreach (static::query()->whereKey($misses)->get() as $row) {
                 self::$instances[static::class.':'.$row->getKey()] = $row;
                 TypeCache::store()->put(self::ROW_KEY.$row->getKey(), $row->getAttributes(), self::CACHE_TTL);
+            }
+            foreach ($misses as $id) {
+                if (!isset(self::$instances[static::class.':'.$id])) {
+                    TypeCache::store()->put(self::ROW_KEY.$id, false, self::CACHE_TTL);
+                }
             }
         }
 
