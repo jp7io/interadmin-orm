@@ -5,6 +5,7 @@ namespace InterAdmin\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use InterAdmin\Models\Concerns\StoresEmptyNumbersAsZero;
 
 /**
  * One object in the media library: the bytes are addressed by this row's own id and extension,
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FileDatabase extends Model
 {
     use SoftDeletes;
+    use StoresEmptyNumbersAsZero;
 
     protected $table = 'files_database';
     protected $primaryKey = 'file_database_id';

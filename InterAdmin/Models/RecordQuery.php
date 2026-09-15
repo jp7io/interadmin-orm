@@ -7,8 +7,8 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Query\Builder;
 use Jp7\InterAdmin\Schema\FieldDefinitions;
 
-/** A record query's alias layer on Eloquent's builder. ⚠ Every builder method taking a column as
- *  parameter 0 is overridden below; one left out compiles the alias as a column name, a 42S22. */
+/** A record query's alias layer on Eloquent's builder. ⚠ Only the methods overridden below translate an
+ *  alias; the rest (`having`, `whereFullText`, `upsert`, ...) compile it as a column name, a 42S22. */
 final class RecordQuery extends Builder
 {
     /**

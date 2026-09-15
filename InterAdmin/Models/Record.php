@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use InterAdmin\Models\Relations\ChildRecords;
 use InterAdmin\Models\Relations\SelectMulti;
+use InterAdmin\Models\Concerns\ReadsSchemaColumns;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use InterAdmin\Models\Type;
@@ -53,6 +54,7 @@ use ReflectionClass;
  */
 class Record extends Model implements RecordInterface
 {
+    use ReadsSchemaColumns;
     use TryMethod;
 
     /** The global scope narrowing a bound class to its own type's rows. */
@@ -665,10 +667,6 @@ class Record extends Model implements RecordInterface
     /** @var array<string, array<int, string>> getColumns() per prefixed table, never an empty one */
     private static array $columnsByTable = [];
 
-    /** Column types whose empty value is 0 rather than '', as RecordAbstract has them. */
-    private const NUMERIC_TYPES = ['tinyint', 'smallint', 'mediumint', 'int', 'integer', 'bigint',
-        'decimal', 'numeric', 'float', 'double', 'year', 'bit'];
-
     /**
      * What these values go into the database as: _convertForDatabase() minus the two branches that
      * MEASURE as no-ops here, PDO already stringifying an object and no FileField being able to
@@ -730,55 +728,6 @@ class Record extends Model implements RecordInterface
         }
 
         return in_array($column, $this->getNumericColumns(), true) ? 0 : '';
-    }
-
-    /** @return array<int, string> */
-    public function getNullableColumns(): array
-    {
-        return $this->schemaColumns('nullable');
-    }
-
-    /** @return array<int, string> */
-    public function getNumericColumns(): array
-    {
-        return $this->schemaColumns('numeric');
-    }
-
-    /**
-     * ⚠ Shares the ORM's cache KEYS as getColumns() does, and unlike it caches an EMPTY answer:
-     * no nullable column is every table before increment 14, not a failed read. One schema read
-     * fills both entries, so the second list costs nothing.
-     *
-     * @return array<int, string>
-     */
-    private function schemaColumns(string $which): array
-    {
-        if (is_array($cached = Cache::get($which.',,'.$this->getTableName()))) {
-            return $cached;
-        }
-
-        $all = $this->getConnection()->getSchemaBuilder()->getColumns($this->getTable());
-
-        if (!$all) {
-            return [];
-        }
-
-        $lists = ['nullable' => [], 'numeric' => []];
-
-        foreach ($all as $column) {
-            if (!empty($column['nullable'])) {
-                $lists['nullable'][] = $column['name'];
-            }
-            if (in_array($column['type_name'] ?? '', self::NUMERIC_TYPES, true)) {
-                $lists['numeric'][] = $column['name'];
-            }
-        }
-
-        foreach ($lists as $name => $list) {
-            Cache::put($name.',,'.$this->getTableName(), $list, Type::CACHE_TTL);
-        }
-
-        return $lists[$which];
     }
 
     /**
