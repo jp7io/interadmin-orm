@@ -2,7 +2,7 @@
 
 namespace InterAdmin\Models\Concerns;
 
-/** ⚠ Strict mode refuses '' for an integer column and null for a NOT NULL one: 0 is stored, as the legacy ORM did. */
+/** ⚠ Strict mode refuses '' for an integer column and null for a NOT NULL one: 0 is stored; a nullable column keeps its null. */
 trait StoresEmptyNumbersAsZero
 {
     use ReadsSchemaColumns;
