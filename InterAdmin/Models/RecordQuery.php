@@ -2,6 +2,7 @@
 
 namespace InterAdmin\Models;
 
+use Closure;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Query\Builder;
 use Jp7\InterAdmin\Schema\FieldDefinitions;
@@ -20,6 +21,8 @@ final class RecordQuery extends Builder
     private ?Record $record = null;
 
     private bool $typeOrdered = false;
+
+    private bool $bareColumns = false;
 
     /** The record whose alias map and columns this query resolves against. */
     public function forRecord(Record $record): static
@@ -193,9 +196,37 @@ final class RecordQuery extends Builder
         return parent::groupBy(...array_map($this->columns(...), $groups));
     }
 
+    /** ⚠ The column ALONE: the value is the row's FIRST column, and the identity columns go first. */
     public function value($column)
     {
-        return parent::value($this->columns($column));
+        return $this->withBareColumns(fn () => parent::value($this->columns($column)));
+    }
+
+    public function soleValue($column)
+    {
+        return $this->withBareColumns(fn () => parent::soleValue($this->columns($column)));
+    }
+
+    private function withBareColumns(Closure $read): mixed
+    {
+        $this->bareColumns = true;
+
+        try {
+            return $read();
+        } finally {
+            $this->bareColumns = false;
+        }
+    }
+
+    /** ⚠ By ALIAS too: a base query's rows carry the column, and the last id was read off the alias. */
+    public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
+    {
+        return parent::orderedChunkById($count, $callback, $this->columns($column ?? $this->defaultKeyName()), $alias, $descending);
+    }
+
+    protected function orderedLazyById($chunkSize = 1000, $column = null, $alias = null, $descending = false)
+    {
+        return parent::orderedLazyById($chunkSize, $this->columns($column ?? $this->defaultKeyName()), $alias, $descending);
     }
 
     public function pluck($column, $key = null)
@@ -284,7 +315,7 @@ final class RecordQuery extends Builder
         return $this->record ? $this->record->valuesForDatabase($values) : $values;
     }
 
-    /** @return array<int, mixed> */
+    /** @return array<array-key, mixed> */
     private function selectList($columns): array
     {
         $columns = (array) $this->columns(is_array($columns) ? $this->nestedSelectsAsKeys($columns) : $columns);
@@ -292,7 +323,7 @@ final class RecordQuery extends Builder
         // ⚠ An aggregate keeps exactly what it asked for: an added column is not a convenience
         // there but an ONLY_FULL_GROUP_BY error, which is the rule the ORM applies too. `*` has
         // the identity already, and a column ahead of it is ERROR 1064.
-        if (in_array('*', $columns, true) || $this->selectsAnAggregate($columns)) {
+        if ($this->bareColumns || in_array('*', $columns, true) || $this->selectsAnAggregate($columns)) {
             return $columns;
         }
 
@@ -305,21 +336,35 @@ final class RecordQuery extends Builder
             array_intersect(self::IDENTITY, $this->record?->getColumns() ?? [])
         );
 
-        return array_values(array_unique(array_merge($identity, $columns)));
+        // ⚠ Never array_unique(): it casts every entry to a string, which a subquery or an Expression
+        // cannot be. A string key is a subquery's name, which select() reads off the key.
+        $list = array_values($identity);
+        foreach ($columns as $as => $column) {
+            if (is_string($as)) {
+                $list[$as] = $column;
+            } elseif (!in_array($column, $list, true)) {
+                $list[] = $column;
+            }
+        }
+
+        return $list;
     }
 
     /**
      * The ORM's nested `'<relation>' => [columns]` named what to eager-load, and no grammar takes an
      * array. A relation read loads its own rows here, so the entry becomes the KEY that read needs.
+     * Any other string key names a subquery, `select(['total' => $query])`, and stays.
      * @param  array<array-key, mixed>  $columns
-     * @return list<mixed>
+     * @return array<array-key, mixed>
      */
     private function nestedSelectsAsKeys(array $columns): array
     {
         $flat = [];
 
         foreach ($columns as $key => $column) {
-            if (!is_array($column)) {
+            if (is_string($key) && !is_array($column)) {
+                $flat[$key] = $column;
+            } elseif (!is_array($column)) {
                 $flat[] = $column;
             } elseif (is_string($key) && $this->record) {
                 foreach ([$key.'_id', $key.'_ids'] as $alias) {
