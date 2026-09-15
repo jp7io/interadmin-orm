@@ -1,9 +1,9 @@
 ## Unreleased
 * Faster than the legacy half on every request, measured page by page against it:
   * A type's list lookups (children, a child by slug, the types built on a model, menu children) read `InterAdmin\Models\TypeIndex`, ONE type-tag entry of every row's tree columns, which any type write forgets whole. Each was a query per call. `Type::listedChild()` answers `listedChildTypes()->where(<id or slug>)->first()` from it.
-  * `getParent()` is memoised per record, as the legacy `_parent` was, and `Record::primeParents()` loads a list's parents in one query per parent type.
+  * `getParent()` is memoised per record, as the legacy `_parent` was, and `Record::primeParents()` loads a list's parents in one query per parent type. A child list read off its parent, eager or not, hands each child that parent, as `deprecatedFind()` did, so a list drawing each row's URL asks nothing per row.
   * `RecordBuilder::keySubquery()` hands a query's keys to `whereIn()` as a subquery; `pluck()` of the key column builds no model per value.
-  * `getColumns()` is memoised per process, a cached row hydrates without building a query, and a column qualified by the record's own table is never read as a relation path.
+  * `getColumns()` is memoised per process, a cached row hydrates without building a query, and a column qualified by the record's own table, or by Laravel's self-join alias, is never read as a relation path: the alias names no table, so asking its columns went to `information_schema` on every request.
 * Removed the legacy `Jp7\InterAdmin` half, its 24 classes and its `Jp7\InterAdmin\` psr-4 entry: `InterAdmin\Models` is the ORM.
 * Breaking changes:
   * What survived lives in jp7io/classes, on the same prefix: `Schema\DynamicLoader`, `Schema\RecordClassMap` and `Schema\TypeClassMap`, and `Schema\FieldDefinitions`, `Schema\ChildDeclarations` and `Schema\PublishedFilterSql` in place of `FieldUtil`, `ChildUtil` and `PublishedFilter`.

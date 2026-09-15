@@ -23,6 +23,8 @@ class ChildRecords extends HasMany
     public function __construct(Builder $query, Model $parent, string $foreignKey, string $localKey, private Type $childType, private ?int $parentTypeId = null)
     {
         parent::__construct($query, $parent, $foreignKey, $localKey);
+
+        $this->query->afterQuery(fn ($records) => $this->applyInverseRelationToCollection($records));
     }
 
     public function addConstraints()
@@ -62,6 +64,21 @@ class ChildRecords extends HasMany
         $this->applyInverseRelationToModel($record);
 
         return $record;
+    }
+
+    /**
+     * ⚠ Always, where Laravel's waits for chaperone(): each child read off this parent is handed it,
+     * as the ORM's deprecatedFind() did, or every child's getUrl() asks for the parent again.
+     */
+    protected function applyInverseRelationToModel(Model $model, ?Model $parent = null)
+    {
+        $parent ??= $this->getParent();
+
+        if ($model instanceof Record && $parent instanceof Record) {
+            $model->rememberParent($parent);
+        }
+
+        return parent::applyInverseRelationToModel($model, $parent);
     }
 
     protected function setForeignAttributesForCreate(Model $model)

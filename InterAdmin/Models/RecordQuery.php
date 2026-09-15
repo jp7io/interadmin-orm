@@ -422,7 +422,10 @@ final class RecordQuery extends Builder
     {
         // ⚠ A column qualified by the record's OWN table is no path, and the bound-type scope sends
         // one on every query: read as a path, it built the type's relationship map to answer no.
+        // Nor is Laravel's self-join alias (getRelationCountHash()), a table getColumns() asked
+        // information_schema about on every request, its empty listing never being cached.
         if (!$this->record || !is_string($path) || !preg_match('/^(\w+)\.(\w+)$/', $path, $match)
+            || str_starts_with($match[1], 'laravel_reserved_')
             || ($match[1] === $this->record->getTable() && in_array($match[2], $this->record->getColumns(), true))) {
             return null;
         }

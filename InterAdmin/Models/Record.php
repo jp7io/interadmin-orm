@@ -572,6 +572,22 @@ class Record extends Model implements RecordInterface
     }
 
     /**
+     * getParent()'s answer from a caller already holding it, as the ORM's deprecatedFind() handed each
+     * child its `_parent`. Only for the pair this row names, read raw: a row an orWhere() let in hangs
+     * off another record, and a partial one is left for getParent() to complete.
+     */
+    public function rememberParent(self $parent): void
+    {
+        $row = $this->attributes;
+        $held = $parent->getAttributes();
+
+        if (isset($row['parent_id'], $row['parent_type_id'], $held['id'], $held['type_id'])
+            && (int) $row['parent_id'] === (int) $held['id'] && (int) $row['parent_type_id'] === (int) $held['type_id']) {
+            $this->parentMemo = [$this->parent_type_id.':'.$this->parent_id => $parent];
+        }
+    }
+
+    /**
      * ⚠ A partial SELECT carries no parent columns -- GraphQL selects what a query names -- and the
      * ORM lazy-loaded an absent one where this reads null: `parent_id` would answer "no parent" and
      * `parent_type_id` would throw. Read from the row, as save() reads an absent `log`.
