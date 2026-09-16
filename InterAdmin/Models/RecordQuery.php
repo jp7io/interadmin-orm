@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Query\Builder;
 use Jp7\InterAdmin\Schema\FieldDefinitions;
+use SortDirection;
 
 /** A record query's alias layer on Eloquent's builder. ⚠ Only the methods overridden below translate an
  *  alias; the rest (`having`, `whereFullText`, `upsert`, ...) compile it as a column name, a 42S22. */
@@ -168,12 +169,24 @@ final class RecordQuery extends Builder
     public function orderBy($column, ...$rest)
     {
         if ($path = $this->relationPath($column)) {
-            $direction = strtolower((string) ($rest[0] ?? 'asc')) === 'desc' ? 'desc' : 'asc';
-
-            return parent::orderByRaw($this->relationPathSql($path).' '.$direction);
+            return parent::orderByRaw($this->relationPathSql($path).' '.$this->sortDirection($rest[0] ?? 'asc'));
         }
 
         return parent::orderBy($this->columns($column), ...$rest);
+    }
+
+    /**
+     * ⚠ SortDirection is Laravel 13's own default for orderBy()'s second argument and a PURE enum:
+     * `(string)` on one is an Error, and its `name` is "Descending" rather than "desc". The parent
+     * reads it on a plain column; only this class's relation-path branch has to spell it out.
+     */
+    private function sortDirection(mixed $direction): string
+    {
+        if ($direction instanceof SortDirection) {
+            return $direction === SortDirection::Descending ? 'desc' : 'asc';
+        }
+
+        return strtolower((string) $direction) === 'desc' ? 'desc' : 'asc';
     }
 
     /**
