@@ -23,7 +23,7 @@ final class TypeIndex
     /** @return array<int, array<string, mixed>> */
     public static function rows(): array
     {
-        return self::$rows ??= TypeCache::store()->remember(self::KEY, TypeCache::TTL, fn () => self::load());
+        return self::$rows ??= TypeCache::store()->remember(self::KEY, TypeCache::TTL, fn (): array => self::load());
     }
 
     /** @return array<string, mixed>|null */
@@ -47,7 +47,7 @@ final class TypeIndex
 
         $ids = self::$children[$parentId] ?? [];
 
-        return $published ? array_values(array_filter($ids, fn (int $id) => self::isPublished(self::$rows[$id]))) : $ids;
+        return $published ? array_values(array_filter($ids, fn (int $id): bool => self::isPublished(self::$rows[$id]))) : $ids;
     }
 
     /**

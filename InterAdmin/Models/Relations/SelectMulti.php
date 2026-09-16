@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  */
 class SelectMulti extends Relation
 {
-    public function __construct(Builder $query, Model $parent, private string $foreignKey)
+    public function __construct(Builder $query, Model $parent, private readonly string $foreignKey)
     {
         parent::__construct($query, $parent);
     }
@@ -60,7 +60,7 @@ class SelectMulti extends Relation
         foreach ($models as $model) {
             $keys = $this->keysOf($model);
             $model->setRelation($relation, $results->filter(
-                fn (Model $related) => in_array($related->getKey(), $keys)
+                fn (Model $related): bool => in_array($related->getKey(), $keys)
             )->values());
         }
 

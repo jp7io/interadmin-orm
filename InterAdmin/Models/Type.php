@@ -220,7 +220,7 @@ class Type extends Model implements TypeInterface
     {
         $id = $this->getKey();
         $this->comboFieldNames = null;
-        TypeCache::forget(...array_map(fn (string $key) => $key.',,'.$id, self::DERIVED_KEYS));
+        TypeCache::forget(...array_map(fn (string $key): string => $key.',,'.$id, self::DERIVED_KEYS));
         TypeIndex::forget();
 
         if (!$this->exists || $this->wasRecentlyCreated || $this->wasChanged(self::CLASS_MAP_COLUMNS)) {
@@ -299,11 +299,11 @@ class Type extends Model implements TypeInterface
     public static function prime(array $ids): array
     {
         $ids = array_unique(array_filter($ids));
-        $wanted = array_filter($ids, fn ($id) => !array_key_exists(static::class.':'.$id, self::$instances));
+        $wanted = array_filter($ids, fn (int|string $id): bool => !array_key_exists(static::class.':'.$id, self::$instances));
 
         $misses = [];
         if ($wanted) {
-            $cached = TypeCache::store()->many(array_map(fn ($id) => self::ROW_KEY.$id, $wanted));
+            $cached = TypeCache::store()->many(array_map(fn ($id): string => self::ROW_KEY.$id, $wanted));
             foreach ($wanted as $id) {
                 $attributes = $cached[self::ROW_KEY.$id] ?? null;
                 if ($attributes === false) {
@@ -420,7 +420,7 @@ class Type extends Model implements TypeInterface
      */
     public static function numericColumns(): array
     {
-        return Cache::remember('numeric-columns,types', self::CACHE_TTL, function () {
+        return Cache::remember('numeric-columns,types', self::CACHE_TTL, function (): array {
             $numeric = [];
             foreach ((new self())->getConnection()->getSchemaBuilder()->getColumns('types') as $column) {
                 if (in_array($column['type_name'] ?? '', self::NUMERIC_TYPES, true)) {
@@ -655,7 +655,7 @@ class Type extends Model implements TypeInterface
     /** classes' Routable::getChildrenMenu(), which the ORM Type used. ⚠ Untyped: ci's Ci\Type overrides it. */
     public function getChildrenMenu()
     {
-        $ids = array_filter($this->listedChildIds(), fn (int $id) => (int) TypeIndex::row($id)['menu'] === 1);
+        $ids = array_filter($this->listedChildIds(), fn (int $id): bool => (int) TypeIndex::row($id)['menu'] === 1);
 
         return $this->newCollection(array_values(Type::prime($ids)));
     }
@@ -960,7 +960,7 @@ class Type extends Model implements TypeInterface
         return TypeCache::store()->remember(
             'order,,'.$this->type_id,
             self::CACHE_TTL,
-            fn () => $this->deriveRecordsOrder()
+            fn (): string => $this->deriveRecordsOrder()
         );
     }
 
@@ -1000,7 +1000,7 @@ class Type extends Model implements TypeInterface
         return TypeCache::store()->remember(
             'eloquent_field_definitions,,'.$this->type_id,
             self::CACHE_TTL,
-            fn () => $this->decodeFieldDefinitions()
+            fn (): array => $this->decodeFieldDefinitions()
         );
     }
 
@@ -1012,7 +1012,7 @@ class Type extends Model implements TypeInterface
         // for 4 of ci's 10,391 rows, the rest carrying a name_id or a label already.
         $aliases = FieldDefinitions::aliases(
             $rows,
-            fn ($typeId) => (string) Type::find($typeId)?->name
+            fn ($typeId): string => (string) Type::find($typeId)?->name
         );
 
         $definitions = [];
@@ -1038,7 +1038,7 @@ class Type extends Model implements TypeInterface
         $fields = $this->fieldDefinitions();
 
         foreach ($fields as $column => $row) {
-            if (strpos($column, 'select_') === 0 && $row['name'] != 'all') {
+            if (str_starts_with($column, 'select_') && $row['name'] != 'all') {
                 $fields[$column]['name'] = self::forFieldLayer($row['name']) ?? self::blank($row['name']);
             }
         }
@@ -1058,7 +1058,7 @@ class Type extends Model implements TypeInterface
         $order = $this->recordsOrder();
 
         // ⚠ beforeQuery() runs as the SQL compiles, AFTER runSelect() ordered a class that opts in.
-        $relation->getQuery()->getQuery()->beforeQuery(fn (RecordQuery $query) => $query->orderByType($order));
+        $relation->getQuery()->getQuery()->beforeQuery(fn (RecordQuery $query): \InterAdmin\Models\RecordQuery => $query->orderByType($order));
 
         return $relation;
     }
@@ -1165,7 +1165,7 @@ class Type extends Model implements TypeInterface
         foreach ($this->fieldDefinitions() as $column => $row) {
             $xtra = $row['xtra'] ?? '';
 
-            if (strpos($column, 'special_') === 0 && $xtra) {
+            if (str_starts_with($column, 'special_') && $xtra) {
                 $multi = in_array($xtra, FieldDefinitions::getSpecialMultiXtras(), true);
                 $specials[substr($row['name_id'], 0, $multi ? -4 : -3)] = [
                     'type_id' => null,
@@ -1203,7 +1203,7 @@ class Type extends Model implements TypeInterface
         $relationships = [];
 
         foreach ($this->fieldDefinitions() as $column => $row) {
-            $shape = strpos($column, 'select_') === 0
+            $shape = str_starts_with($column, 'select_')
                 ? $this->selectRelationship($column, $row)
                 : $this->specialRelationship($column, $row);
 
@@ -1220,7 +1220,7 @@ class Type extends Model implements TypeInterface
     {
         return [
             'type_id' => $this->selectTypeId($column),
-            'multi' => strpos($column, 'select_multi_') === 0,
+            'multi' => str_starts_with($column, 'select_multi_'),
             // The xtras under which the stored id is a TYPE's rather than a record's.
             'holds_type' => in_array($row['xtra'], FieldDefinitions::getSelectTypeXtras(), true),
         ];
@@ -1260,7 +1260,7 @@ class Type extends Model implements TypeInterface
      */
     public function childTypeIds(): array
     {
-        return array_map(fn (array $child) => (int) $child['type_id'], $this->childDeclarations());
+        return array_map(fn (array $child): int => (int) $child['type_id'], $this->childDeclarations());
     }
 
     /**
@@ -1272,7 +1272,7 @@ class Type extends Model implements TypeInterface
     {
         return $this->comboFieldNames ??= array_keys(array_filter(
             $this->fieldDefinitions(),
-            fn (array $row) => (bool) $row['combo'] || $row['type'] === 'varchar_key'
+            fn (array $row): bool => (bool) $row['combo'] || $row['type'] === 'varchar_key'
         ));
     }
 
@@ -1310,7 +1310,7 @@ class Type extends Model implements TypeInterface
         return TypeCache::store()->remember(
             'field_definitions_alias,,'.$this->type_id,
             self::CACHE_TTL,
-            fn () => $this->deriveFieldAliases()
+            fn (): array => $this->deriveFieldAliases()
         );
     }
 

@@ -440,7 +440,7 @@ class Record extends Model implements RecordInterface
      * ⚠ The alias layer reaches the QUERY from here, resolved LATE: this runs once per builder
      * while the map is read per clause, so a type set after newQuery() still translates.
      */
-    protected function newBaseQueryBuilder()
+    protected function newBaseQueryBuilder(): \InterAdmin\Models\RecordQuery
     {
         return (new RecordQuery($this->getConnection()))->forRecord($this);
     }
@@ -983,7 +983,7 @@ class Record extends Model implements RecordInterface
      * ⚠ A null is ON: ci's user classes declare a bare `public $timestamps;` from the ORM days, when
      * Laravel's logout set one and the ORM would have saved it as a column. Only false turns it off.
      */
-    public function usesTimestamps()
+    public function usesTimestamps(): bool
     {
         return $this->timestamps !== false && !static::isIgnoringTimestamps(static::class);
     }
@@ -1008,7 +1008,7 @@ class Record extends Model implements RecordInterface
             return $this->fillable;
         }
 
-        $form = array_filter($this->typeModel()?->fieldDefinitions() ?? [], fn (array $row) => (bool) $row['form']);
+        $form = array_filter($this->typeModel()?->fieldDefinitions() ?? [], fn (array $row): bool => (bool) $row['form']);
 
         return array_values(array_intersect_key($this->fieldAliases(), $form));
     }
@@ -1155,7 +1155,7 @@ class Record extends Model implements RecordInterface
      * with ArgumentCountError where every other unknown name answers null. A tenant aliases a
      * column to any word it likes, so the collision is data rather than a name to avoid here.
      */
-    public function isRelation($key)
+    public function isRelation($key): bool
     {
         return !static::isScopeMethodWithAttribute($key)
             && (parent::isRelation($key)
@@ -1213,14 +1213,14 @@ class Record extends Model implements RecordInterface
      * The ORM's increment(): the one column through the alias map, with no `updated_at`. Laravel
      * puts the name raw into `<name> + n` and into its original, so an alias there is a 42S22.
      */
-    protected function incrementOrDecrement($column, $amount, $extra, $method)
+    protected function incrementOrDecrement($column, $amount, $extra, $method): mixed
     {
         return $this->withoutTimestampsHere(fn () => parent::incrementOrDecrement(
             is_string($column) ? $this->aliasToColumn($column) : $column, $amount, $extra, $method
         ));
     }
 
-    protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
+    protected function incrementOrDecrementEach(array $columns, array $extra, string $method): mixed
     {
         $keys = array_map($this->aliasToColumn(...), array_keys($columns));
 
@@ -1293,7 +1293,7 @@ class Record extends Model implements RecordInterface
      */
     protected function getRelationshipFromMethod($method)
     {
-        $relation = Relation::withConstraintsForNestedRelation(fn () => $this->fieldRelation($method));
+        $relation = Relation::withConstraintsForNestedRelation(fn (): ?\Illuminate\Database\Eloquent\Relations\Relation => $this->fieldRelation($method));
 
         if (!$relation) {
             return parent::getRelationshipFromMethod($method);
@@ -1307,7 +1307,7 @@ class Record extends Model implements RecordInterface
      * getAliasedAttributes() and nothing else, and Eloquent's bag is where one lives now.
      * @return array<string, mixed>
      */
-    public function relationsToArray()
+    public function relationsToArray(): array
     {
         return [];
     }
@@ -1343,7 +1343,7 @@ class Record extends Model implements RecordInterface
         }
 
         return count($byType) === 1 || count(array_unique(array_map(
-            fn (self $model) => serialize([$model->fieldAliases(), $model->fieldRelationships(), $model->childTypeIdMap()]),
+            fn (self $model): string => serialize([$model->fieldAliases(), $model->fieldRelationships(), $model->childTypeIdMap()]),
             $byType
         ))) === 1;
     }

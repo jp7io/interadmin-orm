@@ -52,7 +52,7 @@ final class RecordBuilder extends Builder
         }
 
         return $this->applyAfterQueryCallbacks(
-            $this->toBase()->pluck($column, $key)->map(fn ($id) => $id === null ? null : (int) $id)
+            $this->toBase()->pluck($column, $key)->map(fn ($id): ?int => $id === null ? null : (int) $id)
         );
     }
 

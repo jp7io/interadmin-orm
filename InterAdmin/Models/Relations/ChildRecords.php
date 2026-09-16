@@ -20,14 +20,14 @@ class ChildRecords extends HasMany
 {
     use BuildsRecords;
 
-    public function __construct(Builder $query, Model $parent, string $foreignKey, string $localKey, private Type $childType, private ?int $parentTypeId = null)
+    public function __construct(Builder $query, Model $parent, string $foreignKey, string $localKey, private readonly Type $childType, private readonly ?int $parentTypeId = null)
     {
         parent::__construct($query, $parent, $foreignKey, $localKey);
 
         $this->query->afterQuery(fn ($records) => $this->applyInverseRelationToCollection($records));
     }
 
-    public function addConstraints()
+    public function addConstraints(): void
     {
         parent::addConstraints();
 
@@ -37,11 +37,11 @@ class ChildRecords extends HasMany
     }
 
     /** ⚠ Off the parents, never the blank Eloquent builds this on: its type is the bound class's. */
-    public function addEagerConstraints(array $models)
+    public function addEagerConstraints(array $models): void
     {
         parent::addEagerConstraints($models);
 
-        $types = array_unique(array_map(fn (Model $model) => (int) $model->getAttribute('type_id'), $models));
+        $types = array_unique(array_map(fn (Model $model): int => (int) $model->getAttribute('type_id'), $models));
         $this->query->whereIn($this->parentTypeColumn(), array_values($types));
     }
 
