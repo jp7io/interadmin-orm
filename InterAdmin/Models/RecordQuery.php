@@ -38,7 +38,7 @@ final class RecordQuery extends Builder
      * loses the translation without it while the rest of the clause keeps it. A nested closure
      * does not come through here -- Eloquent hands that one a builder of the model's own.
      */
-    public function newQuery()
+    public function newQuery(): \InterAdmin\Models\RecordQuery
     {
         $query = new static($this->connection, $this->grammar, $this->processor);
 
@@ -108,6 +108,7 @@ final class RecordQuery extends Builder
         return parent::addSelect($this->columns($column));
     }
 
+    /** ⚠ The one variadic left: Laravel's own where() branches on func_num_args() === 2. */
     public function where($column, ...$rest)
     {
         if ($path = $this->relationPath($column)) {
@@ -119,24 +120,24 @@ final class RecordQuery extends Builder
         return parent::where(is_array($column) ? $column : $this->columns($column), ...$rest);
     }
 
-    public function whereIn($column, ...$rest)
+    public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
-        return parent::whereIn($this->columns($column), ...$rest);
+        return parent::whereIn($this->columns($column), $values, $boolean, $not);
     }
 
-    public function whereNotIn($column, ...$rest)
+    public function whereNotIn($column, $values, $boolean = 'and')
     {
-        return parent::whereNotIn($this->columns($column), ...$rest);
+        return parent::whereNotIn($this->columns($column), $values, $boolean);
     }
 
-    public function whereNull($columns, ...$rest)
+    public function whereNull($columns, $boolean = 'and', $not = false)
     {
-        return parent::whereNull($this->columns($columns), ...$rest);
+        return parent::whereNull($this->columns($columns), $boolean, $not);
     }
 
-    public function whereNotNull($columns, ...$rest)
+    public function whereNotNull($columns, $boolean = 'and')
     {
-        return parent::whereNotNull($this->columns($columns), ...$rest);
+        return parent::whereNotNull($this->columns($columns), $boolean);
     }
 
     /** whereDate() and its four siblings: Laravel builds these without passing through where(). */
@@ -166,13 +167,13 @@ final class RecordQuery extends Builder
     }
 
     /** A `<select>.<column>` path sorts through the correlated subquery where() and orderByRaw() use. */
-    public function orderBy($column, ...$rest)
+    public function orderBy($column, $direction = 'asc')
     {
         if ($path = $this->relationPath($column)) {
-            return parent::orderByRaw($this->relationPathSql($path).' '.$this->sortDirection($rest[0] ?? 'asc'));
+            return parent::orderByRaw($this->relationPathSql($path).' '.$this->sortDirection($direction));
         }
 
-        return parent::orderBy($this->columns($column), ...$rest);
+        return parent::orderBy($this->columns($column), $direction);
     }
 
     /**
@@ -210,14 +211,14 @@ final class RecordQuery extends Builder
     }
 
     /** ⚠ The column ALONE: the value is the row's FIRST column, and the identity columns go first. */
-    public function value($column)
+    public function value($column): mixed
     {
-        return $this->withBareColumns(fn () => parent::value($this->columns($column)));
+        return $this->withBareColumns(fn (): mixed => parent::value($this->columns($column)));
     }
 
-    public function soleValue($column)
+    public function soleValue($column): mixed
     {
-        return $this->withBareColumns(fn () => parent::soleValue($this->columns($column)));
+        return $this->withBareColumns(fn (): mixed => parent::soleValue($this->columns($column)));
     }
 
     private function withBareColumns(Closure $read): mixed
