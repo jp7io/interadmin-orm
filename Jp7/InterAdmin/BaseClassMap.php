@@ -100,14 +100,22 @@ abstract class BaseClassMap
     public function getClassTypeId($class): int|string|false
     {
         $type_id = array_search($class, $this->getClasses());
-        if ($type_id === false && strpos($class, '\\') !== false) {
-            // Tenants with interadmin.psr-4=false bind types to underscore class
-            // names, but a legacy underscore->namespace bridge (class_alias) makes
-            // get_called_class() report the namespaced form (e.g. Ci\Loja instead
-            // of Ci_Loja). Fall back to the underscore key so static finders
-            // (::where/::find/::query/::orderBy) resolve for those aliased classes.
-            // Purely additive: only runs when the direct lookup already missed.
-            $type_id = array_search(str_replace('\\', '_', $class), $this->getClasses());
+        if ($type_id === false) {
+            // The map's spelling is the TENANT's and the caller's is its own app's, and the two
+            // disagree in BOTH directions. psr-4 off leaves the column's `Ci_Loja` in the map
+            // while the alias bridge makes get_called_class() report `Ci\Loja`; psr-4 on, or a
+            // tenant migrated to namespaced bindings, puts `Ci\Loja` in the map while ci's own
+            // code still names `Ci_Loja`. Each app holds the other's code, ci-intranet vendoring
+            // ci, so neither direction can be assumed away.
+            //
+            // ⚠ Without the underscore->namespaced arm, a tenant whose bindings have been
+            // migrated cannot resolve an underscore name at all: the lookup misses, DynamicLoader
+            // gets null from getCode() and declares nothing, and every static finder dies on null.
+            //
+            // Purely additive: it only runs when the direct lookup already returned false.
+            $type_id = array_search(strpos($class, '\\') !== false
+                ? str_replace('\\', '_', $class)
+                : str_replace('_', '\\', $class), $this->getClasses());
         }
         return $type_id;
     }
